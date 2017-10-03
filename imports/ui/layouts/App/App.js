@@ -12,10 +12,17 @@ import Navigation from '../../components/Navigation/Navigation';
 import Authenticated from '../../components/Authenticated/Authenticated';
 import Public from '../../components/Public/Public';
 import Index from '../../pages/Index/Index';
+
 import Documents from '../../pages/Documents/Documents';
 import NewDocument from '../../pages/NewDocument/NewDocument';
 import ViewDocument from '../../pages/ViewDocument/ViewDocument';
 import EditDocument from '../../pages/EditDocument/EditDocument';
+
+import Ingredients from '../../pages/Ingredients/Ingredients';
+import NewIngredient from '../../pages/NewIngredient/NewIngredient';
+// import ViewDocument from '../../pages/ViewDocument/ViewDocument';
+// import EditDocument from '../../pages/EditDocument/EditDocument';
+
 import Signup from '../../pages/Signup/Signup';
 import Login from '../../pages/Login/Login';
 import Logout from '../../pages/Logout/Logout';
@@ -52,6 +59,10 @@ const App = props => (
         <Authenticated exact path="/documents/new" component={NewDocument} {...props} />
         <Authenticated exact path="/documents/:_id" component={ViewDocument} {...props} />
         <Authenticated exact path="/documents/:_id/edit" component={EditDocument} {...props} />
+
+        <Authenticated exact path="/ingredients" component={Ingredients} {...props} />
+        <Authenticated exact path="/ingredients/new" component={NewIngredient} {...props} />
+
         <Authenticated exact path="/profile" component={Profile} {...props} />
         <Public path="/signup" component={Signup} {...props} />
         <Public path="/login" component={Login} {...props} />

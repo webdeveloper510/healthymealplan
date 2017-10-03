@@ -22,17 +22,19 @@ Ingredients.schema = new SimpleSchema({
     type: String,
     label: 'The title of the ingredient.',
   },
-  // type: {
-  //   type: String,
-  //   label: 'Type of the ingredient.',
-  // },
+
+  ingredientType: {
+    type: String,
+    label: 'Type _id of the ingredient.',
+    optional: true,
+  },
 
   subIngredients: {
     type: Array,
     label: 'Sub ingredients of this ingredient.',
     optional: true,
-
   },
+
   'subIngredients.$._id': {
     type: String,
     label: '_id of the sub ingredient.',
@@ -57,6 +59,7 @@ Ingredients.schema = new SimpleSchema({
   createdBy: {
     type: String,
     label: 'The userId of the creator.',
+
   },
   updatedAt: {
     type: String,

@@ -22,7 +22,7 @@ const PublicNavigation = () => (
     <Link to="/signup">
       <Button color="contrast">Sign up</Button>
     </Link>
-    <Link eventKey={2} to="/login">
+    <Link to="/login">
       <Button color="contrast">Login</Button>
     </Link>
   </div>
