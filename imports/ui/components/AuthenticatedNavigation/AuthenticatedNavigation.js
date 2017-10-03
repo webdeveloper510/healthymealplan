@@ -7,11 +7,11 @@ import { Meteor } from 'meteor/meteor';
 
 const AuthenticatedNavigation = ({ name, history }) => (
   <div>
-    <Nav>
+    {/* <Nav>
       <LinkContainer to="/documents">
         <NavItem eventKey={1} href="/documents">Documents</NavItem>
       </LinkContainer>
-    </Nav>
+    </Nav> */}
     <Nav pullRight>
       <NavDropdown eventKey={2} title={name} id="user-nav-dropdown">
         <LinkContainer to="/profile">

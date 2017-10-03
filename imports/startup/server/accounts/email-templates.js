@@ -4,8 +4,8 @@ import getPrivateFile from '../../../modules/server/get-private-file';
 import templateToHTML from '../../../modules/server/handlebars-email-to-html';
 import templateToText from '../../../modules/server/handlebars-email-to-text';
 
-const name = 'Application Name';
-const email = '<support@application.com>';
+const name = 'Healthy Meal Plan';
+const email = '<support@healthymealplan.ca>';
 const from = `${name} ${email}`;
 const emailTemplates = Accounts.emailTemplates;
 
@@ -20,7 +20,7 @@ emailTemplates.verifyEmail = {
     return templateToHTML(getPrivateFile('email-templates/verify-email.html'), {
       applicationName: name,
       firstName: user.profile.name.first,
-      verifyUrl: url.replace('#/', '')
+      verifyUrl: url.replace('#/', ''),
     });
   },
   text(user, url) {

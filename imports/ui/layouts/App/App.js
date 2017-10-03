@@ -1,4 +1,4 @@
-/* eslint-disable jsx-a11y/no-href*/
+/* eslint-disable jsx-a11y/no-href */
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -46,26 +46,24 @@ const App = props => (
     {!props.loading ? <div className="App">
       {props.userId && !props.emailVerified ? <Alert className="verify-email text-center"><p>Hey friend! Can you <strong>verify your email address</strong> ({props.emailAddress}) for us? <Button bsStyle="link" onClick={() => handleResendVerificationEmail(props.emailAddress)} href="#">Re-send verification email</Button></p></Alert> : ''}
       <Navigation {...props} />
-      <Grid>
-        <Switch>
-          <Route exact name="index" path="/" component={Index} />
-          <Authenticated exact path="/documents" component={Documents} {...props} />
-          <Authenticated exact path="/documents/new" component={NewDocument} {...props} />
-          <Authenticated exact path="/documents/:_id" component={ViewDocument} {...props} />
-          <Authenticated exact path="/documents/:_id/edit" component={EditDocument} {...props} />
-          <Authenticated exact path="/profile" component={Profile} {...props} />
-          <Public path="/signup" component={Signup} {...props} />
-          <Public path="/login" component={Login} {...props} />
-          <Route path="/logout" component={Logout} {...props} />
-          <Route name="verify-email" path="/verify-email/:token" component={VerifyEmail} />
-          <Route name="recover-password" path="/recover-password" component={RecoverPassword} />
-          <Route name="reset-password" path="/reset-password/:token" component={ResetPassword} />
-          <Route name="terms" path="/terms" component={Terms} />
-          <Route name="privacy" path="/privacy" component={Privacy} />
-          <Route name="examplePage" path="/example-page" component={ExamplePage} />
-          <Route component={NotFound} />
-        </Switch>
-      </Grid>
+      <Switch>
+        <Route exact name="index" path="/" component={Index} />
+        <Authenticated exact path="/documents" component={Documents} {...props} />
+        <Authenticated exact path="/documents/new" component={NewDocument} {...props} />
+        <Authenticated exact path="/documents/:_id" component={ViewDocument} {...props} />
+        <Authenticated exact path="/documents/:_id/edit" component={EditDocument} {...props} />
+        <Authenticated exact path="/profile" component={Profile} {...props} />
+        <Public path="/signup" component={Signup} {...props} />
+        <Public path="/login" component={Login} {...props} />
+        <Route path="/logout" component={Logout} {...props} />
+        <Route name="verify-email" path="/verify-email/:token" component={VerifyEmail} />
+        <Route name="recover-password" path="/recover-password" component={RecoverPassword} />
+        <Route name="reset-password" path="/reset-password/:token" component={ResetPassword} />
+        <Route name="terms" path="/terms" component={Terms} />
+        <Route name="privacy" path="/privacy" component={Privacy} />
+        <Route name="examplePage" path="/example-page" component={ExamplePage} />
+        <Route component={NotFound} />
+      </Switch>
       <Footer />
     </div> : ''}
   </Router>
