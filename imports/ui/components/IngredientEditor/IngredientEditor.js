@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import { FormGroup, ControlLabel } from 'react-bootstrap';
 import { Meteor } from 'meteor/meteor';
 import Button from 'material-ui/Button';
-
 import { Bert } from 'meteor/themeteorchef:bert';
 import validate from '../../../modules/validate';
 
@@ -54,23 +53,24 @@ class IngredientEditor extends React.Component {
 
   render() {
     const { ingredient } = this.props;
-    return (<form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
-      <FormGroup>
-        <ControlLabel>Title</ControlLabel>
-        <input
-          type="text"
-          className="form-control"
-          name="title"
-          ref={title => (this.title = title)}
-          defaultValue={ingredient && ingredient.title}
-          placeholder="Oh, The Places You'll Go!"
-        />
-      </FormGroup>
+    return (
+      <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
+        <FormGroup>
+          <ControlLabel>Title</ControlLabel>
+          <input
+            type="text"
+            className="form-control"
+            name="title"
+            ref={title => (this.title = title)}
+            defaultValue={ingredient && ingredient.title}
+            placeholder="Oh, The Places You'll Go!"
+          />
+        </FormGroup>
 
-      <Button type="submit" raised>
-        {ingredient && ingredient._id ? 'Save Changes' : 'Add Ingredient'}
-      </Button>
-    </form>);
+        <Button type="submit" raised>
+          {ingredient && ingredient._id ? 'Save Changes' : 'Add Ingredient'}
+        </Button>
+      </form>);
   }
 }
 

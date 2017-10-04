@@ -20,8 +20,8 @@ import EditDocument from '../../pages/EditDocument/EditDocument';
 
 import Ingredients from '../../pages/Ingredients/Ingredients';
 import NewIngredient from '../../pages/NewIngredient/NewIngredient';
-// import ViewDocument from '../../pages/ViewDocument/ViewDocument';
-// import EditDocument from '../../pages/EditDocument/EditDocument';
+import ViewIngredient from '../../pages/ViewIngredient/ViewIngredient';
+import EditIngredient from '../../pages/EditIngredient/EditIngredient';
 
 import Signup from '../../pages/Signup/Signup';
 import Login from '../../pages/Login/Login';
@@ -51,7 +51,8 @@ const handleResendVerificationEmail = (emailAddress) => {
 const App = props => (
   <Router>
     {!props.loading ? <div className="App">
-      {props.userId && !props.emailVerified ? <Alert className="verify-email text-center"><p>Hey friend! Can you <strong>verify your email address</strong> ({props.emailAddress}) for us? <Button bsStyle="link" onClick={() => handleResendVerificationEmail(props.emailAddress)} href="#">Re-send verification email</Button></p></Alert> : ''}
+      {/* Check email verification later */}
+      {/* {props.userId && !props.emailVerified ? <Alert className="verify-email text-center"><p>Hey friend! Can you <strong>verify your email address</strong> ({props.emailAddress}) for us? <Button bsStyle="link" onClick={() => handleResendVerificationEmail(props.emailAddress)} href="#">Re-send verification email</Button></p></Alert> : ''} */}
       <Navigation {...props} />
       <Switch>
         <Route exact name="index" path="/" component={Index} />
@@ -62,6 +63,13 @@ const App = props => (
 
         <Authenticated exact path="/ingredients" component={Ingredients} {...props} />
         <Authenticated exact path="/ingredients/new" component={NewIngredient} {...props} />
+        <Authenticated exact path="/ingredients/:_id" component={ViewIngredient} {...props} />
+        <Authenticated exact path="/ingredients/:_id/edit" component={EditIngredient} {...props} />
+
+        {/* 
+        <Authenticated exact path="/types" component={Types} {...props} />
+        <Authenticated exact path="/types/new" component={NewType} {...props} />
+        <Authenticated exact path="/types/:_id" component={ViewType} {...props} /> */}
 
         <Authenticated exact path="/profile" component={Profile} {...props} />
         <Public path="/signup" component={Signup} {...props} />
