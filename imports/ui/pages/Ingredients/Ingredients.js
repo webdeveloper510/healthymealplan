@@ -11,6 +11,7 @@ import Grid from 'material-ui/Grid';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 
 import IngredientsCollection from '../../../api/Ingredients/Ingredients';
+import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 import Loading from '../../components/Loading/Loading';
 
 // import './Ingredients.scss';
@@ -28,47 +29,51 @@ const handleRemove = (ingredientId) => {
 };
 
 const Ingredients = ({ loading, ingredients, match, history }) => (!loading ? (
-  <Grid container className="Documents" style={{ padding: '20px' }} spacing={8}>
-    <Grid item xs={12} className="page-header clearfix">
-      <h4 className="pull-left">Ingredients</h4>
-      <Link className="pull-right" to={`${match.url}/new`}><Button raised color="primary">Add Ingredient</Button></Link>
-    </Grid>
-    <Grid container style={{ padding: '20px' }}>
-      {ingredients.length ?
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Ingredient</TableCell>
+  <div>
+    <AuthenticatedSideNav history={history} />
 
-              <TableCell />
-              <TableCell />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {ingredients.map(({ _id, title }) => (
-              <TableRow key={_id}>
-                <TableCell>{title}</TableCell>
-                {/* <TableCell>{timeago(updatedAt)}</TableCell>
-            <TableCell>{monthDayYearAtTime(createdAt)}</TableCell> */}
-                <TableCell>
-                  <Button
-                    raised
-                    color="primary"
-                    onClick={() => history.push(`${match.url}/${_id}`)}
-                  >View</Button>
-                </TableCell>
-                <TableCell>
-                  <Button
-                    raised
-                    onClick={() => handleRemove(_id)}
-                  >Delete</Button>
-                </TableCell>
+    <Grid container className="SideContent" style={{ padding: '20px' }} spacing={8}>
+      <Grid item xs={12} className="page-header clearfix">
+        <h4 className="pull-left">Ingredients</h4>
+        <Link className="pull-right" to={`${match.url}/new`}><Button raised color="primary">Add Ingredient</Button></Link>
+      </Grid>
+      <Grid container style={{ padding: '20px' }}>
+        {ingredients.length ?
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Ingredient</TableCell>
+
+                <TableCell />
+                <TableCell />
               </TableRow>
-            ))}
-          </TableBody>
-        </Table> : <Alert bsStyle="warning">No Ingredients yet!</Alert>}
+            </TableHead>
+            <TableBody>
+              {ingredients.map(({ _id, title }) => (
+                <TableRow key={_id}>
+                  <TableCell>{title}</TableCell>
+                  {/* <TableCell>{timeago(updatedAt)}</TableCell>
+            <TableCell>{monthDayYearAtTime(createdAt)}</TableCell> */}
+                  <TableCell>
+                    <Button
+                      raised
+                      color="primary"
+                      onClick={() => history.push(`${match.url}/${_id}`)}
+                    >View</Button>
+                  </TableCell>
+                  <TableCell>
+                    <Button
+                      raised
+                      onClick={() => handleRemove(_id)}
+                    >Delete</Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table> : <Alert bsStyle="warning">No Ingredients yet!</Alert>}
+      </Grid>
     </Grid>
-  </Grid>
+  </div>
 ) : <Loading />);
 
 Ingredients.propTypes = {
