@@ -23,6 +23,11 @@ import NewIngredient from '../../pages/NewIngredient/NewIngredient';
 import ViewIngredient from '../../pages/ViewIngredient/ViewIngredient';
 import EditIngredient from '../../pages/EditIngredient/EditIngredient';
 
+import Types from '../../pages/Types/Types';
+import NewType from '../../pages/NewType/NewType';
+// import ViewType from '../../pages/ViewType/ViewType';
+// import EditType from '../../pages/EditType/EditType';
+
 import Signup from '../../pages/Signup/Signup';
 import Login from '../../pages/Login/Login';
 import Logout from '../../pages/Logout/Logout';
@@ -38,15 +43,15 @@ import ExamplePage from '../../pages/ExamplePage/ExamplePage';
 
 import './App.scss';
 
-const handleResendVerificationEmail = (emailAddress) => {
-  Meteor.call('users.sendVerificationEmail', (error) => {
-    if (error) {
-      Bert.alert(error.reason, 'danger');
-    } else {
-      Bert.alert(`Check ${emailAddress} for a verification link!`, 'success');
-    }
-  });
-};
+// const handleResendVerificationEmail = (emailAddress) => {
+//   Meteor.call('users.sendVerificationEmail', (error) => {
+//     if (error) {
+//       Bert.alert(error.reason, 'danger');
+//     } else {
+//       Bert.alert(`Check ${emailAddress} for a verification link!`, 'success');
+//     }
+//   });
+// };
 
 const App = props => (
   <Router>
@@ -66,10 +71,10 @@ const App = props => (
         <Authenticated exact path="/ingredients/:_id" component={ViewIngredient} {...props} />
         <Authenticated exact path="/ingredients/:_id/edit" component={EditIngredient} {...props} />
 
-        {/* 
+
         <Authenticated exact path="/types" component={Types} {...props} />
         <Authenticated exact path="/types/new" component={NewType} {...props} />
-        <Authenticated exact path="/types/:_id" component={ViewType} {...props} /> */}
+        {/* <Authenticated exact path="/types/:_id" component={ViewType} {...props} /> */}
 
         <Authenticated exact path="/profile" component={Profile} {...props} />
         <Public path="/signup" component={Signup} {...props} />

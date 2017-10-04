@@ -8,6 +8,8 @@ import { createContainer } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
 import { Bert } from 'meteor/themeteorchef:bert';
 import Ingredients from '../../../api/Ingredients/Ingredients';
+import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
+
 import NotFound from '../NotFound/NotFound';
 import Loading from '../../components/Loading/Loading';
 
@@ -25,22 +27,25 @@ const handleRemove = (documentId, history) => {
 };
 
 const renderIngredient = (ingredient, match, history) => (ingredient ? (
-  <Grid container className="ViewDocument" spacing={8} style={{ padding: "20px" }}>
-    <Grid item xs={12} className="page-header clearfix">
-      <h4 className="pull-left">{ ingredient && ingredient.title }</h4>
-      <ButtonToolbar className="pull-right">
-        <ButtonGroup bsSize="small">
-          <Button onClick={() => history.push(`${match.url}/edit`)}>Edit</Button>
-          <Button onClick={() => handleRemove(ingredient._id, history)} className="text-danger">
+  <div>
+    <AuthenticatedSideNav history={history} />,
+    <Grid container className="ViewIngredient SideContent" spacing={8} style={{ padding: '20px' }}>
+      <Grid item xs={12} className="page-header clearfix">
+        <h4 className="pull-left">{ ingredient && ingredient.title }</h4>
+        <ButtonToolbar className="pull-right">
+          <ButtonGroup bsSize="small">
+            <Button onClick={() => history.push(`${match.url}/edit`)}>Edit</Button>
+            <Button onClick={() => handleRemove(ingredient._id, history)} className="text-danger">
             Delete
-          </Button>
-        </ButtonGroup>
-      </ButtonToolbar>
+            </Button>
+          </ButtonGroup>
+        </ButtonToolbar>
+      </Grid>
+      <Grid item xs={12}>
+        { ingredient && ingredient.title }
+      </Grid>
     </Grid>
-    <Grid item xs={12}>
-     { ingredient && ingredient.title }
-    </Grid>
-  </Grid>
+  </div>
 ) : <NotFound />);
 
 const ViewIngredient = ({ loading, ingredient, match, history }) => (

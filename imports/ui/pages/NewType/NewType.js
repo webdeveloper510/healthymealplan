@@ -8,27 +8,27 @@ import Typography from 'material-ui/Typography';
 import ArrowBack from 'material-ui-icons/ArrowBack';
 
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
-import IngredientEditor from '../../components/IngredientEditor/IngredientEditor';
+import TypeEditor from '../../components/TypeEditor/TypeEditor';
 
-const NewIngredient = ({ history }) => (
+const NewType = ({ history }) => (
   <div>
     <AuthenticatedSideNav history={history} />,
-    <Grid container className="NewIngredient SideContent" style={{ padding: '20px' }} spacing={8}>
+    <Grid container className="NewType SideContent" style={{ padding: '20px' }} spacing={8}>
       <Grid item xs={12} style={{ color: '#333333', padding: '20px' }}>
 
         <Link to="/ingredients/">
           <Typography type="subheading" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}><ArrowBack /> Ingredients</Typography>
         </Link>
 
-        <Typography type="headline">New Ingredient</Typography>
-        <IngredientEditor history={history} />
+        <Typography type="headline">New Type</Typography>
+        <TypeEditor history={history} />
       </Grid>
     </Grid>
   </div>
 );
 
-NewIngredient.propTypes = {
+NewType.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
-export default NewIngredient;
+export default NewType;

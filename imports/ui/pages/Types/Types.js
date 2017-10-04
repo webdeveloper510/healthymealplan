@@ -6,7 +6,6 @@ import { Alert } from 'react-bootstrap';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 import { Bert } from 'meteor/themeteorchef:bert';
-import { teal } from 'material-ui/colors';
 
 import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
@@ -15,7 +14,7 @@ import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 
-import IngredientsCollection from '../../../api/Ingredients/Ingredients';
+import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 import Loading from '../../components/Loading/Loading';
 
@@ -33,29 +32,29 @@ const handleRemove = (ingredientId) => {
   }
 };
 
-const Ingredients = ({ loading, ingredients, match, history }) => (!loading ? (
+const IngredientTypes = ({ loading, ingredients, match, history }) => (!loading ? (
   <div>
     <AuthenticatedSideNav history={history} />
 
     <Grid container className="SideContent" style={{ padding: '20px' }} spacing={8}>
       <Grid item xs={12} className="page-header clearfix">
-        <Typography type="headline" gutterBottom className="pull-left" color="inherit">Ingredients</Typography>
+        <Typography type="headline" gutterBottom className="pull-left" color="inherit">Types</Typography>
         <Link className="pull-right" to={`${match.url}/new`}>
-          <Button raised color="primary">Add Ingredient</Button>
+          <Button raised color="primary">Add Type</Button>
         </Link>
       </Grid>
-
+            {/* 
       <AppBar position="static" color="default">
         <Toolbar>
           <Typography type="display1" color="inherit">
             Title
           </Typography>
         </Toolbar>
-      </AppBar>
+      </AppBar> */}
 
       <Grid container>
         {ingredients.length ?
-          <Table className="">
+          <Table>
             <TableHead>
               <TableRow>
                 <TableCell>Ingredient</TableCell>
@@ -66,7 +65,7 @@ const Ingredients = ({ loading, ingredients, match, history }) => (!loading ? (
             </TableHead>
             <TableBody>
               {ingredients.map(({ _id, title }) => (
-                <TableRow hover key={_id} onClick={() => history.push(`${match.url}/${_id}`)}>
+                <TableRow key={_id}>
                   <TableCell><Typography type="subheading">{title}</Typography></TableCell>
                   {/* <TableCell>{timeago(updatedAt)}</TableCell>
             <TableCell>{monthDayYearAtTime(createdAt)}</TableCell> */}
@@ -92,7 +91,7 @@ const Ingredients = ({ loading, ingredients, match, history }) => (!loading ? (
   </div>
 ) : <Loading />);
 
-Ingredients.propTypes = {
+IngredientTypes.propTypes = {
   loading: PropTypes.bool.isRequired,
   ingredients: PropTypes.arrayOf(PropTypes.object).isRequired,
   match: PropTypes.object.isRequired,
@@ -100,9 +99,9 @@ Ingredients.propTypes = {
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe('ingredients');
+  const subscription = Meteor.subscribe('ingredientTypes');
   return {
     loading: !subscription.ready(),
-    ingredients: IngredientsCollection.find().fetch(),
+    ingredients: IngredientTypesCollection.find().fetch(),
   };
-}, Ingredients);
+}, IngredientTypes);

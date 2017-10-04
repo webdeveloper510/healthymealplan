@@ -11,7 +11,7 @@ import Chip from 'material-ui/Chip';
 import { Bert } from 'meteor/themeteorchef:bert';
 import validate from '../../../modules/validate';
 
-class IngredientEditor extends React.Component {
+class TypeEditor extends React.Component {
   componentDidMount() {
     const component = this;
     validate(component.form, {
@@ -33,29 +33,28 @@ class IngredientEditor extends React.Component {
 
   handleSubmit() {
     const { history } = this.props;
-    const existingIngredient = this.props.ingredient && this.props.ingredient._id;
-    const methodToCall = existingIngredient ? 'ingredients.update' : 'ingredients.insert';
-    const doc = {
+    const existingIngredientType = this.props.ingredientType && this.props.ingredientType._id;
+    const methodToCall = existingIngredientType ? 'ingredientTypes.update' : 'ingredientTypes.insert';
+    const ingredientType = {
       title: this.title.value.trim(),
-      // body: this.body.value.trim(),
     };
 
-    if (existingIngredient) doc._id = existingIngredient;
+    if (existingIngredientType) ingredientType._id = existingIngredientType;
 
-    Meteor.call(methodToCall, doc, (error, ingredientId) => {
+    Meteor.call(methodToCall, ingredientType, (error, ingredientType) => {
       if (error) {
         Bert.alert(error.reason, 'danger');
       } else {
-        const confirmation = existingIngredient ? 'Ingredient updated!' : 'Ingredient added!';
+        const confirmation = existingIngredientType ? 'Type updated!' : 'Type added!';
         this.form.reset();
         Bert.alert(confirmation, 'success');
-        history.push(`/ingredients/${ingredientId}`);
+        history.push(`/types/${ingredientType}`);
       }
     });
   }
 
   render() {
-    const { ingredient } = this.props;
+    const { ingredientType } = this.props;
     return (
       <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
         <FormGroup>
@@ -65,7 +64,7 @@ class IngredientEditor extends React.Component {
             className="form-control"
             name="title"
             ref={title => (this.title = title)}
-            defaultValue={ingredient && ingredient.title}
+            defaultValue={ingredientType && ingredientType.title}
             placeholder="Oh, The Places You'll Go!"
           />
           <TextField
@@ -76,19 +75,19 @@ class IngredientEditor extends React.Component {
         </FormGroup>
 
         <Button type="submit" raised>
-          {ingredient && ingredient._id ? 'Save Changes' : 'Add Ingredient'}
+          {ingredientType && ingredientType._id ? 'Save Changes' : 'Add Type'}
         </Button>
       </form>);
   }
 }
 
-IngredientEditor.defaultProps = {
-  ingredient: { title: '' },
+TypeEditor.defaultProps = {
+  ingredientType: { title: '' },
 };
 
-IngredientEditor.propTypes = {
-  ingredient: PropTypes.object,
+TypeEditor.propTypes = {
+  ingredientType: PropTypes.object,
   history: PropTypes.object.isRequired,
 };
 
-export default IngredientEditor;
+export default TypeEditor;

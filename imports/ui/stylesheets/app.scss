@@ -7,3 +7,9 @@
   margin-left: 25rem !important;
   width: auto !important;
 }
+
+.table--hover-cursor{
+  tr{
+    cursor: pointer
+  }
+}
