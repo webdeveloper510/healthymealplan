@@ -6,6 +6,8 @@ import { LinkContainer } from 'react-router-bootstrap';
 import { Nav, NavItem, NavDropdown } from 'react-bootstrap';
 import IconButton from 'material-ui/IconButton';
 import Menu, { MenuItem } from 'material-ui/Menu';
+import Typography from 'material-ui/Typography';
+
 import MoreVertIcon from 'material-ui-icons/MoreVert';
 import { Meteor } from 'meteor/meteor';
 
@@ -35,7 +37,12 @@ class AuthenticatedNavigation extends Component {
   render() {
     const { name, history } = this.props;
     return (
-      <div>
+      <div style={{display: 'flex', alignItems: 'center'}}>
+        <Typography style={{ 'color': "#FFF" }}>
+
+          {this.props.emailAddress}
+
+        </Typography>
         <IconButton
           aria-label="More"
           aria-owns={this.state.open ? 'long-menu' : null}
@@ -56,7 +63,7 @@ class AuthenticatedNavigation extends Component {
             },
           }}
         >
-            <MenuItem key={1}  onClick={() => (history.push('/profile') && this.setState({open: false})) }>Profile</MenuItem>
+            <MenuItem key={1}  onClick={() => { (history.push('/profile') && this.setState({open: false})) } }>Profile</MenuItem>
             <MenuItem key={2}  onClick={() => history.push('/logout')}>Logout</MenuItem>
             <MenuItem key={3}  onClick={() => history.push('/ingredients')}>Ingredients</MenuItem>
             <MenuItem key={4}  onClick={() => history.push('/types')}>Types</MenuItem>

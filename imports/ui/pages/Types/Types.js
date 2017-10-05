@@ -22,11 +22,11 @@ import Loading from '../../components/Loading/Loading';
 
 const handleRemove = (ingredientId) => {
   if (confirm('Are you sure? This is permanent!')) {
-    Meteor.call('ingredients.remove', ingredientId, (error) => {
+    Meteor.call('ingredientTypes.remove', ingredientId, (error) => {
       if (error) {
         Bert.alert(error.reason, 'danger');
       } else {
-        Bert.alert('Ingredient deleted!', 'success');
+        Bert.alert('Type deleted!', 'success');
       }
     });
   }
@@ -36,28 +36,21 @@ const IngredientTypes = ({ loading, ingredients, match, history }) => (!loading 
   <div>
     <AuthenticatedSideNav history={history} />
 
-    <Grid container className="SideContent" style={{ padding: '20px' }} spacing={8}>
+    <Grid container className="SideContent">
       <Grid item xs={12} className="page-header clearfix">
         <Typography type="headline" gutterBottom className="pull-left" color="inherit">Types</Typography>
         <Link className="pull-right" to={`${match.url}/new`}>
           <Button raised color="primary">Add Type</Button>
         </Link>
       </Grid>
-            {/* 
-      <AppBar position="static" color="default">
-        <Toolbar>
-          <Typography type="display1" color="inherit">
-            Title
-          </Typography>
-        </Toolbar>
-      </AppBar> */}
+
 
       <Grid container>
         {ingredients.length ?
           <Table>
             <TableHead>
               <TableRow>
-                <TableCell>Ingredient</TableCell>
+                <TableCell>Type</TableCell>
 
                 <TableCell />
                 <TableCell />

@@ -29,11 +29,11 @@ const handleRemove = (documentId, history) => {
 const renderIngredient = (ingredient, match, history) => (ingredient ? (
   <div>
     <AuthenticatedSideNav history={history} />,
-    <Grid container className="ViewIngredient SideContent" spacing={8} style={{ padding: '20px' }}>
+    <Grid container className="ViewIngredient SideContent">
       <Grid item xs={12} className="page-header clearfix">
         <h4 className="pull-left">{ ingredient && ingredient.title }</h4>
         <ButtonToolbar className="pull-right">
-          <ButtonGroup bsSize="small">
+          <ButtonGroup>
             <Button onClick={() => history.push(`${match.url}/edit`)}>Edit</Button>
             <Button onClick={() => handleRemove(ingredient._id, history)} className="text-danger">
             Delete

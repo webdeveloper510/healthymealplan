@@ -40,11 +40,6 @@ Ingredients.schema = new SimpleSchema({
     label: '_id of the sub ingredient.',
   },
 
-  'subIngredients.$.title': {
-    type: String,
-    label: 'Title of the sub ingredient.',
-  },
-
   'subIngredients.$.typeId': {
     type: String,
     label: 'Type of the sub ingredient.',

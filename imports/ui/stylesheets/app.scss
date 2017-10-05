@@ -2,14 +2,16 @@
 @import './forms';
 @import './bootstrap-overrides';
 
+// *{
+//   outline: 1px solid red
+// }
 
 .SideContent{
-  margin-left: 25rem !important;
+  margin: 0 0 0 25rem !important;
   width: auto !important;
 }
 
-.table--hover-cursor{
-  tr{
+.table--hover-cursor tr{
     cursor: pointer
-  }
+  
 }

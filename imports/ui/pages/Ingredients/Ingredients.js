@@ -21,7 +21,9 @@ import Loading from '../../components/Loading/Loading';
 
 // import './Ingredients.scss';
 
-const handleRemove = (ingredientId) => {
+const handleRemove = (event, ingredientId) => {
+  event.stopPropagation();
+
   if (confirm('Are you sure? This is permanent!')) {
     Meteor.call('ingredients.remove', ingredientId, (error) => {
       if (error) {
