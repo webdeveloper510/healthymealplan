@@ -38,7 +38,7 @@ class AuthenticatedNavigation extends Component {
     const { name, history } = this.props;
     return (
       <div style={{display: 'flex', alignItems: 'center'}}>
-        <Typography style={{ 'color': "#FFF" }}>
+        <Typography className="body1" style={{ 'color': "#FFF" }}>
 
           {this.props.emailAddress}
 
@@ -63,10 +63,10 @@ class AuthenticatedNavigation extends Component {
             },
           }}
         >
-            <MenuItem key={1}  onClick={() => { (history.push('/profile') && this.setState({open: false})) } }>Profile</MenuItem>
-            <MenuItem key={2}  onClick={() => history.push('/logout')}>Logout</MenuItem>
-            <MenuItem key={3}  onClick={() => history.push('/ingredients')}>Ingredients</MenuItem>
-            <MenuItem key={4}  onClick={() => history.push('/types')}>Types</MenuItem>
+            <MenuItem key={1} className="body1" onClick={() => { (history.push('/profile') && this.setState({open: false})) } }>Profile</MenuItem>
+            <MenuItem key={2} className="body1" onClick={() => history.push('/logout')}>Logout</MenuItem>
+            <MenuItem key={3} className="body1"  onClick={() => history.push('/ingredients')}>Ingredients</MenuItem>
+            <MenuItem key={4} className="body1"  onClick={() => history.push('/types')}>Types</MenuItem>
 
         </Menu>
       </div>

@@ -29,20 +29,24 @@ const handleRemove = (documentId, history) => {
 const renderIngredient = (ingredient, match, history) => (ingredient ? (
   <div>
     <AuthenticatedSideNav history={history} />,
-    <Grid container className="ViewIngredient SideContent">
-      <Grid item xs={12} className="page-header clearfix">
-        <h4 className="pull-left">{ ingredient && ingredient.title }</h4>
-        <ButtonToolbar className="pull-right">
-          <ButtonGroup>
-            <Button onClick={() => history.push(`${match.url}/edit`)}>Edit</Button>
-            <Button onClick={() => handleRemove(ingredient._id, history)} className="text-danger">
-            Delete
-            </Button>
-          </ButtonGroup>
-        </ButtonToolbar>
-      </Grid>
-      <Grid item xs={12}>
-        { ingredient && ingredient.title }
+    <Grid container justify="center">
+      <Grid item xs={10}>
+        <Grid container className="ViewIngredient SideContent">
+          <Grid item xs={12} className="page-header clearfix">
+            <h4 className="pull-left">{ ingredient && ingredient.title }</h4>
+            <ButtonToolbar className="pull-right">
+              <ButtonGroup>
+                <Button onClick={() => history.push(`${match.url}/edit`)} style={{ marginRight: '15px' }}>Edit</Button>
+                <Button onClick={() => handleRemove(ingredient._id, history)} className="text-danger">
+                Delete
+                </Button>
+              </ButtonGroup>
+            </ButtonToolbar>
+          </Grid>
+          <Grid item xs={12}>
+            { ingredient && ingredient.title }
+          </Grid>
+        </Grid>
       </Grid>
     </Grid>
   </div>

@@ -16,11 +16,11 @@ import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/Authenti
 
 import NotFound from '../NotFound/NotFound';
 
-const EditIngredient = ({ ingredient, history, potentialSubIngredients }) => (ingredient ? (
+const EditIngredient = ({ ingredient, history, potentialSubIngredients, ingredientTypes, popTheSnackbar }) => (ingredient ? (
   <div>
     <AuthenticatedSideNav history={history} />,
-    <Grid container className="EditIngredient SideContent">
-      <IngredientEditor ingredient={ingredient} potentialSubIngredients={potentialSubIngredients} history={history} />
+    <Grid container className="EditIngredient SideContent SideContent--spacer-2x--horizontal">
+      <IngredientEditor ingredient={ingredient} potentialSubIngredients={potentialSubIngredients} popTheSnackbar={popTheSnackbar} ingredientTypes={ingredientTypes} history={history} />
     </Grid>
   </div>
 ) : <NotFound />);
@@ -33,6 +33,7 @@ EditIngredient.propTypes = {
   ingredient: PropTypes.object,
   history: PropTypes.object.isRequired,
   potentialSubIngredients: PropTypes.isRequired,
+  ingredientTypes: PropTypes.array.isRequired,
 };
 
 export default createContainer(({ match }) => {
@@ -43,7 +44,8 @@ export default createContainer(({ match }) => {
   return {
     loading: !subscription.ready() || !subscription2.ready(),
     ingredient: Ingredients.findOne(ingredientId),
-    // subIngredients: Ingredients.find({ _id: { $in: ingredient.subIngredients }}).fetch(),
+    allIngredients: Ingredients.find().fetch(),
     potentialSubIngredients: Ingredients.find().fetch(),
+    ingredientTypes: IngredientTypes.find().fetch(),
   };
 }, EditIngredient);

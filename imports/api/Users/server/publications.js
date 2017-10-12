@@ -1,4 +1,6 @@
 import { Meteor } from 'meteor/meteor';
+import { Mongo } from 'meteor/mongo';
+
 
 Meteor.publish('users.editProfile', function usersProfile() {
   return Meteor.users.find(this.userId, {
@@ -9,3 +11,6 @@ Meteor.publish('users.editProfile', function usersProfile() {
     },
   });
 });
+
+
+Meteor.publish('users.team', () => Meteor.users.find({ roles: ['staff'] }));

@@ -8,10 +8,20 @@ import { Bert } from 'meteor/themeteorchef:bert';
 import AccountPageFooter from '../../components/AccountPageFooter/AccountPageFooter';
 import validate from '../../../modules/validate';
 
+import SnackbarCommon from '../../components/Snackbar/SnackbarCommon';
+
 class Login extends React.Component {
   constructor(props) {
     super(props);
     this.handleSubmit = this.handleSubmit.bind(this);
+
+    this.state = {
+      snackbarOpen: false,
+      snackbarMessageText: '',
+      snackbarButtonText: '',
+      snackbarButtonLink: '',
+    };
+
   }
 
   componentDidMount() {
@@ -45,10 +55,33 @@ class Login extends React.Component {
 
     Meteor.loginWithPassword(this.emailAddress.value, this.password.value, (error) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        // Bert.alert(error.reason, 'danger');
+        this.openSnackbar({
+
+          message: `There was an error ${error.reason}`,
+        });
+
       } else {
-        Bert.alert('Welcome back!', 'success');
+        // history.push('/ingredients');
+        this.openSnackbar({
+          message: 'Welcome back!',
+        });
       }
+    });
+  }
+
+  openSnackbar({ message, buttonText, link }) {
+    this.setState({
+      snackbarOpen: true,
+      snackbarMessageText: message,
+      snackbarButtonText: buttonText || '',
+      snackbarButtonLink: link || '',
+    });
+  }
+
+  closeSnackbar() {
+    this.setState({
+      snackbarOpen: false,
     });
   }
 
@@ -97,6 +130,15 @@ class Login extends React.Component {
           </form>
         </Col>
       </Row>
+
+      <SnackbarCommon
+        snackbarMessageText={this.state.snackbarMessageText}
+        snackbarButtonText={this.state.snackbarButtonText}
+        snackbarButtonLink={this.state.snackbarButtonLink}
+        snackbarOpen={this.state.snackbarOpen}
+        handleRequestClose={this.closeSnackbar.bind(this)}
+        autoHideDuration={5000}
+      />
     </div>);
   }
 }

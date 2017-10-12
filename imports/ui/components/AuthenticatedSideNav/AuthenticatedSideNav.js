@@ -8,17 +8,37 @@ import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 import ExpandLess from 'material-ui-icons/ExpandLess';
 import ExpandMore from 'material-ui-icons/ExpandMore';
+
+import HomeIcon from 'material-ui-icons/Home';
+import KitchenIcon from 'material-ui-icons/Kitchen';
+import OrderIcon from 'material-ui-icons/AttachMoney';
+import MealsIcon from 'material-ui-icons/LocalDining';
+import IngredientsIcon from 'material-ui-icons/Layers';
+import TypesIcon from 'material-ui-icons/List';
+import LifestylesIcon from 'material-ui-icons/FitnessCenter';
+import RestrictionsIcon from 'material-ui-icons/DoNotDisturbAlt';
+import DeliveryIcon from 'material-ui-icons/LocalShipping';
+import DirectionsIcon from 'material-ui-icons/Directions';
+import RoutesIcon from 'material-ui-icons/MyLocation';
+import CustomersIcon from 'material-ui-icons/People';
+import SettingsIcon from 'material-ui-icons/Settings';
+import TeamIcon from 'material-ui-icons/SupervisorAccount';
+
 import Collapse from 'material-ui/transitions/Collapse';
 
 import { Meteor } from 'meteor/meteor';
 
 import './AuthenticatedSideNav.scss';
 
+
 class AuthenticatedSideNav extends Component {
   constructor(props) {
     super(props);
     this.state = {
       open: false,
+      settingsOpen: false,
+      kitchenOpen: false,
+      deliveryOpen: false,
     };
   }
 
@@ -28,72 +48,162 @@ class AuthenticatedSideNav extends Component {
     });
   }
 
+  handleToggleSettings() {
+    this.setState({
+      settingsOpen: !this.state.settingsOpen,
+    });
+  }
+
+  handleToggleKitchen() {
+    this.setState({
+      kitchenOpen: !this.state.kitchenOpen,
+    });
+  }
+
+  handleToggleDelivery() {
+    this.setState({
+      deliveryOpen: !this.state.deliveryOpen,
+    });
+  }
+
   handleNestedListToggle(item) {
     this.setState({
       open: item.state.open,
     });
   }
 
+
   render() {
     const { history } = this.props;
 
     return (
       <div className="page-container__side-nav">
+
         <List>
           <ListItem button>
-            <ListItemText primary="Customers" />
-          </ListItem>
-          <ListItem button>
-            <ListItemText primary="Chefs" />
-          </ListItem>
-          <ListItem button>
-            <ListItemText primary="Drivers" />
+            <ListItemIcon>
+              <HomeIcon className="side-nav-icon" />
+            </ListItemIcon>
+            <ListItemText className="subheading" primary="Home" />
           </ListItem>
 
-          <ListItem button>
-            <ListItemText primary="Deliveries" />
-          </ListItem>
 
-          <ListItem button onClick={this.handleToggle.bind(this)}>
+          <ListItem button onClick={this.handleToggleKitchen.bind(this)}>
 
-            <ListItemText primary="Ingredients" />
-            {this.state.open ? <ExpandLess /> : <ExpandMore />}
+            <ListItemIcon>
+              <KitchenIcon className="side-nav-icon" />
+            </ListItemIcon>
+            <ListItemText className="subheading" primary="Kitchen" />
+            {this.state.kitchenOpen ? <ExpandLess /> : <ExpandMore />}
 
           </ListItem>
 
-          <Collapse in={this.state.open} transitionDuration="auto" unmountOnExit>
+          <Collapse in={this.state.kitchenOpen} transitionDuration="auto" unmountOnExit>
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/orders')}>
+              <ListItemIcon>
+                <OrderIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Orders" />
+            </ListItem>
 
-            <Link to="/ingredients">
-              <ListItem button>
-                <ListItemText inset primary="Ingredients" />
-              </ListItem>
-            </Link>
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/meals')}>
+              <ListItemIcon>
+                <MealsIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Meals" />
+            </ListItem>
 
-            <Link to="/types">
-              <ListItem button>
-                <ListItemText inset primary="Types" />
-              </ListItem>
-            </Link>
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/ingredients')}>
+              <ListItemIcon >
+                <IngredientsIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Ingredients" />
+            </ListItem>
+
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/types')}>
+              <ListItemIcon>
+                <TypesIcon className="side-nav-icon" />
+              </ListItemIcon>
+
+              <ListItemText className="subheading" primary="Types" />
+            </ListItem>
+
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/lifestyles')}>
+              <ListItemIcon>
+                <LifestylesIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Lifestyles" />
+            </ListItem>
+
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/restrictions')}>
+              <ListItemIcon>
+                <RestrictionsIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Restrictions" />
+            </ListItem>
+
+          </Collapse>
+
+          <ListItem button onClick={this.handleToggleDelivery.bind(this)}>
+
+            <ListItemIcon>
+              <DeliveryIcon className="side-nav-icon" />
+            </ListItemIcon>
+
+            <ListItemText className="subheading" primary="Delivery" />
+            {this.state.deliveryOpen ? <ExpandLess /> : <ExpandMore />}
+          </ListItem>
+
+          <Collapse in={this.state.deliveryOpen} transitionDuration="auto" unmountOnExit>
+
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/directions')}>
+              <ListItemIcon>
+                <DirectionsIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Directions" />
+            </ListItem>
+
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/routes')}>
+              <ListItemIcon>
+                <RoutesIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Routes" />
+            </ListItem>
+
+          </Collapse>
+
+          <ListItem button onClick={() => history.push('/customers')}>
+            <ListItemIcon>
+              <CustomersIcon className="side-nav-icon" />
+            </ListItemIcon>
+
+            <ListItemText className="subheading" primary="Customers" />
+          </ListItem>
+
+
+          <ListItem button onClick={this.handleToggleSettings.bind(this)}>
+            <ListItemIcon>
+              <SettingsIcon className="side-nav-icon" />
+            </ListItemIcon>
+
+            <ListItemText className="subheading" primary="Settings" />
+            {this.state.settingsOpen ? <ExpandLess /> : <ExpandMore />}
+
+          </ListItem>
+
+          <Collapse in={this.state.settingsOpen} transitionDuration="auto" unmountOnExit>
+
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/team')}>
+              <ListItemIcon>
+                <TeamIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Team" />
+            </ListItem>
 
           </Collapse>
 
         </List>
       </div>
-
-      // <aside className="page-container__side-nav">
-      //   <Nav pullRight>
-      //     <Link to="/ingredients"><Button raised>Ingredients</Button></Link>
-      //     <Link to="/types"><Button raised>Types</Button></Link>
-
-      //     <NavDropdown title={name} id="user-nav-dropdown">
-      //       <LinkContainer to="/profile">
-      //         <NavItem href="/profile">Profile</NavItem>
-      //       </LinkContainer>
-      //       <MenuItem divider />
-      //       <MenuItem onClick={() => history.push('/logout')}>Logout</MenuItem>
-      //     </NavDropdown>
-      //   </Nav>
-      // </aside>
     );
   }
 }

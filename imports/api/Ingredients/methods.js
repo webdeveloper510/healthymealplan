@@ -3,16 +3,32 @@ import { check } from 'meteor/check';
 import Ingredients from './Ingredients';
 import rateLimit from '../../modules/rate-limit';
 
+import { getNextSequence } from '../../modules/server/get-next-sequence';
+
 Meteor.methods({
   'ingredients.insert': function ingredientsInsert(ingredient) {
     check(ingredient, {
       title: String,
+      subIngredients: Array,
+      typeId: String,
     });
 
-    console.log(ingredient);
+    const existsingredient = Ingredients.findOne({ title: ingredient.title });
+
+    if (existsingredient) {
+      throw new Meteor.Error('500', `${ingredient.title } is already present`);
+    }
+
+    const nextSeqItem = getNextSequence('ingredients');
 
     try {
-      return Ingredients.insert({ createdBy: this.userId, ...ingredient });
+      return Ingredients.insert({
+        SKU: `${nextSeqItem}`,
+        title: ingredient.title,
+        subIngredients: ingredient.subIngredients,
+        typeId: ingredient.typeId,
+        createdBy: this.userId,
+      });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
@@ -21,11 +37,20 @@ Meteor.methods({
     check(ingredient, {
       _id: String,
       title: String,
+      subIngredients: Array,
+      typeId: String,
     });
 
     try {
       const ingredientId = ingredient._id;
-      Ingredients.update(ingredientId, { $set: ingredient });
+      Ingredients.update(ingredientId, {
+        $set: {
+          title: ingredient.title,
+          typeId: ingredient.typeId,
+          subIngredients: ingredient.subIngredients,
+        },
+      });
+
       return ingredientId; // Return _id so we can redirect to document after update.
     } catch (exception) {
       throw new Meteor.Error('500', exception);

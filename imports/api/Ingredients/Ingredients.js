@@ -18,15 +18,20 @@ Ingredients.deny({
 });
 
 Ingredients.schema = new SimpleSchema({
+
+  SKU: {
+    type: Number,
+    label: "SKU of the item"
+  },
+
   title: {
     type: String,
     label: 'The title of the ingredient.',
   },
 
-  ingredientType: {
+  typeId: {
     type: String,
     label: 'Type _id of the ingredient.',
-    optional: true,
   },
 
   subIngredients: {
@@ -35,15 +40,27 @@ Ingredients.schema = new SimpleSchema({
     optional: true,
   },
 
-  'subIngredients.$._id': {
-    type: String,
-    label: '_id of the sub ingredient.',
+  'subIngredients.$': {
+    type: 'String',
+    optional: true,
   },
 
-  'subIngredients.$.typeId': {
+  'subIngredients.$._id': {
     type: String,
-    label: 'Type of the sub ingredient.',
+    optional: true,
   },
+
+  'subIngredients.$.title': {
+    type: String,
+    optional: true,
+  },
+
+  // 'subIngredients.$.typeId': {
+  //   type: String,
+  //   label: 'Type of the sub ingredient.',
+  //   optional: true,
+  // },
+
   createdAt: {
     type: String,
     label: 'The date this ingredient was created.',
@@ -66,6 +83,8 @@ Ingredients.schema = new SimpleSchema({
 
 
 });
+
+// Ingredients.join('IngredientTypes', 'typeId', 'joinedType', ['title']);
 
 Ingredients.attachSchema(Ingredients.schema);
 

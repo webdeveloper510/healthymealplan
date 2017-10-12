@@ -41,16 +41,14 @@ const Navigation = props => (
   //     {!props.authenticated ? <PublicNavigation /> : <AuthenticatedNavigation {...props} />}
   //   </Navbar.Collapse>
   // </Navbar>
-  <AppBar position="static">
+  <AppBar className="appbar-primary appbar--no-shadow" position="static">
     <Toolbar>
       <Grid
         container
         align={'center'}
         justify={'space-between'}
       >
-        <Typography type="title" color="inherit" className={styles.flex}>
-        Healthy Meal Plan
-        </Typography>
+        <Typography type="title" color="inherit" className="title">Healthy Meal Plan</Typography>
         {!props.authenticated ? <PublicNavigation /> : <AuthenticatedNavigation {...props} />}
       </Grid>
     </Toolbar>

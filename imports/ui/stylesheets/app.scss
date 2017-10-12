@@ -2,16 +2,159 @@
 @import './forms';
 @import './bootstrap-overrides';
 
-// *{
-//   outline: 1px solid red
-// }
+body{ background: #FAFAFA }
+
+.appbar-primary{
+  position: fixed !important;
+  z-index: 20 !important;
+  top: 0;
+  left: 0;
+  right:0;
+}
 
 .SideContent{
+  padding-top: 100px !important;
   margin: 0 0 0 25rem !important;
   width: auto !important;
+  padding-top: 3rem;
+}
+
+.SideContent--shrinked{ padding-top: 0; }
+
+.SideContent--spacer-2x--horizontal { 
+  padding-left: 5rem;
+  padding-right: 5rem;
 }
 
 .table--hover-cursor tr{
-    cursor: pointer
-  
+    cursor: pointer 
+}
+
+.row-selected{
+  background: #eeeeee !important
+}
+
+.appbar--no-shadow{
+  box-shadow: none !important;
+}
+
+.button,
+.button-secondary{
+  text-transform: none !important
+}
+
+.button-secondary--top{
+  // padding-left: 0 !important;
+  position: relative !important;
+  padding: 5px 8px 5px 0 !important;
+  left: -5px !important;
+  color: rgba(0, 0, 0, 0.54) !important;
+  font-weight: 500 !important;
+}
+
+.page-container__side-nav{
+  background: #FFFFFF;
+}
+
+.table-container{
+  width: 100%;
+  // margin-top: 3rem;
+}
+
+.paper-for-fields{
+  padding: 3rem !important;
+  position: relative !important
+}
+
+.autoinput-icon,
+.autosuggest-icon{
+  position: absolute !important;
+  right: 2.5em !important;
+  fill-opacity: 0.54 !important;
+}
+
+.autoinput-icon--search.autoinput-icon{
+  position: absolute;
+  right: 1.5em !important;
+}
+
+.autoinput-icon--clear{
+  fill-opacity: .54 !important;
+  top: 33% !important;
+  right: 1.5em !important;
+  position: absolute !important;
+  z-index: 20 !important;
+}
+
+.autoinput{
+  position: relative !important;
+  padding-right: 0 !important;
+}
+
+.chip--bordered{
+  background: none !important;
+  border: 2px dashed #999 !important;
+  // text-transform: capitalize;
+  color: #999 !important;
+}
+
+.divider--space-x{
+  margin-bottom: 50px !important;
+}
+
+.font-medium{
+  font-weight: 500 !important
+}
+
+button{
+  box-shadow: none !important;
+}
+
+.input-box{
+  font-size: 16px
+}
+
+.input-box:after,
+.input-box:before{
+  display: none;
+}
+
+.headline,
+.MuiTypography-headline-125{
+  font-size: 24px !important;
+}
+
+.title{
+  font-size: 21px !important;
+}
+
+.body2{
+  font-size: 14px !important;
+}
+
+.body1{
+  font-size: 14px !important;
+}
+
+.subheading,
+.subheading .subheading
+.subheading h3,
+.MuiTypography-subheading-127{
+  font-size: 16px !important;
+}
+
+.display1{
+  font-size: 34px !important;
+}
+
+.display2{
+  font-size: 45px !important;
+}
+
+div[role^="menuitem"]{
+  font-size: 14px !important;
+}
+
+.font-uppercase{
+  text-transform: uppercase !important;
 }
