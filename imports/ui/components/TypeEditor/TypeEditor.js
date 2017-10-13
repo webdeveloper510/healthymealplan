@@ -133,7 +133,7 @@ class TypeEditor extends React.Component {
           message: error.reason,
         });
       } else {
-        const confirmation = existingIngredientType ? `${localStorage.getItem('ingredientType')} type updated` : `${localStorage.getItem('ingredientType')}type added.`;
+        const confirmation = existingIngredientType ? `${localStorage.getItem('ingredientType')} type updated` : `${localStorage.getItem('ingredientType')} type added.`;
         this.form.reset();
 
         popTheSnackbar({
@@ -176,12 +176,12 @@ class TypeEditor extends React.Component {
 
         <Grid container style={{ marginBottom: "50px" }}>
           <Grid item xs={6}>
-            <Typography type="headline" className="headline font-medium">Add new type</Typography>
+            <Typography type="headline" className="headline font-medium">Add type</Typography>
           </Grid>
 
           <Grid item xs={6}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <Button>Cancel</Button>
+            <Button style={{ marginRight: "10px" }} onClick={() => history.push('/ingredients')}>Cancel</Button>
               <Button raised disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">Save</Button>
             </div>
           </Grid>
@@ -198,7 +198,7 @@ class TypeEditor extends React.Component {
             <Paper elevation={2} className="paper-for-fields">
               <TextField
                 id="title"
-                label="Enter the name of the type"
+                label="Name"
                 margin="normal"
                 name="title"
                 fullWidth

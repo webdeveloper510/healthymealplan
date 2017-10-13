@@ -43,7 +43,6 @@ class Types extends React.Component {
       selectedCheckboxesNumber: 0,
       options: { sort: { title: 1 } },
       searchSelector: {},
-      rowsVisible: 8,
       currentTabValue: 0
     };
   }
@@ -191,7 +190,7 @@ class Types extends React.Component {
             />
           </div>
           <ListContainer
-            limit={8}
+            limit={6}
             collection={IngredientTypesCollection}
             publication="ingredientTypes"
             options={this.state.options}
@@ -200,7 +199,6 @@ class Types extends React.Component {
 
             <TypesTable
               searchTerm={this.state.searchSelector}
-              changeRowLimit={this.changeRowLimit.bind(this)}
               rowsLimit={this.state.rowsVisible}
               history={this.props.history}
               soryByOptions={this.sortByOption}

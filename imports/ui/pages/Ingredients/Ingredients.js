@@ -190,7 +190,7 @@ class Ingredients extends React.Component {
               </Grid>
               <Grid item xs={6}>
                 <Link to="/ingredients/new">
-                  <Button className="btn btn-primary" raised color="primary" style={{ float: 'right'}}>Add ingredient</Button>
+                  <Button className="btn btn-primary" raised color="primary" style={{ float: 'right', textTransform: 'capitalize' }}>Add ingredient</Button>
                 </Link>
               </Grid> 
             </Grid>

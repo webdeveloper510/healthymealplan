@@ -30,9 +30,6 @@ class TypesTable extends React.Component {
       checkboxesSelected: false,
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      rowsVisible: 5,
-      rowsMenuOpen: false,
-      anchorEl: null,
     };
   }
 
@@ -164,7 +161,7 @@ class TypesTable extends React.Component {
 
 TypesTable.propTypes = {
   loading: PropTypes.bool.isRequired,
-  results: PropTypes.isRequired,
+  results: PropTypes.Array.isRequired,
   history: PropTypes.isRequired,
 };
 

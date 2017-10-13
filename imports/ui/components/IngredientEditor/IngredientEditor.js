@@ -82,7 +82,7 @@ class IngredientEditor extends React.Component {
       },
       messages: {
         title: {
-          required: 'Need a title in here.',
+          required: 'Name required.',
         },
 
       },
