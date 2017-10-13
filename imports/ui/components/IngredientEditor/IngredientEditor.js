@@ -30,6 +30,7 @@ import Paper from 'material-ui/Paper';
 import Grid from 'material-ui/Grid';
 import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
+import Avatar from 'material-ui/Avatar';
 
 import { teal, red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
@@ -56,11 +57,12 @@ class IngredientEditor extends React.Component {
       value: '', // Autosuggest
       valueTypes: this.props.ingredient && this.props.ingredient.typeMain ? this.props.ingredient.typeMain.title : '',
       suggestions: [],
-      suggestionsTypes: [],
+      suggestionsTypes: [], 
       types: this.props.ingredientTypes ? this.props.ingredientTypes : [],
-      subIngredients: this.props.ingredient ? this.props.ingredient.subIngredients : [],
+      subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
       selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
+      hasFormChanged: false
     };
   }
 
@@ -96,12 +98,14 @@ class IngredientEditor extends React.Component {
 
   // Use your imagination to render suggestions.
   onChange(event, { newValue }) {
+
     this.setState({
       value: newValue,
     });
   }
 
   onChangeTypes(event, { newValue }) {
+
     this.setState({
       valueTypes: newValue,
     });
@@ -124,11 +128,13 @@ class IngredientEditor extends React.Component {
 
     this.setState({
       subIngredients: clonedSubIngredients,
+      hasFormChanged: true
     });
   }
 
   onSuggestionSelectedTypes(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
     console.log(suggestion);
+
     // const clonedSubIngredients = this.state.types ? this.state.types.slice() : [];
 
     // let isThere = false;
@@ -143,9 +149,7 @@ class IngredientEditor extends React.Component {
 
     // clonedSubIngredients.push({ _id: suggestion._id, title: suggestion.title });
 
-    // this.setState({
-    //   subIngredients: clonedSubIngredients,
-    // });
+    this.setState({ hasFormChanged: true });
   }
 
   // Autosuggest will call this function every time you need to update suggestions.
@@ -207,10 +211,10 @@ class IngredientEditor extends React.Component {
   }
 
   handleRemoveActual() {
-    const { popTheSnackbar, history } = this.props;
+    const { popTheSnackbar, history, ingredient } = this.props;
 
-    const existingIngredient = this.props.ingredient && this.props.ingredient._id;
-    localStorage.setItem('ingredientDeleted', existingIngredient.title);
+    const existingIngredient = ingredient && ingredient._id;
+    localStorage.setItem('ingredientDeleted', ingredient.title);
     const ingredientDeletedMessage = `${localStorage.getItem('ingredientDeleted')} deleted from ingredients.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
@@ -379,7 +383,7 @@ class IngredientEditor extends React.Component {
 
   handleTypeChange(event, name) {
     console.log(`Type changed ${event.target.value}`);
-    this.setState({ selectedType: event.target.value });
+    this.setState({ selectedType: event.target.value, hasFormChanged: true });
   }
 
   handleSubIngredientChipDelete(subIngredient) {
@@ -391,6 +395,7 @@ class IngredientEditor extends React.Component {
 
     this.setState({
       subIngredients: stateCopy,
+      hasFormChanged: true
     });
   }
 
@@ -404,6 +409,28 @@ class IngredientEditor extends React.Component {
     if (this.props.allIngredients) {
       return this.props.allIngredients.find(el => el._id === subIngredient);
     }
+  }
+
+  getSubIngredientAvatar(subIngredient) {
+    if (subIngredient.title) {
+      return subIngredient.title.charAt(0);
+    }
+
+    if (this.props.allIngredients) {
+     const avatarToReturn = this.props.allIngredients.find(el => el._id === subIngredient);
+      return avatarToReturn.title.charAt(0);
+    }
+  }
+
+  titleFieldChanged(e){
+
+    console.log(e.currentTarget.value.length)
+
+    const hasFormChanged = e.currentTarget.value.length > 0 ? true : false;
+
+    this.setState({
+      hasFormChanged: hasFormChanged
+    })
   }
 
   render() {
@@ -442,7 +469,7 @@ class IngredientEditor extends React.Component {
           <Grid item xs={8}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
               <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
-              <Button raised style={{ backgroundColor: primary, margin: '1dp' }} type="submit" color="contrast">Save</Button>
+              <Button disabled={!this.state.hasFormChanged} className="btn btn-primary" raised type="submit" color="contrast">Save</Button>
             </div>
           </Grid>
         </Grid>
@@ -467,6 +494,7 @@ class IngredientEditor extends React.Component {
                     defaultValue={ingredient && ingredient.title}
                     ref={title => (this.title = title)}
                     inputProps={{}}
+                    onChange={this.titleFieldChanged.bind(this)}
                   />
                 </Paper>
               </Grid>
@@ -540,6 +568,7 @@ class IngredientEditor extends React.Component {
 
                     inputProps={{
                       placeholder: 'Search',
+                      
                       value: this.state.valueTypes,
                       onChange: this.onChangeTypes.bind(this),
                       className: 'auto',
@@ -613,6 +642,7 @@ class IngredientEditor extends React.Component {
                   <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                     {this.state.subIngredients ? this.state.subIngredients.map((subIngredient, i) => (
                       <Chip
+                        avatar={<Avatar> {this.getSubIngredientAvatar(subIngredient)} </Avatar>}
                         style={{ marginRight: '8px' }}
                         label={this.getSubIngredientTitle(subIngredient)}
                         key={i}
@@ -648,8 +678,8 @@ class IngredientEditor extends React.Component {
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                   <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
-                  <Button type="submit" raised style={{ backgroundColor: primary, margin: '1dp' }} color="contrast">
-                    {ingredient && ingredient._id ? 'Save Changes' : 'Save'}
+                  <Button disabled={!this.state.hasFormChanged} type="submit" className="btn btn-primary" raised color="contrast">
+                   Save
                   </Button>
                 </div>
               </Grid>

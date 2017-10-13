@@ -2,11 +2,12 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { createContainer } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
+import Grid from 'material-ui/Grid';
+
 import IngredientTypes from '../../../api/IngredientTypes/IngredientTypes';
 import TypeEditor from '../../components/TypeEditor/TypeEditor';
 import NotFound from '../NotFound/NotFound';
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
-import Grid from 'material-ui/Grid';
 
 const EditType = ({ ingredientType, history, popTheSnackbar }) => (ingredientType ? (
   <div>

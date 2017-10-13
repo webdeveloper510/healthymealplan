@@ -12,6 +12,13 @@ import Chip from 'material-ui/Chip';
 import ArrowBack from 'material-ui-icons/ArrowBack';
 import $ from 'jquery';
 
+import Dialog, {
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from 'material-ui/Dialog';
+
 import { Bert } from 'meteor/themeteorchef:bert';
 import validate from '../../../modules/validate';
 import { teal, red } from 'material-ui/colors';
@@ -26,7 +33,19 @@ const styles = theme => ({
   },
 });
 
+
 class TypeEditor extends React.Component {
+  constructor(props) {
+    super(props);
+
+
+    this.state = {
+      deleteDialogOpen: false,
+
+    };
+  }
+
+
   componentDidMount() {
     const component = this;
     validate(component.form, {
@@ -37,18 +56,53 @@ class TypeEditor extends React.Component {
         },
 
       },
-      messages: {
-        title: {
-          required: 'Need a title in here.',
-        },
 
-      },
       submitHandler() { component.handleSubmit(); },
     });
   }
 
+  /* Dialog box controls */
+  deleteDialogHandleClickOpen() {
+    this.setState({ deleteDialogOpen: true });
+  }
+
+  deleteDialogHandleRequestClose() {
+    this.setState({ deleteDialogOpen: false });
+  }
+
+  handleRemoveActual() {
+    const { popTheSnackbar, history, ingredientType } = this.props;
+
+    const existingIngredientType = ingredientType && ingredientType._id;
+
+    localStorage.setItem('ingredientTypeDeleted', ingredientType.title);
+
+    const ingredientTypeDeletedMessage = `${localStorage.getItem('ingredientTypeDeleted')} deleted from types.`;
+
+    this.deleteDialogHandleRequestClose.bind(this);
+
+    Meteor.call('ingredientTypes.remove', existingIngredientType, (error) => {
+      if (error) {
+        popTheSnackbar({
+          message: error.reason,
+        });
+      } else {
+        popTheSnackbar({
+          message: ingredientTypeDeletedMessage,
+        });
+
+        history.push('/types');
+      }
+    });
+  }
+
+  handleRemove() {
+    this.deleteDialogHandleClickOpen();
+  }
+
   handleSubmit() {
-    const { history } = this.props;
+    // console.log('Reached handle submti');
+    const { history, popTheSnackbar } = this.props;
     const existingIngredientType = this.props.ingredientType && this.props.ingredientType._id;
     const methodToCall = existingIngredientType ? 'ingredientTypes.update' : 'ingredientTypes.insert';
 
@@ -56,24 +110,38 @@ class TypeEditor extends React.Component {
       title: document.querySelector('#title').value.trim(),
     };
 
-    if (existingIngredientType) ingredientType._id = existingIngredientType;
+    console.log(ingredientType);
+
+    if (existingIngredientType) {
+      ingredientType._id = existingIngredientType;
+      localStorage.setItem('ingredientType', existingIngredientType.title);
+    } else {
+      localStorage.setItem('ingredientType', ingredientType.title);
+    }
+
 
     Meteor.call(methodToCall, ingredientType, (error, ingredientTypeId) => {
       if (error) {
-        // Bert.alert(error.reason, 'danger');
-
+        popTheSnackbar({
+          message: error.reason,
+        });
       } else {
-        const confirmation = existingIngredientType ? 'Type updated' : 'Type added.';
+        const confirmation = existingIngredientType ? `${localStorage.getItem('ingredientType')} type updated` : `${localStorage.getItem('ingredientType')}type added.`;
         this.form.reset();
-        // Bert.alert(confirmation, 'success');
 
-        history.push(`/types/${ingredientTypeId}`);
+        popTheSnackbar({
+          message: confirmation,
+          buttonText: 'View',
+          buttonLink: `/types/${ingredientTypeId}/edit`,
+        });
+
+        history.push('/types');
       }
     });
   }
 
   render() {
-    const { ingredientType } = this.props;
+    const { ingredientType, history } = this.props;
     return (
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
 
@@ -112,14 +180,7 @@ class TypeEditor extends React.Component {
             </Typography>
           </Grid>
           <Grid item xs={12} sm={6}>
-            {/* <ControlLabel>Title</ControlLabel>
-            <input
-              type="text"
-              className="form-control"
-              name="title"
-              
-              placeholder="Oh, The Places You'll Go!"
-            /> */}
+
             <TextField
               id="title"
               label="Enter the name of the type"
@@ -134,9 +195,8 @@ class TypeEditor extends React.Component {
 
         <Grid container justify="center">
           <Grid item xs={6}>
-            <Button raised onClick={() => history.push('/types')}>
-                  Cancel
-            </Button>
+            {ingredientType ? (<Button raised onClick={this.handleRemove.bind(this)} style={{ backgroundColor: danger, color: '#FFFFFF' }}>Delete</Button>)
+              : (<Button raised onClick={() => history.push('/types')}>Cancel</Button>)}
           </Grid>
 
           <Grid item xs={6}>
@@ -148,18 +208,34 @@ class TypeEditor extends React.Component {
           </Grid>
         </Grid>
 
+        {ingredientType ? (<Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
+          <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
+          Delete {ingredientType ? ingredientType.title.toLowerCase() : ''}?
+          </Typography>
+          <DialogContent>
+            <DialogContentText className="subheading">
+            There may be ingredients associated with {ingredientType.title}. Are you sure you want to delete {ingredientType.title.toLowerCase()} ?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
+            Cancel
+            </Button>
+            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleRemoveActual.bind(this)} color="accent">
+            Delete
+            </Button>
+          </DialogActions>
+        </Dialog>) : ''}
 
       </form>);
   }
 }
 
-TypeEditor.defaultProps = {
-  ingredientType: { title: '' },
-};
 
 TypeEditor.propTypes = {
   ingredientType: PropTypes.object,
   history: PropTypes.object.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 export default TypeEditor;

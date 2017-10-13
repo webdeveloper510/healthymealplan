@@ -38,6 +38,11 @@ body{ background: #FAFAFA }
   box-shadow: none !important;
 }
 
+.appbar--no-background{
+  background: none !important;
+  color: #333 !important;
+}
+
 .button,
 .button-secondary{
   text-transform: none !important
@@ -58,6 +63,11 @@ body{ background: #FAFAFA }
 
 .table-container{
   width: 100%;
+  position: relative;
+
+  tbody tr{
+    cursor: pointer;
+  }
   // margin-top: 3rem;
 }
 
@@ -108,6 +118,25 @@ body{ background: #FAFAFA }
 
 button{
   box-shadow: none !important;
+}
+
+.btn.btn-primary:disabled{
+  background: #e0e0e0 !important;
+}
+
+.btn-primary{
+  background: rgb(0, 150, 136) !important;
+}
+
+.btn-danger{
+  background: rgb(211, 47, 47) !important;
+}
+
+
+#react-autowhatever-1,
+#react-autowhatever-2,
+#react-autowhatever{
+  z-index: 2;
 }
 
 .input-box{
@@ -168,3 +197,21 @@ div[role^="menuitem"]{
 // .button--bordered--accent{
 //   border-color: #ff4081 !important
 // }
+
+.table-container--delete-rows-container{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 16px;
+
+  background: rgb(211, 47, 47);
+  color: #fff;
+  width: 100%;
+  padding: 12px 15px 12px 25px;
+  position: absolute;
+  top: -62px;
+}
+
+.delete-rows-container--delete-icon{
+  cursor: pointer;
+}

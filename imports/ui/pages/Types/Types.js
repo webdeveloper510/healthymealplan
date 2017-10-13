@@ -10,15 +10,15 @@ import $ from 'jquery';
 
 import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
-import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
-import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import Paper from 'material-ui/Paper';
 import Input from 'material-ui/Input';
 import { teal, red } from 'material-ui/colors';
 import SearchIcon from 'material-ui-icons/Search';
 import ClearIcon from 'material-ui-icons/Clear';
+import AppBar from 'material-ui/AppBar';
+import Tabs, { Tab } from 'material-ui/Tabs';
 
 import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
@@ -44,6 +44,7 @@ class Types extends React.Component {
       options: { sort: { title: 1 } },
       searchSelector: {},
       rowsVisible: 8,
+      currentTabValue: 0
     };
   }
 
@@ -69,14 +70,14 @@ class Types extends React.Component {
 
 
     this.setState({
-      searchSelector: $('#search-ingredient-text').val(),
+      searchSelector: $('#search-type-text').val(),
     });
 
     // const query = {
     //   title: { $regex: searchValue },
     // };
 
-    // if ($('#search-ingredient-text').val() > 1) {
+    // if ($('#search-type-text').val() > 1) {
     //   this.setState({
     //     searchSelector: query,
     //   });
@@ -100,17 +101,10 @@ class Types extends React.Component {
 
 
   clearSearchBox() {
-    $('#search-ingredient-text').val('');
+    $('#search-type-text').val('');
 
     this.setState({
       searchSelector: {},
-    });
-
-    this.props.popTheSnackbar({
-      message: 'This is a message',
-      duration: 10000,
-      buttonText: 'This is a button',
-      buttonLink: '/types',
     });
   }
 
@@ -129,8 +123,15 @@ class Types extends React.Component {
     });
   }
 
+
+  handleTabChange(event, value){
+    this.setState({ currentTabValue: value });
+  }
+
   render() {
     const { loading, ingredients, match, history } = this.props;
+
+
     return (!loading ? (
       <div>
         <AuthenticatedSideNav history={history} />
@@ -145,6 +146,16 @@ class Types extends React.Component {
               <Button className="button button--primary" onClick={() => history.push('/types/new')} raised color="primary" style={{ float: 'right', backgroundColor: primary }}>Add type</Button>
             </Grid>
           </Grid>
+
+          <div style={{ marginTop: "25px" }}>
+              <AppBar position="static" className="appbar--no-background appbar--no-shadow">
+                <Tabs value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
+                  <Tab label="All" />
+                  {/* <Tab label="Item Two" />
+                  <Tab label="Item Three" /> */}
+                </Tabs>
+              </AppBar>
+            </div>
 
           <div style={{ width: '100%',
             background: '#FFF',
@@ -174,15 +185,15 @@ class Types extends React.Component {
               placeholder="Search types"
               onKeyUp={this.searchByName.bind(this)}
               inputProps={{
-                id: 'search-ingredient-text',
+                id: 'search-type-text',
                 'aria-label': 'Description',
               }}
             />
           </div>
           <ListContainer
-            limit={6}
+            limit={8}
             collection={IngredientTypesCollection}
-            publication="ingredients"
+            publication="ingredientTypes"
             options={this.state.options}
             selector={{ title: { $regex: new RegExp(this.state.searchSelector, 'i') } }}
           >

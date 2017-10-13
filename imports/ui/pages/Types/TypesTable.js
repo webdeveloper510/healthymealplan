@@ -142,32 +142,18 @@ class TypesTable extends React.Component {
                 <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
                   {this.props.count} of {this.props.typesCount} types
                 </Typography>
-                {/* <Typography className="body1" type="body1">Rows</Typography>
-                <Button id="simple-menu-anchor" dense aria-owns={this.state.rowsMenuOpen ? 'simple-menu' : null} aria-haspopup="true" onClick={this.handleClick.bind(this)}>
-                    {this.props.rowsLimit}
-                </Button>
-
-                <Menu id="simple-menu"
-                  anchorEl={this.state.anchorEl}
-                  open={this.state.rowsMenuOpen}
-                  onRequestClose={this.handleRequestClose}
-                  >
-                  <MenuItem onClick={this.handleRequestClose.bind(this, val = 8)}>8</MenuItem>
-                  <MenuItem onClick={this.handleRequestClose.bind(this, val = 15)}>15</MenuItem>
-                  <MenuItem onClick={this.handleRequestClose.bind(this, val = 30)}>30</MenuItem>
-                </Menu> */}
               </TableCell>
+  
               <TableCell />
-              <TableCell />
+              <TableCell style={{ display: 'flex', height: '56px', alignItems: 'center', justifyContent: 'flex-end' }}>
 
               {
                 this.props.hasMore ? (
-                  <TableCell style={{ display: 'flex', height: '56px', alignItems: 'center', justifyContent: 'flex-end' }}>
-
-                    {this.props.hasMore ? (<Button style={{ marginLeft: '1em' }} onClick={this.props.loadMore}>Load More</Button>) : ''}
-                  </TableCell>) : ''
+                    this.props.hasMore ? (<Button style={{ marginLeft: '1em' }} onClick={this.props.loadMore}>Load More</Button>) : ''
+                 ) : '&nbsp;'
 
               }
+               </TableCell>
             </TableRow>
           </TableFooter>
         </Table>

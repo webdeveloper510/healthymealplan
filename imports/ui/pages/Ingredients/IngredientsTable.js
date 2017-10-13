@@ -16,6 +16,9 @@ import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
 import Menu, { MenuItem } from 'material-ui/Menu';
+// import DeleteIcon from 'material-ui-icons/Delete';
+// import Tooltip from 'material-ui/Tooltip';
+// import IconButton from 'material-ui/IconButton';
 
 
 import { createContainer } from 'meteor/react-meteor-data';
@@ -27,7 +30,6 @@ class IngredientsTable extends React.Component {
     super(props);
 
     this.state = {
-      checkboxesSelected: false,
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
       // rowsVisible: 5,
@@ -50,21 +52,70 @@ class IngredientsTable extends React.Component {
     console.log(type);
   }
 
-  rowSelected(e) {
-    const selectedRowId = e.target.parentNode.parentNode.getAttribute('id');
+  rowSelected(e, event) {
+    // console.log(e);
+    // console.log($(event.target).prop('checked'));
+    // console.log(event.target.parentNode.parentNode);
 
-    $(`.${selectedRowId}`).toggleClass('row-selected');
 
-    const currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber;
+    const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
+    // $(`.${selectedRowId}`).toggleClass('row-selected');
+    let currentlySelectedCheckboxes;
+
+    const clonedSelectedCheckboxes = this.state.selectedCheckboxes ? this.state.selectedCheckboxes.slice() : [];
+
+    if ($(event.target).prop('checked')) {
+      currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber + 1;
+      clonedSelectedCheckboxes.push(e._id);
+    } else {
+      currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber - 1;
+      clonedSelectedCheckboxes.splice(clonedSelectedCheckboxes.indexOf(e._id), 1);
+    }
+
 
     this.setState({
-      checkboxesSelected: true,
-      selectedCheckboxesNumber: currentlySelectedCheckboxes + 1,
+      selectedCheckboxesNumber: currentlySelectedCheckboxes,
+      selectedCheckboxes: clonedSelectedCheckboxes,
     });
   }
 
-  selectAllRows() {
-    $('.row-checkbox').prop('checked', 'checked');
+  selectAllRows(event) {
+    let allCheckboxIds = [];
+    console.log(event.target);
+
+    if ($(event.target).prop('checked')) {
+      $('.row-checkbox').each((index, el) => {
+        console.log(el);
+        // make the row selected
+        // $(`.${el.getAttribute('id')}`).addClass('row-selected');
+
+        // push the ids to a array
+        allCheckboxIds.push(el.getAttribute('id'));
+
+        // set each checkbox checked
+        $(el).children().find('input[type="checkbox"]').prop('checked', true);
+      });
+    } else {
+      allCheckboxIds = [];
+
+      $('.row-checkbox').each((index, el) => {
+        // console.log(el);
+        // // make the row selected
+        // // $(`.${el.getAttribute('id')}`).removeClass('row-selected');
+
+        // // push the ids to a array
+        // allCheckboxIds.push(el.getAttribute('id'));
+
+        // set each checkbox checked
+        $(el).children().find('input[type="checkbox"]').prop('checked', false);
+      });
+    }
+
+
+    this.setState({
+      selectedCheckboxesNumber: allCheckboxIds.length,
+      selectedCheckboxes: allCheckboxIds,
+    });
   }
 
 
@@ -78,6 +129,38 @@ class IngredientsTable extends React.Component {
     console.log(val);
   }
 
+  deleteSelectedRows() {
+    console.log('Delete selected rows');
+
+    localStorage.setItem('ingredientTableDeleted', this.state.selectedCheckboxesNumber);
+
+    const ingredientIds = this.state.selectedCheckboxes;
+
+    console.log(ingredientIds);
+
+    Meteor.call('ingredients.batchRemove', ingredientIds, (error) => {
+      console.log('inside method');
+      if (error) {
+        this.props.popTheSnackbar({
+          message: error.reason,
+        });
+      } else {
+        this.props.popTheSnackbar({
+          message: `${localStorage.getItem('ingredientTableDeleted')} ingredients deleted.`,
+        });
+      }
+    });
+
+    this.setState({
+      selectedCheckboxes: [],
+      selectedCheckboxesNumber: 0,
+    });
+
+    // $('.row-selected').toggleClass('row-selected');
+  }
+
+
+
   renderNoResults(count) {
     if (count == 0) {
       return (
@@ -86,20 +169,32 @@ class IngredientsTable extends React.Component {
     }
   }
 
+  isCheckboxSelected(id){
+    console.log(this.state.selectedCheckboxes)
+    // return (this.state.selectedCheckboxes.indexOf(id) !== -1)
+  }
 
   render() {
-    console.log(this.props);
+    // console.log(this.props);
     return (
       <Paper elevation={2} className="table-container">
-        <p> {this.state.checkboxesSelected > 1 ? (`${this.state.selectedCheckboxes} items selected`) : ''}</p>
+        {this.state.selectedCheckboxes.length > 0 ? (
+          <div className="table-container--delete-rows-container">
+            <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
+              {this.state.selectedCheckboxesNumber} ingredient{this.state.selectedCheckboxes.length > 1 ? ('s') : ''} selected
+            </Typography>
+            <Button style={{ color: '#FFF' }} onClick={this.deleteSelectedRows.bind(this)}>Delete</Button>
+          </div>
+        )
+          : ''
+
+        }
         <Table>
           {this.props.count > 0 ?
             (<TableHead>
               <TableRow>
-
-                <TableCell padding="checkbox" style={{ width: '80px' }}><Checkbox onClick={this.selectAllRows.bind(this)} /></TableCell>
+                <TableCell padding="checkbox" style={{ width: '80px' }}><Checkbox onChange={this.selectAllRows.bind(this)} /></TableCell>
                 <TableCell padding="none"><Typography className="body2" type="body2">SKU</Typography></TableCell>
-
                 <TableCell padding="none"><Typography className="body2" type="body2">Ingredient</Typography></TableCell>
                 <TableCell><Typography className="body2" type="body2">Type</Typography></TableCell>
               </TableRow>
@@ -108,10 +203,11 @@ class IngredientsTable extends React.Component {
           }
           <TableBody>
             {
-              this.props.results.map((e, i) => (
+              this.props.results.map((e, i) => (   
+              
                 <TableRow hover className={e._id} key={e._id}>
                   <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '80px' }} padding="checkbox">
-                    <Checkbox className="row-checkbox" id={e._id} onChange={this.rowSelected.bind(this)} />
+                    <Checkbox className="row-checkbox" id={e._id}  onChange={this.rowSelected.bind(this, e)} />
                   </TableCell>
                   <TableCell padding="none" style={{ width: '200px' }} onClick={() => this.props.history.push(`ingredients/${e._id}/edit`)}>
                     <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
@@ -132,7 +228,8 @@ class IngredientsTable extends React.Component {
 
                   </TableCell>
                 </TableRow>
-              ))
+              )              
+            )
             }
 
 
@@ -146,31 +243,14 @@ class IngredientsTable extends React.Component {
                 <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
                   {this.props.count} of {this.props.ingredientCount} ingredients
                 </Typography>
-                {/* <Typography className="body1" type="body1">Rows</Typography>
-                <Button id="simple-menu-anchor" dense aria-owns={this.state.rowsMenuOpen ? 'simple-menu' : null} aria-haspopup="true" onClick={this.handleClick.bind(this)}>
-                    {this.props.rowsLimit}
-                </Button>
-
-                <Menu id="simple-menu"
-                  anchorEl={this.state.anchorEl}
-                  open={this.state.rowsMenuOpen}
-                  onRequestClose={this.handleRequestClose}
-                  >
-                  <MenuItem onClick={this.handleRequestClose.bind(this, val = 8)}>8</MenuItem>
-                  <MenuItem onClick={this.handleRequestClose.bind(this, val = 15)}>15</MenuItem>
-                  <MenuItem onClick={this.handleRequestClose.bind(this, val = 30)}>30</MenuItem>
-                </Menu> */}
               </TableCell>
               <TableCell />
               <TableCell />
-
               {
                 this.props.hasMore ? (
                   <TableCell style={{ display: 'flex', height: '56px', alignItems: 'center', justifyContent: 'flex-end' }}>
-
                     {this.props.hasMore ? (<Button style={{ marginLeft: '1em' }} onClick={this.props.loadMore}>Load More</Button>) : ''}
                   </TableCell>) : ''
-
               }
             </TableRow>
           </TableFooter>
@@ -184,6 +264,9 @@ IngredientsTable.propTypes = {
   loading: PropTypes.bool.isRequired,
   results: PropTypes.isRequired,
   history: PropTypes.isRequired,
+  hasMore: PropTypes.bool.isRequired,
+  count: PropTypes.number.isRequired,
+  loadMore: PropTypes.func.isRequired,
 };
 
 

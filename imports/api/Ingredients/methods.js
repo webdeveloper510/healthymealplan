@@ -66,6 +66,18 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
+
+  'ingredients.batchRemove': function ingredientsRemove(ingredientIds) {
+    check(ingredientIds, Array);
+    console.log('Server: ingredients.batchRemove');
+
+    try {
+      return Ingredients.remove({ _id: { $in: ingredientIds } });
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
+
   'ingredients.subIngredients.insert': function ingredientsRemove(subIngredient) {
     console.log('Subingredients insert');
     check(subIngredient, {

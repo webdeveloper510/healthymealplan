@@ -7,6 +7,8 @@ import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 import { Bert } from 'meteor/themeteorchef:bert';
 import { teal, red } from 'material-ui/colors';
+import Containers from 'meteor/utilities:react-list-container';
+const ListContainer = Containers.ListContainer;
 
 import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
@@ -34,14 +36,13 @@ import DeleteIcon from 'material-ui-icons/Delete';
 import FilterListIcon from 'material-ui-icons/FilterList';
 import SearchIcon from 'material-ui-icons/Search';
 import ClearIcon from 'material-ui-icons/Clear';
-
+import AppBar from 'material-ui/AppBar';
+import Tabs, { Tab } from 'material-ui/Tabs';
 
 import IngredientsCollection from '../../../api/Ingredients/Ingredients';
 import IngredientTypes from '../../../api/IngredientTypes/IngredientTypes';
 
-import Containers from 'meteor/utilities:react-list-container';
 
-const ListContainer = Containers.ListContainer;
 
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 import Loading from '../../components/Loading/Loading';
@@ -76,6 +77,7 @@ class Ingredients extends React.Component {
       options: { sort: { title: 1 } },
       searchSelector: {},
       rowsVisible: 8,
+      currentTabValue: 0
     };
   }
 
@@ -115,13 +117,6 @@ class Ingredients extends React.Component {
 
     this.setState({
       searchSelector: {},
-    });
-
-    this.props.popTheSnackbar({
-      message: 'This is a message',
-      duration: 10000,
-      buttonText: 'This is a button',
-      buttonLink: '/types',
     });
   }
 
@@ -175,6 +170,11 @@ class Ingredients extends React.Component {
     });
   }
 
+  handleTabChange(event, value){
+    this.setState({ currentTabValue: value });
+  }
+
+
   render() {
     // console.log(this.props.ingredients);
     return (
@@ -190,10 +190,21 @@ class Ingredients extends React.Component {
               </Grid>
               <Grid item xs={6}>
                 <Link to="/ingredients/new">
-                  <Button className="button button--primary" raised color="primary" style={{ float: 'right', backgroundColor: primary }}>Add ingredient</Button>
+                  <Button className="btn btn-primary" raised color="primary" style={{ float: 'right'}}>Add ingredient</Button>
                 </Link>
-              </Grid>
+              </Grid> 
             </Grid>
+
+
+            <div style={{ marginTop: "25px" }}>
+              <AppBar position="static" className="appbar--no-background appbar--no-shadow">
+                <Tabs value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
+                  <Tab label="All" />
+                  {/* <Tab label="Item Two" />
+                  <Tab label="Item Three" /> */}
+                </Tabs>
+              </AppBar>
+            </div>
 
             <div style={{ width: '100%',
               background: '#FFF',
@@ -233,13 +244,13 @@ class Ingredients extends React.Component {
               collection={IngredientsCollection}
               publication="ingredients"
               options={this.state.options}
-              selector={{ $or: [{ title: new RegExp(this.state.searchSelector) }, { SKU: new RegExp(this.state.searchSelector) }] }}
+              selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector, 'i') } }, { SKU: { $regex: new RegExp(this.state.searchSelector, 'i') } }] }}
             >
 
               <IngredientsTable
+                popTheSnackbar={this.props.popTheSnackbar}
                 searchTerm={this.state.searchSelector}
                 changeRowLimit={this.changeRowLimit.bind(this)}
-                rowsLimit={this.state.rowsVisible}
                 history={this.props.history}
                 soryByOptions={this.sortByOption}
               />

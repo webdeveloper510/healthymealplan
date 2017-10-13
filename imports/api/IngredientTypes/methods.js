@@ -2,6 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import IngredientTypes from './IngredientTypes';
 import rateLimit from '../../modules/rate-limit';
+import { getNextSequence } from '../../modules/server/get-next-sequence';
 
 Meteor.methods({
   'ingredientTypes.insert': function ingredientTypesInsert(ingredientType) {
@@ -9,8 +10,11 @@ Meteor.methods({
       title: String,
     });
 
+    let nextSeqItem = getNextSequence('types');
+    nextSeqItem = nextSeqItem.toString();
+
     try {
-      return IngredientTypes.insert({ createdBy: this.userId, ...ingredientType });
+      return IngredientTypes.insert({ SKU: nextSeqItem, ...ingredientType, createdBy: this.userId });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
