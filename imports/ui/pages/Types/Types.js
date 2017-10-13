@@ -6,6 +6,7 @@ import { timeago, monthDayYearAtTime } from '@cleverbeagle/dates';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 import { Bert } from 'meteor/themeteorchef:bert';
+import $ from 'jquery';
 
 import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
@@ -14,45 +15,191 @@ import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import Table, { TableBody, TableCell, TableHead, TableRow } from 'material-ui/Table';
 import Paper from 'material-ui/Paper';
-import Checkbox from 'material-ui/Checkbox';
+import Input from 'material-ui/Input';
+import { teal, red } from 'material-ui/colors';
+import SearchIcon from 'material-ui-icons/Search';
+import ClearIcon from 'material-ui-icons/Clear';
 
 import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 import Loading from '../../components/Loading/Loading';
-import { teal, red } from 'material-ui/colors';
+
+import Containers from 'meteor/utilities:react-list-container';
+
+const ListContainer = Containers.ListContainer;
+
+import TypesTable from './TypesTable';
 
 const primary = teal[500];
 const danger = red[700];
 
-const handleRemove = (ingredientId) => {
-  if (confirm('Are you sure? This is permanent!')) {
-    Meteor.call('ingredientTypes.remove', ingredientId, (error) => {
-      if (error) {
-        Bert.alert(error.reason, 'danger');
-      } else {
-        Bert.alert('Type deleted!', 'success');
-      }
+class Types extends React.Component {
+  constructor(props) {
+    super(props);
+
+    this.state = {
+      checkboxesSelected: false,
+      selectedCheckboxes: [],
+      selectedCheckboxesNumber: 0,
+      options: { sort: { title: 1 } },
+      searchSelector: {},
+      rowsVisible: 8,
+    };
+  }
+
+  componentDidMount() { }
+
+
+  handleRemove(ingredientId) {
+    if (confirm('Are you sure? This is permanent!')) {
+      Meteor.call('ingredientTypes.remove', ingredientId, (error) => {
+        if (error) {
+          Bert.alert(error.reason, 'danger');
+        } else {
+          Bert.alert('Type deleted!', 'success');
+        }
+      });
+    }
+  }
+
+
+  searchByName() {
+    // const searchValue = new RegExp(, 'i');
+    // console.log(searchValue);
+
+
+    this.setState({
+      searchSelector: $('#search-ingredient-text').val(),
+    });
+
+    // const query = {
+    //   title: { $regex: searchValue },
+    // };
+
+    // if ($('#search-ingredient-text').val() > 1) {
+    //   this.setState({
+    //     searchSelector: query,
+    //   });
+
+    //   return true;
+    // }
+
+    // this.setState({
+    //   searchSelector: {},
+    // });
+
+    // return false;
+  }
+
+  changeRowLimit(limit) {
+    console.log(limit);
+    this.setState({
+      rowsVisible: limit,
     });
   }
-};
-
-const IngredientTypes = ({ loading, ingredients, match, history }) => (!loading ? (
-  <div>
-    <AuthenticatedSideNav history={history} />
-
-    <Grid container className="SideContent SideContent--spacer-2x--horizontal" spacing={8}>
-
-      <Grid container className="clearfix">
-        <Grid item xs={6}>
-          <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }} color="inherit">Types</Typography>
-        </Grid>
-        <Grid item xs={6}>
-          <Button className="button button--primary" onClick={() => history.push('/types/new')} raised color="primary" style={{ float: 'right', backgroundColor: primary }}>Add type</Button>
-        </Grid>
-      </Grid>
 
 
-      <Grid container>
+  clearSearchBox() {
+    $('#search-ingredient-text').val('');
+
+    this.setState({
+      searchSelector: {},
+    });
+
+    this.props.popTheSnackbar({
+      message: 'This is a message',
+      duration: 10000,
+      buttonText: 'This is a button',
+      buttonLink: '/types',
+    });
+  }
+
+  sortByOption(event) {
+    const field = event.currentTarget.getAttribute('data-sortby');
+
+    // This is a filler object that we are going to use set the state with.
+    // Putting the sortBy field using index as objects can also be used as arrays.
+    // the value of it would be 1 or -1 Asc or Desc
+
+    const options = {};
+    options[field] = 1;
+
+    this.setState({
+      options: { sort: options },
+    });
+  }
+
+  render() {
+    const { loading, ingredients, match, history } = this.props;
+    return (!loading ? (
+      <div>
+        <AuthenticatedSideNav history={history} />
+
+        <Grid container className="SideContent SideContent--spacer-2x--horizontal" spacing={8}>
+
+          <Grid container className="clearfix">
+            <Grid item xs={6}>
+              <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }} color="inherit">Types</Typography>
+            </Grid>
+            <Grid item xs={6}>
+              <Button className="button button--primary" onClick={() => history.push('/types/new')} raised color="primary" style={{ float: 'right', backgroundColor: primary }}>Add type</Button>
+            </Grid>
+          </Grid>
+
+          <div style={{ width: '100%',
+            background: '#FFF',
+            borderTopRightRadius: '2px',
+            borderTopLeftRadius: '2px',
+            marginTop: '3em',
+            padding: '16px 25px 1em',
+            boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
+            position: 'relative' }}
+          >
+
+            <SearchIcon
+              className="autoinput-icon autoinput-icon--search"
+              style={{ display: (this.state.searchSelector.length > 0) ? 'none' : 'block', top: '33%', right: '1.8em !important' }}
+            />
+
+            <ClearIcon
+              className="autoinput-icon--clear"
+              onClick={this.clearSearchBox.bind(this)}
+              style={{ cursor: 'pointer',
+                display: (this.state.searchSelector.length > 0) ? 'block' : 'none' }}
+            />
+
+            <Input
+              className="input-box"
+              style={{ width: '100%', position: 'relative' }}
+              placeholder="Search types"
+              onKeyUp={this.searchByName.bind(this)}
+              inputProps={{
+                id: 'search-ingredient-text',
+                'aria-label': 'Description',
+              }}
+            />
+          </div>
+          <ListContainer
+            limit={6}
+            collection={IngredientTypesCollection}
+            publication="ingredients"
+            options={this.state.options}
+            selector={{ title: { $regex: new RegExp(this.state.searchSelector, 'i') } }}
+          >
+
+            <TypesTable
+              searchTerm={this.state.searchSelector}
+              changeRowLimit={this.changeRowLimit.bind(this)}
+              rowsLimit={this.state.rowsVisible}
+              history={this.props.history}
+              soryByOptions={this.sortByOption}
+            />
+
+          </ListContainer>
+
+          {/* selector={{ $or: [{ title: new RegExp(this.state.searchSelector) }, { SKU: new RegExp(this.state.searchSelector) }] }} */}
+
+          {/* <Grid container>
         <Grid item xs={12}>
           <Paper elevation={2} className="table-container">
             {ingredients.length ?
@@ -70,8 +217,8 @@ const IngredientTypes = ({ loading, ingredients, match, history }) => (!loading 
                       <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '100px' }} padding="checkbox">
                         <Checkbox id={_id} onChange={this.rowSelected} />
                       </TableCell>
-                      <TableCell onClick={() => history.push(`${match.url}/${_id}`)}><Typography type="subheading">{title}</Typography></TableCell>
-                      {/* <TableCell>
+                      <TableCell onClick={() => history.push(`${match.url}/${_id}`)}><Typography type="subheading">{title}</Typography></TableCell> */}
+          {/* <TableCell>
                         <Button
                           raised
                           color="primary"
@@ -84,18 +231,18 @@ const IngredientTypes = ({ loading, ingredients, match, history }) => (!loading 
                           onClick={() => handleRemove(_id)}
                         >Delete</Button>
                       </TableCell> */}
-                    </TableRow>
-                  ))}
-              </TableBody>
+          {/* </TableRow> </TableBody>
               </Table> : <Alert bsStyle="warning">No Types yet!</Alert>}
           </Paper>
         </Grid>
-      </Grid>
-    </Grid>
-  </div>
-) : <Loading />);
+      </Grid> */}
+        </Grid>
+      </div>
+    ) : <Loading />);
+  }
+}
 
-IngredientTypes.propTypes = {
+Types.propTypes = {
   loading: PropTypes.bool.isRequired,
   ingredients: PropTypes.arrayOf(PropTypes.object).isRequired,
   match: PropTypes.object.isRequired,
@@ -108,4 +255,4 @@ export default createContainer(() => {
     loading: !subscription.ready(),
     ingredients: IngredientTypesCollection.find().fetch(),
   };
-}, IngredientTypes);
+}, Types);

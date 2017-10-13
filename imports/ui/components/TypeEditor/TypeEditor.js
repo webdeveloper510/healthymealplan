@@ -60,11 +60,13 @@ class TypeEditor extends React.Component {
 
     Meteor.call(methodToCall, ingredientType, (error, ingredientTypeId) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        // Bert.alert(error.reason, 'danger');
+
       } else {
-        const confirmation = existingIngredientType ? 'Type updated!' : 'Type added!';
-        // this.form.reset();
-        Bert.alert(confirmation, 'success');
+        const confirmation = existingIngredientType ? 'Type updated' : 'Type added.';
+        this.form.reset();
+        // Bert.alert(confirmation, 'success');
+
         history.push(`/types/${ingredientTypeId}`);
       }
     });
@@ -73,51 +75,44 @@ class TypeEditor extends React.Component {
   render() {
     const { ingredientType } = this.props;
     return (
-      <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
-        <Grid container justify="center">
-          <Grid item xs={10}>
-            <Grid container>
-              <Grid item xs={6}>
-                <Typography type="subheading">Unsaved Type</Typography>
-              </Grid>
+      <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
 
-              <Grid item xs={6}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                  <Button>Cancel</Button>
-                  <Button raised style={{ backgroundColor: primary, margin: '1dp' }} color="contrast">Save</Button>
-                </div>
-              </Grid>
-            </Grid>
+        <Grid container>
+          <Grid item xs={6}>
+            <Typography type="subheading">Unsaved Type</Typography>
           </Grid>
-        </Grid>
 
-        <Grid container justify="center">
-          <Grid item xs={10}>
-            <Grid container>
-              <Grid item xs={12}>
-                <Link to="/types">
-                  <Typography type="subheading" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}><ArrowBack className={styles.icon} /> Types</Typography>
-                </Link>
-
-                <Typography type="title">Add new type</Typography>
-
-              </Grid>
-
-            </Grid>
+          <Grid item xs={6}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <Button>Cancel</Button>
+              <Button raised style={{ backgroundColor: primary, margin: '1dp' }} color="contrast">Save</Button>
+            </div>
           </Grid>
         </Grid>
 
 
         <Grid container justify="center">
-          <Grid item xs={10}>
-            <Grid container>
-              <Grid item xs={12} sm={6}>
-                <Typography type="subheading">
+
+          <Grid item xs={12}>
+            <Link to="/types">
+              <Typography type="subheading" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}><ArrowBack className={styles.icon} /> Types</Typography>
+            </Link>
+
+            <Typography type="title">Add new type</Typography>
+
+          </Grid>
+        </Grid>
+
+
+        <Grid container justify="center">
+
+          <Grid item xs={12} sm={6}>
+            <Typography type="subheading">
               Type
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={6}>
-                {/* <ControlLabel>Title</ControlLabel>
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={6}>
+            {/* <ControlLabel>Title</ControlLabel>
             <input
               type="text"
               className="form-control"
@@ -125,37 +120,31 @@ class TypeEditor extends React.Component {
               
               placeholder="Oh, The Places You'll Go!"
             /> */}
-                <TextField
-                  id="title"
-                  label="Enter the name of the type"
-                  margin="normal"
-                  name="title"
-                  fullWidth
-                  defaultValue={ingredientType && ingredientType.title}
-                  ref={title => (this.title = title)}
-                />
-              </Grid>
-            </Grid>
+            <TextField
+              id="title"
+              label="Enter the name of the type"
+              margin="normal"
+              name="title"
+              fullWidth
+              defaultValue={ingredientType && ingredientType.title}
+              ref={title => (this.title = title)}
+            />
           </Grid>
         </Grid>
 
         <Grid container justify="center">
-          <Grid item xs={10}>
-            <Grid container>
-              <Grid item xs={6}>
-                <Button type="submit" raised >
+          <Grid item xs={6}>
+            <Button raised onClick={() => history.push('/types')}>
                   Cancel
-                </Button>
-              </Grid>
+            </Button>
+          </Grid>
 
-              <Grid item xs={6}>
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                  <Button type="submit" raised style={{ backgroundColor: primary, margin: '1dp' }} color="contrast">
-                    {ingredientType && ingredientType._id ? 'Save Changes' : 'Add Type'}
-                  </Button>
-                </div>
-              </Grid>
-            </Grid>
+          <Grid item xs={6}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
+              <Button type="submit" raised style={{ backgroundColor: primary, margin: '1dp' }} color="contrast">
+                {ingredientType && ingredientType._id ? 'Save Changes' : 'Add Type'}
+              </Button>
+            </div>
           </Grid>
         </Grid>
 

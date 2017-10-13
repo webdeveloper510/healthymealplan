@@ -5,11 +5,15 @@ import { Meteor } from 'meteor/meteor';
 import IngredientTypes from '../../../api/IngredientTypes/IngredientTypes';
 import TypeEditor from '../../components/TypeEditor/TypeEditor';
 import NotFound from '../NotFound/NotFound';
+import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
+import Grid from 'material-ui/Grid';
 
-const EditType = ({ ingredientType, history }) => (ingredientType ? (
-  <div className="EditType">
-    <h4 className="page-header">{`Editing "${ingredientType.title}"`}</h4>
-    <TypeEditor ingredientType={ingredientType} history={history} />
+const EditType = ({ ingredientType, history, popTheSnackbar }) => (ingredientType ? (
+  <div>
+    <AuthenticatedSideNav history={history} />,
+    <Grid container className="EditType SideContent SideContent--spacer-2x--horizontal">
+      <TypeEditor ingredientType={ingredientType} popTheSnackbar={popTheSnackbar} history={history} />
+    </Grid>
   </div>
 ) : <NotFound />);
 
@@ -20,6 +24,7 @@ EditType.defaultProps = {
 EditType.propTypes = {
   ingredientType: PropTypes.object,
   history: PropTypes.object.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 export default createContainer(({ match }) => {

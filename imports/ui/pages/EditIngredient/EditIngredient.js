@@ -9,9 +9,7 @@ import Grid from 'material-ui/Grid';
 import Ingredients from '../../../api/Ingredients/Ingredients';
 import IngredientTypes from '../../../api/IngredientTypes/IngredientTypes';
 
-
 import IngredientEditor from '../../components/IngredientEditor/IngredientEditor';
-
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 
 import NotFound from '../NotFound/NotFound';
@@ -20,7 +18,13 @@ const EditIngredient = ({ ingredient, history, potentialSubIngredients, ingredie
   <div>
     <AuthenticatedSideNav history={history} />,
     <Grid container className="EditIngredient SideContent SideContent--spacer-2x--horizontal">
-      <IngredientEditor ingredient={ingredient} potentialSubIngredients={potentialSubIngredients} popTheSnackbar={popTheSnackbar} ingredientTypes={ingredientTypes} history={history} />
+      <IngredientEditor
+        ingredient={ingredient}
+        potentialSubIngredients={potentialSubIngredients}
+        popTheSnackbar={popTheSnackbar}
+        ingredientTypes={ingredientTypes}
+        history={history}
+      />
     </Grid>
   </div>
 ) : <NotFound />);
@@ -34,6 +38,7 @@ EditIngredient.propTypes = {
   history: PropTypes.object.isRequired,
   potentialSubIngredients: PropTypes.isRequired,
   ingredientTypes: PropTypes.array.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 export default createContainer(({ match }) => {

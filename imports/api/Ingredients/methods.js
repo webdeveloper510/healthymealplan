@@ -16,14 +16,15 @@ Meteor.methods({
     const existsingredient = Ingredients.findOne({ title: ingredient.title });
 
     if (existsingredient) {
-      throw new Meteor.Error('500', `${ingredient.title } is already present`);
+      throw new Meteor.Error('500', `${ingredient.title} is already present`);
     }
 
-    const nextSeqItem = getNextSequence('ingredients');
+    let nextSeqItem = getNextSequence('ingredients');
+    nextSeqItem = nextSeqItem.toString();
 
     try {
       return Ingredients.insert({
-        SKU: `${nextSeqItem}`,
+        SKU: nextSeqItem,
         title: ingredient.title,
         subIngredients: ingredient.subIngredients,
         typeId: ingredient.typeId,

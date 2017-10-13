@@ -18,6 +18,11 @@ IngredientTypes.deny({
 });
 
 IngredientTypes.schema = new SimpleSchema({
+  SKU: {
+    type: String,
+    label: 'SKU of the item',
+  },
+
   title: {
     type: String,
     label: 'The title of the ingredient.',

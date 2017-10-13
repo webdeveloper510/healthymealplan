@@ -16,6 +16,13 @@ import TextField from 'material-ui/TextField';
 import Select from 'material-ui/Select';
 import Input, { InputLabel } from 'material-ui/Input';
 import { FormControl, FormHelperText } from 'material-ui/Form';
+import Dialog, {
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from 'material-ui/Dialog';
+
 
 import Chip from 'material-ui/Chip';
 import Paper from 'material-ui/Paper';
@@ -47,13 +54,13 @@ class IngredientEditor extends React.Component {
 
     this.state = {
       value: '', // Autosuggest
-      valueTypes: this.props.ingredient && this.props.ingredient.typeMain ? this.props.ingredient.typeMain.title
-        : '',
+      valueTypes: this.props.ingredient && this.props.ingredient.typeMain ? this.props.ingredient.typeMain.title : '',
       suggestions: [],
       suggestionsTypes: [],
       types: this.props.ingredientTypes ? this.props.ingredientTypes : [],
       subIngredients: this.props.ingredient ? this.props.ingredient.subIngredients : [],
       selectedType: this.props.ingredient.typeId,
+      deleteDialogOpen: false,
     };
   }
 
@@ -77,9 +84,17 @@ class IngredientEditor extends React.Component {
   }
 
 
+  /* Dialog box controls */
+  deleteDialogHandleClickOpen() {
+    this.setState({ deleteDialogOpen: true });
+  }
+
+  deleteDialogHandleRequestClose() {
+    this.setState({ deleteDialogOpen: false });
+  }
+
+
   // Use your imagination to render suggestions.
-
-
   onChange(event, { newValue }) {
     this.setState({
       value: newValue,
@@ -95,7 +110,6 @@ class IngredientEditor extends React.Component {
   onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
     const clonedSubIngredients = this.state.subIngredients ? this.state.subIngredients.slice() : [];
 
-    // console.log(suggestion);
     let isThere = false;
 
     if (clonedSubIngredients.length > 0) {
@@ -192,32 +206,37 @@ class IngredientEditor extends React.Component {
     return suggestion.title;
   }
 
-  handleRemove() {
+  handleRemoveActual() {
+    const { popTheSnackbar, history } = this.props;
+
     const existingIngredient = this.props.ingredient && this.props.ingredient._id;
+    localStorage.setItem('ingredientDeleted', existingIngredient.title);
+    const ingredientDeletedMessage = `${localStorage.getItem('ingredientDeleted')} deleted from ingredients.`;
 
-    if (confirm('Are you sure? This is permanent!')) {
-      Meteor.call('ingredients.remove', existingIngredient, (error) => {
-        if (error) {
-          // Bert.alert(error.reason, 'danger');
+    this.deleteDialogHandleRequestClose.bind(this);
 
-          this.props.popTheSnackbar({
-            message: error.reason,
+    Meteor.call('ingredients.remove', existingIngredient, (error) => {
+      if (error) {
+        popTheSnackbar({
+          message: error.reason,
+        });
+      } else {
+        popTheSnackbar({
+          message: ingredientDeletedMessage,
+        });
 
-          });
-        } else {
-          this.props.popTheSnackbar({
-            message: 'Ingredient deleted!',
-          });
+        history.push('/ingredients');
+      }
+    });
+  }
 
-          this.props.history.push('/ingredients');
-          // Bert.alert('Ingredient deleted!', 'success');
-        }
-      });
-    }
+
+  handleRemove() {
+    this.deleteDialogHandleClickOpen();
   }
 
   handleSubmit() {
-    const { history } = this.props;
+    const { history, popTheSnackbar } = this.props;
     const existingIngredient = this.props.ingredient && this.props.ingredient._id;
     const methodToCall = existingIngredient ? 'ingredients.update' : 'ingredients.insert';
 
@@ -234,27 +253,53 @@ class IngredientEditor extends React.Component {
 
     ingredient.typeId = typeActual._id;
 
-    console.log(ingredient);
-
+    // console.log(ingredient);
 
     Meteor.call(methodToCall, ingredient, (error, ingredientId) => {
       if (error) {
-        this.props.popTheSnackbar({
+        popTheSnackbar({
           message: error.reason,
         });
       } else {
-        console.log(`${ingredientId} returned from method`);
-        const confirmation = existingIngredient ? 'Ingredient updated!' : 'Ingredient added!';
-        this.form.reset();
-        this.props.popTheSnackbar({
+        localStorage.setItem('ingredientForSnackbar', ingredient.title || $('[name="title"]').val());
+
+        const confirmation = existingIngredient ? (`${localStorage.getItem('ingredientForSnackbar')} ingredient updated.`)
+          : `${localStorage.getItem('ingredientForSnackbar')} ingredient added.`;
+        // this.form.reset();
+
+        popTheSnackbar({
           message: confirmation,
           buttonText: 'View',
-          buttonLink: `/ingredients/${ingredientId}`,
+          buttonLink: `/ingredients/${ingredientId}/edit`,
         });
 
-        this.props.history.push('/ingredients');
+        history.push('/ingredients');
       }
     });
+  }
+
+  renderDeleteDialog() {
+    return (
+      <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
+        <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
+        Delete {this.props.ingredient.title.toLowerCase()}?
+        </Typography>
+        <DialogContent>
+          <DialogContentText className="subheading">
+          Are you sure you want to delete {this.props.ingredient.title.toLowerCase()} { (this.props.ingredient && this.props.ingredient.typeMain) ?
+              `from ${this.props.ingredient.typeMain.title.toLowerCase()}?` : '?'}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
+          Cancel
+          </Button>
+          <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleRemoveActual.bind(this)} color="accent">
+          Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
   }
 
   renderSuggestion(suggestion) {
@@ -362,6 +407,7 @@ class IngredientEditor extends React.Component {
   }
 
   render() {
+    console.log(this.props);
     const { ingredient, ingredientTypes, history } = this.props;
 
     if (!ingredient || !ingredientTypes) {
@@ -388,7 +434,7 @@ class IngredientEditor extends React.Component {
           <Grid item xs={4}>
             <Typography type="headline" style={{ fontWeight: 500 }}>{ingredient && ingredient._id ? `${ingredient.title}` : 'Add ingredient'}</Typography>
 
-            {ingredient ?
+            {this.props.ingredient ?
               (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1"> SKU {ingredient.SKU ? ingredient.SKU : ''} </Typography>)
               : '' }
 
@@ -396,7 +442,7 @@ class IngredientEditor extends React.Component {
           <Grid item xs={8}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
               <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
-              <Button raised style={{ backgroundColor: primary, margin: '1dp' }} onClick={() => this.form.submit()} color="contrast">Save</Button>
+              <Button raised style={{ backgroundColor: primary, margin: '1dp' }} type="submit" color="contrast">Save</Button>
             </div>
           </Grid>
         </Grid>
@@ -493,9 +539,8 @@ class IngredientEditor extends React.Component {
                     focusInputOnSuggestionClick={false}
 
                     inputProps={{
-                      autoFocus: true,
                       placeholder: 'Search',
-                      value: ingredient.typeMain ? ingredient.typeMain.title : this.state.valueTypes,
+                      value: this.state.valueTypes,
                       onChange: this.onChangeTypes.bind(this),
                       className: 'auto',
                     }}
@@ -611,6 +656,8 @@ class IngredientEditor extends React.Component {
             </Grid>
           </Grid>
         </Grid>
+
+        {this.renderDeleteDialog()}
       </form>);
   }
 }
@@ -624,6 +671,7 @@ IngredientEditor.propTypes = {
   ingredientTypes: PropTypes.array.isRequired,
   potentialSubIngredients: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 export default IngredientEditor;

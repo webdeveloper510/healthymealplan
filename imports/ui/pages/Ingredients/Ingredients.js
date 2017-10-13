@@ -229,7 +229,7 @@ class Ingredients extends React.Component {
               />
             </div>
             <ListContainer
-              limit={6}
+              limit={7}
               collection={IngredientsCollection}
               publication="ingredients"
               options={this.state.options}

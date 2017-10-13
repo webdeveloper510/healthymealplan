@@ -19,10 +19,10 @@ import Menu, { MenuItem } from 'material-ui/Menu';
 
 
 import { createContainer } from 'meteor/react-meteor-data';
-import IngredientsCollection from '../../../api/Ingredients/Ingredients';
+import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
 import Loading from '../../components/Loading/Loading';
 
-class IngredientsTable extends React.Component {
+class TypesTable extends React.Component {
   constructor(props) {
     super(props);
 
@@ -30,21 +30,21 @@ class IngredientsTable extends React.Component {
       checkboxesSelected: false,
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      // rowsVisible: 5,
+      rowsVisible: 5,
       rowsMenuOpen: false,
       anchorEl: null,
     };
   }
 
-  renderSubIngredientsNumber(subIngredient) {
-    if (subIngredient && subIngredient.length > 1) {
-      return `${subIngredient.length} sub-ingredients`;
-    } else if (subIngredient && subIngredient.length == 1) {
-      return `${subIngredient.length} sub-ingredient`;
-    }
+  // renderSubIngredientsNumber(subIngredient) {
+  //   if (subIngredient && subIngredient.length > 1) {
+  //     return `${subIngredient.length} sub-ingredients`;
+  //   } else if (subIngredient && subIngredient.length == 1) {
+  //     return `${subIngredient.length} sub-ingredient`;
+  //   }
 
-    return '';
-  }
+  //   return '';
+  // }
 
   renderType(type) {
     console.log(type);
@@ -81,7 +81,7 @@ class IngredientsTable extends React.Component {
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No ingredient found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
+        <p style={{ padding: '25px' }} className="subheading">No type found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
       );
     }
   }
@@ -89,6 +89,7 @@ class IngredientsTable extends React.Component {
 
   render() {
     console.log(this.props);
+
     return (
       <Paper elevation={2} className="table-container">
         <p> {this.state.checkboxesSelected > 1 ? (`${this.state.selectedCheckboxes} items selected`) : ''}</p>
@@ -100,8 +101,7 @@ class IngredientsTable extends React.Component {
                 <TableCell padding="checkbox" style={{ width: '80px' }}><Checkbox onClick={this.selectAllRows.bind(this)} /></TableCell>
                 <TableCell padding="none"><Typography className="body2" type="body2">SKU</Typography></TableCell>
 
-                <TableCell padding="none"><Typography className="body2" type="body2">Ingredient</Typography></TableCell>
-                <TableCell><Typography className="body2" type="body2">Type</Typography></TableCell>
+                <TableCell padding="none"><Typography className="body2" type="body2">Type</Typography></TableCell>
               </TableRow>
             </TableHead>)
             : ''
@@ -113,24 +113,20 @@ class IngredientsTable extends React.Component {
                   <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '80px' }} padding="checkbox">
                     <Checkbox className="row-checkbox" id={e._id} onChange={this.rowSelected.bind(this)} />
                   </TableCell>
-                  <TableCell padding="none" style={{ width: '200px' }} onClick={() => this.props.history.push(`ingredients/${e._id}/edit`)}>
+                  <TableCell padding="none" onClick={() => this.props.history.push(`types/${e._id}/edit`)}>
                     <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
                   </TableCell>
 
-                  <TableCell style={{ paddingTop: '10px', paddingBottom: '10px' }} padding="none" onClick={() => this.props.history.push(`ingredients/${e._id}/edit`)}>
-
+                  <TableCell style={{ paddingTop: '10px', paddingBottom: '10px' }} padding="none" onClick={() => this.props.history.push(`types/${e._id}/edit`)}>
                     <Typography type="subheading" style={{ textTransform: 'capitalize' }}>{e.title}</Typography>
-                    <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                      {this.renderSubIngredientsNumber(e.subIngredients)}
-                    </Typography>
 
                   </TableCell>
-                  <TableCell>
+                  {/* <TableCell>
                     {e.typeMain ? (<Typography type="subheading">{e.typeMain.title}</Typography>)
                       : (<Typography className="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>)}
 
 
-                  </TableCell>
+                  </TableCell> */}
                 </TableRow>
               ))
             }
@@ -144,7 +140,7 @@ class IngredientsTable extends React.Component {
             <TableRow>
               <TableCell>
                 <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                  {this.props.count} of {this.props.ingredientCount} ingredients
+                  {this.props.count} of {this.props.typesCount} types
                 </Typography>
                 {/* <Typography className="body1" type="body1">Rows</Typography>
                 <Button id="simple-menu-anchor" dense aria-owns={this.state.rowsMenuOpen ? 'simple-menu' : null} aria-haspopup="true" onClick={this.handleClick.bind(this)}>
@@ -180,7 +176,7 @@ class IngredientsTable extends React.Component {
   }
 }
 
-IngredientsTable.propTypes = {
+TypesTable.propTypes = {
   loading: PropTypes.bool.isRequired,
   results: PropTypes.isRequired,
   history: PropTypes.isRequired,
@@ -188,10 +184,10 @@ IngredientsTable.propTypes = {
 
 
 export default createContainer(() => {
-  const ingredientCountSub = Meteor.subscribe('ingredients-all-count');
+  const typesCountSub = Meteor.subscribe('types-all-count');
 
   return {
     // ingredientTypes: IngredientsWithTypes.find().fetch(),
-    ingredientCount: Counts.get('ingredients'),
+    typesCount: Counts.get('types'),
   };
-}, IngredientsTable);
+}, TypesTable);

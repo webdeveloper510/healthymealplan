@@ -20,8 +20,8 @@ Ingredients.deny({
 Ingredients.schema = new SimpleSchema({
 
   SKU: {
-    type: Number,
-    label: "SKU of the item"
+    type: String,
+    label: 'SKU of the item',
   },
 
   title: {

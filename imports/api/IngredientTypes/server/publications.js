@@ -9,3 +9,8 @@ Meteor.publish('ingredientTypes.view', (ingredientTypeId) => {
   check(ingredientTypeId, String);
   return IngredientTypes.find({ _id: ingredientTypeId });
 });
+
+Meteor.publish('types-all-count', function () {
+  Counts.publish(this, 'types', IngredientTypes.find());
+});
+

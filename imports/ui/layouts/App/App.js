@@ -117,13 +117,12 @@ class App extends React.Component {
             open={this.state.snackbarOpen}
             onRequestClose={this.handleRequestClose.bind(this)}
             action={this.state.snackbarButtonText ? (<Link to={this.state.snackbarButtonLink}><Button color="accent" dense onClick={this.props.onClickHandler}>{this.state.snackbarButtonText}</Button></Link>) : ''}
-            message={<span id="message-id" className="body2 font-uppercase">{this.state.snackbarMessageText}</span>}
-            autoHideDuration={5000}
+            message={<span id="message-id" className="body2">{this.state.snackbarMessageText}</span>}
+            autoHideDuration={4000}
           />
 
           <Switch>
             <Route exact name="index" path="/" component={Index} />
-
 
             <Authenticated exact path="/ingredients" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Ingredients} {...this.props} />
             <Authenticated exact path="/ingredients/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewIngredient} {...this.props} />

@@ -9,8 +9,6 @@ Meteor.methods({
       title: String,
     });
 
-    console.log(ingredientType);
-
     try {
       return IngredientTypes.insert({ createdBy: this.userId, ...ingredientType });
     } catch (exception) {
