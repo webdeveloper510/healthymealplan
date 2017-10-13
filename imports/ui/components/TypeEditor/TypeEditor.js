@@ -22,6 +22,8 @@ import Dialog, {
 import { Bert } from 'meteor/themeteorchef:bert';
 import validate from '../../../modules/validate';
 import { teal, red } from 'material-ui/colors';
+import ChevronLeft from 'material-ui-icons/ChevronLeft';
+import Paper from 'material-ui/Paper';
 
 const primary = teal[500];
 const danger = red[700];
@@ -41,6 +43,7 @@ class TypeEditor extends React.Component {
 
     this.state = {
       deleteDialogOpen: false,
+      hasFormChanged: false,
 
     };
   }
@@ -49,6 +52,10 @@ class TypeEditor extends React.Component {
   componentDidMount() {
     const component = this;
     validate(component.form, {
+
+      errorPlacement: function(error, element){
+        error.insertAfter($(element).parent().parent()); 
+      },
 
       rules: {
         title: {
@@ -140,56 +147,66 @@ class TypeEditor extends React.Component {
     });
   }
 
+  titleFieldChanged(e){
+    
+    console.log(e.currentTarget.value.length)
+
+    const hasFormChanged = e.currentTarget.value.length > 0 ? true : false;
+
+    this.setState({
+      hasFormChanged: hasFormChanged
+    })
+  }
+    
+
   render() {
     const { ingredientType, history } = this.props;
     return (
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
 
         <Grid container>
+          <Grid item xs={12}>
+              <Button onClick={() => this.props.history.push('/types')} className="button button-secondary button-secondary--top">
+                <Typography type="subheading" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}><ChevronLeft style={{ marginRight: '4px' }} /> Types</Typography>
+              </Button>
+            </Grid>
+          
+        </Grid>
+
+
+        <Grid container style={{ marginBottom: "50px" }}>
           <Grid item xs={6}>
-            <Typography type="subheading">Unsaved Type</Typography>
+            <Typography type="headline" className="headline font-medium">Add new type</Typography>
           </Grid>
 
           <Grid item xs={6}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
               <Button>Cancel</Button>
-              <Button raised style={{ backgroundColor: primary, margin: '1dp' }} color="contrast">Save</Button>
+              <Button raised disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">Save</Button>
             </div>
           </Grid>
         </Grid>
 
 
-        <Grid container justify="center">
-
-          <Grid item xs={12}>
-            <Link to="/types">
-              <Typography type="subheading" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}><ArrowBack className={styles.icon} /> Types</Typography>
-            </Link>
-
-            <Typography type="title">Add new type</Typography>
-
-          </Grid>
-        </Grid>
-
-
-        <Grid container justify="center">
-
-          <Grid item xs={12} sm={6}>
-            <Typography type="subheading">
+        <Grid container style={{ marginBottom: '50px' }}>
+          <Grid item xs={12} sm={4}>
+            <Typography type="subheading" className="font-medium">
               Type
             </Typography>
           </Grid>
-          <Grid item xs={12} sm={6}>
-
-            <TextField
-              id="title"
-              label="Enter the name of the type"
-              margin="normal"
-              name="title"
-              fullWidth
-              defaultValue={ingredientType && ingredientType.title}
-              ref={title => (this.title = title)}
-            />
+          <Grid item xs={12} sm={8}>
+            <Paper elevation={2} className="paper-for-fields">
+              <TextField
+                id="title"
+                label="Enter the name of the type"
+                margin="normal"
+                name="title"
+                fullWidth
+                onChange={this.titleFieldChanged.bind(this)}
+                defaultValue={ingredientType && ingredientType.title}
+                ref={title => (this.title = title)}
+              />
+            </Paper>
           </Grid>
         </Grid>
 
@@ -201,8 +218,8 @@ class TypeEditor extends React.Component {
 
           <Grid item xs={6}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <Button type="submit" raised style={{ backgroundColor: primary, margin: '1dp' }} color="contrast">
-                {ingredientType && ingredientType._id ? 'Save Changes' : 'Add Type'}
+              <Button type="submit" raised  disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">
+                Save
               </Button>
             </div>
           </Grid>

@@ -69,6 +69,11 @@ class IngredientEditor extends React.Component {
   componentDidMount() {
     const component = this;
     validate(component.form, {
+
+      errorPlacement: function(error, element){
+        error.insertAfter($(element).parent().parent()); 
+      },
+
       rules: {
         title: {
           required: true,
@@ -445,15 +450,11 @@ class IngredientEditor extends React.Component {
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
         <Grid container justify="center">
           <Grid item xs={12}>
-            <Grid container >
-              <Grid item xs={12}>
-                <Button onClick={() => this.props.history.push('/ingredients')} className="button button-secondary button-secondary--top">
-                  <Typography type="subheading" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}><ChevronLeft style={{ marginRight: '4px' }} /> Ingredients</Typography>
-                </Button>
+           
+              <Button onClick={() => this.props.history.push('/ingredients')} className="button button-secondary button-secondary--top">
+                <Typography type="subheading" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}><ChevronLeft style={{ marginRight: '4px' }} /> Ingredients</Typography>
+              </Button>
 
-              </Grid>
-
-            </Grid>
           </Grid>
         </Grid>
 
@@ -568,10 +569,9 @@ class IngredientEditor extends React.Component {
 
                     inputProps={{
                       placeholder: 'Search',
-                      
                       value: this.state.valueTypes,
                       onChange: this.onChangeTypes.bind(this),
-                      className: 'auto',
+                      className: 'auto type-autocomplete',
                     }}
                   />
 
