@@ -9,7 +9,7 @@ import Ingredients from '../Ingredients';
 // import IngredientTypes from '../../IngredientTypes/IngredientTypes';
 
 
-Meteor.publish('ingredients', (selector, options) => {
+Meteor.publish('ingredients', function ingredients(selector, options){
   check(selector, Match.Any);
   check(options, Match.Any);
 

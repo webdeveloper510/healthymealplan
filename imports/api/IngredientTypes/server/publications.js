@@ -3,7 +3,7 @@ import { check } from 'meteor/check';
 import { Match } from 'meteor/check';
 import IngredientTypes from '../IngredientTypes';
 
-Meteor.publish('ingredientTypes', (selector, options) => {
+Meteor.publish('ingredientTypes', function ingredientTypes(selector, options){
   check(selector, Match.Any);
   check(options, Match.Any);
 

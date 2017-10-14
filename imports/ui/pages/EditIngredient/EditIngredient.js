@@ -10,13 +10,11 @@ import Ingredients from '../../../api/Ingredients/Ingredients';
 import IngredientTypes from '../../../api/IngredientTypes/IngredientTypes';
 
 import IngredientEditor from '../../components/IngredientEditor/IngredientEditor';
-import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 
 import NotFound from '../NotFound/NotFound';
 
 const EditIngredient = ({ ingredient, history, potentialSubIngredients, ingredientTypes, popTheSnackbar }) => (ingredient ? (
   <div>
-    <AuthenticatedSideNav history={history} />,
     <Grid container className="EditIngredient SideContent SideContent--spacer-2x--horizontal">
       <IngredientEditor
         ingredient={ingredient}

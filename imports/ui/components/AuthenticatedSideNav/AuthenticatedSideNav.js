@@ -75,6 +75,8 @@ class AuthenticatedSideNav extends Component {
 
   render() {
     const { history } = this.props;
+    
+    console.log(this.props);
 
     return (
       <div className="page-container__side-nav">
@@ -99,7 +101,7 @@ class AuthenticatedSideNav extends Component {
           </ListItem>
 
           <Collapse in={this.state.kitchenOpen} transitionDuration="auto" unmountOnExit>
-            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/orders')}>
+            {/* <ListItem className="padding-left-nested-item" button onClick={() => history.push('/orders')}>
               <ListItemIcon>
                 <OrderIcon className="side-nav-icon" />
               </ListItemIcon>
@@ -111,7 +113,7 @@ class AuthenticatedSideNav extends Component {
                 <MealsIcon className="side-nav-icon" />
               </ListItemIcon>
               <ListItemText className="subheading" primary="Meals" />
-            </ListItem>
+            </ListItem> */}
 
             <ListItem className="padding-left-nested-item" button onClick={() => history.push('/ingredients')}>
               <ListItemIcon >
@@ -127,7 +129,7 @@ class AuthenticatedSideNav extends Component {
 
               <ListItemText className="subheading" primary="Types" />
             </ListItem>
-
+{/* 
             <ListItem className="padding-left-nested-item" button onClick={() => history.push('/lifestyles')}>
               <ListItemIcon>
                 <LifestylesIcon className="side-nav-icon" />
@@ -140,11 +142,11 @@ class AuthenticatedSideNav extends Component {
                 <RestrictionsIcon className="side-nav-icon" />
               </ListItemIcon>
               <ListItemText className="subheading" primary="Restrictions" />
-            </ListItem>
+            </ListItem> */}
 
           </Collapse>
 
-          <ListItem button onClick={this.handleToggleDelivery.bind(this)}>
+          {/* <ListItem button onClick={this.handleToggleDelivery.bind(this)}>
 
             <ListItemIcon>
               <DeliveryIcon className="side-nav-icon" />
@@ -170,8 +172,8 @@ class AuthenticatedSideNav extends Component {
               <ListItemText className="subheading" primary="Routes" />
             </ListItem>
 
-          </Collapse>
-
+          </Collapse> */}
+{/* 
           <ListItem button onClick={() => history.push('/customers')}>
             <ListItemIcon>
               <CustomersIcon className="side-nav-icon" />
@@ -200,7 +202,7 @@ class AuthenticatedSideNav extends Component {
               <ListItemText className="subheading" primary="Team" />
             </ListItem>
 
-          </Collapse>
+          </Collapse> */}
 
         </List>
       </div>

@@ -12,18 +12,22 @@ body{ background: #FAFAFA }
   right:0;
 }
 
-.SideContent{
-  padding-top: 100px !important;
-  margin: 0 0 0 25rem !important;
-  width: auto !important;
-  padding-top: 3rem;
+// .SideContent{
+//   padding-top: 100px !important;
+//   margin: 0 0 0 25rem !important;
+//   width: auto !important;
+//   padding-top: 3rem;
+// }
+
+// .SideContent--shrinked{ padding-top: 0; }
+
+.SideContent--spacer-2x--horizontal {
+  padding-left: 2.5em;
+  padding-right: 2.5em
 }
 
-.SideContent--shrinked{ padding-top: 0; }
-
-.SideContent--spacer-2x--horizontal { 
-  padding-left: 5rem;
-  padding-right: 5rem;
+.SideContent--spacer-2x--top { 
+  padding-top: 40px;
 }
 
 .table--hover-cursor tr{
@@ -34,8 +38,14 @@ body{ background: #FAFAFA }
   background: #eeeeee !important
 }
 
+.appbar--no-auth{
+  background-color: #263238 !important;
+}  
+
 .appbar--no-shadow{
   box-shadow: none !important;
+  background-color: #263238 !important;
+  
 }
 
 .appbar--no-background{
@@ -45,7 +55,7 @@ body{ background: #FAFAFA }
 
 .button,
 .button-secondary{
-  text-transform: none !important
+  // text-transform: none !important
 }
 
 .button-secondary--top{
@@ -59,6 +69,7 @@ body{ background: #FAFAFA }
 
 .page-container__side-nav{
   background: #FFFFFF;
+  height: 100%;
 }
 
 .table-container{
@@ -116,6 +127,13 @@ body{ background: #FAFAFA }
   font-weight: 500 !important
 }
 
+.appbar-no-auth{
+  box-shadow: none;
+  .logout-icon{
+    display: none;
+  }
+}
+
 button{
   box-shadow: none !important;
 }
@@ -125,13 +143,13 @@ button{
 }
 
 .btn-primary{
-  background: rgb(0, 150, 136) !important;
+  background: #000 !important;
+  color: #fff !important
 }
 
 .btn-danger{
   background: rgb(211, 47, 47) !important;
 }
-
 
 #react-autowhatever-1,
 #react-autowhatever-2,
@@ -214,4 +232,18 @@ div[role^="menuitem"]{
 
 .delete-rows-container--delete-icon{
   cursor: pointer;
+}
+
+.login-container{
+  width: 100%;
+  max-width: 380px;
+  padding: 40px !important
+}
+
+.logout-icon{
+  fill: #FFFFFF
+}
+
+.logout-icon:hover{
+  fill-opacity: 1 !important;
 }

@@ -67,7 +67,7 @@ Meteor.methods({
     }
   },
 
-  'ingredients.batchRemove': function ingredientsRemove(ingredientIds) {
+  'ingredients.batchRemove': function ingredientsBatchRemove(ingredientIds) {
     check(ingredientIds, Array);
     console.log('Server: ingredients.batchRemove');
 

@@ -42,6 +42,17 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
+
+  'ingredientTypes.batchRemove': function ingredientTypesBatchRemove(ingredientTypeIds) {
+    check(ingredientTypeIds, Array);
+    console.log('Server: ingredient.Types.batchRemove');
+
+    try {
+      return IngredientTypes.remove({ _id: { $in: ingredientTypeIds } });
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
 });
 
 rateLimit({
@@ -49,6 +60,7 @@ rateLimit({
     'ingredientTypes.insert',
     'ingredientTypes.update',
     'ingredientTypes.remove',
+    'ingredients.batchRemove',
   ],
   limit: 5,
   timeRange: 1000,

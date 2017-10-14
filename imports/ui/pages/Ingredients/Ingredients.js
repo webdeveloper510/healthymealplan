@@ -8,6 +8,7 @@ import { createContainer } from 'meteor/react-meteor-data';
 import { Bert } from 'meteor/themeteorchef:bert';
 import { teal, red } from 'material-ui/colors';
 import Containers from 'meteor/utilities:react-list-container';
+
 const ListContainer = Containers.ListContainer;
 
 import Button from 'material-ui/Button';
@@ -43,7 +44,6 @@ import IngredientsCollection from '../../../api/Ingredients/Ingredients';
 import IngredientTypes from '../../../api/IngredientTypes/IngredientTypes';
 
 
-
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 import Loading from '../../components/Loading/Loading';
 import IngredientsTable from './IngredientsTable';
@@ -75,9 +75,8 @@ class Ingredients extends React.Component {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
       options: { sort: { title: 1 } },
-      searchSelector: {},
-      rowsVisible: 8,
-      currentTabValue: 0
+      searchSelector: '',
+      currentTabValue: 0,
     };
   }
 
@@ -163,14 +162,8 @@ class Ingredients extends React.Component {
     return '';
   }
 
-  changeRowLimit(limit) {
-    console.log(limit);
-    this.setState({
-      rowsVisible: limit,
-    });
-  }
 
-  handleTabChange(event, value){
+  handleTabChange(event, value) {
     this.setState({ currentTabValue: value });
   }
 
@@ -180,23 +173,23 @@ class Ingredients extends React.Component {
     return (
       (!this.props.loading ? (
         <div>
-          <AuthenticatedSideNav history={history} />
+          {/* <AuthenticatedSideNav history={history} /> */}
 
 
-          <Grid container className="SideContent SideContent--spacer-2x--horizontal" spacing={8}>
+          <Grid container className="SideContent SideContent--spacer-2x--top SideContent--spacer-2x--horizontal">
             <Grid container className="clearfix">
               <Grid item xs={6}>
                 <Typography type="headline" gutterBottom className="pull-left headline" style={{ fontWeight: 500 }} color="inherit">Ingredients</Typography>
               </Grid>
               <Grid item xs={6}>
                 <Link to="/ingredients/new">
-                  <Button className="btn btn-primary" raised color="primary" style={{ float: 'right', textTransform: 'capitalize' }}>Add ingredient</Button>
+                  <Button className="btn btn-primary" raised color="primary" style={{ float: 'right' }}>Add ingredient</Button>
                 </Link>
-              </Grid> 
+              </Grid>
             </Grid>
 
 
-            <div style={{ marginTop: "25px" }}>
+            <div style={{ marginTop: '25px' }}>
               <AppBar position="static" className="appbar--no-background appbar--no-shadow">
                 <Tabs value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
                   <Tab label="All" />
@@ -240,17 +233,17 @@ class Ingredients extends React.Component {
               />
             </div>
             <ListContainer
-              limit={7}
+              limit={5}
               collection={IngredientsCollection}
               publication="ingredients"
               options={this.state.options}
-              selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector, 'i') } }, { SKU: { $regex: new RegExp(this.state.searchSelector, 'i') } }] }}
+              selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+                { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
             >
 
               <IngredientsTable
                 popTheSnackbar={this.props.popTheSnackbar}
                 searchTerm={this.state.searchSelector}
-                changeRowLimit={this.changeRowLimit.bind(this)}
                 history={this.props.history}
                 soryByOptions={this.sortByOption}
               />

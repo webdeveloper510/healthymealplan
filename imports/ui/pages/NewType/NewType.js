@@ -8,7 +8,6 @@ import TypeEditor from '../../components/TypeEditor/TypeEditor';
 
 const NewType = ({ history, popTheSnackbar }) => (
   <div>
-    <AuthenticatedSideNav history={history} />,
     <Grid container className="NewType SideContent SideContent--spacer-2x--horizontal">
       <TypeEditor popTheSnackbar={popTheSnackbar} history={history} />
     </Grid>

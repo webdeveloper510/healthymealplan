@@ -32,9 +32,7 @@ class IngredientsTable extends React.Component {
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      // rowsVisible: 5,
-      rowsMenuOpen: false,
-      anchorEl: null,
+
     };
   }
 
@@ -52,14 +50,15 @@ class IngredientsTable extends React.Component {
     console.log(type);
   }
 
-  rowSelected(e, event) {
+  rowSelected(e, event, checked) {
     // console.log(e);
+    console.log(checked);
     // console.log($(event.target).prop('checked'));
     // console.log(event.target.parentNode.parentNode);
 
 
     const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
-    // $(`.${selectedRowId}`).toggleClass('row-selected');
+    $(`.${selectedRowId}`).toggleClass('row-selected');
     let currentlySelectedCheckboxes;
 
     const clonedSelectedCheckboxes = this.state.selectedCheckboxes ? this.state.selectedCheckboxes.slice() : [];
@@ -85,9 +84,8 @@ class IngredientsTable extends React.Component {
 
     if ($(event.target).prop('checked')) {
       $('.row-checkbox').each((index, el) => {
-        console.log(el);
         // make the row selected
-        // $(`.${el.getAttribute('id')}`).addClass('row-selected');
+        $(`.${el.getAttribute('id')}`).addClass('row-selected');
 
         // push the ids to a array
         allCheckboxIds.push(el.getAttribute('id'));
@@ -99,34 +97,18 @@ class IngredientsTable extends React.Component {
       allCheckboxIds = [];
 
       $('.row-checkbox').each((index, el) => {
-        // console.log(el);
         // // make the row selected
-        // // $(`.${el.getAttribute('id')}`).removeClass('row-selected');
-
-        // // push the ids to a array
-        // allCheckboxIds.push(el.getAttribute('id'));
+        $(`.${el.getAttribute('id')}`).removeClass('row-selected');
 
         // set each checkbox checked
         $(el).children().find('input[type="checkbox"]').prop('checked', false);
       });
     }
 
-
     this.setState({
       selectedCheckboxesNumber: allCheckboxIds.length,
       selectedCheckboxes: allCheckboxIds,
     });
-  }
-
-
-  handleClick(event) {
-    this.setState({ rowsMenuopen: true, anchorEl: event.currentTarget });
-  }
-
-  handleRequestClose(val) {
-    this.setState({ rowsMenuopen: false });
-
-    console.log(val);
   }
 
   deleteSelectedRows() {
@@ -160,7 +142,6 @@ class IngredientsTable extends React.Component {
   }
 
 
-
   renderNoResults(count) {
     if (count == 0) {
       return (
@@ -169,9 +150,16 @@ class IngredientsTable extends React.Component {
     }
   }
 
-  isCheckboxSelected(id){
-    console.log(this.state.selectedCheckboxes)
-    // return (this.state.selectedCheckboxes.indexOf(id) !== -1)
+  isCheckboxSelected(id) {
+    // console.log(this.state.selectedCheckboxes);
+
+    if (this.state.selectedCheckboxes.length) {
+      if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
+        return false;
+      }
+    }
+
+    return 'checked';
   }
 
   render() {
@@ -189,47 +177,61 @@ class IngredientsTable extends React.Component {
           : ''
 
         }
-        <Table>
+        <Table className="table-container" style={{ tableLayout: 'fixed' }}>
           {this.props.count > 0 ?
             (<TableHead>
               <TableRow>
-                <TableCell padding="checkbox" style={{ width: '80px' }}><Checkbox onChange={this.selectAllRows.bind(this)} /></TableCell>
-                <TableCell padding="none"><Typography className="body2" type="body2">SKU</Typography></TableCell>
-                <TableCell padding="none"><Typography className="body2" type="body2">Ingredient</Typography></TableCell>
-                <TableCell><Typography className="body2" type="body2">Type</Typography></TableCell>
+                <TableCell padding="checkbox" style={{ width: '12%' }}>
+                  <Checkbox onChange={this.selectAllRows.bind(this)} /></TableCell>
+                <TableCell padding="none" style={{ width: '12%' }}>
+                  <Typography className="body2" type="body2">SKU</Typography></TableCell>
+                <TableCell padding="none" style={{ width: '38%' }}>
+                  <Typography className="body2" type="body2">Ingredient</Typography></TableCell>
+                <TableCell style={{ width: '38%' }}><Typography className="body2" type="body2">Type</Typography></TableCell>
               </TableRow>
             </TableHead>)
             : ''
           }
           <TableBody>
             {
-              this.props.results.map((e, i) => (   
-              
+              this.props.results.map((e, i) => (
+
                 <TableRow hover className={e._id} key={e._id}>
-                  <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '80px' }} padding="checkbox">
-                    <Checkbox className="row-checkbox" id={e._id}  onChange={this.rowSelected.bind(this, e)} />
+                  <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
+                    <Checkbox
+                      className="row-checkbox"
+                      id={e._id}
+                      onChange={this.rowSelected.bind(this, e)}
+                    />
                   </TableCell>
-                  <TableCell padding="none" style={{ width: '200px' }} onClick={() => this.props.history.push(`ingredients/${e._id}/edit`)}>
+
+                  <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.history.push(`ingredients/${e._id}/edit`)}>
                     <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
                   </TableCell>
 
-                  <TableCell style={{ paddingTop: '10px', paddingBottom: '10px' }} padding="none" onClick={() => this.props.history.push(`ingredients/${e._id}/edit`)}>
+                  <TableCell
+                    style={{ paddingTop: '10px', paddingBottom: '10px', width: '38%' }}
+                    padding="none"
+                    onClick={() => this.props.history.push(`ingredients/${e._id}/edit`)}
+                  >
 
-                    <Typography type="subheading" style={{ textTransform: 'capitalize' }}>{e.title}</Typography>
+                    <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                      {e.title}
+                    </Typography>
                     <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
                       {this.renderSubIngredientsNumber(e.subIngredients)}
                     </Typography>
 
                   </TableCell>
-                  <TableCell>
-                    {e.typeMain ? (<Typography type="subheading">{e.typeMain.title}</Typography>)
+                  <TableCell style={{ width: '38%' }}>
+                    {e.typeMain ? (<Typography type="subheading" className="subheading">{e.typeMain.title}</Typography>)
                       : (<Typography className="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>)}
 
 
                   </TableCell>
                 </TableRow>
-              )              
-            )
+              ),
+              )
             }
 
 
@@ -247,10 +249,10 @@ class IngredientsTable extends React.Component {
               <TableCell />
               <TableCell />
               {
-                this.props.hasMore ? (
+                this.props.hasMore ? 
                   <TableCell style={{ display: 'flex', height: '56px', alignItems: 'center', justifyContent: 'flex-end' }}>
-                    {this.props.hasMore ? (<Button style={{ marginLeft: '1em' }} onClick={this.props.loadMore}>Load More</Button>) : ''}
-                  </TableCell>) : ''
+                    <Button onClick={this.props.loadMore}>Load More</Button>
+                  </TableCell> : ''
               }
             </TableRow>
           </TableFooter>
@@ -267,6 +269,7 @@ IngredientsTable.propTypes = {
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,
   loadMore: PropTypes.func.isRequired,
+  ingredientCount: PropTypes.number.isRequired,
 };
 
 

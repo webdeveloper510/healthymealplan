@@ -38,12 +38,11 @@ class Types extends React.Component {
     super(props);
 
     this.state = {
-      checkboxesSelected: false,
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
       options: { sort: { title: 1 } },
-      searchSelector: {},
-      currentTabValue: 0
+      searchSelector: '',
+      currentTabValue: 0,
     };
   }
 
@@ -91,13 +90,6 @@ class Types extends React.Component {
     // return false;
   }
 
-  changeRowLimit(limit) {
-    console.log(limit);
-    this.setState({
-      rowsVisible: limit,
-    });
-  }
-
 
   clearSearchBox() {
     $('#search-type-text').val('');
@@ -123,38 +115,36 @@ class Types extends React.Component {
   }
 
 
-  handleTabChange(event, value){
+  handleTabChange(event, value) {
     this.setState({ currentTabValue: value });
   }
 
   render() {
     const { loading, ingredients, match, history } = this.props;
 
-
     return (!loading ? (
       <div>
-        <AuthenticatedSideNav history={history} />
 
-        <Grid container className="SideContent SideContent--spacer-2x--horizontal" spacing={8}>
+        <Grid container className="SideContent SideContent--spacer-2x--horizontal SideContent--spacer-2x--top">
 
           <Grid container className="clearfix">
             <Grid item xs={6}>
-              <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }} color="inherit">Types</Typography>
+              <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }}>Types</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Button className="button button--primary" onClick={() => history.push('/types/new')} raised color="primary" style={{ float: 'right', backgroundColor: primary }}>Add type</Button>
+              <Button className="btn btn-primary" onClick={() => history.push('/types/new')} raised color="primary" style={{ float: 'right' }}>Add type</Button>
             </Grid>
           </Grid>
 
-          <div style={{ marginTop: "25px" }}>
-              <AppBar position="static" className="appbar--no-background appbar--no-shadow">
-                <Tabs value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
-                  <Tab label="All" />
-                  {/* <Tab label="Item Two" />
+          <div style={{ marginTop: '25px' }}>
+            <AppBar position="static" className="appbar--no-background appbar--no-shadow">
+              <Tabs value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
+                <Tab label="All" />
+                {/* <Tab label="Item Two" />
                   <Tab label="Item Three" /> */}
-                </Tabs>
-              </AppBar>
-            </div>
+              </Tabs>
+            </AppBar>
+          </div>
 
           <div style={{ width: '100%',
             background: '#FFF',
@@ -190,14 +180,15 @@ class Types extends React.Component {
             />
           </div>
           <ListContainer
-            limit={6}
+            limit={5}
             collection={IngredientTypesCollection}
             publication="ingredientTypes"
             options={this.state.options}
-            selector={{ title: { $regex: new RegExp(this.state.searchSelector, 'i') } }}
+            selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+              { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
           >
-
             <TypesTable
+              popTheSnackbar={this.props.popTheSnackbar}
               searchTerm={this.state.searchSelector}
               rowsLimit={this.state.rowsVisible}
               history={this.props.history}

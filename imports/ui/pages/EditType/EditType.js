@@ -11,7 +11,6 @@ import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/Authenti
 
 const EditType = ({ ingredientType, history, popTheSnackbar }) => (ingredientType ? (
   <div>
-    <AuthenticatedSideNav history={history} />,
     <Grid container className="EditType SideContent SideContent--spacer-2x--horizontal">
       <TypeEditor ingredientType={ingredientType} popTheSnackbar={popTheSnackbar} history={history} />
     </Grid>

@@ -167,7 +167,8 @@ class TypeEditor extends React.Component {
         <Grid container>
           <Grid item xs={12}>
               <Button onClick={() => this.props.history.push('/types')} className="button button-secondary button-secondary--top">
-                <Typography type="subheading" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}><ChevronLeft style={{ marginRight: '4px' }} /> Types</Typography>
+                <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', fontWeight: 'medium' }}>
+                <ChevronLeft style={{ marginRight: '4px' }} /> Types</Typography>
               </Button>
             </Grid>
           
@@ -190,7 +191,7 @@ class TypeEditor extends React.Component {
 
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={12} sm={4}>
-            <Typography type="subheading" className="font-medium">
+            <Typography type="subheading" className="subheading font-medium">
               Type
             </Typography>
           </Grid>

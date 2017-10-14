@@ -57,12 +57,12 @@ class IngredientEditor extends React.Component {
       value: '', // Autosuggest
       valueTypes: this.props.ingredient && this.props.ingredient.typeMain ? this.props.ingredient.typeMain.title : '',
       suggestions: [],
-      suggestionsTypes: [], 
+      suggestionsTypes: [],
       types: this.props.ingredientTypes ? this.props.ingredientTypes : [],
       subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
       selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
-      hasFormChanged: false
+      hasFormChanged: false,
     };
   }
 
@@ -70,8 +70,8 @@ class IngredientEditor extends React.Component {
     const component = this;
     validate(component.form, {
 
-      errorPlacement: function(error, element){
-        error.insertAfter($(element).parent().parent()); 
+      errorPlacement(error, element) {
+        error.insertAfter($(element).parent().parent());
       },
 
       rules: {
@@ -103,14 +103,12 @@ class IngredientEditor extends React.Component {
 
   // Use your imagination to render suggestions.
   onChange(event, { newValue }) {
-
     this.setState({
       value: newValue,
     });
   }
 
   onChangeTypes(event, { newValue }) {
-
     this.setState({
       valueTypes: newValue,
     });
@@ -133,7 +131,7 @@ class IngredientEditor extends React.Component {
 
     this.setState({
       subIngredients: clonedSubIngredients,
-      hasFormChanged: true
+      hasFormChanged: true,
     });
   }
 
@@ -329,11 +327,10 @@ class IngredientEditor extends React.Component {
   }
 
   renderInput(inputProps) {
-    const { autoFocus, value, ...other } = inputProps;
+    const { value, ...other } = inputProps;
 
     return (
       <TextField
-        autoFocus={autoFocus}
         className={styles.textField}
         value={value}
         style={{ width: '100%' }}
@@ -348,11 +345,10 @@ class IngredientEditor extends React.Component {
   }
 
   renderInputTypes(inputProps) {
-    const { autoFocus, value, ...other } = inputProps;
+    const { value, ...other } = inputProps;
 
     return (
       <TextField
-        autoFocus={autoFocus}
         className={styles.textField}
         value={value}
         style={{ width: '100%' }}
@@ -400,7 +396,7 @@ class IngredientEditor extends React.Component {
 
     this.setState({
       subIngredients: stateCopy,
-      hasFormChanged: true
+      hasFormChanged: true,
     });
   }
 
@@ -422,20 +418,19 @@ class IngredientEditor extends React.Component {
     }
 
     if (this.props.allIngredients) {
-     const avatarToReturn = this.props.allIngredients.find(el => el._id === subIngredient);
+      const avatarToReturn = this.props.allIngredients.find(el => el._id === subIngredient);
       return avatarToReturn.title.charAt(0);
     }
   }
 
-  titleFieldChanged(e){
+  titleFieldChanged(e) {
+    console.log(e.currentTarget.value.length);
 
-    console.log(e.currentTarget.value.length)
-
-    const hasFormChanged = e.currentTarget.value.length > 0 ? true : false;
+    const hasFormChanged = e.currentTarget.value.length > 0;
 
     this.setState({
-      hasFormChanged: hasFormChanged
-    })
+      hasFormChanged,
+    });
   }
 
   render() {
@@ -450,17 +445,18 @@ class IngredientEditor extends React.Component {
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
         <Grid container justify="center">
           <Grid item xs={12}>
-           
-              <Button onClick={() => this.props.history.push('/ingredients')} className="button button-secondary button-secondary--top">
-                <Typography type="subheading" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}><ChevronLeft style={{ marginRight: '4px' }} /> Ingredients</Typography>
-              </Button>
+
+            <Button onClick={() => this.props.history.push('/ingredients')} className="button button-secondary button-secondary--top">
+              <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
+              <ChevronLeft style={{ marginRight: '4px' }} /> Ingredients</Typography>
+            </Button>
 
           </Grid>
         </Grid>
 
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={4}>
-            <Typography type="headline" style={{ fontWeight: 500 }}>{ingredient && ingredient._id ? `${ingredient.title}` : 'Add ingredient'}</Typography>
+            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{ingredient && ingredient._id ? `${ingredient.title}` : 'Add ingredient'}</Typography>
 
             {this.props.ingredient ?
               (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1"> SKU {ingredient.SKU ? ingredient.SKU : ''} </Typography>)
@@ -480,14 +476,13 @@ class IngredientEditor extends React.Component {
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
-                <Typography type="subheading" className="font-medium">
+                <Typography type="subheading" className="subheading font-medium">
               Ingredient
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
                   <TextField
-                    autoFocus
                     id="title"
                     label="Name"
                     name="title"
@@ -510,7 +505,7 @@ class IngredientEditor extends React.Component {
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
-                <Typography type="subheading" className="font-medium">
+                <Typography type="subheading" className="subheading font-medium">
                 Type
                 </Typography>
               </Grid>
@@ -569,7 +564,7 @@ class IngredientEditor extends React.Component {
 
                     inputProps={{
                       placeholder: 'Search',
-                      value: this.state.valueTypes,
+                      value: this.state.valueTypes ? this.state.valueTypes : 'N/A',
                       onChange: this.onChangeTypes.bind(this),
                       className: 'auto type-autocomplete',
                     }}
@@ -631,7 +626,6 @@ class IngredientEditor extends React.Component {
                     focusInputOnSuggestionClick={false}
 
                     inputProps={{
-                      autoFocus: true,
                       placeholder: 'Search',
                       value: this.state.value,
                       onChange: this.onChange.bind(this),

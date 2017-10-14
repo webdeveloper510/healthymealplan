@@ -1,9 +1,14 @@
 import React from 'react';
-import { Row, Col, FormGroup, ControlLabel, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Meteor } from 'meteor/meteor';
 import { Bert } from 'meteor/themeteorchef:bert';
+import Grid from 'material-ui/Grid';
+import Paper from 'material-ui/Paper';
+import TextField from 'material-ui/TextField';
+import Button from 'material-ui/Button';
+import Typography from 'material-ui/Typography';
+import $ from 'jquery';
 // import OAuthLoginButtons from '../../components/OAuthLoginButtons/OAuthLoginButtons';
 import AccountPageFooter from '../../components/AccountPageFooter/AccountPageFooter';
 import validate from '../../../modules/validate';
@@ -19,6 +24,11 @@ class Login extends React.Component {
     const component = this;
 
     validate(component.form, {
+      
+      errorPlacement(error, element) {
+        error.insertAfter($(element).parent().parent());
+      },
+      
       rules: {
         emailAddress: {
           required: true,
@@ -45,7 +55,7 @@ class Login extends React.Component {
 
     const { popTheSnackbar } = this.props;
 
-    Meteor.loginWithPassword(this.emailAddress.value, this.password.value, (error) => {
+    Meteor.loginWithPassword($('#email').val(), $('#password').val(), (error) => {
       if (error) {
         // Bert.alert(error.reason, 'danger');
         popTheSnackbar({
@@ -65,50 +75,79 @@ class Login extends React.Component {
 
   render() {
     return (<div className="Login">
-      <Row>
-        <Col xs={12} sm={6} md={5} lg={4}>
-          <h4 className="page-header">Log In</h4>
-          <Row>
-            <Col xs={12}>
-              {/* <OAuthLoginButtons
-                services={['facebook', 'github', 'google']}
-                emailMessage={{
-                  offset: 100,
-                  text: 'Log In with an Email Address',
-                }}
-              /> */}
-            </Col>
-          </Row>
-          <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
-            <FormGroup>
-              <ControlLabel>Email Address</ControlLabel>
-              <input
-                type="email"
-                name="emailAddress"
-                ref={emailAddress => (this.emailAddress = emailAddress)}
-                className="form-control"
-              />
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel className="clearfix">
-                <span className="pull-left">Password</span>
-                <Link className="pull-right" to="/recover-password">Forgot password?</Link>
-              </ControlLabel>
-              <input
-                type="password"
-                name="password"
-                ref={password => (this.password = password)}
-                className="form-control"
-              />
-            </FormGroup>
-            <Button type="submit" bsStyle="success">Log In</Button>
-            <AccountPageFooter>
-              <p>{'Don\'t have an account?'} <Link to="/signup">Sign Up</Link>.</p>
-            </AccountPageFooter>
-          </form>
-        </Col>
-      </Row>
+      <Grid container justify="center" style={{ height: '100%' }}>
+        <Paper elevation={2} className="login-container">
+          <Grid item xs={12}>
+              <Typography type="title" className="title">Log in</Typography>
 
+            {/* <Grid container>
+                <Grid xs={12}>
+                  {/* <OAuthLoginButtons
+                    services={['facebook', 'github', 'google']}
+                    emailMessage={{
+                      offset: 100,
+                      text: 'Log In with an Email Address',
+                    }}
+                  /> 
+                </Grid>
+                  </Grid> */}
+            <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
+              {/* <FormGroup>
+                  <ControlLabel>Email Address</ControlLabel>
+                  <input
+                    type="email"
+                    name="emailAddress"
+                    ref={emailAddress => (this.emailAddress = emailAddress)}
+                  />
+                </FormGroup> */}
+              <Grid item xs={12}>
+                <TextField
+                  style={{ marginTop: "1em" }}
+                  fullWidth
+                  id="email"
+                  label="Email"
+                  margin="normal"
+                  InputProps={{
+                    type: 'email',
+                    name: 'emailAddress',
+                  }}
+                />
+              </Grid>
+
+              {/* <FormGroup>
+                  <ControlLabel className="clearfix">
+                    <span className="pull-left">Password</span>
+                    {/* <Link className="pull-right" to="/recover-password">Forgot password?</Link> */}
+              {/* </ControlLabel>
+                  <input
+                    type="password"
+                    name="password"
+                    ref={password => (this.password = password)}
+                    className="form-control"
+                  />
+                </FormGroup> */}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  id="password"
+                  label="Password"
+                  margin="normal"
+                  InputProps={{
+                    type: 'password',
+                    name: 'password',
+                  }}
+                />
+              </Grid>
+
+              <Button type="submit" raised color="primary" className="btn btn-primary" style={{ marginTop: "25px", textTransform: 'none', float: 'right' }}>Log in</Button>
+              {/* <AccountPageFooter>
+                  <p>{'Don\'t have an account?'} <Link to="/signup">Sign Up</Link>.</p>
+                </AccountPageFooter> */}
+            </form>
+          </Grid>
+        </Paper>
+
+      </Grid>
 
     </div>);
   }
