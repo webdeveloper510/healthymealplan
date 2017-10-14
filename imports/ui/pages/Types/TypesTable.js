@@ -140,17 +140,17 @@ class TypesTable extends React.Component {
                   {this.props.count} of {this.props.typesCount} types
                 </Typography>
               </TableCell>
-  
+
               <TableCell />
               <TableCell style={{ display: 'flex', height: '56px', alignItems: 'center', justifyContent: 'flex-end' }}>
 
-              {
-                this.props.hasMore ? (
+                {
+                  this.props.hasMore ? (
                     this.props.hasMore ? (<Button style={{ marginLeft: '1em' }} onClick={this.props.loadMore}>Load More</Button>) : ''
-                 ) : '&nbsp;'
+                  ) : '&nbsp;'
 
-              }
-               </TableCell>
+                }
+              </TableCell>
             </TableRow>
           </TableFooter>
         </Table>
@@ -161,7 +161,7 @@ class TypesTable extends React.Component {
 
 TypesTable.propTypes = {
   loading: PropTypes.bool.isRequired,
-  results: PropTypes.Array.isRequired,
+  // results: PropTypes..isRequired,
   history: PropTypes.isRequired,
 };
 
