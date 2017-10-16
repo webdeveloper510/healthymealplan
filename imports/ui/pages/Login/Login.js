@@ -60,7 +60,7 @@ class Login extends React.Component {
         // Bert.alert(error.reason, 'danger');
         popTheSnackbar({
 
-          message: `There was an error ${error.reason}`,
+          message: `Email or password does not match.`,
         });
 
       } else {
@@ -78,7 +78,7 @@ class Login extends React.Component {
       <Grid container justify="center" style={{ height: '100%' }}>
         <Paper elevation={2} className="login-container">
           <Grid item xs={12}>
-              <Typography type="title" className="title">Log in</Typography>
+              <Typography type="headline" className="headline font-medium" style={{ paddingBottom: "20px" }}>Log in</Typography>
 
             {/* <Grid container>
                 <Grid xs={12}>

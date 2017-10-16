@@ -1,8 +1,19 @@
-@import './colors';
-@import './forms';
-@import './bootstrap-overrides';
+// @import './colors';
+// @import './forms';
+// @import './bootstrap-overrides';
 
-body{ background: #FAFAFA }
+html, 
+body, 
+#react-root{
+  height: 100%;
+  min-height: 100%;
+}
+
+body{ 
+  background: #FAFAFA;
+  margin: 0;
+  padding: 0;
+}
 
 .appbar-primary{
   position: fixed !important;
@@ -10,6 +21,16 @@ body{ background: #FAFAFA }
   top: 0;
   left: 0;
   right:0;
+}
+
+
+//snackbar
+#message-id{
+  width: 100%;
+  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 // .SideContent{
@@ -224,10 +245,13 @@ div[role^="menuitem"]{
 
   background: rgb(211, 47, 47);
   color: #fff;
-  width: 100%;
+  // width: 100%;
+ 
   padding: 12px 15px 12px 25px;
   position: absolute;
-  top: -62px;
+  top: -62px;  
+  left: 0;
+  right: 0;
 }
 
 .delete-rows-container--delete-icon{
@@ -237,7 +261,15 @@ div[role^="menuitem"]{
 .login-container{
   width: 100%;
   max-width: 380px;
-  padding: 40px !important
+  padding: 40px !important;
+
+  @media(min-width: 992px){
+    // position: absolute;
+    // z-index: 30;
+    // transform: translate(-50%, -50%);
+    // top: 50%;
+    // left: 50%
+  }
 }
 
 .logout-icon{

@@ -231,9 +231,8 @@ class TypesTable extends React.Component {
 }
 
 TypesTable.propTypes = {
-  loading: PropTypes.bool.isRequired,
-  // results: PropTypes..isRequired,
-  history: PropTypes.isRequired,
+  results: PropTypes.isRequired,
+  history: PropTypes.func.isRequired,
 };
 
 

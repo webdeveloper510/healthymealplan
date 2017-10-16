@@ -14,7 +14,7 @@ import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/Authenti
 import AuthenticatedNavigation from '../../components/AuthenticatedNavigation/AuthenticatedNavigation';
 
 import Public from '../../components/Public/Public';
-// import Index from '../../pages/Index/Index';
+import Index from '../../pages/Index/Index';
 
 // import AddAccount from '../../pages/Accounts/AddAccount';
 
@@ -66,6 +66,8 @@ import Avatar from 'material-ui/Avatar';
 
 import MenuIcon from 'material-ui-icons/Menu';
 import ExitToAppIcon from 'material-ui-icons/ExitToApp';
+import CloseIcon from 'material-ui-icons/Close';
+
 
 import { Link } from 'react-router-dom';
 
@@ -88,17 +90,46 @@ const styles = theme => ({
     width: '100%',
     zIndex: 1,
     overflow: 'hidden',
+    minHeight: '100%'
+  },
+  rootNotAuthenticated: {
+    width: '100%',
+    zIndex: 1,
+    overflow: 'hidden',
+    minHeight: '100%',
+    justifyContent: 'center',
+    display: 'flex',
+    alignItems: 'center '
+  },
+  appFrameNotAuthenticated: {
+    width: '100%',
+    zIndex: 1,
+    overflow: 'hidden',
+    minHeight: '100%',
+    justifyContent: 'center',
+    display: 'flex',
+    alignItems: 'center'
   },
   appFrame: {
     position: 'relative',
     display: 'flex',
     width: '100%',
     height: '100%',
+    minHeight:'100%'
+  },
+  appFrameNotAuthenticated: {
+    position: 'relative',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    height: '100%',
+    minHeight:'100%'
   },
   appBar: {
     position: 'absolute',
     boxShadow: 'none',
-    backgroundColor: "#263238",
+    backgroundColor: '#263238',
     marginLeft: drawerWidth,
     [theme.breakpoints.up('md')]: {
       width: `calc(100% - ${drawerWidth}px)`,
@@ -117,9 +148,16 @@ const styles = theme => ({
       position: 'relative',
       height: '100%',
       height: '100vh',
-      minHeight: '100%'
+      minHeight: '100%',
     },
   },
+  contentNotAuthenticated: {
+    backgroundColor: theme.palette.background.default,
+    width: '100%',
+    height: '100%',
+    minHeight: '100%',
+  },
+
   content: {
     backgroundColor: theme.palette.background.default,
     width: '100%',
@@ -132,6 +170,8 @@ const styles = theme => ({
     },
   },
 });
+
+// {!this.state.snackbarButtonText ? (<CloseIcon onClick={this.handleRequestClose.bind(this)} />) : ''}
 
 class App extends React.Component {
 
@@ -176,15 +216,15 @@ class App extends React.Component {
     });
   }
 
-  getInitials(name){
+  getInitials(name) {
 
-    if(name){
-    const split = name.split(" ");
+    if (name) {
+      const split = name.split(' ');
 
-    return split[0].charAt(0) + split[1].charAt(0);
+      return split[0].charAt(0) + split[1].charAt(0);
     }
-    
-    return ''
+
+    return '';
   }
 
   render() {
@@ -197,17 +237,18 @@ class App extends React.Component {
     return (
 
       <Router>
-        <div className={classes.root}>
+        <div className={this.props.authenticated ? classes.root : classes.rootNotAuthenticated}>
           <Snackbar
             anchorOrigin={{ vertical, horizontal }}
             open={this.state.snackbarOpen}
             onRequestClose={this.handleRequestClose.bind(this)}
-            action={this.state.snackbarButtonText ? (<Link to={this.state.snackbarButtonLink}><Button color="accent" dense onClick={this.props.onClickHandler}>{this.state.snackbarButtonText}</Button></Link>) : ''}
+            action={this.state.snackbarButtonText ? (<Button color="accent" dense onClick={() => this.props.history.push(this.state.snackbarButtonLink)}>{this.state.snackbarButtonText}</Button>) : ''}
             message={<span id="message-id" className="body2">{this.state.snackbarMessageText}</span>}
             autoHideDuration={4000}
           />
-          <div className={classes.appFrame}>
-            <AppBar className={this.props.authenticated ? classes.appBar : 'appbar--no-shadow appbar-no-auth'}>
+          <div className={this.props.authenticated ? classes.appFrame : classes.appFrameNotAuthenticated}>
+          { this.props.authenticated ? (
+          <AppBar className={this.props.authenticated ? classes.appBar : 'appbar--no-shadow appbar-no-auth'}>
               <Toolbar>
                 <IconButton
                   color="contrast"
@@ -218,7 +259,6 @@ class App extends React.Component {
                   <MenuIcon />
                 </IconButton>
 
-                { this.props.authenticated ? (
                 <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', alignItems: 'center' }}>
                   <Typography type="subheading" className="subheading font-medium" style={{ color: '#FFF', alignItems: 'center', display: 'flex', paddingRight: '15px' }}>
                     <Avatar style={{ marginRight: '1em' }}>{this.getInitials(this.props.name ? this.props.name : '')}</Avatar>{this.props.name}
@@ -226,56 +266,55 @@ class App extends React.Component {
                   <Tooltip title="Log out">
                     <Link to="/logout">
                       <IconButton>
-                        <ExitToAppIcon className="logout-icon" style={{ fillOpacity: '0.54', fill: '#FFFFFF' }}/>
+                        <ExitToAppIcon className="logout-icon" style={{ fillOpacity: '0.54', fill: '#FFFFFF' }} />
                       </IconButton>
                     </Link>
                   </Tooltip>
-                </div>) : ''
-                }
-              </Toolbar> 
-            </AppBar>
+                </div>
+              </Toolbar>
+            </AppBar>) : '' }
             {this.props.authenticated ? (<div>
-            <Hidden mdUp>
-              <Drawer
-                type="temporary"
-                anchor={theme.direction === 'rtl' ? 'right' : 'left'}
-                open={this.state.mobileOpen}
-                classes={{
-                  paper: classes.drawerPaper,
-                }}
-                onRequestClose={this.handleDrawerToggle.bind(this)}
-                ModalProps={{
-                  keepMounted: true, // Better open performance on mobile.
-                }}
-              >
-              <div style={{ padding: "10px 20px 10px", display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
-                <Typography type="headline" style={{ color: "rgba(0, 0, 0, 0.38)" }} className="headline font-medium">Healthy Meal Plan</Typography>
-                <p style={{ color: "rgba(0, 0, 0, 0.38)" }} className="body1"><small>v 0.10</small></p>
-              </div>
+              <Hidden mdUp>
+                <Drawer
+                  type="temporary"
+                  anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+                  open={this.state.mobileOpen}
+                  classes={{
+                    paper: classes.drawerPaper,
+                  }}
+                  onRequestClose={this.handleDrawerToggle.bind(this)}
+                  ModalProps={{
+                    keepMounted: true, // Better open performance on mobile.
+                  }}
+                >
+                  <div style={{ padding: '10px 20px 10px', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
+                    <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Healthy Meal Plan</Typography>
+                    <p style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="body1"><small>v 0.10</small></p>
+                  </div>
 
-                <AuthenticatedSideNav {...this.props} />
-              </Drawer>
-            </Hidden>
-            
-            <Hidden mdDown implementation="css">
+                  <AuthenticatedSideNav {...this.props} />
+                </Drawer>
+              </Hidden>
 
-              <Drawer
-                type="permanent"
-                open
-                classes={{
-                  paper: classes.drawerPaper,
-                }}
-              >
-              <div style={{ padding: "10px 20px 10px", display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
-                <Typography type="headline" style={{ color: "rgba(0, 0, 0, 0.38)" }} className="headline font-medium">Healthy Meal Plan</Typography>
-                <p style={{ color: "rgba(0, 0, 0, 0.38)" }} className="body1"><small>v 0.10</small></p>
-              </div>
-                <AuthenticatedSideNav {...this.props} />
+              <Hidden mdDown implementation="css">
 
-              </Drawer>
-            </Hidden></div>) : '' }
-            
-            <main className={classes.content}>
+                <Drawer
+                  type="permanent"
+                  open
+                  classes={{
+                    paper: classes.drawerPaper,
+                  }}
+                >
+                  <div style={{ padding: '10px 20px 10px', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
+                    <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Healthy Meal Plan</Typography>
+                    <p style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="body1"><small>v 0.10</small></p>
+                  </div>
+                  <AuthenticatedSideNav {...this.props} />
+
+                </Drawer>
+              </Hidden></div>) : '' }
+
+            <main className={this.props.authenticated ? classes.content : classes.contentNotAuthenticated}>
               {!this.props.loading ? (
                 <Switch>
                   <Authenticated exact path="/ingredients" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Ingredients} {...this.props} />
@@ -294,6 +333,8 @@ class App extends React.Component {
 
                   <Public path="/signup" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Signup} {...this.props} />
                   <Public path="/login" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Login} {...this.props} />
+
+                  <Authenticated path="/" exact component={Index} {...this.props} />
 
                   <Route path="/logout" component={Logout} {...this.props} />
                   <Route name="verify-email" path="/verify-email/:token" component={VerifyEmail} />

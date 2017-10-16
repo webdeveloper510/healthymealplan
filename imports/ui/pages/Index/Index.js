@@ -1,13 +1,14 @@
 import React from 'react';
-import { Button } from 'react-bootstrap';
+
+import Typography from 'material-ui/Typography';
 
 import './Index.scss';
 
 const Index = () => (
   <div className="Index">
-    
-    <h1></h1>
-    
+
+    <Typography type="headline">You can't see this</Typography>
+
   </div>
 );
 
