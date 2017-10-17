@@ -12,6 +12,7 @@ import $ from 'jquery';
 // import OAuthLoginButtons from '../../components/OAuthLoginButtons/OAuthLoginButtons';
 import AccountPageFooter from '../../components/AccountPageFooter/AccountPageFooter';
 import validate from '../../../modules/validate';
+import RemoveRedEyeIcon from 'material-ui-icons/RemoveRedEye';
 
 class Login extends React.Component {
   constructor(props) {
@@ -24,11 +25,11 @@ class Login extends React.Component {
     const component = this;
 
     validate(component.form, {
-      
+
       errorPlacement(error, element) {
         error.insertAfter($(element).parent().parent());
       },
-      
+
       rules: {
         emailAddress: {
           required: true,
@@ -60,7 +61,7 @@ class Login extends React.Component {
         // Bert.alert(error.reason, 'danger');
         popTheSnackbar({
 
-          message: `Email or password does not match.`,
+          message: 'Email or password does not match.',
         });
 
       } else {
@@ -78,7 +79,7 @@ class Login extends React.Component {
       <Grid container justify="center" style={{ height: '100%' }}>
         <Paper elevation={2} className="login-container">
           <Grid item xs={12}>
-              <Typography type="headline" className="headline font-medium" style={{ paddingBottom: "20px" }}>Log in</Typography>
+            <Typography type="headline" className="headline font-medium" style={{ paddingBottom: '20px' }}>Log in</Typography>
 
             {/* <Grid container>
                 <Grid xs={12}>
@@ -102,7 +103,7 @@ class Login extends React.Component {
                 </FormGroup> */}
               <Grid item xs={12}>
                 <TextField
-                  style={{ marginTop: "1em" }}
+                  style={{ marginTop: '1em' }}
                   fullWidth
                   id="email"
                   label="Email"
@@ -137,9 +138,10 @@ class Login extends React.Component {
                     name: 'password',
                   }}
                 />
+                <RemoveRedEyeIcon onClick={() => console.log('Clicked')} />
               </Grid>
 
-              <Button type="submit" raised color="primary" className="btn btn-primary" style={{ marginTop: "25px", textTransform: 'none', float: 'right' }}>Log in</Button>
+              <Button type="submit" raised color="primary" className="btn btn-primary" style={{ marginTop: '25px', textTransform: 'none', float: 'right' }}>Log in</Button>
               {/* <AccountPageFooter>
                   <p>{'Don\'t have an account?'} <Link to="/signup">Sign Up</Link>.</p>
                 </AccountPageFooter> */}

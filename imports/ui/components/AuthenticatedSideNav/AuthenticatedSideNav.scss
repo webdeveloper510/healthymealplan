@@ -20,3 +20,21 @@
 .page-container__side-nav h3{
   font-size: 16px !important;
 }
+
+.page-container__side-nav a.active,
+.page-container__side-nav a.active .padding-left-nested-item{
+
+  text-decoration: none;
+  color: inherit;
+
+  svg {
+    fill: #000000;
+    fill-opacity: 1;
+  }
+  
+}
+
+.page-container__side-nav a{
+  text-decoration: none;
+  color: inherit;
+}

@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { withRouter, Link } from 'react-router-dom';
+import { withRouter, Link, NavLink } from 'react-router-dom';
 import Button from 'material-ui/Button';
 import { LinkContainer } from 'react-router-bootstrap';
 // import { Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
@@ -72,25 +72,53 @@ class AuthenticatedSideNav extends Component {
     });
   }
 
+  isListItemActive(expected) {
+    return this.props.location.pathname;
+
+    if (expected.indexOf(this.props.location.pathname) !== -1) {
+
+    }
+
+    return '';
+
+    // switch (currentPath) {
+    //   case '/':
+    //     return 'list-item-active';
+
+    //   case '/ingredients':
+    //     return 'list-item-active';
+
+    //   case '/ingredients/new':
+    //     return 'list-item-active';
+
+    //   case '/ingredients/':
+    //     return 'list-item-active';
+
+    //   default:
+    //     return '';
+    // }
+  }
 
   render() {
     const { history } = this.props;
-    
-    console.log(this.props);
+
+    console.log(this.props.location);
 
     return (
       <div className="page-container__side-nav">
 
         <List>
-          <ListItem button>
-            <ListItemIcon>
-              <HomeIcon className="side-nav-icon" />
-            </ListItemIcon>
-            <ListItemText className="subheading" primary="Home" />
-          </ListItem>
+          <NavLink exact to="/">
+            <ListItem button>
+              <ListItemIcon>
+                <HomeIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Home" />
+            </ListItem>
+          </NavLink>
 
 
-          <ListItem button onClick={this.handleToggleKitchen.bind(this)}>
+          <ListItem button className={this.isListItemActive(['/ingredients', '/types'])} onClick={this.handleToggleKitchen.bind(this)}>
 
             <ListItemIcon>
               <KitchenIcon className="side-nav-icon" />
@@ -114,22 +142,25 @@ class AuthenticatedSideNav extends Component {
               </ListItemIcon>
               <ListItemText className="subheading" primary="Meals" />
             </ListItem> */}
+            <NavLink to="/ingredients">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon >
+                  <IngredientsIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Ingredients" />
+              </ListItem>
+            </NavLink>
 
-            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/ingredients')}>
-              <ListItemIcon >
-                <IngredientsIcon className="side-nav-icon" />
-              </ListItemIcon>
-              <ListItemText className="subheading" primary="Ingredients" />
-            </ListItem>
+            <NavLink to="/types">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <TypesIcon className="side-nav-icon" />
+                </ListItemIcon>
 
-            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/types')}>
-              <ListItemIcon>
-                <TypesIcon className="side-nav-icon" />
-              </ListItemIcon>
-
-              <ListItemText className="subheading" primary="Types" />
-            </ListItem>
-{/* 
+                <ListItemText className="subheading" primary="Types" />
+              </ListItem>
+            </NavLink>
+            {/* 
             <ListItem className="padding-left-nested-item" button onClick={() => history.push('/lifestyles')}>
               <ListItemIcon>
                 <LifestylesIcon className="side-nav-icon" />
@@ -173,7 +204,7 @@ class AuthenticatedSideNav extends Component {
             </ListItem>
 
           </Collapse> */}
-{/* 
+          {/* 
           <ListItem button onClick={() => history.push('/customers')}>
             <ListItemIcon>
               <CustomersIcon className="side-nav-icon" />

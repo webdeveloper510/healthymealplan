@@ -7,7 +7,7 @@ import './Index.scss';
 const Index = () => (
   <div className="Index">
 
-    <Typography type="headline">You can't see this</Typography>
+    <Typography type="headline" style={{ color: '#FFFFFF' }}>Healthy Meal Plan</Typography>
 
   </div>
 );

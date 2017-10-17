@@ -171,9 +171,22 @@ class TypesTable extends React.Component {
               <TableRow>
 
                 <TableCell padding="checkbox" style={{ width: '12%' }}><Checkbox onClick={this.selectAllRows.bind(this)} /></TableCell>
-                <TableCell padding="none" style={{ width: '44%' }}><Typography className="body2" type="body2">SKU</Typography></TableCell>
+                <TableCell padding="none" style={{ width: '44%' }} onClick={() => this.props.sortByOptions('SKU')}>
+                  <Typography
+                    className="body2 table-head-col-hover"
+                    type="body2"
+                  >SKU
+                  </Typography>
+                </TableCell>
 
-                <TableCell padding="none" style={{ width: '44%' }}><Typography className="body2" type="body2">Type</Typography></TableCell>
+                <TableCell padding="none" style={{ width: '44%' }} onClick={() => this.props.sortByOptions('title')}>
+
+                  <Typography
+                    className="body2 table-head-col-hover"
+                    type="body2"
+                  >
+                  Type</Typography>
+                </TableCell>
               </TableRow>
             </TableHead>)
             : ''
@@ -233,6 +246,7 @@ class TypesTable extends React.Component {
 TypesTable.propTypes = {
   results: PropTypes.isRequired,
   history: PropTypes.func.isRequired,
+  sortByOptions: PropTypes.func.isRequired,
 };
 
 

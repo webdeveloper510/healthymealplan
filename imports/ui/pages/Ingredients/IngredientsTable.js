@@ -16,6 +16,7 @@ import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
 import Menu, { MenuItem } from 'material-ui/Menu';
+
 // import DeleteIcon from 'material-ui-icons/Delete';
 // import Tooltip from 'material-ui/Tooltip';
 // import IconButton from 'material-ui/IconButton';
@@ -193,6 +194,12 @@ class IngredientsTable extends React.Component {
             : ''
           }
           <TableBody>
+
+            {/* <CSSTransitionGroup
+              transitionName="example"
+              transitionEnterTimeout={500}
+              transitionLeaveTimeout={300}
+            > */}
             {
               this.props.results.map((e, i) => (
 
@@ -233,6 +240,7 @@ class IngredientsTable extends React.Component {
               ),
               )
             }
+            {/* </CSSTransitionGroup> */}
 
 
             {this.renderNoResults(this.props.count)}
@@ -249,7 +257,7 @@ class IngredientsTable extends React.Component {
               <TableCell />
               <TableCell />
               {
-                this.props.hasMore ? 
+                this.props.hasMore ?
                   <TableCell style={{ display: 'flex', height: '56px', alignItems: 'center', justifyContent: 'flex-end' }}>
                     <Button onClick={this.props.loadMore}>Load More</Button>
                   </TableCell> : ''
@@ -263,8 +271,7 @@ class IngredientsTable extends React.Component {
 }
 
 IngredientsTable.propTypes = {
-  loading: PropTypes.bool.isRequired,
-  results: PropTypes.isRequired,
+  // results: PropType.isRequired,
   history: PropTypes.isRequired,
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,
