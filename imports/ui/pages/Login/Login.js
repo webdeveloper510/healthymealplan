@@ -73,6 +73,18 @@ class Login extends React.Component {
     });
   }
 
+  showPasswordField() {
+
+    console.log($('#password').prop('type'));
+
+    if ($('#password').prop('type') == 'password') {
+      $('#password').prop('type', 'text');
+      return true;
+    }
+
+    $('#password').prop('type', 'password');
+  }
+
 
   render() {
     return (<div className="Login">
@@ -138,7 +150,7 @@ class Login extends React.Component {
                     name: 'password',
                   }}
                 />
-                <RemoveRedEyeIcon onClick={() => console.log('Clicked')} />
+                <RemoveRedEyeIcon style={{ fillOpacity: 0.54 }} onClick={this.showPasswordField} />
               </Grid>
 
               <Button type="submit" raised color="primary" className="btn btn-primary" style={{ marginTop: '25px', textTransform: 'none', float: 'right' }}>Log in</Button>
