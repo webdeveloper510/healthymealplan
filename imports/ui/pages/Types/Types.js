@@ -150,7 +150,7 @@ class Types extends React.Component {
 
           <div style={{ marginTop: '25px' }}>
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
-              <Tabs value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
+              <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
                 <Tab label="All" />
                 {/* <Tab label="Item Two" />
                   <Tab label="Item Three" /> */}

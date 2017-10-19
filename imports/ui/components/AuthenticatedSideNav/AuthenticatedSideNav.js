@@ -76,7 +76,7 @@ class AuthenticatedSideNav extends Component {
     return this.props.location.pathname;
 
     if (expected.indexOf(this.props.location.pathname) !== -1) {
-
+      return 'list-item-active';
     }
 
     return '';

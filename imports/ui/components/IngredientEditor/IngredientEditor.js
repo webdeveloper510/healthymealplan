@@ -1,5 +1,10 @@
 /* eslint-disable max-len, no-return-assign */
 
+/* 
+  Refactor the autocomplete tabs into their own components
+  not a priority for now, but this is an itch that we should really scratch. 
+*/
+
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
@@ -55,7 +60,7 @@ class IngredientEditor extends React.Component {
 
     this.state = {
       value: '', // Autosuggest
-      valueTypes: this.props.ingredient && this.props.ingredient.typeMain ? this.props.ingredient.typeMain.title : '',
+      valueTypes: this.props.ingredient && this.props.ingredient.typeMain ? this.props.ingredient.typeMain.title : 'N/A',
       suggestions: [],
       suggestionsTypes: [],
       types: this.props.ingredientTypes ? this.props.ingredientTypes : [],
@@ -256,7 +261,12 @@ class IngredientEditor extends React.Component {
     if (existingIngredient) ingredient._id = existingIngredient;
 
     const typeName = this.state.valueTypes.trim();
-    const typeActual = this.props.ingredientTypes.find(el => el.title === typeName);
+
+    if (typeName) {
+      const typeActual = this.props.ingredientTypes.find(el => el.title === typeName);
+    } else {
+      const typeActual = this.props.ingredientTypes.find(el => el.title === 'N/A');
+    }
 
     ingredient.typeId = typeActual._id;
 
@@ -448,7 +458,7 @@ class IngredientEditor extends React.Component {
 
             <Button onClick={() => this.props.history.push('/ingredients')} className="button button-secondary button-secondary--top">
               <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-              <ChevronLeft style={{ marginRight: '4px' }} /> Ingredients</Typography>
+                <ChevronLeft style={{ marginRight: '4px' }} /> Ingredients</Typography>
             </Button>
 
           </Grid>
@@ -564,7 +574,8 @@ class IngredientEditor extends React.Component {
 
                     inputProps={{
                       placeholder: 'Search',
-                      value: this.state.valueTypes ? this.state.valueTypes : 'N/A',
+                      defaultValue: this.props.newIngredient ? 'N/A' : '',
+                      value: this.state.valueTypes,
                       onChange: this.onChangeTypes.bind(this),
                       className: 'auto type-autocomplete',
                     }}
@@ -632,12 +643,11 @@ class IngredientEditor extends React.Component {
                       className: 'autoinput',
                     }}
                   />
-                  <Typography type="body2" style={{ textTransform: 'uppercase', marginBottom: '10px' }} className="body2" >Sub-ingredients</Typography>
                   <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
                     {this.state.subIngredients ? this.state.subIngredients.map((subIngredient, i) => (
                       <Chip
                         avatar={<Avatar> {this.getSubIngredientAvatar(subIngredient)} </Avatar>}
-                        style={{ marginRight: '8px' }}
+                        style={{ marginRight: '8px', marginBottom: '8px' }}
                         label={this.getSubIngredientTitle(subIngredient)}
                         key={i}
                         onRequestDelete={this.handleSubIngredientChipDelete.bind(this, subIngredient)}
