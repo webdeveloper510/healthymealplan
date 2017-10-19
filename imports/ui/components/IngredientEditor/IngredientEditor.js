@@ -261,16 +261,17 @@ class IngredientEditor extends React.Component {
     if (existingIngredient) ingredient._id = existingIngredient;
 
     const typeName = this.state.valueTypes.trim();
+    let typeActual = null;
 
     if (typeName) {
-      const typeActual = this.props.ingredientTypes.find(el => el.title === typeName);
+      typeActual = this.props.ingredientTypes.find(el => el.title === typeName);
     } else {
-      const typeActual = this.props.ingredientTypes.find(el => el.title === 'N/A');
+      typeActual = this.props.ingredientTypes.find(el => el.title === 'N/A');
     }
 
     ingredient.typeId = typeActual._id;
 
-    // console.log(ingredient);
+    console.log(ingredient);
 
     Meteor.call(methodToCall, ingredient, (error, ingredientId) => {
       if (error) {
@@ -434,7 +435,7 @@ class IngredientEditor extends React.Component {
   }
 
   titleFieldChanged(e) {
-    console.log(e.currentTarget.value.length);
+    // console.log(e.currentTarget.value.length);
 
     const hasFormChanged = e.currentTarget.value.length > 0;
 

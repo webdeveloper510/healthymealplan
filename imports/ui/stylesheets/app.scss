@@ -48,8 +48,8 @@ body{
 // .SideContent--shrinked{ padding-top: 0; }
 
 .SideContent--spacer-2x--horizontal {
-  padding-left: 2.5em;
-  padding-right: 2.5em
+  padding-left: 1.5em;
+  padding-right: 1.5em
 }
 
 .SideContent--spacer-2x--top { 
@@ -106,6 +106,13 @@ body{
     cursor: pointer;
   }
   // margin-top: 3rem;
+}
+
+label.error{
+  display: inline-block;
+  margin-top: 5px;
+  color: rgb(211, 47, 47);
+  font-family: "Roboto", sans-serif
 }
 
 .table-head-col-hover:hover{

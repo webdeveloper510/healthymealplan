@@ -33,7 +33,7 @@ class IngredientsTable extends React.Component {
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-
+      deleteDialogOpen: false,
     };
   }
 
@@ -163,6 +163,30 @@ class IngredientsTable extends React.Component {
     return 'checked';
   }
 
+  renderDeleteDialog() {
+    return (
+      <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
+        <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
+        Delete {this.state.selectedCheckboxesNumber} ingredients?
+        </Typography>
+        <DialogContent>
+          <DialogContentText className="subheading">
+          Are you sure you want to delete {this.state.selectedCheckboxesNumber} ingredients?
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
+          Cancel
+          </Button>
+          <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleRemoveActual.bind(this)} color="accent">
+          Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    );
+  }
+
+
   render() {
     // console.log(this.props);
     return (
@@ -266,6 +290,7 @@ class IngredientsTable extends React.Component {
           </TableFooter>
         </Table>
       </Paper>
+
     );
   }
 }

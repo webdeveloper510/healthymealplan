@@ -15,6 +15,8 @@ import OrderIcon from 'material-ui-icons/AttachMoney';
 import MealsIcon from 'material-ui-icons/LocalDining';
 import IngredientsIcon from 'material-ui-icons/Layers';
 import TypesIcon from 'material-ui-icons/List';
+import FolderIcon from 'material-ui-icons/Folder';
+
 import LifestylesIcon from 'material-ui-icons/FitnessCenter';
 import RestrictionsIcon from 'material-ui-icons/DoNotDisturbAlt';
 import DeliveryIcon from 'material-ui-icons/LocalShipping';
@@ -158,6 +160,16 @@ class AuthenticatedSideNav extends Component {
                 </ListItemIcon>
 
                 <ListItemText className="subheading" primary="Types" />
+              </ListItem>
+            </NavLink>
+
+            <NavLink to="/categories">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <FolderIcon className="side-nav-icon" />
+                </ListItemIcon>
+
+                <ListItemText className="subheading" primary="Categories" />
               </ListItem>
             </NavLink>
             {/* 

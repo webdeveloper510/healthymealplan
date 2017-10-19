@@ -50,6 +50,11 @@ import Index from '../../pages/Index/Index';
 // import ViewDocument from '../../pages/ViewDocument/ViewDocument';
 // import EditDocument from '../../pages/EditDocument/EditDocument';
 
+import Categories from '../../pages/Categories/Categories';
+// import NewCategory from '../../pages/NewCategory/NewCategory';
+// import ViewDocument from '../../pages/ViewDocument/ViewDocument';
+// import EditDocument from '../../pages/EditDocument/EditDocument';
+
 import Ingredients from '../../pages/Ingredients/Ingredients';
 import NewIngredient from '../../pages/NewIngredient/NewIngredient';
 import ViewIngredient from '../../pages/ViewIngredient/ViewIngredient';
@@ -347,6 +352,8 @@ class App extends React.Component {
                   >
                     <Switch key={this.props.key} location={this.props.location}>
 
+                      <Authenticated exact path="/categories" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Categories} {...this.props} />
+
                       <Authenticated exact path="/ingredients" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Ingredients} {...this.props} />
                       <Authenticated exact path="/ingredients/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewIngredient} {...this.props} />
                       <Authenticated exact path="/ingredients/:_id" popTheSnackbar={this.popTheSnackbar.bind(this)} component={ViewIngredient} {...this.props} />
@@ -360,6 +367,7 @@ class App extends React.Component {
                       <Authenticated exact path="/types/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewType} {...this.props} />
                       <Authenticated exact path="/types/:_id" popTheSnackbar={this.popTheSnackbar.bind(this)} component={ViewType} {...this.props} />
                       <Authenticated exact path="/types/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditType} {...this.props} />
+
 
                       <Public path="/signup" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Signup} {...this.props} />
                       <Public path="/login" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Login} {...this.props} />
