@@ -301,9 +301,11 @@ class App extends React.Component {
                     </IconButton>
 
                     <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', alignItems: 'center' }}>
-                      <Typography type="subheading" className="subheading font-medium" style={{ color: '#FFF', alignItems: 'center', display: 'flex', paddingRight: '15px' }}>
-                        <Avatar style={{ marginRight: '1em' }}>{this.getInitials(this.props.name ? this.props.name : '')}</Avatar>{this.props.name}
-                      </Typography>
+                      <Link to="/profile" className="link--no-hover">
+                        <Typography type="subheading" className="subheading font-medium" style={{ color: '#FFF', alignItems: 'center', display: 'flex', paddingRight: '15px' }}>
+                          <Avatar style={{ marginRight: '.8em' }}>{this.getInitials(this.props.name ? this.props.name : '')}</Avatar>{this.props.name}
+                        </Typography>
+                      </Link>
                       <Tooltip title="Log out">
                         <Link to="/logout">
                           <IconButton>
@@ -371,7 +373,7 @@ class App extends React.Component {
                       <Authenticated exact path="/ingredients/:_id" popTheSnackbar={this.popTheSnackbar.bind(this)} component={ViewIngredient} {...this.props} />
                       <Authenticated exact path="/ingredients/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditIngredient} {...this.props} />
 
-                      <Authenticated exact path="/profile" component={Profile} {...this.props} />
+                      <Authenticated exact path="/profile" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Profile} {...this.props} />
 
                       <Authenticated exact path="/team" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Team} {...this.props} />
 

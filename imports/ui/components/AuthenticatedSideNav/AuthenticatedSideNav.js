@@ -224,28 +224,27 @@ class AuthenticatedSideNav extends Component {
 
             <ListItemText className="subheading" primary="Customers" />
           </ListItem>
+*/}
+            <ListItem button onClick={this.handleToggleSettings.bind(this)}>
+              <ListItemIcon>
+                <SettingsIcon className="side-nav-icon" />
+              </ListItemIcon>
 
+              <ListItemText className="subheading" primary="Settings" />
+              {this.state.settingsOpen ? <ExpandLess /> : <ExpandMore />}
 
-          <ListItem button onClick={this.handleToggleSettings.bind(this)}>
-            <ListItemIcon>
-              <SettingsIcon className="side-nav-icon" />
-            </ListItemIcon>
-
-            <ListItemText className="subheading" primary="Settings" />
-            {this.state.settingsOpen ? <ExpandLess /> : <ExpandMore />}
-
-          </ListItem>
-
+            </ListItem>
           <Collapse in={this.state.settingsOpen} transitionDuration="auto" unmountOnExit>
 
-            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/team')}>
-              <ListItemIcon>
-                <TeamIcon className="side-nav-icon" />
-              </ListItemIcon>
-              <ListItemText className="subheading" primary="Team" />
-            </ListItem>
-
-          </Collapse> */}
+            <NavLink to="/team">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <TeamIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Team" />
+              </ListItem>
+            </NavLink>
+          </Collapse> 
 
         </List>
       </div>

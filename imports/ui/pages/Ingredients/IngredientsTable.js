@@ -207,11 +207,13 @@ class IngredientsTable extends React.Component {
                 <TableRow>
                   <TableCell padding="checkbox" style={{ width: '12%' }}>
                     <Checkbox onChange={this.selectAllRows.bind(this)} /></TableCell>
-                  <TableCell padding="none" style={{ width: '12%' }}>
+                  <TableCell padding="none" style={{ width: '12%' }}  onClick={() => this.props.sortByOptions('SKU')}>
                     <Typography className="body2" type="body2">SKU</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '38%' }}>
+                  <TableCell padding="none" style={{ width: '38%' }}  onClick={() => this.props.sortByOptions('title')}>
                     <Typography className="body2" type="body2">Ingredient</Typography></TableCell>
-                  <TableCell style={{ width: '38%' }}><Typography className="body2" type="body2">Type</Typography></TableCell>
+                  <TableCell style={{ width: '38%' }}  onClick={() => this.props.sortByOptions('type')}>
+                    <Typography className="body2" type="body2">Type</Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>)
               : ''

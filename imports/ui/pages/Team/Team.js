@@ -80,8 +80,7 @@ class Team extends React.Component {
     console.log(this.props.users);
     return (
       <div>
-        <AuthenticatedSideNav />
-        <Grid container className="SideContent SideContent--spacer-2x--horizontal">
+        <Grid container className="SideContent SideContent--spacer-2x--horizontal SideContent--spacer-2x--top">
 
           <Grid container style={{ marginBottom: '50px' }}>
             <Grid item xs={12}>
@@ -109,7 +108,6 @@ class Team extends React.Component {
           </Grid>
 
           <Divider light className="divider--space-x" />
-
 
           <Grid container justify="center" style={{ marginBottom: '75px' }}>
             <Grid item xs={12}>
