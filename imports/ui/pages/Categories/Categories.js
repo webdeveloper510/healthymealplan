@@ -21,6 +21,8 @@ import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 
 import CategoriesCollection from '../../../api/Categories/Categories';
+import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
+
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 import Loading from '../../components/Loading/Loading';
 
@@ -193,13 +195,13 @@ class Categories extends React.Component {
           </div>
           <ListContainer
             limit={5}
-            collection={IngredientTypesCollection}
-            publication="ingredientTypes"
+            collection={CategoriesCollection}
+            publication="categories"
             options={this.state.options}
             selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
               { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
           >
-            <TypesTable
+            <CategoriesTable
               popTheSnackbar={this.props.popTheSnackbar}
               searchTerm={this.state.searchSelector}
               rowsLimit={this.state.rowsVisible}

@@ -21,6 +21,8 @@ import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 
 import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
+import IngredientsCollection from '../../../api/Ingredients/Ingredients';
+
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 import Loading from '../../components/Loading/Loading';
 
@@ -192,9 +194,14 @@ class Types extends React.Component {
             />
           </div>
           <ListContainer
-            limit={5}
+            limit={50}
             collection={IngredientTypesCollection}
             publication="ingredientTypes"
+            joins={[{
+                foreignProperty: "typeId",
+                collection: IngredientsCollection,
+                joinAs: "ingredientsWithin"
+            }]}
             options={this.state.options}
             selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
               { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
@@ -263,8 +270,10 @@ Types.propTypes = {
 
 export default createContainer(() => {
   const subscription = Meteor.subscribe('ingredientTypes');
+  const subscription2 = Meteor.subscribe('ingredients');
+  
   return {
-    loading: !subscription.ready(),
+    loading: !subscription.ready() || !subscription2.ready(),
     ingredients: IngredientTypesCollection.find().fetch(),
   };
 }, Types);

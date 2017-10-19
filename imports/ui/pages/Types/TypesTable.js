@@ -10,6 +10,14 @@ import Table, {
   TableRow,
   TableSortLabel,
 } from 'material-ui/Table';
+
+import Dialog, {
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from 'material-ui/Dialog';
+
 import $ from 'jquery';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
@@ -30,6 +38,7 @@ class TypesTable extends React.Component {
       checkboxesSelected: false,
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
+      deleteDialogOpen: false
     };
   }
 
@@ -134,6 +143,7 @@ class TypesTable extends React.Component {
     this.setState({
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
+      deleteDialogOpen: false
     });
 
     // $('.row-selected').toggleClass('row-selected');
@@ -148,18 +158,40 @@ class TypesTable extends React.Component {
   }
 
 
+  isCheckboxSelected(id) {
+    // console.log(this.state.selectedCheckboxes);
+
+    if (this.state.selectedCheckboxes.length) {
+      if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+
+  deleteDialogHandleClickOpen() {
+    this.setState({ deleteDialogOpen: true });
+  }
+
+  deleteDialogHandleRequestClose() {
+    this.setState({ deleteDialogOpen: false });
+  }
+
   render() {
     console.log(this.props);
 
     return (
+      <div>
       <Paper elevation={2} className="table-container">
         {
           this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container">
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
-                {this.state.selectedCheckboxesNumber} ingredient{this.state.selectedCheckboxes.length > 1 ? ('s') : ''} selected
+                {this.state.selectedCheckboxesNumber} type{this.state.selectedCheckboxes.length > 1 ? ('s') : ''} selected
               </Typography>
-              <Button style={{ color: '#FFF' }} onClick={this.deleteSelectedRows.bind(this)}>Delete</Button>
+              <Button style={{ color: '#FFF' }} onClick={this.deleteDialogHandleClickOpen.bind(this)}>Delete</Button>
             </div>
           )
             : ''
@@ -193,26 +225,31 @@ class TypesTable extends React.Component {
           }
           <TableBody>
             {
-              this.props.results.map((e, i) => (
-                <TableRow hover className={e._id} key={e._id}>
-                  <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
-                    <Checkbox className="row-checkbox" id={e._id} onChange={this.rowSelected.bind(this, e)} />
-                  </TableCell>
-                  <TableCell style={{ width: '44%' }} padding="none" onClick={() => this.props.history.push(`types/${e._id}/edit`)}>
-                    <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
-                  </TableCell>
+              this.props.results.map((e, i) => {
+                const isSelected = this.isCheckboxSelected(e._id);
 
-                  <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '44%' }} padding="none" onClick={() => this.props.history.push(`types/${e._id}/edit`)}>
-                    <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>{e.title}</Typography>
-                  </TableCell>
-                  {/* <TableCell>
-                    {e.typeMain ? (<Typography type="subheading">{e.typeMain.title}</Typography>)
-                      : (<Typography className="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>)}
+                return (
+                  <TableRow hover className={e._id} key={e._id}>
+                    <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
+                      <Checkbox className="row-checkbox" id={e._id} checked={isSelected} onChange={this.rowSelected.bind(this, e)} />
+                    </TableCell>
+                    <TableCell style={{ width: '44%' }} padding="none" onClick={() => this.props.history.push(`types/${e._id}/edit`)}>
+                      <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
+                    </TableCell>
+
+                    <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '44%' }} padding="none" onClick={() => this.props.history.push(`types/${e._id}/edit`)}>
+                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>{e.title}</Typography>
+                    </TableCell>
+                    {/* <TableCell>
+                      {e.typeMain ? (<Typography type="subheading">{e.typeMain.title}</Typography>)
+                        : (<Typography className="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>)}
 
 
-                  </TableCell> */}
-                </TableRow>
-              ))
+                    </TableCell> */}
+                  </TableRow>
+                );
+              }
+            )
             }
 
 
@@ -239,6 +276,23 @@ class TypesTable extends React.Component {
           </TableFooter>
         </Table>
       </Paper>
+        <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
+        <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
+    Delete {this.state.selectedCheckboxesNumber} type{this.state.selectedCheckboxes.length > 1 ? ('s') : ''}?
+        </Typography>
+        <DialogContent>
+          <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} type{this.state.selectedCheckboxes.length > 1 ? ('s') : ''}?</DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
+      Cancel
+          </Button>
+          <Button stroked className="button--bordered button--bordered--accent" onClick={this.deleteSelectedRows.bind(this)} color="accent">
+      Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    </div>
     );
   }
 }

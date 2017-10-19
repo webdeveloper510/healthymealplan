@@ -31,7 +31,7 @@ import Avatar from 'material-ui/Avatar';
 import MenuIcon from 'material-ui-icons/Menu';
 import ExitToAppIcon from 'material-ui-icons/ExitToApp';
 import CloseIcon from 'material-ui-icons/Close';
-import { blueGrey, green } from 'material-ui/colors';
+import { blueGrey, green, red } from 'material-ui/colors';
 
 
 import { Link } from 'react-router-dom';
@@ -185,16 +185,17 @@ const styles = theme => ({
 
 const themeRoot = createMuiTheme({
   palette: {
-    primary: blueGrey, // Purple and green play nicely together.
+    primary: {
+      ...blueGrey,
+      A500: '#000000',
+      
+    }, // Purple and green play nicely together.
     secondary: {
       ...green,
       A500: '#69f0ae',
     },
-    // error: '',
-    // accent: {
-    //   ...green,
-    //   A500: '#69f0ae',
-    // }, // #2bbd7e
+
+    error: red,
   },
 });
 
@@ -270,10 +271,21 @@ class App extends React.Component {
             <Snackbar
               anchorOrigin={{ vertical, horizontal }}
               open={this.state.snackbarOpen}
-              onRequestClose={this.handleRequestClose.bind(this)}
-              action={this.state.snackbarButtonText ? (<Button color="accent" dense onClick={() => this.props.history.push(this.state.snackbarButtonLink)}>{this.state.snackbarButtonText}</Button>) : ''}
-              message={<span id="message-id" className="body2">{this.state.snackbarMessageText}</span>}
               autoHideDuration={4000}
+              onRequestClose={this.handleRequestClose.bind(this)}
+              action={[(this.state.snackbarButtonText ?
+                (<Link to={this.state.snackbarButtonLink} className="link--no-hover">
+                  <Button color="accent" dense>{this.state.snackbarButtonText}</Button>
+                </Link>) : ''),
+                <IconButton
+                key="close"
+                aria-label="Close"
+                color="inherit"
+                onClick={this.handleRequestClose.bind(this)}
+              >
+                <CloseIcon />
+              </IconButton>]}
+              message={<span id="message-id" className="body2">{this.state.snackbarMessageText}</span>}
             />
             <div className={this.props.authenticated ? classes.appFrame : classes.appFrameNotAuthenticated}>
               { this.props.authenticated ? (
@@ -302,7 +314,7 @@ class App extends React.Component {
                     </div>
                   </Toolbar>
                 </AppBar>) : '' }
-              {this.props.authenticated ? (<div>
+              {this.props.authenticated ? (<div style={{ backgroundColor: '#FFFFFF' }}>
                 <Hidden mdUp>
                   <Drawer
                     type="temporary"
