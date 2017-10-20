@@ -163,7 +163,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/categories">
+            {/* <NavLink to="/categories">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <FolderIcon className="side-nav-icon" />
@@ -171,7 +171,7 @@ class AuthenticatedSideNav extends Component {
 
                 <ListItemText className="subheading" primary="Categories" />
               </ListItem>
-            </NavLink>
+            </NavLink> */}
             {/* 
             <ListItem className="padding-left-nested-item" button onClick={() => history.push('/lifestyles')}>
               <ListItemIcon>
@@ -225,15 +225,15 @@ class AuthenticatedSideNav extends Component {
             <ListItemText className="subheading" primary="Customers" />
           </ListItem>
 */}
-            <ListItem button onClick={this.handleToggleSettings.bind(this)}>
-              <ListItemIcon>
-                <SettingsIcon className="side-nav-icon" />
-              </ListItemIcon>
+          <ListItem button onClick={this.handleToggleSettings.bind(this)}>
+            <ListItemIcon>
+              <SettingsIcon className="side-nav-icon" />
+            </ListItemIcon>
 
-              <ListItemText className="subheading" primary="Settings" />
-              {this.state.settingsOpen ? <ExpandLess /> : <ExpandMore />}
+            <ListItemText className="subheading" primary="Settings" />
+            {this.state.settingsOpen ? <ExpandLess /> : <ExpandMore />}
 
-            </ListItem>
+          </ListItem>
           <Collapse in={this.state.settingsOpen} transitionDuration="auto" unmountOnExit>
 
             <NavLink to="/team">
@@ -244,7 +244,7 @@ class AuthenticatedSideNav extends Component {
                 <ListItemText className="subheading" primary="Team" />
               </ListItem>
             </NavLink>
-          </Collapse> 
+          </Collapse>
 
         </List>
       </div>

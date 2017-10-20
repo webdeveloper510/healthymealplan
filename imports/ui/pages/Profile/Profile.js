@@ -14,6 +14,8 @@ import Grid from 'material-ui/Grid';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
+import Input from 'material-ui/Input';
+import MaskedInput from 'react-text-mask';
 import Button from 'material-ui/Button';
 import Divider from 'material-ui/Divider';
 import Dialog, {
@@ -22,8 +24,20 @@ import Dialog, {
   DialogContentText,
   DialogTitle,
 } from 'material-ui/Dialog';
+import $ from 'jquery';
 
 // import './Profile.scss';
+
+function TextMaskCustom(props) {
+  return (
+    <MaskedInput
+      {...props}
+      mask={['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+      placeholderChar={'\u2000'}
+      showMask
+    />
+  );
+}
 
 class Profile extends React.Component {
   constructor(props) {
@@ -38,10 +52,12 @@ class Profile extends React.Component {
     this.dialogHandleRequestClose = this.dialogHandleRequestClose.bind(this);
     this.handlePersonalInfoFormChange = this.handlePersonalInfoFormChange.bind(this);
     this.handlePasswordSubmit = this.handlePasswordSubmit.bind(this);
-    
+    this.handlePersonalFormSubmit = this.handlePersonalFormSubmit.bind(this);
+
+
     this.state = {
       formDialogOpen: false,
-      personalFormPristine: true
+      personalFormPristine: true,
     };
   }
 
@@ -49,6 +65,11 @@ class Profile extends React.Component {
     const component = this;
 
     validate(component.form, {
+
+      errorPlacement(error, element) {
+        error.insertAfter($(element).parent().parent());
+      },
+
       rules: {
         firstName: {
           required: true,
@@ -59,6 +80,12 @@ class Profile extends React.Component {
         emailAddress: {
           required: true,
           email: true,
+        },
+        phone: {
+          required: true,
+          // number: true,
+          // minimumlength: 10,
+          // maxlength: 10
         },
         // currentPassword: {
         //   required() {
@@ -95,12 +122,17 @@ class Profile extends React.Component {
     });
 
     validate(component.passwordForm, {
+
+      errorPlacement(error, element) {
+        error.insertAfter($(element).parent().parent());
+      },
+
       rules: {
         currentPassword: {
-         required: true
+          required: true,
         },
         newPassword: {
-          required: true
+          required: true,
         },
       },
       messages: {
@@ -115,12 +147,12 @@ class Profile extends React.Component {
     });
   }
 
-  dialogHandleClickOpen(){
+  dialogHandleClickOpen() {
     this.setState({ formDialogOpen: true });
   }
 
-  dialogHandleRequestClose(){
-    
+  dialogHandleRequestClose() {
+
     this.setState({ formDialogOpen: false });
   }
 
@@ -131,6 +163,14 @@ class Profile extends React.Component {
     return service === 'password' ? 'password' : 'oauth';
   }
 
+  handlePersonalFormSubmit() {
+    if ($('#personalForm').valid()) {
+      this.handleSubmit();
+    } else {
+      console.log('not valid');
+    }
+  }
+
   handleSubmit() {
 
     const profile = {
@@ -139,7 +179,10 @@ class Profile extends React.Component {
         name: {
           first: this.firstName.value,
           last: this.lastName.value,
+
         },
+
+        phone: this.phone.value,
       },
     };
 
@@ -147,18 +190,18 @@ class Profile extends React.Component {
       if (error) {
         this.props.popTheSnackbar({ message: error.reason });
       } else {
-        this.props.popTheSnackbar({message: 'Profile updated.'});
+        this.props.popTheSnackbar({ message: 'Profile updated.' });
       }
     });
 
- 
+
   }
 
-  handlePasswordSubmit(){
+  handlePasswordSubmit() {
 
     console.log(this.currentPassword.value);
     console.log(this.newPassword.value);
-    
+
     Accounts.changePassword(this.currentPassword.value, this.newPassword.value, (error) => {
       if (error) {
         this.props.popTheSnackbar({
@@ -169,19 +212,21 @@ class Profile extends React.Component {
         this.newPassword.value = '';
 
         this.props.popTheSnackbar({
-          message: "Password updated",
+          message: 'Password updated.',
         });
 
         this.dialogHandleRequestClose();
       }
     });
-    
+
   }
 
-  handlePersonalInfoFormChange(){
-    this.setState({
-      personalFormPristine: false
-    })
+  handlePersonalInfoFormChange() {
+    if ($('#personalForm').valid()) {
+      this.setState({
+        personalFormPristine: false,
+      });
+    }
 
   }
   // renderOAuthUser(loading, user) {
@@ -206,61 +251,73 @@ class Profile extends React.Component {
 
   renderPasswordUser(loading, user) {
     return !loading ? (<div>
-        <Grid container>
-          <Grid item xs={12} sm={6}>
-            <TextField
-              onChange={() => this.handlePersonalInfoFormChange()}
+      <Grid container>
+        <Grid item xs={12} sm={6}>
+          <TextField
+            onChange={() => this.handlePersonalInfoFormChange()}
             fullWidth
-              type="text"
-              name="firstName"
-              defaultValue={user.profile.name.first}
-              inputRef={(firstName) => (this.firstName = firstName)}
-              
-            />
-          </Grid>
+            type="text"
 
-          <Grid item xs={12} sm={6}>
-            <TextField
-              onChange={() => this.handlePersonalInfoFormChange()}
+            name="firstName"
+            defaultValue={user.profile.name.first}
+            inputRef={firstName => (this.firstName = firstName)}
+
+          />
+        </Grid>
+
+        <Grid item xs={12} sm={6}>
+          <TextField
+            onChange={() => this.handlePersonalInfoFormChange()}
             fullWidth
-              type="text"
-              name="lastName"
-              defaultValue={user.profile.name.last}
-              inputRef={(lastName) => (this.lastName = lastName)}
-            />
-          </Grid>
+            type="text"
+            name="lastName"
+            defaultValue={user.profile.name.last}
+            inputRef={lastName => (this.lastName = lastName)}
+          />
+        </Grid>
+
+      </Grid>
+
+      <Grid container style={{ marginTop: '1em' }}>
+        <Grid item xs={12}>
+          <TextField
+            onChange={() => this.handlePersonalInfoFormChange()}
+            fullWidth
+            type="email"
+            name="emailAddress"
+            disabled
+            defaultValue={user.emails[0].address}
+            inputRef={emailAddress => (this.emailAddress = emailAddress)}
+          />
 
         </Grid>
 
-        <Grid container style={{ marginTop: "1em"}}>
-          <Grid item xs={12}>
-            <TextField
-              onChange={() => this.handlePersonalInfoFormChange()}
-              fullWidth
-              type="email"
-              name="emailAddress"
-              defaultValue={user.emails[0].address}
-              inputRef={(emailAddress) => (this.emailAddress = emailAddress)}
-            />
-          </Grid>
-
-          <Grid item xs={12}>
-            <Button type="submit" disabled={this.state.personalFormPristine} color="primary" raised>Save</Button>
-          </Grid>
-        </Grid>
-
-        {/* <Divider light className="divider--space-x" /> */}
+        <Grid item xs={12}>
+          {/* <TextField
+            fullWidth
         
-        <Grid container style={{ marginTop: '30px' }}>
-          <Grid item xs={12}>
-            <Typography type="body2" className="text-uppercase" style={{ marginBottom: '30px' }}>Password</Typography>
-            <Button color="primary" onClick={() => this.dialogHandleClickOpen()} raised>Change password</Button>
-          </Grid>
-            
+
+          /> */}
+
+          <Input
+            onChange={() => this.handlePersonalInfoFormChange()}
+            type="tel"
+            name="phone"
+            placeholder="Phone"
+            defaultValue={user.profile.phone}
+            inputRef={phone => (this.phone = phone)}
+            inputComponent={TextMaskCustom}
+            onChange={this.handleChange('textmask')}
+          />
+
         </Grid>
 
-      
-    
+        {/* <Grid item xs={12}>
+          <Button type="submit" disabled={this.state.personalFormPristine} color="primary" raised>Save</Button>
+        </Grid> */}
+      </Grid>
+
+
     </div>) : <div />;
   }
 
@@ -276,74 +333,92 @@ class Profile extends React.Component {
     return (<div className="Profile">
       <Grid container className="SideContent SideContent--spacer-2x--horizontal SideContent--spacer-2x--top">
 
-          <Grid container style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Typography type="headline" style={{ fontWeight: 500 }}>Account</Typography>
-            </Grid>
-
+        <Grid container style={{ marginBottom: '50px' }}>
+          <Grid item xs={6}>
+            <Typography type="headline" style={{ fontWeight: 500 }}>Account</Typography>
           </Grid>
 
-
-          <Grid container justify="center" style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Grid container>
-                <Grid item xs={12} sm={4} >
-                  <Typography type="subheading" className="font-medium"> Personal details
-                  </Typography>
-                 
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                  <Paper elevation={2} className="paper-for-fields">
-                  <Typography type="body2" className="text-uppercase" style={{ marginBottom: '30px' }}>Perosnal information</Typography>
-                  <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
-                    {this.renderProfileForm(loading, user)}
-                  </form>
-          
-                  </Paper>
-                </Grid>
-              </Grid>
-            </Grid>
+          <Grid item xs={6} style={{ textAlign: 'right' }}>
+            <Button type="submit" disabled={this.state.personalFormPristine} onClick={() => this.handlePersonalFormSubmit()} color="primary" raised>Save</Button>
           </Grid>
-
-
         </Grid>
 
 
-        <Dialog open={this.state.formDialogOpen} onRequestClose={() => this.dialogHandleRequestClose()}>
-            <DialogTitle>Change your password</DialogTitle>
-            <DialogContent>
-              <DialogContentText>
-                
-              </DialogContentText>
-                <form ref={(passwordForm) => (this.passwordForm = passwordForm)} onSubmit={event => event.preventDefault()}>
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4} >
+                <Typography type="subheading" className="font-medium"> Personal details
+                </Typography>
 
-                  <TextField
-                    margin="dense"
-                    fullWidth
-                    label="Current password"
-                    type="password"
-                    name="currentPassword"
-                    inputRef={(currentPassword) => (this.currentPassword = currentPassword)}
-                  />
-                  <TextField
-                    margin="dense"
-                    fullWidth
-                    label="New password"
-                    type="password"
-                    name="newPassword"
-                    inputRef={(newPassword) => (this.newPassword = newPassword)}
-                  />
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Typography type="body2" className="font-uppercase" style={{ marginBottom: '30px' }}>Perosnal information</Typography>
+                  <form ref={form => (this.form = form)} id="personalForm" onSubmit={event => event.preventDefault()}>
+                    {this.renderProfileForm(loading, user)}
+                  </form>
 
-        
-                  <Button type="submit" onClick={() => this.handlePasswordSubmit()} color="primary" raised>Save</Button>
-                  
-                </form>
+                  <Grid container style={{ marginTop: '30px' }}>
+                    <Grid item xs={12}>
+                      <Typography type="body2" className="font-uppercase" style={{ marginBottom: '30px' }}>Password</Typography>
+                      <Button color="primary" onClick={() => this.dialogHandleClickOpen()} raised>Change password</Button>
+                    </Grid>
 
-              </DialogContent>
-              
-          </Dialog>
-      </div>
-    
+                  </Grid>
+
+
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+
+      </Grid>
+
+
+      <Dialog open={this.state.formDialogOpen} onRequestClose={() => this.dialogHandleRequestClose()}>
+        <DialogTitle>Change your password</DialogTitle>
+        <DialogContent>
+          <DialogContentText />
+          <form ref={passwordForm => (this.passwordForm = passwordForm)} onSubmit={event => event.preventDefault()}>
+
+            <TextField
+              margin="dense"
+              fullWidth
+              label="Current password"
+              type="password"
+              name="currentPassword"
+              helperText="Enter the password you currently use to login."
+              inputRef={currentPassword => (this.currentPassword = currentPassword)}
+            />
+
+            <TextField
+              margin="dense"
+              fullWidth
+              label="New password"
+              type="password"
+              name="newPassword"
+              helperText="Enter a new password of 6 or more characters."
+
+              inputRef={newPassword => (this.newPassword = newPassword)}
+            />
+
+
+          </form>
+
+        </DialogContent>
+        <DialogActions>
+
+          <Button style={{ marginTop: '1em' }} color="default" onClick={() => this.dialogHandleRequestClose()}>Cancel</Button>
+          <Button type="submit" style={{ marginTop: '1em' }} onClick={() => this.handlePasswordSubmit()} color="primary">Save</Button>
+
+        </DialogActions>
+
+      </Dialog>
+    </div>
+
     );
   }
 }

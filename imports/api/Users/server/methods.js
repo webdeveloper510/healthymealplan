@@ -1,6 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import {Roles} from 'meteor/alanning:roles';
+import { Roles } from 'meteor/alanning:roles';
 
 import { Accounts } from 'meteor/accounts-base';
 import editProfile from './edit-profile';
@@ -18,6 +18,8 @@ Meteor.methods({
           first: String,
           last: String,
         },
+
+        phone: String,
       },
     });
 
@@ -42,7 +44,7 @@ rateLimit({
   methods: [
     'users.sendVerificationEmail',
     'users.editProfile',
-    'users.addNewStaff'
+    'users.addNewStaff',
   ],
   limit: 5,
   timeRange: 1000,
