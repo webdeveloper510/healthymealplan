@@ -83,7 +83,7 @@ class Profile extends React.Component {
         },
         phone: {
           required: true,
-          // number: true,
+          number: true,
           // minimumlength: 10,
           // maxlength: 10
         },
@@ -300,14 +300,15 @@ class Profile extends React.Component {
           /> */}
 
           <Input
+            fullWidth
             onChange={() => this.handlePersonalInfoFormChange()}
             type="tel"
             name="phone"
             placeholder="Phone"
             defaultValue={user.profile.phone}
             inputRef={phone => (this.phone = phone)}
-            inputComponent={TextMaskCustom}
-            onChange={this.handleChange('textmask')}
+            /* inputComponent={TextMaskCustom} */
+            /* onChange={} */
           />
 
         </Grid>
