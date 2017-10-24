@@ -51,7 +51,9 @@ import Index from '../../pages/Index/Index';
 // import EditDocument from '../../pages/EditDocument/EditDocument';
 
 import Categories from '../../pages/Categories/Categories';
-// import NewCategory from '../../pages/NewCategory/NewCategory';
+import NewCategory from '../../pages/NewCategory/NewCategory';
+import EditCategory from '../../pages/EditCategory/EditCategory';
+
 // import ViewDocument from '../../pages/ViewDocument/ViewDocument';
 // import EditDocument from '../../pages/EditDocument/EditDocument';
 
@@ -188,7 +190,7 @@ const themeRoot = createMuiTheme({
     primary: {
       ...blueGrey,
       A500: '#000000',
-      
+
     }, // Purple and green play nicely together.
     secondary: {
       ...green,
@@ -367,6 +369,8 @@ class App extends React.Component {
                     <Switch key={this.props.key} location={this.props.location}>
 
                       <Authenticated exact path="/categories" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Categories} {...this.props} />
+                      <Authenticated exact path="/categories/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewCategory} {...this.props} />
+                      <Authenticated exact path="/categories/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditCategory} {...this.props} />
 
                       <Authenticated exact path="/ingredients" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Ingredients} {...this.props} />
                       <Authenticated exact path="/ingredients/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewIngredient} {...this.props} />
@@ -386,7 +390,7 @@ class App extends React.Component {
                       <Public path="/signup" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Signup} {...this.props} />
                       <Public path="/login" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Login} {...this.props} />
 
-                      <Authenticated path="/" exact component={Index} {...this.props} />
+                      <Authenticated exact path="/" component={Index} {...this.props} />
 
                       <Route path="/logout" component={Logout} {...this.props} />
                       <Route name="verify-email" path="/verify-email/:token" component={VerifyEmail} />

@@ -143,10 +143,10 @@ class Categories extends React.Component {
 
           <Grid container className="clearfix">
             <Grid item xs={6}>
-              <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }}>Types</Typography>
+              <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }}>Categories</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Button className="btn btn-primary" onClick={() => history.push('/types/new')} raised color="primary" style={{ float: 'right' }}>Add type</Button>
+              <Button className="btn btn-primary" onClick={() => history.push('/categories/new')} raised color="primary" style={{ float: 'right' }}>Add category</Button>
             </Grid>
           </Grid>
 
@@ -194,9 +194,16 @@ class Categories extends React.Component {
             />
           </div>
           <ListContainer
-            limit={5}
+            limit={50}
             collection={CategoriesCollection}
             publication="categories"
+            joins={[
+              {
+                localProperty: 'types',
+                collection: IngredientTypesCollection,
+                joinAs: 'joinedTypes',
+              },
+            ]}
             options={this.state.options}
             selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
               { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
@@ -227,8 +234,10 @@ Categories.propTypes = {
 
 export default createContainer(() => {
   const subscription = Meteor.subscribe('categories');
+  const subscription2 = Meteor.subscribe('ingredientTypes');
+
   return {
-    loading: !subscription.ready(),
+    loading: !subscription.ready() && !subscription2.ready(),
     categories: CategoriesCollection.find().fetch(),
   };
 }, Categories);

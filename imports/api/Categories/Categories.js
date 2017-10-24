@@ -18,7 +18,10 @@ Categories.deny({
 });
 
 Categories.schema = new SimpleSchema({
-
+  SKU: {
+    type: String,
+    label: 'The SKU of the ',
+  },
   title: {
     type: String,
     label: 'The title of the category.',
@@ -26,6 +29,10 @@ Categories.schema = new SimpleSchema({
   types: {
     type: Array,
     label: 'The types that belong to this category',
+  },
+  'types.$': {
+    type: String,
+    label: 'The id of each type',
   },
   owner: {
     type: String,
