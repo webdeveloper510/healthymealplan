@@ -63,7 +63,7 @@ class CategoryEditor extends React.Component {
       valueTypes: '',
       suggestions: [],
       suggestionsTypes: [],
-      types: this.props.ingredient && this.props.ingredientTypes ? _.sortBy(this.props.ingredientTypes.filter((e, i) => this.props.ingredient.types.indexOf(e._id) !== -1), 'title') : [],
+      types: this.props.ingredient && this.props.ingredientTypes && !this.props.newIngredient ? _.sortBy(this.props.ingredientTypes.filter((e, i) => this.props.ingredient.types.indexOf(e._id) !== -1), 'title') : [],
       subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
       selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
@@ -284,7 +284,7 @@ class CategoryEditor extends React.Component {
       } else {
         localStorage.setItem('categoryForSnackbar', category.title || $('[name="title"]').val());
 
-        const confirmation = existingCategory ? (`${localStorage.getItem('ingredientForSnackbar')} category updated.`)
+        const confirmation = existingCategory ? (`${localStorage.getItem('categoryForSnackbar')} category updated.`)
           : `${localStorage.getItem('categoryForSnackbar')} category added.`;
         // this.form.reset();
 

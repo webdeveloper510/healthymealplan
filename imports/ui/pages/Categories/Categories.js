@@ -185,7 +185,7 @@ class Categories extends React.Component {
             <Input
               className="input-box"
               style={{ width: '100%', position: 'relative' }}
-              placeholder="Search types"
+              placeholder="Search categories"
               onKeyUp={this.searchByName.bind(this)}
               inputProps={{
                 id: 'search-type-text',

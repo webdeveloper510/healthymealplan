@@ -209,11 +209,9 @@ class CategoriesTable extends React.Component {
                     <Checkbox onChange={this.selectAllRows.bind(this)} /></TableCell>
                   <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.sortByOptions('SKU')}>
                     <Typography className="body2" type="body2">SKU</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '38%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <TableCell padding="none" style={{ width: '76%' }} onClick={() => this.props.sortByOptions('title')}>
                     <Typography className="body2" type="body2">Category</Typography></TableCell>
-                  <TableCell style={{ width: '38%' }} onClick={() => this.props.sortByOptions('type')}>
-                    <Typography className="body2" type="body2">Types</Typography>
-                  </TableCell>
+
                 </TableRow>
               </TableHead>)
               : ''
@@ -245,7 +243,7 @@ class CategoriesTable extends React.Component {
                       </TableCell>
 
                       <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '38%' }}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '76%' }}
                         padding="none"
                         onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                       >
@@ -254,14 +252,8 @@ class CategoriesTable extends React.Component {
                           {e.title}
                         </Typography>
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {this.renderSubIngredientsNumber(e.subIngredients)}
+                          {e.joinedTypes ? `${e.joinedTypes.length} type(s)` : '-'}
                         </Typography>
-
-                      </TableCell>
-                      <TableCell style={{ width: '38%' }}>
-                        {e.joinedTypes ? (<Typography type="subheading" className="subheading">{e.joinedTypes.length}</Typography>)
-                          : (<Typography className="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }}>-</Typography>)}
-
 
                       </TableCell>
                     </TableRow>
@@ -280,7 +272,6 @@ class CategoriesTable extends React.Component {
                     {this.props.count} of {this.props.ingredientCount} categories
                   </Typography>
                 </TableCell>
-                <TableCell />
                 <TableCell />
                 {
                   this.props.hasMore ?
