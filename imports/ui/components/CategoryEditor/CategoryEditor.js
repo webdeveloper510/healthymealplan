@@ -63,7 +63,7 @@ class CategoryEditor extends React.Component {
       valueTypes: '',
       suggestions: [],
       suggestionsTypes: [],
-      types: this.props.newIngredient && this.props.ingredient ? [] : this.props.ingredientTypes.map((e, i) => this.props.ingredient.types.indexOf(e) !== -1),
+      types: this.props.ingredient && this.props.ingredientTypes ? _.sortBy(this.props.ingredientTypes.filter((e, i) => this.props.ingredient.types.indexOf(e._id) !== -1), 'title') : [],
       subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
       selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
@@ -623,7 +623,8 @@ class CategoryEditor extends React.Component {
                   />
 
                   <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '25px' }}>
-                    {!this.props.newIngredient && this.state.types.length > 0 ? this.state.types.map((type, i) => (
+                    {this.state.types.length ? this.state.types.map((type, i) => (
+
                       <Chip
                         avatar={<Avatar> {this.getTypeAvatar(type)} </Avatar>}
                         style={{ marginRight: '8px', marginBottom: '8px' }}

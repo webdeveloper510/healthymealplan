@@ -42,14 +42,21 @@ EditCategory.propTypes = {
 
 export default createContainer(({ match }) => {
   const categoryId = match.params._id;
-  const subscription = Meteor.subscribe('categories');
+  const subscription = Meteor.subscribe('categories.view', categoryId);
   const subscription2 = Meteor.subscribe('ingredientTypes');
 
+  // let categorySubReady = new ReactiveVar(false);
+
+  // if(subscription.ready()){
+  //   currentIngredientTypes = 
+  // }
+
   return {
-    loading: !subscription.ready() || !subscription2.ready(),
+    loading: !subscription.ready() && !subscription2.ready(),
     ingredient: Categories.findOne(categoryId),
-    allIngredients: Categories.find().fetch(),
+    // allIngredients: Categories.find().fetch(),
     // potentialSubIngredients: Ingredients.find().fetch(),
+    // currentIngredientTypes: IngredientTypes.find({_id: {$in: ingredient.types }}),
     ingredientTypes: IngredientTypes.find().fetch(),
   };
 }, EditCategory);
