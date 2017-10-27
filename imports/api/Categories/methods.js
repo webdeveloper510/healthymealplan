@@ -11,18 +11,22 @@ Meteor.methods({
       types: Array,
     });
 
-    console.log(cat);
+    const existsCategory = Categories.findOne({ title: cat.title });
+
+    if (existsCategory) {
+      throw new Meteor.Error('500', `${cat.title} is already present`);
+    }
 
     let nextSeqItem = getNextSequence('categories');
     nextSeqItem = nextSeqItem.toString();
 
-    // return;
     try {
       return Categories.insert({ SKU: nextSeqItem, title: cat.title, types: cat.types, owner: this.userId });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
+
   'categories.update': function categoriesUpdate(cat) {
     check(cat, {
       _id: String,

@@ -6,16 +6,13 @@ import Table, {
   TableCell,
   TableFooter,
   TableHead,
-  TablePagination,
   TableRow,
-  TableSortLabel,
 } from 'material-ui/Table';
 
 import Dialog, {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
 } from 'material-ui/Dialog';
 
 import $ from 'jquery';
@@ -23,7 +20,6 @@ import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
-import Menu, { MenuItem } from 'material-ui/Menu';
 
 // import DeleteIcon from 'material-ui-icons/Delete';
 // import Tooltip from 'material-ui/Tooltip';
@@ -45,15 +41,15 @@ class CategoriesTable extends React.Component {
     };
   }
 
-  renderSubIngredientsNumber(subIngredient) {
-    if (subIngredient && subIngredient.length > 1) {
-      return `${subIngredient.length} sub-ingredients`;
-    } else if (subIngredient && subIngredient.length == 1) {
-      return `${subIngredient.length} sub-ingredient`;
-    }
+  // renderSubIngredientsNumber(subIngredient) {
+  //   if (subIngredient && subIngredient.length > 1) {
+  //     return `${subIngredient.length} sub-ingredients`;
+  //   } else if (subIngredient && subIngredient.length == 1) {
+  //     return `${subIngredient.length} sub-ingredient`;
+  //   }
 
-    return '';
-  }
+  //   return '';
+  // }
 
   renderType(type) {
     console.log(type);
@@ -156,7 +152,7 @@ class CategoriesTable extends React.Component {
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No ingredient found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
+        <p style={{ padding: '25px' }} className="subheading">No category found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
       );
     }
   }
@@ -252,7 +248,14 @@ class CategoriesTable extends React.Component {
                           {e.title}
                         </Typography>
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {e.joinedTypes ? `${e.joinedTypes.length} type(s)` : '-'}
+                          {e.joinedTypes ?
+                            (
+                              e.joinedTypes.length > 1 ? (
+                                `${e.joinedTypes.length} types`
+                              ) : (`${e.joinedTypes.length} type`)
+                            )
+
+                            : '-'}
                         </Typography>
 
                       </TableCell>
@@ -269,7 +272,7 @@ class CategoriesTable extends React.Component {
               <TableRow>
                 <TableCell>
                   <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                    {this.props.count} of {this.props.ingredientCount} categories
+                    {this.props.count} of {this.props.categoryCount} categories
                   </Typography>
                 </TableCell>
                 <TableCell />
@@ -310,15 +313,16 @@ CategoriesTable.propTypes = {
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,
   loadMore: PropTypes.func.isRequired,
-  ingredientCount: PropTypes.number.isRequired,
+  categoryCount: PropTypes.number.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 
 export default createContainer(() => {
-  const ingredientCountSub = Meteor.subscribe('categories-all-count');
+  const categoryCountSub = Meteor.subscribe('categories-all-count');
 
   return {
     // ingredientTypes: IngredientsWithTypes.find().fetch(),
-    ingredientCount: Counts.get('categories'),
+    categoryCount: Counts.get('categories'),
   };
 }, CategoriesTable);

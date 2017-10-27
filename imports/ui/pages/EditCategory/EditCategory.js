@@ -13,29 +13,29 @@ import CategoryEditor from '../../components/CategoryEditor/CategoryEditor';
 
 import NotFound from '../NotFound/NotFound';
 
-const EditCategory = ({ ingredient, history, ingredientTypes, popTheSnackbar }) => (ingredient ? (
+const EditCategory = ({ category, history, ingredientTypes, popTheSnackbar }) => (category ? (
   <div>
     <Grid container className="EditCategory SideContent SideContent--spacer-2x--horizontal">
       <CategoryEditor
-        ingredient={ingredient}
+        category={category}
         potentialSubIngredients={[]}
         popTheSnackbar={popTheSnackbar}
         ingredientTypes={ingredientTypes}
         history={history}
-        newIngredient={false}
+        newCategory={false}
       />
     </Grid>
   </div>
 ) : <NotFound />);
 
 EditCategory.defaultProps = {
-  ingredient: null,
+  category: null,
 };
 
 EditCategory.propTypes = {
-  ingredient: PropTypes.object,
+  category: PropTypes.object,
   history: PropTypes.object.isRequired,
-  potentialSubIngredients: PropTypes.isRequired,
+  // potentialSubIngredients: PropTypes.isRequired,
   ingredientTypes: PropTypes.array.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };
@@ -53,7 +53,7 @@ export default createContainer(({ match }) => {
 
   return {
     loading: !subscription.ready() && !subscription2.ready(),
-    ingredient: Categories.findOne(categoryId),
+    category: Categories.findOne(categoryId),
     // allIngredients: Categories.find().fetch(),
     // potentialSubIngredients: Ingredients.find().fetch(),
     // currentIngredientTypes: IngredientTypes.find({_id: {$in: ingredient.types }}),

@@ -7,7 +7,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 
 import Autosuggest from 'react-autosuggest';
 
@@ -18,14 +17,13 @@ import { Meteor } from 'meteor/meteor';
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
-import Select from 'material-ui/Select';
-import Input, { InputLabel } from 'material-ui/Input';
-import { FormControl, FormHelperText } from 'material-ui/Form';
+// import Select from 'material-ui/Select';
+// import Input, { InputLabel } from 'material-ui/Input';
+// import { FormControl, FormHelperText } from 'material-ui/Form';
 import Dialog, {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
 } from 'material-ui/Dialog';
 
 
@@ -37,35 +35,31 @@ import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 import Avatar from 'material-ui/Avatar';
 
-import { teal, red } from 'material-ui/colors';
+import { red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
 import Search from 'material-ui-icons/Search';
 
 
-import { Bert } from 'meteor/themeteorchef:bert';
 import validate from '../../../modules/validate';
 
-const primary = teal[500];
+// const primary = teal[500];
 const danger = red[700];
 
-const styles = theme => ({
 
-
-});
-
+const styles = theme => ({ });
 
 class CategoryEditor extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      value: '', // Autosuggest
+      // value: '', // Autosuggest
       valueTypes: '',
-      suggestions: [],
+      // suggestions: [],
       suggestionsTypes: [],
-      types: this.props.ingredient && this.props.ingredientTypes && !this.props.newIngredient ? _.sortBy(this.props.ingredientTypes.filter((e, i) => this.props.ingredient.types.indexOf(e._id) !== -1), 'title') : [],
-      subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
-      selectedType: this.props.ingredient.typeId,
+      types: this.props.category && this.props.ingredientTypes && !this.props.newCategory ? _.sortBy(this.props.ingredientTypes.filter((e, i) => this.props.category.types.indexOf(e._id) !== -1), 'title') : [],
+      // subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
+      // selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
       hasFormChanged: false,
     };
@@ -222,15 +216,15 @@ class CategoryEditor extends React.Component {
   }
 
   handleRemoveActual() {
-    const { popTheSnackbar, history, ingredient } = this.props;
+    const { popTheSnackbar, history, category } = this.props;
 
-    const existingIngredient = ingredient && ingredient._id;
-    localStorage.setItem('categoryDeleted', ingredient.title);
+    const exisitingCategory = category && category._id;
+    localStorage.setItem('categoryDeleted', category.title);
     const categoryDeletedMessage = `${localStorage.getItem('categoryDeleted')} deleted from categories.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('categories.remove', existingIngredient, (error) => {
+    Meteor.call('categories.remove', exisitingCategory, (error) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
@@ -252,7 +246,7 @@ class CategoryEditor extends React.Component {
 
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
-    const existingCategory = this.props.ingredient && this.props.ingredient._id;
+    const existingCategory = this.props.category && this.props.category._id;
     const methodToCall = existingCategory ? 'categories.update' : 'categories.insert';
 
     const category = {
@@ -303,12 +297,12 @@ class CategoryEditor extends React.Component {
     return (
       <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
         <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-        Delete {this.props.ingredient.title.toLowerCase()}?
+        Delete {this.props.category.title.toLowerCase()}?
         </Typography>
         <DialogContent>
           <DialogContentText className="subheading">
-          Are you sure you want to delete {this.props.ingredient.title.toLowerCase()} { (this.props.ingredient && this.props.ingredient.typeMain) ?
-              `from ${this.props.ingredient.typeMain.title.toLowerCase()}?` : '?'}
+          Are you sure you want to delete {this.props.category.title.toLowerCase()} { (this.props.category && this.props.category.typeMain) ?
+              `from ${this.props.category.typeMain.title.toLowerCase()}?` : '?'}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -487,9 +481,9 @@ class CategoryEditor extends React.Component {
 
   render() {
     console.log(this.props);
-    const { ingredient, ingredientTypes, history } = this.props;
+    const { category, ingredientTypes, history } = this.props;
 
-    if (!ingredient || !ingredientTypes) {
+    if (!category || !ingredientTypes) {
       return ('<h1>Loading</h1>');
     }
 
@@ -508,10 +502,10 @@ class CategoryEditor extends React.Component {
 
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={4}>
-            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{ingredient && ingredient._id ? `${ingredient.title}` : 'Add category'}</Typography>
+            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{category && category._id ? `${category.title}` : 'Add category'}</Typography>
 
-            {this.props.ingredient ?
-              (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1"> SKU {ingredient.SKU ? ingredient.SKU : ''} </Typography>)
+            {this.props.category ?
+              (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1">{category.SKU ? (category.SKU) : ''} </Typography>)
               : '' }
 
           </Grid>
@@ -539,7 +533,7 @@ class CategoryEditor extends React.Component {
                     label="Name"
                     name="title"
                     fullWidth
-                    defaultValue={ingredient && ingredient.title}
+                    defaultValue={category && category.title}
                     ref={title => (this.title = title)}
                     inputProps={{}}
                     onChange={this.titleFieldChanged.bind(this)}
@@ -564,22 +558,7 @@ class CategoryEditor extends React.Component {
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
 
-                  {/* <FormControl style={{ width: '100%' }}>
-                    <Select
-                      value={this.state.selectedType}
-                      onChange={this.handleTypeChange.bind(this)}
-                      input={<Input id="type" />}
-                      native
-                    >
 
-                      {ingredientTypes && ingredientTypes.map(ingredientType => (
-                        <option key={ingredientType._id} value={ingredientType._id}>
-                          {ingredientType.title}
-                        </option>
-                      ))}
-
-                    </Select>
-                  </FormControl> */}
                   <Search className="autoinput-icon" />
                   <Autosuggest
                     id="1"
@@ -719,11 +698,11 @@ class CategoryEditor extends React.Component {
             <Grid container>
               <Grid item xs={4}>
                 {
-                  this.props.newIngredient ? '' : (
+                  this.props.newCategory ? '' : (
                     <Button
                       style={{ backgroundColor: danger, color: '#FFFFFF' }}
                       raised
-                      onClick={ingredient && ingredient._id ? this.handleRemove.bind(this) : () => this.props.history.push('/ingredients')}
+                      onClick={category && category._id ? this.handleRemove.bind(this) : () => this.props.history.push('/categories')}
                     >
                     Delete
                     </Button>
@@ -750,11 +729,11 @@ class CategoryEditor extends React.Component {
 }
 
 CategoryEditor.defaultProps = {
-  ingredient: { title: '' },
+  category: { title: '' },
 };
 
 CategoryEditor.propTypes = {
-  ingredient: PropTypes.object,
+  category: PropTypes.object,
   ingredientTypes: PropTypes.array.isRequired,
   potentialSubIngredients: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,

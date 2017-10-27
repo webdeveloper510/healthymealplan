@@ -1,20 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import { Alert } from 'react-bootstrap';
-import { timeago, monthDayYearAtTime } from '@cleverbeagle/dates';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
-import { Bert } from 'meteor/themeteorchef:bert';
+
 import $ from 'jquery';
 
 import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
-import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
-import Paper from 'material-ui/Paper';
 import Input from 'material-ui/Input';
-import { teal, red } from 'material-ui/colors';
 import SearchIcon from 'material-ui-icons/Search';
 import ClearIcon from 'material-ui-icons/Clear';
 import AppBar from 'material-ui/AppBar';
@@ -23,17 +17,13 @@ import Tabs, { Tab } from 'material-ui/Tabs';
 import CategoriesCollection from '../../../api/Categories/Categories';
 import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
 
-import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 import Loading from '../../components/Loading/Loading';
+import CategoriesTable from './CategoriesTable';
 
 import Containers from 'meteor/utilities:react-list-container';
 
 const ListContainer = Containers.ListContainer;
 
-import CategoriesTable from './CategoriesTable';
-
-const primary = teal[500];
-const danger = red[700];
 
 class Categories extends React.Component {
   constructor(props) {
@@ -49,18 +39,6 @@ class Categories extends React.Component {
   }
 
   componentDidMount() { }
-
-  handleRemove(ingredientId) {
-    if (confirm('Are you sure? This is permanent!')) {
-      Meteor.call('ingredientTypes.remove', ingredientId, (error) => {
-        if (error) {
-          Bert.alert(error.reason, 'danger');
-        } else {
-          Bert.alert('Type deleted!', 'success');
-        }
-      });
-    }
-  }
 
   searchByName() {
     // const searchValue = new RegExp(, 'i');
@@ -124,17 +102,16 @@ class Categories extends React.Component {
       options: { sort: newOptions },
     });
 
-    console.log('Data sorting changed');
-    console.log(this.state.options);
+    // console.log('Data sorting changed');
+    // console.log(this.state.options);
   }
-
 
   handleTabChange(event, value) {
     this.setState({ currentTabValue: value });
   }
 
   render() {
-    const { loading, ingredients, match, history } = this.props;
+    const { loading, history } = this.props;
 
     return (!loading ? (
       <div>
