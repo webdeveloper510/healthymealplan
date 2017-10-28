@@ -245,7 +245,7 @@ class Ingredients extends React.Component {
                 popTheSnackbar={this.props.popTheSnackbar}
                 searchTerm={this.state.searchSelector}
                 history={this.props.history}
-                soryByOptions={this.sortByOption}
+                sortByOptions={this.sortByOption}
               />
 
             </ListContainer>

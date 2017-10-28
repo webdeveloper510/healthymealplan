@@ -54,6 +54,11 @@ import Categories from '../../pages/Categories/Categories';
 import NewCategory from '../../pages/NewCategory/NewCategory';
 import EditCategory from '../../pages/EditCategory/EditCategory';
 
+import Restrictions from '../../pages/Restrictions/Restrictions';
+import NewRestriction from '../../pages/NewRestriction/NewRestriction';
+import EditRestriction from '../../pages/EditRestriction/EditRestriction';
+
+
 // import ViewDocument from '../../pages/ViewDocument/ViewDocument';
 // import EditDocument from '../../pages/EditDocument/EditDocument';
 
@@ -279,14 +284,14 @@ class App extends React.Component {
                 (<Link to={this.state.snackbarButtonLink} className="link--no-hover">
                   <Button color="accent" dense>{this.state.snackbarButtonText}</Button>
                 </Link>) : ''),
-                <IconButton
-                key="close"
-                aria-label="Close"
-                color="inherit"
-                onClick={this.handleRequestClose.bind(this)}
+              <IconButton
+                  key="close"
+                  aria-label="Close"
+                  color="inherit"
+                  onClick={this.handleRequestClose.bind(this)}
               >
-                <CloseIcon />
-              </IconButton>]}
+                  <CloseIcon />
+                </IconButton>]}
               message={<span id="message-id" className="body2">{this.state.snackbarMessageText}</span>}
             />
             <div className={this.props.authenticated ? classes.appFrame : classes.appFrameNotAuthenticated}>
@@ -378,6 +383,11 @@ class App extends React.Component {
                       <Authenticated exact path="/ingredients/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditIngredient} {...this.props} />
 
                       <Authenticated exact path="/profile" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Profile} {...this.props} />
+
+                      <Authenticated exact path="/restrictions" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Restrictions} {...this.props} />
+                      <Authenticated exact path="/restrictions/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewRestriction} {...this.props} />
+                      <Authenticated exact path="/restrictions/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditRestriction} {...this.props} />
+
 
                       <Authenticated exact path="/team" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Team} {...this.props} />
 

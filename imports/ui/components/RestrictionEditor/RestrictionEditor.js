@@ -7,26 +7,27 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-
-import Autosuggest from 'react-autosuggest';
-
-import _ from 'lodash';
-
 import { Meteor } from 'meteor/meteor';
 
-import Button from 'material-ui/Button';
+
+import Autosuggest from 'react-autosuggest';
+import _ from 'lodash';
+
+import NumberFormat from 'react-number-format';``
 import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
-// import Select from 'material-ui/Select';
-// import Input, { InputLabel } from 'material-ui/Input';
-// import { FormControl, FormHelperText } from 'material-ui/Form';
+import IconButton from 'material-ui/IconButton';
+import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
+import { FormLabel, FormControl, FormControlLabel } from 'material-ui/Form';
+import Radio, { RadioGroup } from 'material-ui/Radio';
+
 import Dialog, {
   DialogActions,
   DialogContent,
   DialogContentText,
 } from 'material-ui/Dialog';
 
-
+import Button from 'material-ui/Button';
 import Chip from 'material-ui/Chip';
 import Paper from 'material-ui/Paper';
 
@@ -45,23 +46,52 @@ import validate from '../../../modules/validate';
 // const primary = teal[500];
 const danger = red[700];
 
+function NumberFormatCustom(props) {
+  return (
+    <NumberFormat
+      {...props}
+      thousandSeparator
+    />
+  );
+}
 
+function startAdornment() {
+  return (
+    <InputAdornment position="start">$</InputAdornment>
+  );
+}
+
+function endAdornment() {
+  return (
+    <InputAdornment position="end">%</InputAdornment>
+  );
+}
 const styles = theme => ({ });
 
-class CategoryEditor extends React.Component {
+class RestrictionEditor extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      // value: '', // Autosuggest
+      valueRestriction: '', //radio
       valueTypes: '',
-      // suggestions: [],
+      valueCategories: '',
+      
       suggestionsTypes: [],
-      types: this.props.category && this.props.ingredientTypes && !this.props.newCategory ? _.sortBy(this.props.ingredientTypes.filter((e, i) => this.props.category.types.indexOf(e._id) !== -1), 'title') : [],
+      suggestionsCategories: [],
+      
+      types: this.props.category && this.props.ingredientTypes && !this.props.newRestriction ? _.sortBy(this.props.ingredientTypes.filter((e, i) => this.props.category.types.indexOf(e._id) !== -1), 'title') : [],
+      categories: '',
+      
       // subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
       // selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
       hasFormChanged: false,
+
+      valueDiscountOrExtra: 'none',
+      discountOrExtraSelected: false,
+      discountType: 'Percentage',
+      discountOrExtraAmount: '',
     };
   }
 
@@ -100,6 +130,39 @@ class CategoryEditor extends React.Component {
   }
 
 
+  handleDiscountChange(event, value){
+    // console.log(event.target.value);
+
+    this.setState({ 
+      discountType: event.target.value
+    });
+  };
+
+  handleDiscountOrExtraValueChange(event, value){
+    this.setState({ 
+      discountOrExtraAmount: event.target.value
+    });
+  }
+
+  handleDiscountOrExtraRadioChange(event, value){
+    let discountOrExtraSelected = true;
+
+    if(value == 'none'){
+      discountOrExtraSelected = false;
+    }
+
+    this.setState({
+      discountOrExtraSelected: discountOrExtraSelected,
+      valueDiscountOrExtra: value
+    });
+  };
+
+
+  handleRestrictionChange(event, value){
+    this.setState({ 
+      valueRestriction: value
+    });
+  };
   // Use your imagination to render suggestions.
   onChange(event, { newValue }) {
     this.setState({
@@ -492,9 +555,9 @@ class CategoryEditor extends React.Component {
         <Grid container justify="center">
           <Grid item xs={12}>
 
-            <Button onClick={() => this.props.history.push('/categories')} className="button button-secondary button-secondary--top">
+            <Button onClick={() => this.props.history.push('/restrictions')} className="button button-secondary button-secondary--top">
               <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                <ChevronLeft style={{ marginRight: '4px' }} /> Categories</Typography>
+                <ChevronLeft style={{ marginRight: '4px' }} /> Restrictions</Typography>
             </Button>
 
           </Grid>
@@ -502,7 +565,7 @@ class CategoryEditor extends React.Component {
 
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={4}>
-            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{category && category._id ? `${category.title}` : 'Add category'}</Typography>
+            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{category && category._id ? `${category.title}` : 'Add restriction'}</Typography>
 
             {this.props.category ?
               (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1">{category.SKU ? (category.SKU) : ''} </Typography>)
@@ -511,7 +574,7 @@ class CategoryEditor extends React.Component {
           </Grid>
           <Grid item xs={8}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/categories')}>Cancel</Button>
+              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/restrictions')}>Cancel</Button>
               <Button disabled={!this.state.hasFormChanged} className="btn btn-primary" raised type="submit" color="contrast">Save</Button>
             </div>
           </Grid>
@@ -523,7 +586,7 @@ class CategoryEditor extends React.Component {
             <Grid container>
               <Grid item xs={12} sm={4}>
                 <Typography type="subheading" className="subheading font-medium">
-              Category
+              Restriction
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
@@ -538,6 +601,114 @@ class CategoryEditor extends React.Component {
                     inputProps={{}}
                     onChange={this.titleFieldChanged.bind(this)}
                   />
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+
+        <Divider light className="divider--space-x" />
+
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography type="subheading" className="subheading font-medium">
+                  Discounts & Extras
+                </Typography>
+                <Typography gutterTop gutterBottom>
+                  Applying a discount or extra will affect the total amount of a lifestyle's price plan if ingredients are restricted.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Grid container>
+                    <Grid item xs={12}>
+                    <FormControl component="fieldset">
+                      <RadioGroup
+                        aria-label="discountOrExtra"
+                        name="discountOrExtra"
+                        value={this.state.valueDiscountOrExtra}
+                        onChange={this.handleDiscountOrExtraRadioChange.bind(this)}
+                        style={{ flexDirection: 'row' }}
+                      >
+                        <FormControlLabel className="radiobuttonlabel" value="none" control={<Radio checked={this.state.valueDiscountOrExtra === 'none'}/>} label="None" />
+                        <FormControlLabel className="radiobuttonlabel" value="discount" control={<Radio checked={this.state.valueDiscountOrExtra === 'discount'}/>} label="Discount" />
+                        <FormControlLabel className="radiobuttonlabel" value="extra" control={<Radio checked={this.state.valueDiscountOrExtra === 'extra'} />} label="Extra" />
+
+                      </RadioGroup>
+                    </FormControl>
+                    </Grid>
+                    <Grid item xs={6} sm={6}>
+                      <TextField
+                        disabled={!this.state.discountOrExtraSelected}
+                        fullWidth
+                        id="select-discount-type"
+                        select
+                        label="Type"
+                        value={this.state.discountType}
+                        onChange={this.handleDiscountChange.bind(this)}
+                        SelectProps={{ native: false }}
+                      >
+                        <MenuItem key={1} value="Percentage">Percentage</MenuItem>
+                        <MenuItem key={2} value="Fixed amount">Fixed amount</MenuItem>
+                      </TextField>
+                    </Grid>
+
+                    <Grid item xs={6} sm={6}>
+                   
+                      <TextField
+                        fullWidth
+                        value={this.state.discountOrExtraAmount}
+                        id="discountOrExtraValue"
+                        name="discountOrExtraValue"
+                        disabled={!this.state.discountOrExtraSelected}
+                        onChange={this.handleDiscountOrExtraValueChange.bind(this)}
+                        minlength="2"
+                        label="Amount"
+
+                        inputProps={{
+                          'aria-label': 'Description',
+                          minLength: 1,
+                          maxLength: 3,
+                          type: "number"
+                        }}
+                      />
+                    </Grid>
+
+                  </Grid>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Divider light className="divider--space-x" />
+
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography type="subheading" className="subheading font-medium">
+                  Category
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                <FormControl component="fieldset">
+                  <RadioGroup
+                    aria-label="RestrictionType"
+                    name="restrictionType"
+                    value={this.state.valueRestriction}
+                    style={{ flexDirection: 'row' }}
+                    onChange={this.handleRestrictionChange.bind(this)}
+                  >
+                    <FormControlLabel className="radiobuttonlabel" value="allergy" control={<Radio />} label="Allergy" />
+                    <FormControlLabel className="radiobuttonlabel" value="dietary" control={<Radio />} label="Dietary" />
+                    <FormControlLabel className="radiobuttonlabel" value="religious" control={<Radio />} label="Religious" />
+                  </RadioGroup>
+                </FormControl>
                 </Paper>
               </Grid>
             </Grid>
@@ -611,6 +782,82 @@ class CategoryEditor extends React.Component {
                         key={i}
                         onRequestDelete={this.handleTypeChipDelete.bind(this, type)}
                       />)) : <Chip className="chip--bordered" label="Type" />}
+                  </div>
+
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+
+        <Divider light className="divider--space-x" />
+
+
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography type="subheading" className="subheading font-medium">
+                Category
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+
+
+                  <Search className="autoinput-icon" />
+                  <Autosuggest
+                    id="1"
+                    className="autosuggest"
+                    theme={{
+                      container: {
+                        flexGrow: 1,
+                        position: 'relative',
+                      },
+                      suggestionsContainerOpen: {
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                      },
+                      suggestion: {
+                        display: 'block',
+                      },
+                      suggestionsList: {
+                        margin: 0,
+                        padding: 0,
+                        listStyleType: 'none',
+                      },
+                    }}
+                    renderInputComponent={this.renderInputTypes.bind(this)}
+                    suggestions={this.state.suggestionsTypes}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(this)}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(this)}
+                    onSuggestionSelected={this.onSuggestionSelectedTypes.bind(this)}
+                    getSuggestionValue={this.getSuggestionValueTypes.bind(this)}
+                    renderSuggestion={this.renderSuggestionTypes.bind(this)}
+                    renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(this)}
+
+                    focusInputOnSuggestionClick={false}
+
+                    inputProps={{
+                      placeholder: 'Search',
+                      value: this.state.valueTypes,
+                      onChange: this.onChangeTypes.bind(this),
+                      className: 'auto type-autocomplete',
+                    }}
+                  />
+
+                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '25px' }}>
+                    {this.state.types.length ? this.state.types.map((type, i) => (
+
+                      <Chip
+                        avatar={<Avatar> {this.getTypeAvatar(type)} </Avatar>}
+                        style={{ marginRight: '8px', marginBottom: '8px' }}
+                        label={type.title}
+                        key={i}
+                        onRequestDelete={this.handleTypeChipDelete.bind(this, type)}
+                      />)) : <Chip className="chip--bordered" label="Category" />}
                   </div>
 
                 </Paper>
@@ -728,11 +975,11 @@ class CategoryEditor extends React.Component {
   }
 }
 
-CategoryEditor.defaultProps = {
+RestrictionEditor.defaultProps = {
   category: { title: '' },
 };
 
-CategoryEditor.propTypes = {
+RestrictionEditor.propTypes = {
   category: PropTypes.object,
   ingredientTypes: PropTypes.array.isRequired,
   potentialSubIngredients: PropTypes.array.isRequired,
@@ -740,4 +987,4 @@ CategoryEditor.propTypes = {
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
-export default CategoryEditor;
+export default RestrictionEditor;
