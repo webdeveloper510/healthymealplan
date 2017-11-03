@@ -14,8 +14,10 @@ import ClearIcon from 'material-ui-icons/Clear';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 
-import CategoriesCollection from '../../../api/Categories/Categories';
-import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
+import RestrictionsCollection from '../../../api/Restrictions/Restrictions';
+// import CategoriesCollection from '../../../api/Categories/Categories';
+
+// import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
 
 import Loading from '../../components/Loading/Loading';
 import RestrictionsTable from './RestrictionsTable';
@@ -134,12 +136,11 @@ class Restrictions extends React.Component {
                 <Tab label="Allergies" />
                 <Tab label="Dietary" />
                 <Tab label="Religious" />
-                {/* <Tab label="Item Two" />
-                  <Tab label="Item Three" /> */}
+
               </Tabs>
             </AppBar>
           </div>
-          
+
           {/* {this.state.currentTabValue === 0 && <div>Item One</div>}
           {this.state.currentTabValue === 1 && <div>Item Two</div>}
           {this.state.currentTabValue === 2 && <div>Item Three</div>} */}
@@ -179,20 +180,8 @@ class Restrictions extends React.Component {
           </div>
           <ListContainer
             limit={50}
-            collection={CategoriesCollection}
-            publication="categories"
-            joins={[
-              {
-                localProperty: 'types',
-                collection: IngredientTypesCollection,
-                joinAs: 'joinedTypes',
-              },
-              {
-                localProperty: 'categories',
-                collection: CategoriesCollection,
-                joinAs: 'joinedCategories',
-              },
-            ]}
+            collection={RestrictionsCollection}
+            publication="restrictions"
             options={this.state.options}
             selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
               { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
@@ -216,17 +205,16 @@ class Restrictions extends React.Component {
 
 Restrictions.propTypes = {
   loading: PropTypes.bool.isRequired,
-  categories: PropTypes.arrayOf(PropTypes.object).isRequired,
+  // categories: PropTypes.arrayOf(PropTypes.object).isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe('categories');
-  const subscription2 = Meteor.subscribe('ingredientTypes');
+  const subscription = Meteor.subscribe('restrictions');
 
   return {
-    loading: !subscription.ready() && !subscription2.ready(),
-    categories: CategoriesCollection.find().fetch(),
+    loading: !subscription.ready(),
+    restrictions: RestrictionsCollection.find().fetch(),
   };
 }, Restrictions);

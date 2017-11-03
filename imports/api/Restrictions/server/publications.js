@@ -11,10 +11,10 @@ Meteor.publish('restrictions', (selector, options) => {
 });
 
 // Note: IngredientTypes.view is also used when editing an existing document.
-Meteor.publish('restrictions.view', (categoryId) => {
-  check(categoryId, String);
+Meteor.publish('restrictions.view', (restrictionId) => {
+  check(restrictionId, String);
 
-  return Restrictions.find({ _id: categoryId });
+  return Restrictions.find({ _id: restrictionId });
 });
 
 Meteor.publish('restrictions-all-count', function categoryCount() {

@@ -42,6 +42,25 @@ Restrictions.schema = new SimpleSchema({
     type: String,
     label: 'The id of each type',
   },
+  discount: {
+    type: Number,
+    label: 'The amount of discount',
+    optional: true,
+  },
+  extra: {
+    type: Number,
+    label: 'The amount of extra',
+    optional: true,
+  },
+  discountOrExtraType: {
+    type: String,
+    label: 'Percentage or Fixed amount',
+    optional: true,
+  },
+  restrictionType: {
+    type: 'String',
+    label: 'The type of restriction itself.',
+  },
   owner: {
     type: String,
     label: 'The ID of the user this category belongs to.',

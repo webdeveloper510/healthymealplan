@@ -36,16 +36,6 @@ class RestrictionsTable extends React.Component {
     };
   }
 
-  // renderSubIngredientsNumber(subIngredient) {
-  //   if (subIngredient && subIngredient.length > 1) {
-  //     return `${subIngredient.length} sub-ingredients`;
-  //   } else if (subIngredient && subIngredient.length == 1) {
-  //     return `${subIngredient.length} sub-ingredient`;
-  //   }
-
-  //   return '';
-  // }
-
   renderType(type) {
     console.log(type);
   }
@@ -184,7 +174,7 @@ class RestrictionsTable extends React.Component {
           {this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container">
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
-                {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'} selected
+                {this.state.selectedCheckboxesNumber} restriction{this.state.selectedCheckboxes.length > 1 ? ('s') : ''} selected
               </Typography>
               <Button style={{ color: '#FFF' }} onClick={this.deleteDialogHandleClickOpen.bind(this)}>Delete</Button>
             </div>
@@ -211,11 +201,6 @@ class RestrictionsTable extends React.Component {
             }
             <TableBody>
 
-              {/* <CSSTransitionGroup
-              transitionName="example"
-              transitionEnterTimeout={500}
-              transitionLeaveTimeout={300}
-            > */}
               {
                 this.props.results.map((e, i) => {
                   const isSelected = this.isCheckboxSelected(e._id);
@@ -244,17 +229,13 @@ class RestrictionsTable extends React.Component {
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
                           {e.title}
                         </Typography>
+
+
+                      </TableCell>
+                      <TableCell>
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {e.joinedTypes ?
-                            (
-                              e.joinedTypes.length > 1 ? (
-                                `${e.joinedTypes.length} types`
-                              ) : (`${e.joinedTypes.length} type`)
-                            )
-
-                            : '-'}
+                          {e.restrictionType}
                         </Typography>
-
                       </TableCell>
                     </TableRow>
                   );

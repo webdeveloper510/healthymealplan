@@ -58,10 +58,6 @@ import Restrictions from '../../pages/Restrictions/Restrictions';
 import NewRestriction from '../../pages/NewRestriction/NewRestriction';
 import EditRestriction from '../../pages/EditRestriction/EditRestriction';
 
-
-// import ViewDocument from '../../pages/ViewDocument/ViewDocument';
-// import EditDocument from '../../pages/EditDocument/EditDocument';
-
 import Ingredients from '../../pages/Ingredients/Ingredients';
 import NewIngredient from '../../pages/NewIngredient/NewIngredient';
 import ViewIngredient from '../../pages/ViewIngredient/ViewIngredient';
@@ -164,7 +160,7 @@ const styles = theme => ({
     width: 250,
     [theme.breakpoints.up('md')]: {
       width: drawerWidth,
-      position: 'relative',
+      // position: 'fixed',
       height: '100%',
       height: '100vh',
       minHeight: '100%',
@@ -183,9 +179,13 @@ const styles = theme => ({
     padding: theme.spacing.unit * 3,
     height: 'calc(100% - 56px)',
     marginTop: 56,
+    marginLeft: 0,
     [theme.breakpoints.up('sm')]: {
       height: 'calc(100% - 64px)',
       marginTop: 64,
+    },
+    [theme.breakpoints.up('md')]: {
+      marginLeft: `${drawerWidth}px`,
     },
   },
 });
@@ -339,7 +339,7 @@ class App extends React.Component {
                   >
                     <div style={{ padding: '10px 20px 10px', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
                       <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Healthy Meal Plan</Typography>
-                      <p style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="body1"><small>v 0.10</small></p>
+                      <Typography style={{ color: 'rgba(0, 0, 0, 0.38)' }} type="body2" className="body2">v 0.10</Typography>
                     </div>
 
                     <AuthenticatedSideNav {...this.props} />
@@ -357,7 +357,7 @@ class App extends React.Component {
                   >
                     <div style={{ padding: '10px 20px 10px', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
                       <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Healthy Meal Plan</Typography>
-                      <p style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="body1"><small>v 0.10</small></p>
+                      <Typography style={{ color: 'rgba(0, 0, 0, 0.38)' }} type="body2" className="body2">v 0.10</Typography>
                     </div>
                     <AuthenticatedSideNav {...this.props} />
 

@@ -10,6 +10,9 @@ import '../../api/IngredientTypes/server/publications';
 import '../../api/Categories/methods';
 import '../../api/Categories/server/publications';
 
+import '../../api/Restrictions/methods';
+import '../../api/Restrictions/server/publications';
+
 import '../../api/OAuth/server/methods';
 
 import '../../api/Users/server/methods';

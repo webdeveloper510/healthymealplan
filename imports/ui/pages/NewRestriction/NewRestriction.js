@@ -6,20 +6,20 @@ import { Meteor } from 'meteor/meteor';
 
 import Grid from 'material-ui/Grid';
 
-import Ingredients from '../../../api/Ingredients/Ingredients';
+import Categories from '../../../api/Categories/Categories';
 import IngredientTypes from '../../../api/IngredientTypes/IngredientTypes';
 
 import RestrictionEditor from '../../components/RestrictionEditor/RestrictionEditor';
 
-const NewRestriction = ({ history, ingredientTypes, potentialSubIngredients, newRestriction, popTheSnackbar }) => (
+const NewRestriction = ({ history, ingredientTypes, categories, newRestriction, popTheSnackbar }) => (
   <div>
     <Grid container className="NewRestriction SideContent SideContent--spacer-2x--horizontal">
       <RestrictionEditor
         history={history}
-        potentialSubIngredients={potentialSubIngredients}
         popTheSnackbar={popTheSnackbar}
         newRestriction={newRestriction}
         ingredientTypes={ingredientTypes}
+        categories={categories}
       />
     </Grid>
   </div>
@@ -27,7 +27,7 @@ const NewRestriction = ({ history, ingredientTypes, potentialSubIngredients, new
 
 NewRestriction.propTypes = {
   history: PropTypes.object.isRequired,
-  potentialSubIngredients: PropTypes.array.isRequired,
+  categories: PropTypes.array.isRequired,
   ingredientTypes: PropTypes.array.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
   newRestriction: PropTypes.bool.isRequired,
@@ -40,7 +40,7 @@ export default createContainer(() => {
   return {
     newRestriction: true,
     loading: !subscription2.ready() && !subscription.ready(),
-    potentialSubIngredients: Ingredients.find().fetch(),
+    categories: Categories.find().fetch(),
     ingredientTypes: IngredientTypes.find().fetch(),
   };
 }, NewRestriction);
