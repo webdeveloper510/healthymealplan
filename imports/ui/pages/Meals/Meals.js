@@ -141,7 +141,7 @@ class Meals extends React.Component {
               <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }}>Meals</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Button className="btn btn-primary" onClick={() => history.push('/types/new')} raised color="primary" style={{ float: 'right' }}>Add meal</Button>
+              <Button className="btn btn-primary" onClick={() => history.push('/meals/new')} raised color="primary" style={{ float: 'right' }}>Add meal</Button>
             </Grid>
           </Grid>
 
