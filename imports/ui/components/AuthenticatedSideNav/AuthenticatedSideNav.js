@@ -109,7 +109,7 @@ class AuthenticatedSideNav extends Component {
     return (
       <div className="page-container__side-nav">
 
-        <List>
+        <List style={{ paddingTop: '0 !important' }}>
           <NavLink exact to="/">
             <ListItem button>
               <ListItemIcon>
@@ -136,14 +136,16 @@ class AuthenticatedSideNav extends Component {
                 <OrderIcon className="side-nav-icon" />
               </ListItemIcon>
               <ListItemText className="subheading" primary="Orders" />
-            </ListItem>
-
-            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/meals')}>
-              <ListItemIcon>
-                <MealsIcon className="side-nav-icon" />
-              </ListItemIcon>
-              <ListItemText className="subheading" primary="Meals" />
             </ListItem> */}
+            <NavLink to="/meals">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <MealsIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Meals" />
+              </ListItem>
+            </NavLink>
+
             <NavLink to="/ingredients">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon >
@@ -181,14 +183,14 @@ class AuthenticatedSideNav extends Component {
               <ListItemText className="subheading" primary="Lifestyles" />
             </ListItem>
             */}
-           <NavLink to="/restrictions">
-            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/restrictions')}>
-              <ListItemIcon>
-                <RestrictionsIcon className="side-nav-icon" />
-              </ListItemIcon>
-              <ListItemText className="subheading" primary="Restrictions" />
-            </ListItem>
-          </NavLink>
+            <NavLink to="/restrictions">
+              <ListItem className="padding-left-nested-item" button onClick={() => history.push('/restrictions')}>
+                <ListItemIcon>
+                  <RestrictionsIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Restrictions" />
+              </ListItem>
+            </NavLink>
 
           </Collapse>
 

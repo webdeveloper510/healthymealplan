@@ -68,6 +68,10 @@ import NewType from '../../pages/NewType/NewType';
 import ViewType from '../../pages/ViewType/ViewType';
 import EditType from '../../pages/EditType/EditType';
 
+import Meals from '../../pages/Meals/Meals';
+import NewMeal from '../../pages/NewMeal/NewMeal';
+import EditMeal from '../../pages/EditMeal/EditMeal';
+
 import Team from '../../pages/Team/Team';
 
 
@@ -284,14 +288,14 @@ class App extends React.Component {
                 (<Link to={this.state.snackbarButtonLink} className="link--no-hover">
                   <Button color="accent" dense>{this.state.snackbarButtonText}</Button>
                 </Link>) : ''),
-              <IconButton
-                  key="close"
-                  aria-label="Close"
-                  color="inherit"
-                  onClick={this.handleRequestClose.bind(this)}
+                <IconButton
+                key="close"
+                aria-label="Close"
+                color="inherit"
+                onClick={this.handleRequestClose.bind(this)}
               >
-                  <CloseIcon />
-                </IconButton>]}
+                <CloseIcon />
+              </IconButton>]}
               message={<span id="message-id" className="body2">{this.state.snackbarMessageText}</span>}
             />
             <div className={this.props.authenticated ? classes.appFrame : classes.appFrameNotAuthenticated}>
@@ -337,7 +341,7 @@ class App extends React.Component {
                       keepMounted: true, // Better open performance on mobile.
                     }}
                   >
-                    <div style={{ padding: '10px 20px 10px', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
+                    <div style={{ padding: '10px 20px 0', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
                       <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Healthy Meal Plan</Typography>
                       <Typography style={{ color: 'rgba(0, 0, 0, 0.38)' }} type="body2" className="body2">v 0.10</Typography>
                     </div>
@@ -355,7 +359,7 @@ class App extends React.Component {
                       paper: classes.drawerPaper,
                     }}
                   >
-                    <div style={{ padding: '10px 20px 10px', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
+                    <div style={{ padding: '10px 20px 0', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
                       <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Healthy Meal Plan</Typography>
                       <Typography style={{ color: 'rgba(0, 0, 0, 0.38)' }} type="body2" className="body2">v 0.10</Typography>
                     </div>
@@ -381,6 +385,10 @@ class App extends React.Component {
                       <Authenticated exact path="/ingredients/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewIngredient} {...this.props} />
                       <Authenticated exact path="/ingredients/:_id" popTheSnackbar={this.popTheSnackbar.bind(this)} component={ViewIngredient} {...this.props} />
                       <Authenticated exact path="/ingredients/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditIngredient} {...this.props} />
+
+                      <Authenticated exact path="/meals" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Meals} {...this.props} />
+                      <Authenticated exact path="/meals/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewMeal} {...this.props} />
+                      <Authenticated exact path="/meals/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditMeal} {...this.props} />
 
                       <Authenticated exact path="/profile" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Profile} {...this.props} />
 

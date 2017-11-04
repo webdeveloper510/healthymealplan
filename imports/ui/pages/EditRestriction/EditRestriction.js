@@ -44,7 +44,7 @@ EditRestriction.propTypes = {
 
 export default createContainer(({ match }) => {
   const restrictionId = match.params._id;
-  const subscription = Meteor.subscribe('restrictions.view', restrictionId);
+  const subscription = Meteor.subscribe('restrictions');
   const subscription2 = Meteor.subscribe('ingredientTypes');
   const subscription3 = Meteor.subscribe('categories');
 

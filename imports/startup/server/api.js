@@ -13,6 +13,9 @@ import '../../api/Categories/server/publications';
 import '../../api/Restrictions/methods';
 import '../../api/Restrictions/server/publications';
 
+import '../../api/Meals/methods';
+import '../../api/Meals/server/publications';
+
 import '../../api/OAuth/server/methods';
 
 import '../../api/Users/server/methods';

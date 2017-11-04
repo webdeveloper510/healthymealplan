@@ -18,6 +18,6 @@ Meteor.publish('restrictions.view', (restrictionId) => {
 });
 
 Meteor.publish('restrictions-all-count', function categoryCount() {
-  Counts.publish(this, 'restrictions', Restrictions.find());
+  Counts.publish(this, 'restrictions-count', Restrictions.find());
 });
 

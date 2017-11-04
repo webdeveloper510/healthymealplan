@@ -198,6 +198,9 @@ button{
   color: #fff !important
 }
 
+.btn.btn-danger:disabled{
+  background: #e0e0e0 !important;
+}
 .btn-danger{
   background: rgb(211, 47, 47) !important;
 }

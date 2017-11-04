@@ -64,9 +64,11 @@ class RestrictionEditor extends React.Component {
       suggestionsTypes: [],
       suggestionsCategories: [],
 
-      types: (!this.props.loading && this.props.restriction && this.props.ingredientTypes) ?
+      types: (!this.props.newRestriction && this.props.restriction && this.props.ingredientTypes) ?
         _.sortBy(this.props.ingredientTypes.filter(e => this.props.restriction.types.indexOf(e._id) !== -1), 'title') : [],
-      categories: (!this.props.loading && this.props.restriction && this.props.categories) ?
+
+        
+      categories: (!this.props.newRestriction && this.props.restriction && this.props.categories) ?
         _.sortBy(this.props.categories.filter(e => this.props.restriction.categories.indexOf(e._id) !== -1), 'title') : [],
 
       deleteDialogOpen: false,
@@ -749,6 +751,7 @@ class RestrictionEditor extends React.Component {
                       getSuggestionValue={this.getSuggestionValueTypes.bind(this)}
                       renderSuggestion={this.renderSuggestion.bind(this)}
                       renderSuggestionsContainer={this.renderSuggestionsContainer.bind(this)}
+                      focusInputOnSuggestionClick={false}
 
                       inputProps={{
                         placeholder: 'Search',
@@ -767,7 +770,7 @@ class RestrictionEditor extends React.Component {
                           label={type.title}
                           key={i}
                           onRequestDelete={this.handleTypeChipDelete.bind(this, type)}
-                        />)) : <Chip className="chip--bordered" label="Type" />}
+                        />)) : ''}
                     </div>
 
                   </Paper>
@@ -794,7 +797,7 @@ class RestrictionEditor extends React.Component {
 
                     <Search className="autoinput-icon" />
                     <Autosuggest
-                      id="1"
+                      id="2"
                       className="autosuggest"
                       theme={{
                         container: {
@@ -823,6 +826,8 @@ class RestrictionEditor extends React.Component {
                       getSuggestionValue={this.getSuggestionValueCategories.bind(this)}
                       renderSuggestion={this.renderSuggestion.bind(this)}
                       renderSuggestionsContainer={this.renderSuggestionsContainer.bind(this)}
+                      focusInputOnSuggestionClick={false}
+
                       inputProps={{
                         placeholder: 'Search',
                         value: this.state.valueCategories,
@@ -840,7 +845,7 @@ class RestrictionEditor extends React.Component {
                           label={category.title}
                           key={i}
                           onRequestDelete={this.handleCategoryChipDelete.bind(this, category)}
-                        />)) : <Chip className="chip--bordered" label="Category" />}
+                        />)) : ''}
                     </div>
 
                   </Paper>

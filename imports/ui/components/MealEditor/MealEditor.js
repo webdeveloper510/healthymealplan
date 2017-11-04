@@ -3,23 +3,18 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
-import { Link } from 'react-router-dom';
 import Grid from 'material-ui/Grid';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
 import TextField from 'material-ui/TextField';
-import Chip from 'material-ui/Chip';
-import ArrowBack from 'material-ui-icons/ArrowBack';
 import $ from 'jquery';
 
 import Dialog, {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
 } from 'material-ui/Dialog';
 
-import { Bert } from 'meteor/themeteorchef:bert';
 import validate from '../../../modules/validate';
 import { teal, red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
@@ -36,7 +31,7 @@ const styles = theme => ({
 });
 
 
-class TypeEditor extends React.Component {
+class MealEditor extends React.Component {
   constructor(props) {
     super(props);
 
@@ -53,8 +48,8 @@ class TypeEditor extends React.Component {
     const component = this;
     validate(component.form, {
 
-      errorPlacement: function(error, element){
-        error.insertAfter($(element).parent().parent()); 
+      errorPlacement(error, element) {
+        error.insertAfter($(element).parent().parent());
       },
 
       rules: {
@@ -78,17 +73,17 @@ class TypeEditor extends React.Component {
   }
 
   handleRemoveActual() {
-    const { popTheSnackbar, history, ingredientType } = this.props;
+    const { popTheSnackbar, history, meal } = this.props;
 
-    const existingIngredientType = ingredientType && ingredientType._id;
+    const existingMeal = meal && meal._id;
 
-    localStorage.setItem('ingredientTypeDeleted', ingredientType.title);
+    localStorage.setItem('mealDeleted', ingredientType.title);
 
-    const ingredientTypeDeletedMessage = `${localStorage.getItem('ingredientTypeDeleted')} deleted from types.`;
+    const mealDeletedMessage = `${localStorage.getItem('mealDeleted')} deleted from meals.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('ingredientTypes.remove', existingIngredientType, (error) => {
+    Meteor.call('meals.remove', existingIngredientType, (error) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
@@ -98,7 +93,7 @@ class TypeEditor extends React.Component {
           message: ingredientTypeDeletedMessage,
         });
 
-        history.push('/types');
+        history.push('/meals');
       }
     });
   }
@@ -110,79 +105,78 @@ class TypeEditor extends React.Component {
   handleSubmit() {
     // console.log('Reached handle submti');
     const { history, popTheSnackbar } = this.props;
-    const existingIngredientType = this.props.ingredientType && this.props.ingredientType._id;
-    const methodToCall = existingIngredientType ? 'ingredientTypes.update' : 'ingredientTypes.insert';
+    const existingMeal = this.props.meal && this.props.meal._id;
+    const methodToCall = existingMeal ? 'meals.update' : 'meals.insert';
 
-    const ingredientType = {
+    const meal = {
       title: document.querySelector('#title').value.trim(),
     };
 
-    console.log(ingredientType);
+    console.log(meal);
 
-    if (existingIngredientType) {
-      ingredientType._id = existingIngredientType;
-      localStorage.setItem('ingredientType', existingIngredientType.title);
+    if (existingMeal) {
+      meal._id = existingMeal;
+      localStorage.setItem('meal', existingMeal.title);
     } else {
-      localStorage.setItem('ingredientType', ingredientType.title);
+      localStorage.setItem('meal', meal.title);
     }
 
 
-    Meteor.call(methodToCall, ingredientType, (error, ingredientTypeId) => {
+    Meteor.call(methodToCall, meal, (error, mealId) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
         });
       } else {
-        const confirmation = existingIngredientType ? `${localStorage.getItem('ingredientType')} type updated` : `${localStorage.getItem('ingredientType')} type added.`;
+        const confirmation = existingMeal ? `${localStorage.getItem('meal')} meal updated` : `${localStorage.getItem('meal')} meal added.`;
         this.form.reset();
 
         popTheSnackbar({
           message: confirmation,
           buttonText: 'View',
-          buttonLink: `/types/${ingredientTypeId}/edit`,
+          buttonLink: `/meals/${mealId}/edit`,
         });
 
-        history.push('/types');
+        history.push('/meals');
       }
     });
   }
 
-  titleFieldChanged(e){
-    
-    console.log(e.currentTarget.value.length)
+  titleFieldChanged(e) {
+    console.log(e.currentTarget.value.length);
 
-    const hasFormChanged = e.currentTarget.value.length > 0 ? true : false;
+    const hasFormChanged = e.currentTarget.value.length > 0;
 
     this.setState({
-      hasFormChanged: hasFormChanged
-    })
+      hasFormChanged,
+    });
   }
-    
+
 
   render() {
-    const { ingredientType, history } = this.props;
+    const { meal, history } = this.props;
     return (
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
 
         <Grid container>
           <Grid item xs={12}>
-              <Button onClick={() => this.props.history.push('/types')} className="button button-secondary button-secondary--top">
-                <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', fontWeight: 'medium' }}>
-                <ChevronLeft style={{ marginRight: '4px' }} /> Types</Typography>
-              </Button>
-            </Grid>
-          
+            <Button onClick={() => this.props.history.push('/meals')} className="button button-secondary button-secondary--top">
+              <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', fontWeight: 'medium' }}>
+                <ChevronLeft style={{ marginRight: '4px' }} /> Meals</Typography>
+            </Button>
+          </Grid>
+
         </Grid>
 
 
-        <Grid container style={{ marginBottom: "50px" }}>
+        <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={6}>
-            <Typography type="headline" className="headline font-medium">Add type</Typography>
+            <Typography type="headline" className="headline font-medium">Add meal</Typography>
           </Grid>
 
           <Grid item xs={6}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <Button style={{ marginRight: "10px" }} onClick={() => history.push('/ingredients')}>Cancel</Button>
+              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
               <Button raised disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">Save</Button>
             </div>
           </Grid>
@@ -192,7 +186,7 @@ class TypeEditor extends React.Component {
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={12} sm={4}>
             <Typography type="subheading" className="subheading font-medium">
-              Type
+              Meal
             </Typography>
           </Grid>
           <Grid item xs={12} sm={8}>
@@ -202,9 +196,10 @@ class TypeEditor extends React.Component {
                 label="Name"
                 margin="normal"
                 name="title"
+                disabled={!this.props.newMeal}
                 fullWidth
                 onChange={this.titleFieldChanged.bind(this)}
-                defaultValue={ingredientType && ingredientType.title}
+                defaultValue={meal && meal.title}
                 ref={title => (this.title = title)}
               />
             </Paper>
@@ -213,33 +208,33 @@ class TypeEditor extends React.Component {
 
         <Grid container justify="center">
           <Grid item xs={6}>
-            {ingredientType ? (<Button raised onClick={this.handleRemove.bind(this)} style={{ backgroundColor: danger, color: '#FFFFFF' }}>Delete</Button>)
-              : (<Button raised onClick={() => history.push('/types')}>Cancel</Button>)}
+            {meal ? (<Button raised onClick={this.handleRemove.bind(this)} className="btn btn-danger" style={{ backgroundColor: danger, color: '#FFFFFF' }} disabled>Delete</Button>)
+              : (<Button raised onClick={() => history.push('/meals')}>Cancel</Button>)}
           </Grid>
 
           <Grid item xs={6}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <Button type="submit" raised  disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">
+              <Button type="submit" raised disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">
                 Save
               </Button>
             </div>
           </Grid>
         </Grid>
 
-        {ingredientType ? (<Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
+        {meal ? (<Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-          Delete {ingredientType ? ingredientType.title.toLowerCase() : ''}?
+          Delete {meal ? meal.title.toLowerCase() : ''}?
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading">
-            There may be ingredients associated with {ingredientType.title} type. Are you sure you want to delete {ingredientType.title.toLowerCase()}?
+            There may be ingredients associated with {meal.title}. Are you sure you want to delete {meal.title.toLowerCase()} ?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
             Cancel
             </Button>
-            <Button onClick={this.handleRemoveActual.bind(this)} color="error">
+            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleRemoveActual.bind(this)} color="accent">
             Delete
             </Button>
           </DialogActions>
@@ -250,10 +245,10 @@ class TypeEditor extends React.Component {
 }
 
 
-TypeEditor.propTypes = {
-  ingredientType: PropTypes.object,
+MealEditor.propTypes = {
+  meal: PropTypes.object.required,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
-export default TypeEditor;
+export default MealEditor;
