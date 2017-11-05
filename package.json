@@ -20,6 +20,7 @@
     "lodash": "^4.17.4",
     "material-ui": "^1.0.0-beta.16",
     "material-ui-icons": "^1.0.0-beta.14",
+    "material-ui-upload": "^1.2.1",
     "meteor-node-stubs": "^0.2.11",
     "prop-types": "^15.5.10",
     "react": "^15.6.1",

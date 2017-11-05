@@ -18,6 +18,9 @@ import '../../api/Meals/server/publications';
 
 import '../../api/OAuth/server/methods';
 
+import '../../api/Plates/methods';
+import '../../api/Plates/server/publications';
+
 import '../../api/Users/server/methods';
 import '../../api/Users/server/publications';
 

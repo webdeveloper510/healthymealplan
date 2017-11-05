@@ -19,6 +19,8 @@ import FolderIcon from 'material-ui-icons/Folder';
 
 import LifestylesIcon from 'material-ui-icons/FitnessCenter';
 import RestrictionsIcon from 'material-ui-icons/DoNotDisturbAlt';
+import PlatesIcon from 'material-ui-icons/RoomService';
+
 import DeliveryIcon from 'material-ui-icons/LocalShipping';
 import DirectionsIcon from 'material-ui-icons/Directions';
 import RoutesIcon from 'material-ui-icons/MyLocation';
@@ -140,7 +142,7 @@ class AuthenticatedSideNav extends Component {
             <NavLink to="/plates">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
-                  <MealsIcon className="side-nav-icon" />
+                  <PlatesIcon className="side-nav-icon" />
                 </ListItemIcon>
                 <ListItemText className="subheading" primary="Plates" />
               </ListItem>

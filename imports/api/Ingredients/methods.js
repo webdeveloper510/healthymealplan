@@ -78,27 +78,6 @@ Meteor.methods({
     }
   },
 
-  'ingredients.subIngredients.insert': function ingredientsRemove(subIngredient) {
-    console.log('Subingredients insert');
-    check(subIngredient, {
-      _id: String,
-    });
-
-    try {
-      return Ingredients.remove(ingredientId);
-    } catch (exception) {
-      throw new Meteor.Error('500', exception);
-    }
-  },
-  'ingredients.subIngredients.remove': function ingredientsRemove(subIngredientId) {
-    check(subIngredientId, String);
-
-    try {
-      return Ingredients.remove(subIngredientId);
-    } catch (exception) {
-      throw new Meteor.Error('500', exception);
-    }
-  },
 });
 
 rateLimit({
@@ -106,8 +85,7 @@ rateLimit({
     'ingredients.insert',
     'ingredients.update',
     'ingredients.remove',
-    'ingredients.subIngredients.insert',
-    'ingredients.subIngredients.remove',
+    'ingredients.batchRemove',
   ],
   limit: 5,
   timeRange: 1000,
