@@ -119,19 +119,35 @@ class Ingredients extends React.Component {
     });
   }
 
-  sortByOption(event) {
-    const field = event.currentTarget.getAttribute('data-sortby');
+  sortByOption(field) {
+    // const field = event.currentTarget.getAttribute('data-sortby');
+    console.log(field);
 
     // This is a filler object that we are going to use set the state with.
     // Putting the sortBy field using index as objects can also be used as arrays.
     // the value of it would be 1 or -1 Asc or Desc
 
-    const options = {};
-    options[field] = 1;
+    const stateCopyOptions = this.state.options;
+    const newOptions = {};
+
+
+    // if user has selected to sort by that table column
+    if (stateCopyOptions.sort.hasOwnProperty(`${field}`)) {
+      if (stateCopyOptions.sort[field] === -1) {
+        newOptions[field] = 1;
+      } else if (stateCopyOptions.sort[field] === 1) {
+        newOptions[field] = -1;
+      }
+    } else { // if user selects a new table column to sort
+      newOptions[field] = 1;
+    }
 
     this.setState({
-      options: { sort: options },
+      options: { sort: newOptions },
     });
+
+    // console.log('Data sorting changed');
+    // console.log(this.state.options);
   }
 
   rowSelected(e) {
@@ -245,7 +261,7 @@ class Ingredients extends React.Component {
                 popTheSnackbar={this.props.popTheSnackbar}
                 searchTerm={this.state.searchSelector}
                 history={this.props.history}
-                sortByOptions={this.sortByOption}
+                sortByOptions={this.sortByOption.bind(this)}
               />
 
             </ListContainer>

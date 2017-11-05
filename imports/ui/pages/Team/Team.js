@@ -96,7 +96,7 @@ class Team extends React.Component {
                 <Grid item xs={12} sm={4}>
                   <Typography type="subheading" className="font-medium"> Owners
                   </Typography>
-                  <Typography gutterBottom>
+                  <Typography style={{ paddingRight: '80px' }}>
                     {'Owners have permission to see and do everything. They can also add and remove other owners.'}
                   </Typography>
                 </Grid>
@@ -114,7 +114,7 @@ class Team extends React.Component {
               <Grid container>
                 <Grid item xs={12} sm={4}>
                   <Typography type="subheading" className="font-medium">Staff Members</Typography>
-                  <Typography gutterBottom>
+                  <Typography style={{ paddingRight: '80px' }}>
                     {'Staff members can only see or manage certain features if you give them access.'}
                   </Typography>
 

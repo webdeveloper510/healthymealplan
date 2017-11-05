@@ -12,9 +12,9 @@ Meteor.methods({
       restrictionType: String,
       types: Array,
       categories: Array,
-      discount: Match.Maybe(String, undefined),
-      extra: Match.Maybe(String, undefined),
-      discountOrExtraType: Match.Maybe(String, undefined),
+      discount: Match.Maybe(Number),
+      extra: Match.Maybe(Number),
+      discountOrExtraType: Match.Maybe(String),
     });
 
     const existsRestriction = Restrictions.findOne({ title: restriction.title });
@@ -56,8 +56,30 @@ Meteor.methods({
     check(restriction, {
       _id: String,
       title: String,
+      restrictionType: String,
       types: Array,
+      categories: Array,
+      discount: Match.Maybe(Number),
+      extra: Match.Maybe(Number),
+      discountOrExtraType: Match.Maybe(String),
     });
+
+
+    const restrictionToInsert = {
+      title: restriction.title,
+      restrictionType: restriction.restrictionType,
+      categories: restriction.categories,
+      types: restriction.types,
+      owner: this.userId,
+    };
+
+    if (restriction.discount) {
+      restrictionToInsert.discount = restriction.discount;
+      restrictionToInsert.discountOrExtraType = restriction.discountOrExtraType;
+    } else if (restriction.extra) {
+      restrictionToInsert.extra = restriction.extra;
+      restrictionToInsert.discountOrExtraType = restriction.discountOrExtraType;
+    }
 
     try {
       const restrictionId = restriction._id;

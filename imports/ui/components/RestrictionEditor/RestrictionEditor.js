@@ -64,18 +64,27 @@ class RestrictionEditor extends React.Component {
       suggestionsTypes: [],
       suggestionsCategories: [],
 
-      types: (!this.props.newRestriction && this.props.restriction && this.props.ingredientTypes) ?
-        _.sortBy(this.props.ingredientTypes.filter(e => this.props.restriction.types.indexOf(e._id) !== -1), 'title') : [],
 
-        
+      // This was working
+      // types: (!this.props.newRestriction && this.props.restriction && this.props.ingredientTypes) ?
+      //   _.sortBy(this.props.ingredientTypes.filter(e => this.props.restriction.types.indexOf(e._id) !== -1), 'title') : [],
+
+
+      // categories: (!this.props.newRestriction && this.props.restriction && this.props.categories) ?
+      //   _.sortBy(this.props.categories.filter(e => this.props.restriction.categories.indexOf(e._id) !== -1), 'title') : [],
+
+      types: (!this.props.newRestriction && this.props.restriction && this.props.ingredientTypes) ?
+        this.props.restriction.types : [],
+
+
       categories: (!this.props.newRestriction && this.props.restriction && this.props.categories) ?
-        _.sortBy(this.props.categories.filter(e => this.props.restriction.categories.indexOf(e._id) !== -1), 'title') : [],
+        this.props.restriction.categories : [],
 
       deleteDialogOpen: false,
       hasFormChanged: false,
 
       valueDiscountOrExtra: (!this.props.newRestriction && this.props.restriction && (this.props.restriction.hasOwnProperty('discount') || this.props.restriction.hasOwnProperty('extra'))) ?
-        (this.props.restriction.hasOwnProperty('discount') ? 'discount' : 'extra') : '',
+        (this.props.restriction.hasOwnProperty('discount') ? 'discount' : 'extra') : 'none',
 
       discountOrExtraSelected: !!((!this.props.newRestriction && this.props.restriction && (this.props.restriction.hasOwnProperty('discount') || this.props.restriction.hasOwnProperty('extra')))),
 
@@ -193,7 +202,7 @@ class RestrictionEditor extends React.Component {
       return;
     }
 
-    clonedTypes.push({ _id: suggestion._id, title: suggestion.title });
+    clonedTypes.push(suggestion._id);
 
     this.setState({
       hasFormChanged: true,
@@ -217,7 +226,7 @@ class RestrictionEditor extends React.Component {
       return;
     }
 
-    clonedCats.push({ _id: suggestion._id, title: suggestion.title });
+    clonedCats.push(suggestion._id);
 
     this.setState({
       hasFormChanged: true,
@@ -319,15 +328,15 @@ class RestrictionEditor extends React.Component {
 
     const restriction = {
       title: document.querySelector('#title').value.trim(),
-      types: this.state.types.map((e, i) => e._id),
-      categories: this.state.categories.map((e, i) => e._id),
+      types: this.state.types,
+      categories: this.state.categories,
       restrictionType: this.state.valueRestriction,
     };
 
 
     if (this.state.discountOrExtraSelected) {
       const discountOrExtra = this.state.valueDiscountOrExtra;
-      restriction[discountOrExtra] = this.state.discountOrExtraAmount;
+      restriction[discountOrExtra] = parseFloat(this.state.discountOrExtraAmount);
       restriction.discountOrExtraType = this.state.discountType;
     }
 
@@ -357,7 +366,6 @@ class RestrictionEditor extends React.Component {
 
         const confirmation = existingRestriction ? (`${localStorage.getItem('restrictionForSnackbar')} restriction updated.`)
           : `${localStorage.getItem('restrictionForSnackbar')} restriction added.`;
-        // this.form.reset();
 
         popTheSnackbar({
           message: confirmation,
@@ -453,30 +461,6 @@ class RestrictionEditor extends React.Component {
       categories: stateCopy,
       hasFormChanged: true,
     });
-  }
-
-
-  getSubIngredientTitle(subIngredient) {
-    // console.log(subIngredient);
-
-    if (subIngredient.title) {
-      return subIngredient.title;
-    }
-
-    if (this.props.allIngredients) {
-      return this.props.allIngredients.find(el => el._id === subIngredient);
-    }
-  }
-
-  getSubIngredientAvatar(subIngredient) {
-    if (subIngredient.title) {
-      return subIngredient.title.charAt(0);
-    }
-
-    if (this.props.allIngredients) {
-      const avatarToReturn = this.props.allIngredients.find(el => el._id === subIngredient);
-      return avatarToReturn.title.charAt(0);
-    }
   }
 
 
@@ -607,10 +591,8 @@ class RestrictionEditor extends React.Component {
             <Grid item xs={12}>
               <Grid container>
                 <Grid item xs={12} sm={4}>
-                  <Typography type="subheading" className="subheading font-medium">
-                  Discounts & Extras
-                  </Typography>
-                  <Typography gutterBottom>
+                  <Typography type="subheading" className="subheading font-medium">Value</Typography>
+                  <Typography style={{ paddingRight: '80px' }}>
                   Applying a discount or extra will affect the total amount of a lifestyle's price plan if ingredients are restricted.
                   </Typography>
                 </Grid>
@@ -761,17 +743,34 @@ class RestrictionEditor extends React.Component {
                       }}
                     />
 
-                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '25px' }}>
-                      {this.state.types.length ? this.state.types.map((type, i) => (
+                    {/* {this.state.types.length ? this.state.types.map((type, i) => (
 
                         <Chip
-                          avatar={<Avatar> {this.getTypeAvatar(type)} </Avatar>}
+                          avatar={<Avatar />}
                           style={{ marginRight: '8px', marginBottom: '8px' }}
                           label={type.title}
                           key={i}
                           onRequestDelete={this.handleTypeChipDelete.bind(this, type)}
-                        />)) : ''}
+                        />)) : ''} */}
+
+                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '25px' }}>
+                      {this.props.ingredientTypes && this.state.types ? (
+                        this.props.ingredientTypes.filter((e, i) => {
+                          if (this.state.types.indexOf(e._id) >= 0) {
+                            return e;
+                          }
+                        }).map((e, i) => (
+                          <Chip
+                            avatar={<Avatar>{this.getTypeAvatar(e)}</Avatar>}
+                            style={{ marginRight: '8px', marginBottom: '8px' }}
+                            label={e.title}
+                            key={i}
+                            onRequestDelete={this.handleTypeChipDelete.bind(this, e)}
+                          />
+                        ))
+                      ) : ''}
                     </div>
+
 
                   </Paper>
                 </Grid>
@@ -787,9 +786,7 @@ class RestrictionEditor extends React.Component {
             <Grid item xs={12}>
               <Grid container>
                 <Grid item xs={12} sm={4}>
-                  <Typography type="subheading" className="subheading font-medium">
-                Category
-                  </Typography>
+                  <Typography type="subheading" className="subheading font-medium">Category</Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
                   <Paper elevation={2} className="paper-for-fields">
@@ -837,15 +834,32 @@ class RestrictionEditor extends React.Component {
                     />
 
                     <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '25px' }}>
-                      {this.state.categories.length ? this.state.categories.map((category, i) => (
+                      {/* {this.state.categories.length ? this.state.categories.map((category, i) => (
 
                         <Chip
-                          avatar={<Avatar> {this.getCategoryAvatar(category)} </Avatar>}
+                          avatar={<Avatar />}
                           style={{ marginRight: '8px', marginBottom: '8px' }}
                           label={category.title}
                           key={i}
                           onRequestDelete={this.handleCategoryChipDelete.bind(this, category)}
-                        />)) : ''}
+                        />)) : ''} */}
+
+
+                      {this.props.categories && this.state.categories ? (
+                        this.props.categories.filter((e, i) => {
+                          if (this.state.categories.indexOf(e._id) >= 0) {
+                            return e;
+                          }
+                        }).map((e, i) => (
+                          <Chip
+                            avatar={<Avatar>{this.getCategoryAvatar(e)}</Avatar>}
+                            style={{ marginRight: '8px', marginBottom: '8px' }}
+                            label={e.title}
+                            key={i}
+                            onRequestDelete={this.handleCategoryChipDelete.bind(this, e)}
+                          />
+                        ))
+                      ) : ''}
                     </div>
 
                   </Paper>
@@ -892,11 +906,10 @@ class RestrictionEditor extends React.Component {
 }
 
 RestrictionEditor.defaultProps = {
-  restriction: { title: '' },
 };
 
 RestrictionEditor.propTypes = {
-  restriction: PropTypes.object,
+  restriction: PropTypes.object.isRequired,
   newRestriction: PropTypes.bool.isRequired,
   ingredientTypes: PropTypes.array.isRequired,
   categories: PropTypes.array.isRequired,

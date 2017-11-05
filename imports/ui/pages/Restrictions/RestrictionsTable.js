@@ -162,10 +162,15 @@ class RestrictionsTable extends React.Component {
     this.setState({ deleteDialogOpen: false });
   }
 
-  // renderDeleteDialog() {
-  //   return (
-  //   );
-  // }
+
+  renderDiscountOrExtra(e) {
+    if (e.discount) {
+      return `${e.discountOrExtraType == 'Fixed amount' ? '$' : ''}${e.discount}${e.discountOrExtraType == 'Percentage' ? '%' : ''}`;
+    } else if (e.extra) {
+      return `${e.e.discountOrExtraType == 'Fixed amount' ? '$' : ''}${e.extra}${e.discountOrExtraType == 'Percentage' ? '%' : ''}`;
+    }
+    return 'N/A';
+  }
 
   render() {
     return (
@@ -192,8 +197,14 @@ class RestrictionsTable extends React.Component {
                   <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.sortByOptions('SKU')}>
                     <Typography className="body2" type="body2">SKU</Typography>
                   </TableCell>
-                  <TableCell padding="none" style={{ width: '76%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <TableCell padding="none" style={{ width: '35.33%' }} onClick={() => this.props.sortByOptions('title')}>
                     <Typography className="body2" type="body2">Restriction</Typography>
+                  </TableCell>
+                  <TableCell padding="none" style={{ width: '20.33%' }} onClick={() => this.props.sortByOptions('restrictionType')}>
+                    <Typography className="body2" type="body2">Category</Typography>
+                  </TableCell>
+                  <TableCell padding="none" style={{ width: '20.33%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Value</Typography>
                   </TableCell>
                 </TableRow>
               </TableHead>)
@@ -204,6 +215,7 @@ class RestrictionsTable extends React.Component {
               {
                 this.props.results.map((e, i) => {
                   const isSelected = this.isCheckboxSelected(e._id);
+                  console.log(e);
 
                   return (
                     <TableRow hover className={e._id} key={e._id}>
@@ -221,7 +233,7 @@ class RestrictionsTable extends React.Component {
                       </TableCell>
 
                       <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '76%' }}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '35.33%' }}
                         padding="none"
                         onClick={() => this.props.history.push(`/restrictions/${e._id}/edit`)}
                       >
@@ -232,9 +244,23 @@ class RestrictionsTable extends React.Component {
 
 
                       </TableCell>
-                      <TableCell>
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                      <TableCell
+                        padding="none"
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '20.33%' }}
+                        onClick={() => this.props.history.push(`/restrictions/${e._id}/edit`)}
+                      >
+                        <Typography className="body1" type="body1" style={{ textTransform: 'capitalize', color: 'rgba(0, 0, 0, .54)' }}>
                           {e.restrictionType}
+                        </Typography>
+                      </TableCell>
+
+                      <TableCell
+                        padding="none"
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '20.33%' }}
+                        onClick={() => this.props.history.push(`/restrictions/${e._id}/edit`)}
+                      >
+                        <Typography className="body1" type="body1" style={{ textTransform: 'capitalize', color: 'rgba(0, 0, 0, .54)' }}>
+                          {this.renderDiscountOrExtra(e)}
                         </Typography>
                       </TableCell>
                     </TableRow>
@@ -300,7 +326,6 @@ export default createContainer(() => {
   const restrictionsCountSub = Meteor.subscribe('restrictions-all-count');
 
   return {
-    // ingredientTypes: IngredientsWithTypes.find().fetch(),
-    categoryCount: Counts.get('restrictions'),
+    categoryCount: Counts.get('restrictions-count'),
   };
 }, RestrictionsTable);
