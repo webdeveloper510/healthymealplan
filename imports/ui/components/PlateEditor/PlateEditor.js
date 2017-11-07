@@ -7,7 +7,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
 
 import Autosuggest from 'react-autosuggest';
 
@@ -18,14 +17,13 @@ import { Meteor } from 'meteor/meteor';
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
-import Select from 'material-ui/Select';
-import Input, { InputLabel } from 'material-ui/Input';
+// import Select from 'material-ui/Select';
+// import Input, { InputLabel } from 'material-ui/Input';
 import { FormControl, FormHelperText } from 'material-ui/Form';
 import Dialog, {
   DialogActions,
   DialogContent,
   DialogContentText,
-  DialogTitle,
 } from 'material-ui/Dialog';
 
 
@@ -37,14 +35,13 @@ import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 import Avatar from 'material-ui/Avatar';
 
-import { teal, red } from 'material-ui/colors';
+import { red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
 
 import Search from 'material-ui-icons/Search';
 
 import validate from '../../../modules/validate';
 
-const primary = teal[500];
 const danger = red[700];
 
 const styles = theme => ({
@@ -58,12 +55,15 @@ class PlateEditor extends React.Component {
     super(props);
 
     this.state = {
+      plateImageSrc: '',
       value: '', // Autosuggest
+      valueMealType: 'Breakfast',
       suggestions: [],
       subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
       selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
       hasFormChanged: false,
+      imageFieldChanged: false,
     };
   }
 
@@ -79,6 +79,19 @@ class PlateEditor extends React.Component {
         title: {
           required: true,
         },
+
+        subtitle: {
+          required: true,
+        },
+
+        plateImage: {
+          required: true,
+        },
+
+        type: {
+          required: true,
+        },
+
 
       },
       messages: {
@@ -109,10 +122,21 @@ class PlateEditor extends React.Component {
     });
   }
 
-  onFileLoad(e, file){
-    console.log(e.target.result, file.name);
+  onFileLoad(e) {
+    // console.log(e.target.files[0]);
+
+    const fr = new FileReader();
+
+    fr.onload = (el) => {
+      this.setState({
+        plateImageSrc: el.target.result,
+        imageFieldChanged: true,
+      });
+    };
+
+    fr.readAsDataURL(e.target.files[0]);
   }
-  
+
 
   onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
     const clonedSubIngredients = this.state.subIngredients ? this.state.subIngredients.slice() : [];
@@ -170,13 +194,13 @@ class PlateEditor extends React.Component {
   handleRemoveActual() {
     const { popTheSnackbar, history, ingredient } = this.props;
 
-    const existingIngredient = ingredient && ingredient._id;
-    localStorage.setItem('ingredientDeleted', ingredient.title);
-    const ingredientDeletedMessage = `${localStorage.getItem('ingredientDeleted')} deleted from ingredients.`;
+    const existingPlate = ingredient && ingredient._id;
+    localStorage.setItem('plateDeleted', ingredient.title);
+    const plateDeletedMessage = `${localStorage.getItem('plateDeleted')} deleted from plates.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('ingredients.remove', existingIngredient, (error) => {
+    Meteor.call('plates.remove', existingPlate, (error) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
@@ -186,7 +210,7 @@ class PlateEditor extends React.Component {
           message: ingredientDeletedMessage,
         });
 
-        history.push('/ingredients');
+        history.push('/plates');
       }
     });
   }
@@ -198,51 +222,159 @@ class PlateEditor extends React.Component {
 
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
-    const existingIngredient = this.props.ingredient && this.props.ingredient._id;
-    const methodToCall = existingIngredient ? 'ingredients.update' : 'ingredients.insert';
+    const existingPlate = this.props.ingredient && this.props.ingredient._id;
+    const methodToCall = existingPlate ? 'plates.update' : 'plates.insert';
 
-    const ingredient = {
+    const plate = {
       title: document.querySelector('#title').value.trim(),
-      subIngredients: this.state.subIngredients || [],
-      typeId: this.state.valueTypes.trim(),
+      subtitle: document.querySelector('#subtitle').value.trim(),
+      mealType: this.state.valueMealType.trim(),
+      ingredients: this.state.subIngredients || [],
     };
 
-    if (existingIngredient) ingredient._id = existingIngredient;
+    if (existingPlate) ingredient._id = existingPlate;
 
-    const typeName = this.state.valueTypes.trim();
-    let typeActual = null;
+    // const typeName = this.state.valueTypes.trim();
+    // const typeActual = null;
 
-    if (typeName) {
-      typeActual = this.props.ingredientTypes.find(el => el.title === typeName);
-    } else {
-      typeActual = this.props.ingredientTypes.find(el => el.title === 'N/A');
-    }
+    // if (typeName) {
+    //   typeActual = this.props.ingredientTypes.find(el => el.title === typeName);
+    // } else {
+    //   typeActual = this.props.ingredientTypes.find(el => el.title === 'N/A');
+    // }
 
-    ingredient.typeId = typeActual._id;
+    // ingredient.typeId = typeActual._id;
 
-    console.log(ingredient);
+    console.log(plate);
 
-    Meteor.call(methodToCall, ingredient, (error, ingredientId) => {
+
+    // console.log(files);
+
+    // files.forEach((file, index) => {
+
+    //   var upload = Documents.insert({        
+    //     file: file,
+    //     streams: 'dynamic',
+    //     chunkSize: 'dynamic'
+    //   }, false);
+
+    //   upload.on('start', function (err, file) {
+    //     console.log('Started');
+    //     console.log(file);
+
+    //   });
+
+    //   upload.on('progress', function (progress, fileObject) {
+    //     console.log(progress);
+    //     console.log(fileObject);
+    //   });
+
+    //   upload.on('end', function(err, fileObj){
+    //     console.log(fileObj);
+    //     console.log('ended');
+    //     console.log(upload);
+
+    //     let data = {
+    //       projectId: projectId,
+    //       fileId: upload.config.fileId
+    //     }
+
+    //     Meteor.call('Projects.methods.addFileId', data, function(err, res){
+    //       if(err){
+    //         // console.log(err);
+    //       }
+    //     });
+
+    //     Meteor.call('Documents.methods.addProjectId', data, function(err, res){
+    //       if(err){
+    //         // console.log(err);
+    //       }
+    //     });
+
+    //   });//on upload end
+
+
+    //   upload.start();
+
+
+    // }); //forEach Files
+
+    Meteor.call(methodToCall, plate, (error, plateId) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
         });
       } else {
-        localStorage.setItem('ingredientForSnackbar', ingredient.title || $('[name="title"]').val());
+        localStorage.setItem('plateForSnackbar', plate.title || $('[name="title"]').val());
 
-        const confirmation = existingIngredient ? (`${localStorage.getItem('ingredientForSnackbar')} ingredient updated.`)
-          : `${localStorage.getItem('ingredientForSnackbar')} ingredient added.`;
+        const confirmation = existingPlate ? (`${localStorage.getItem('plateForSnackbar')} plate updated.`)
+          : `${localStorage.getItem('plateForSnackbar')} plate added.`;
         // this.form.reset();
+
+        if (this.state.imageFieldChanged) {
+          if (existingPlate) {
+
+          } else {
+
+          }
+        }
+
 
         popTheSnackbar({
           message: confirmation,
           buttonText: 'View',
-          buttonLink: `/ingredients/${ingredientId}/edit`,
+          buttonLink: `/plates/${plateId}/edit`,
         });
 
-        history.push('/ingredients');
+        history.push('/plates');
       }
     });
+  }
+
+  uploadFile() {
+    // files.forEach((file, index) => {
+    //   const upload = Documents.insert({
+    //     file,
+    //     streams: 'dynamic',
+    //     chunkSize: 'dynamic',
+    //   }, false);
+
+    //   upload.on('start', (err, file) => {
+    //     console.log('Started');
+    //     console.log(file);
+    //   });
+
+    //   upload.on('progress', (progress, fileObject) => {
+    //     console.log(progress);
+    //     console.log(fileObject);
+    //   });
+
+    //   upload.on('end', (err, fileObj) => {
+    //     console.log(fileObj);
+    //     console.log('ended');
+    //     console.log(upload);
+
+    //     const data = {
+    //       projectId,
+    //       fileId: upload.config.fileId,
+    //     };
+
+    //     Meteor.call('Projects.methods.addFileId', data, (err, res) => {
+    //       if (err) {
+    //         // console.log(err);
+    //       }
+    //     });
+
+    //     Meteor.call('Documents.methods.addProjectId', data, (err, res) => {
+    //       if (err) {
+    //         // console.log(err);
+    //       }
+    //     });
+    //   });// on upload end
+
+
+    //   upload.start();
+    // }); // forEach Files
   }
 
   renderDeleteDialog() {
@@ -351,6 +483,12 @@ class PlateEditor extends React.Component {
     });
   }
 
+  handleMealTypeChange(event, value) {
+    this.setState({
+      valueMealType: event.target.value,
+    });
+  }
+
   render() {
     const { ingredient, history } = this.props;
 
@@ -428,6 +566,37 @@ class PlateEditor extends React.Component {
           </Grid>
         </Grid>
 
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography type="subheading" className="subheading font-medium">
+                Meal type
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <TextField
+                    fullWidth
+                    id="select-meal-type"
+                    select
+                    value={this.state.valueMealType}
+                    label="Select a meal type"
+                    onChange={this.handleMealTypeChange.bind(this)}
+                    SelectProps={{ native: false }}
+                    name="type"
+                  >
+                    <MenuItem key={2} value="Breakfast">Breakfast</MenuItem>
+                    <MenuItem key={3} value="Lunch">Lunch</MenuItem>
+                    <MenuItem key={4} value="Dinner">Dinner</MenuItem>
+
+                  </TextField>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
 
         <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
@@ -439,7 +608,8 @@ class PlateEditor extends React.Component {
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
-                  <input type="file" onChange={this.onFileLoad.bind(this)} />
+                  <input type="file" id="plateImage" name="plateImage" onChange={this.onFileLoad.bind(this)} />
+                  <img style={{ marginTop: '50px', display: 'block' }} src={this.state.plateImageSrc} style={{ maxWidth: '100%' }} />
                 </Paper>
               </Grid>
             </Grid>

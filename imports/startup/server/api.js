@@ -21,6 +21,11 @@ import '../../api/OAuth/server/methods';
 import '../../api/Plates/methods';
 import '../../api/Plates/server/publications';
 
+
+// import '../../api/Plates/methods';
+import '../../api/PlateImages/server/publications';
+
+
 import '../../api/Users/server/methods';
 import '../../api/Users/server/publications';
 

@@ -9,9 +9,9 @@ Meteor.methods({
   'plates.insert': function platesInsert(plate) {
     check(plate, {
       title: String,
-      subTitle: String,      
+      subtitle: String,
+      mealType: String,
       ingredients: Array,
-      imageId: String,      
     });
 
     const existingPlate = Plates.findOne({ title: plate.title });
@@ -27,8 +27,9 @@ Meteor.methods({
       return Plates.insert({
         SKU: nextSeqItem,
         title: plate.title,
+        subtitle: plate.subtitle,
         ingredients: plate.subIngredients,
-        imageId: plate.imageId,
+        mealType: plate.mealType,
         createdBy: this.userId,
       });
     } catch (exception) {
@@ -37,11 +38,10 @@ Meteor.methods({
   },
   'plates.update': function platesUpdate(plate) {
     check(plate, {
-      _id: String,
       title: String,
-      subTitle: String,      
+      subtitle: String,
+      mealType: String,
       ingredients: Array,
-      imageId: String,      
     });
 
     try {
@@ -49,7 +49,27 @@ Meteor.methods({
 
       Plates.update(plateId, {
         $set: {
-         ...plate  
+          ...plate,
+        },
+      });
+
+      return plateId; // Return _id so we can redirect to document after update.
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
+
+  'plates.updateImageId': function platesUpdate(plate) {
+    check(plate, {
+      imageId: String,
+    });
+
+    try {
+      const plateId = plate._id;
+
+      Plates.update(plateId, {
+        $set: {
+          imageId: plate.imageId,
         },
       });
 
@@ -79,7 +99,7 @@ Meteor.methods({
     }
   },
 
- 
+
 });
 
 rateLimit({
@@ -88,6 +108,7 @@ rateLimit({
     'plates.update',
     'plates.remove',
     'plates.batchRemove',
+    'plates.updateImageId',
   ],
   limit: 5,
   timeRange: 1000,

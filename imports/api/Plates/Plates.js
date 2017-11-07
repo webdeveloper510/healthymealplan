@@ -29,7 +29,7 @@ Plates.schema = new SimpleSchema({
     label: 'The title of the plate.',
   },
 
-  subTitle: {
+  subtitle: {
     type: String,
     label: 'Subtitle of the plate.',
   },
@@ -38,6 +38,11 @@ Plates.schema = new SimpleSchema({
     type: String,
     label: '_id of the plate image.',
     optional: true,
+  },
+
+  mealType: {
+    type: String,
+    label: 'Meal type of the plate.',
   },
 
   'ingredients.$': {

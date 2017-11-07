@@ -6,6 +6,7 @@ import { Bert } from 'meteor/themeteorchef:bert';
 import { teal, red } from 'material-ui/colors';
 import Containers from 'meteor/utilities:react-list-container';
 import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';
+
 const ListContainer = Containers.ListContainer;
 
 
@@ -45,10 +46,10 @@ import Loading from '../../components/Loading/Loading';
 
 const styles = {
   card: {
-    maxWidth: "33%",
+    maxWidth: '33%',
   },
   media: {
-    height: "240px",
+    height: '240px',
   },
 };
 
@@ -168,14 +169,10 @@ class Plates extends React.Component {
     this.setState({ currentTabValue: value });
   }
 
-
   render() {
-    // console.log(this.props.ingredients);
     return (
       (!this.props.loading ? (
         <div>
-          {/* <AuthenticatedSideNav history={history} /> */}
-
 
           <Grid container className="SideContent SideContent--spacer-2x--top SideContent--spacer-2x--horizontal">
             <Grid container className="clearfix">
@@ -183,7 +180,7 @@ class Plates extends React.Component {
                 <Typography type="headline" gutterBottom className="pull-left headline" style={{ fontWeight: 500 }} color="inherit">Plates</Typography>
               </Grid>
               <Grid item xs={6}>
-                <Button className="btn btn-primary" raised color="primary" style={{ float: 'right' }}>Add plate</Button>
+                <Button className="btn btn-primary" raised color="primary" style={{ float: 'right' }} onClick={() => this.props.history.push('/plates/new')}>Add plate</Button>
               </Grid>
             </Grid>
 
@@ -217,7 +214,7 @@ class Plates extends React.Component {
 
             </ListContainer> */}
 
-         
+
             {/* 
                 joins={[{
                     localProperty: "typeId",
@@ -229,7 +226,7 @@ class Plates extends React.Component {
                   joinAs: "subs"
                 }]}
             */}
-            <Grid container style={{ marginTop: "60px" }} spacing={16}>
+            <Grid container style={{ marginTop: '60px' }} spacing={16}>
               <Grid item xs={12} sm={6} md={4} lg={4}>
                 <Card>
                   <CardMedia
@@ -242,18 +239,18 @@ class Plates extends React.Component {
                     Spanish-style Steak & Parmesan Orzo
                     </Typography>
                     <Typography component="p">
-                    with a garlicky tomato sauce and Brussels sprouts                  
+                    with a garlicky tomato sauce and Brussels sprouts
                     </Typography>
                   </CardContent>
                   <CardActions>
                     <Button dense color="primary">Edit</Button>
                   </CardActions>
                 </Card>
-                
+
               </Grid>
 
               <Grid item xs={12} sm={6} md={4} lg={4}>
-              
+
                 <Card>
                   <CardMedia
                     style={styles.media}
@@ -265,18 +262,18 @@ class Plates extends React.Component {
                     Spanish-style Steak & Parmesan Orzo
                     </Typography>
                     <Typography component="p">
-                    with a garlicky tomato sauce and Brussels sprouts                  
+                    with a garlicky tomato sauce and Brussels sprouts
                     </Typography>
                   </CardContent>
                   <CardActions>
                     <Button dense color="primary">Edit</Button>
                   </CardActions>
                 </Card>
-                
+
               </Grid>
 
               <Grid item xs={12} sm={6} md={4} lg={4}>
-              
+
                 <Card>
                   <CardMedia
                     style={styles.media}
@@ -288,18 +285,18 @@ class Plates extends React.Component {
                     Spanish-style Steak & Parmesan Orzo
                     </Typography>
                     <Typography component="p">
-                    with a garlicky tomato sauce and Brussels sprouts                  
+                    with a garlicky tomato sauce and Brussels sprouts
                     </Typography>
                   </CardContent>
                   <CardActions>
                     <Button dense color="primary">Edit</Button>
                   </CardActions>
                 </Card>
-                
+
               </Grid>
 
               <Grid item xs={12} sm={6} md={4} lg={4}>
-              
+
                 <Card>
                   <CardMedia
                     style={styles.media}
@@ -311,14 +308,14 @@ class Plates extends React.Component {
                     Spanish-style Steak & Parmesan Orzo
                     </Typography>
                     <Typography component="p">
-                    with a garlicky tomato sauce and Brussels sprouts                  
+                    with a garlicky tomato sauce and Brussels sprouts
                     </Typography>
                   </CardContent>
                   <CardActions>
                     <Button dense color="primary">Edit</Button>
                   </CardActions>
                 </Card>
-                
+
               </Grid>
             </Grid>
           </Grid>
@@ -333,7 +330,7 @@ class Plates extends React.Component {
 
 Plates.propTypes = {
   loading: PropTypes.bool.isRequired,
-  ingredients: PropTypes.arrayOf(PropTypes.object),
+  // ingredients: PropTypes.arrayOf(PropTypes.object),
   // ingredientTypes: PropTypes.isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
