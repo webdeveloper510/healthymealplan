@@ -4,7 +4,6 @@ import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
-import { Bert } from 'meteor/themeteorchef:bert';
 // import OAuthLoginButtons from '../../components/OAuthLoginButtons/OAuthLoginButtons';
 import InputHint from '../../components/InputHint/InputHint';
 import AccountPageFooter from '../../components/AccountPageFooter/AccountPageFooter';
@@ -70,10 +69,10 @@ class Signup extends React.Component {
       },
     }, (error) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        // Bert.alert(error.reason, 'danger');
       } else {
         // Meteor.call('users.sendVerificationEmail');
-        Bert.alert('Welcome!', 'success');
+        // Bert.alert('Welcome!', 'success');
         // history.push('/documents');
       }
     });

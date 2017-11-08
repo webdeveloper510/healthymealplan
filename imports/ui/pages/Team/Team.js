@@ -27,8 +27,6 @@ import { teal, red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
 // import Search from 'material-ui-icons/Search';
 
-
-// import { Bert } from 'meteor/themeteorchef:bert';
 // import validate from '../../../modules/validate';
 
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';

@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Row, Col, Alert, FormGroup, ControlLabel, Button } from 'react-bootstrap';
 import { Accounts } from 'meteor/accounts-base';
-import { Bert } from 'meteor/themeteorchef:bert';
+// import { Bert } from 'meteor/themeteorchef:bert';
 import validate from '../../../modules/validate';
 
 class ResetPassword extends React.Component {
@@ -46,7 +46,7 @@ class ResetPassword extends React.Component {
 
     Accounts.resetPassword(token, this.newPassword.value, (error) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        // Bert.alert(error.reason, 'danger');
       } else {
         history.push('/documents');
       }

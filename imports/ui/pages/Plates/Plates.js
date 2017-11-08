@@ -2,7 +2,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
-import { Bert } from 'meteor/themeteorchef:bert';
 import { teal, red } from 'material-ui/colors';
 import Containers from 'meteor/utilities:react-list-container';
 import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';

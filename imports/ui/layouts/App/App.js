@@ -64,7 +64,7 @@ import EditIngredient from '../../pages/EditIngredient/EditIngredient';
 
 import Plates from '../../pages/Plates/Plates';
 import NewPlate from '../../pages/NewPlate/NewPlate';
-// import EditIngredient from '../../pages/EditIngredient/EditIngredient';
+import EditPlate from '../../pages/EditPlate/EditPlate';
 
 import Types from '../../pages/Types/Types';
 import NewType from '../../pages/NewType/NewType';
@@ -394,7 +394,7 @@ class App extends React.Component {
 
                       <Authenticated exact path="/plates" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Plates} {...this.props} />
                       <Authenticated exact path="/plates/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewPlate} {...this.props} />
-                      <Authenticated exact path="/plates/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditIngredient} {...this.props} />
+                      <Authenticated exact path="/plates/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditPlate} {...this.props} />
 
                       <Authenticated exact path="/profile" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Profile} {...this.props} />
 

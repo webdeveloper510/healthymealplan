@@ -19,7 +19,7 @@ import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
 // import Select from 'material-ui/Select';
 // import Input, { InputLabel } from 'material-ui/Input';
-import { FormControl, FormHelperText } from 'material-ui/Form';
+// import { FormControl, FormHelperText } from 'material-ui/Form';
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -41,6 +41,7 @@ import ChevronLeft from 'material-ui-icons/ChevronLeft';
 import Search from 'material-ui-icons/Search';
 
 import validate from '../../../modules/validate';
+import PlateImages from '../../../api/PlateImages/PlateImages';
 
 const danger = red[700];
 
@@ -57,10 +58,9 @@ class PlateEditor extends React.Component {
     this.state = {
       plateImageSrc: '',
       value: '', // Autosuggest
-      valueMealType: 'Breakfast',
+      valueMealType: this.props.plate ? this.props.plate.mealType : 'Breakfast',
       suggestions: [],
-      subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
-      selectedType: this.props.ingredient.typeId,
+      subIngredients: this.props.plate && this.props.plate.ingredients ? _.sortBy(this.props.plate.ingredients, 'title') : [],
       deleteDialogOpen: false,
       hasFormChanged: false,
       imageFieldChanged: false,
@@ -232,7 +232,7 @@ class PlateEditor extends React.Component {
       ingredients: this.state.subIngredients || [],
     };
 
-    if (existingPlate) ingredient._id = existingPlate;
+    if (existingPlate) plate._id = existingPlate;
 
     // const typeName = this.state.valueTypes.trim();
     // const typeActual = null;
@@ -248,57 +248,6 @@ class PlateEditor extends React.Component {
     console.log(plate);
 
 
-    // console.log(files);
-
-    // files.forEach((file, index) => {
-
-    //   var upload = Documents.insert({        
-    //     file: file,
-    //     streams: 'dynamic',
-    //     chunkSize: 'dynamic'
-    //   }, false);
-
-    //   upload.on('start', function (err, file) {
-    //     console.log('Started');
-    //     console.log(file);
-
-    //   });
-
-    //   upload.on('progress', function (progress, fileObject) {
-    //     console.log(progress);
-    //     console.log(fileObject);
-    //   });
-
-    //   upload.on('end', function(err, fileObj){
-    //     console.log(fileObj);
-    //     console.log('ended');
-    //     console.log(upload);
-
-    //     let data = {
-    //       projectId: projectId,
-    //       fileId: upload.config.fileId
-    //     }
-
-    //     Meteor.call('Projects.methods.addFileId', data, function(err, res){
-    //       if(err){
-    //         // console.log(err);
-    //       }
-    //     });
-
-    //     Meteor.call('Documents.methods.addProjectId', data, function(err, res){
-    //       if(err){
-    //         // console.log(err);
-    //       }
-    //     });
-
-    //   });//on upload end
-
-
-    //   upload.start();
-
-
-    // }); //forEach Files
-
     Meteor.call(methodToCall, plate, (error, plateId) => {
       if (error) {
         popTheSnackbar({
@@ -309,84 +258,93 @@ class PlateEditor extends React.Component {
 
         const confirmation = existingPlate ? (`${localStorage.getItem('plateForSnackbar')} plate updated.`)
           : `${localStorage.getItem('plateForSnackbar')} plate added.`;
-        // this.form.reset();
 
         if (this.state.imageFieldChanged) {
           if (existingPlate) {
-
+            PlateImages.remove({ _id: existingPlate.imageId });
           } else {
-
+            this.uploadFile(document.getElementById('plateImage').files[0], plateId, confirmation);
           }
+        } else {
+          popTheSnackbar({
+            message: confirmation,
+            buttonText: 'View',
+            buttonLink: `/plates/${plateId}/edit`,
+          });
+
+          history.push('/plates');
         }
-
-
-        popTheSnackbar({
-          message: confirmation,
-          buttonText: 'View',
-          buttonLink: `/plates/${plateId}/edit`,
-        });
-
-        history.push('/plates');
       }
+
+      // popTheSnackbar({
+      //   message: confirmation,
+      //   buttonText: 'View',
+      //   buttonLink: `/plates/${plateId}/edit`,
+      // });
+
+      // history.push('/plates');
     });
   }
 
-  uploadFile() {
-    // files.forEach((file, index) => {
-    //   const upload = Documents.insert({
-    //     file,
-    //     streams: 'dynamic',
-    //     chunkSize: 'dynamic',
-    //   }, false);
+  uploadFile(file, plateId, confirmation) {
+    // console.log(plateImage);
+    const upload = PlateImages.insert({
+      file,
+      streams: 'dynamic',
+      chunkSize: 'dynamic',
+    }, false);
 
-    //   upload.on('start', (err, file) => {
-    //     console.log('Started');
-    //     console.log(file);
-    //   });
+    upload.on('start', (err, file) => {
+      console.log('Started');
+      console.log(file);
+    });
 
-    //   upload.on('progress', (progress, fileObject) => {
-    //     console.log(progress);
-    //     console.log(fileObject);
-    //   });
+    upload.on('progress', (progress, fileObject) => {
+      console.log(progress);
+      console.log(fileObject);
+    });
 
-    //   upload.on('end', (err, fileObj) => {
-    //     console.log(fileObj);
-    //     console.log('ended');
-    //     console.log(upload);
+    upload.on('end', (err, fileObj) => {
+      console.log(fileObj);
+      console.log('ended');
+      console.log(upload);
 
-    //     const data = {
-    //       projectId,
-    //       fileId: upload.config.fileId,
-    //     };
+      // const data = {
+      //   // projectId,
+      //   fileId: upload.config.fileId,
+      // };
+      console.log(plateId);
 
-    //     Meteor.call('Projects.methods.addFileId', data, (err, res) => {
-    //       if (err) {
-    //         // console.log(err);
-    //       }
-    //     });
+      Meteor.call('plates.updateImageId', { _id: plateId, imageId: upload.config.fileId }, (err, plateId) => {
+        if (err) {
+          console.log(err);
+        } else {
+          this.props.popTheSnackbar({
+            message: confirmation,
+            buttonText: 'View',
+            buttonLink: `/plates/${plateId}/edit`,
+          });
 
-    //     Meteor.call('Documents.methods.addProjectId', data, (err, res) => {
-    //       if (err) {
-    //         // console.log(err);
-    //       }
-    //     });
-    //   });// on upload end
+          this.props.history.push('/plates');
+        }
+      });
+
+      // add a method call here which updates the plate with the image id
+    });// on upload end
 
 
-    //   upload.start();
-    // }); // forEach Files
+    upload.start();
   }
 
   renderDeleteDialog() {
     return (
       <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
         <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-        Delete {this.props.ingredient.title.toLowerCase()}?
+        Delete {this.props.plate.title.toLowerCase()}?
         </Typography>
         <DialogContent>
           <DialogContentText className="subheading">
-          Are you sure you want to delete {this.props.ingredient.title.toLowerCase()} { (this.props.ingredient && this.props.ingredient.typeMain) ?
-              `from ${this.props.ingredient.typeMain.title.toLowerCase()}?` : '?'}
+          Are you sure you want to delete {this.props.plate.title.toLowerCase()}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -490,9 +448,9 @@ class PlateEditor extends React.Component {
   }
 
   render() {
-    const { ingredient, history } = this.props;
+    const { plate, history } = this.props;
 
-    if (!ingredient) {
+    if (!plate) {
       return ('<h1>Loading</h1>');
     }
 
@@ -511,10 +469,10 @@ class PlateEditor extends React.Component {
 
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={4}>
-            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{ingredient && ingredient._id ? `${ingredient.title}` : 'Add plate'}</Typography>
+            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{plate && plate._id ? `${plate.title}` : 'Add plate'}</Typography>
 
-            {this.props.ingredient ?
-              (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1"> SKU {ingredient.SKU ? ingredient.SKU : ''} </Typography>)
+            {this.props.plate ?
+              (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1"> SKU {plate.SKU ? plate.SKU : ''} </Typography>)
               : '' }
 
           </Grid>
@@ -543,7 +501,7 @@ class PlateEditor extends React.Component {
                     name="title"
                     margin="normal"
                     fullWidth
-                    defaultValue={ingredient && ingredient.title}
+                    defaultValue={plate && plate.title}
                     ref={title => (this.title = title)}
                     inputProps={{}}
                     onChange={this.titleFieldChanged.bind(this)}
@@ -555,7 +513,7 @@ class PlateEditor extends React.Component {
                     label="Subtitle"
                     name="subtitle"
                     fullWidth
-                    defaultValue={ingredient && ingredient.subtitle}
+                    defaultValue={plate && plate.subtitle}
                     ref={title => (this.title = title)}
                     inputProps={{}}
                     onChange={this.titleFieldChanged.bind(this)}
@@ -580,7 +538,7 @@ class PlateEditor extends React.Component {
                     fullWidth
                     id="select-meal-type"
                     select
-                    value={this.state.valueMealType}
+                    value={this.state.valueMealType ? this.state.valueMealType : ''}
                     label="Select a meal type"
                     onChange={this.handleMealTypeChange.bind(this)}
                     SelectProps={{ native: false }}
@@ -698,7 +656,7 @@ class PlateEditor extends React.Component {
                     <Button
                       style={{ backgroundColor: danger, color: '#FFFFFF' }}
                       raised
-                      onClick={ingredient && ingredient._id ? this.handleRemove.bind(this) : () => this.props.history.push('/ingredients')}
+                      onClick={plate && plate._id ? this.handleRemove.bind(this) : () => this.props.history.push('/ingredients')}
                     >
                     Delete
                     </Button>
@@ -725,12 +683,11 @@ class PlateEditor extends React.Component {
 }
 
 PlateEditor.defaultProps = {
-  ingredient: { title: '' },
+  plate: { title: '' },
 };
 
 PlateEditor.propTypes = {
-  ingredient: PropTypes.object,
-  ingredientTypes: PropTypes.array.isRequired,
+  plate: PropTypes.object,
   potentialSubIngredients: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,

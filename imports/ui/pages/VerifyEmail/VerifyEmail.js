@@ -3,7 +3,8 @@ import PropTypes from 'prop-types';
 import { Alert } from 'react-bootstrap';
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
-import { Bert } from 'meteor/themeteorchef:bert';
+
+// Verify email needs to use the snackbar instead of bert! Redo!
 
 class VerifyEmail extends React.Component {
   constructor(props) {

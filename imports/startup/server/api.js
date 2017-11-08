@@ -22,7 +22,6 @@ import '../../api/Plates/methods';
 import '../../api/Plates/server/publications';
 
 
-// import '../../api/Plates/methods';
 import '../../api/PlateImages/server/publications';
 
 

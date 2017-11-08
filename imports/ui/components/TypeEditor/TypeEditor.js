@@ -19,7 +19,6 @@ import Dialog, {
   DialogTitle,
 } from 'material-ui/Dialog';
 
-import { Bert } from 'meteor/themeteorchef:bert';
 import validate from '../../../modules/validate';
 import { teal, red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';

@@ -28,7 +28,7 @@ Meteor.methods({
         SKU: nextSeqItem,
         title: plate.title,
         subtitle: plate.subtitle,
-        ingredients: plate.subIngredients,
+        ingredients: plate.ingredients,
         mealType: plate.mealType,
         createdBy: this.userId,
       });
@@ -61,6 +61,7 @@ Meteor.methods({
 
   'plates.updateImageId': function platesUpdate(plate) {
     check(plate, {
+      _id: String,
       imageId: String,
     });
 

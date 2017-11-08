@@ -1,11 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
-import { Alert } from 'react-bootstrap';
-import { timeago, monthDayYearAtTime } from '@cleverbeagle/dates';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
-import { Bert } from 'meteor/themeteorchef:bert';
 import $ from 'jquery';
 
 import Button from 'material-ui/Button';
@@ -198,9 +195,9 @@ class Types extends React.Component {
             collection={IngredientTypesCollection}
             publication="ingredientTypes"
             joins={[{
-                foreignProperty: "typeId",
-                collection: IngredientsCollection,
-                joinAs: "ingredientsWithin"
+              foreignProperty: 'typeId',
+              collection: IngredientsCollection,
+              joinAs: 'ingredientsWithin',
             }]}
             options={this.state.options}
             selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
@@ -271,7 +268,7 @@ Types.propTypes = {
 export default createContainer(() => {
   const subscription = Meteor.subscribe('ingredientTypes');
   const subscription2 = Meteor.subscribe('ingredients');
-  
+
   return {
     loading: !subscription.ready() || !subscription2.ready(),
     ingredients: IngredientTypesCollection.find().fetch(),

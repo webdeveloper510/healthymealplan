@@ -3,7 +3,7 @@ import { Row, Col, Alert, FormGroup, ControlLabel, Button } from 'react-bootstra
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Accounts } from 'meteor/accounts-base';
-import { Bert } from 'meteor/themeteorchef:bert';
+// import { Bert } from 'meteor/themeteorchef:bert';
 import AccountPageFooter from '../../components/AccountPageFooter/AccountPageFooter';
 import validate from '../../../modules/validate';
 
@@ -39,9 +39,9 @@ class RecoverPassword extends React.Component {
 
     Accounts.forgotPassword({ email }, (error) => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        // Bert.alert(error.reason, 'danger');
       } else {
-        Bert.alert(`Check ${email} for a reset link!`, 'success');
+        // Bert.alert(`Check ${email} for a reset link!`, 'success');
         history.push('/login');
       }
     });
