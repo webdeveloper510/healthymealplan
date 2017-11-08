@@ -14,8 +14,11 @@ Meteor.methods({
       ingredients: Array,
     });
 
-    const existingPlate = Plates.findOne({ title: plate.title });
+    console.log("Reaching here")
 
+    const existingPlate = Plates.findOne({ title: plate.title });
+    console.log(existingPlate)
+    
     if (existingPlate) {
       throw new Meteor.Error('500', `${plate.title} is already present`);
     }

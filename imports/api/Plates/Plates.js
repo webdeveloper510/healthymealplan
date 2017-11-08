@@ -45,10 +45,15 @@ Plates.schema = new SimpleSchema({
     label: 'Meal type of the plate.',
   },
 
-  'ingredients.$': {
-    type: 'String',
-    optional: true,
+  ingredients: {
+    type: Array,
+    label: 'Ingredients belonging to the plate.'
   },
+
+  // 'ingredients.$': {
+  //   type: 'String',
+  //   optional: true,
+  // },
 
   'ingredients.$._id': {
     type: String,

@@ -34,6 +34,7 @@ import Grid from 'material-ui/Grid';
 import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 import Avatar from 'material-ui/Avatar';
+import $ from 'jquery';
 
 import { red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
@@ -42,6 +43,7 @@ import Search from 'material-ui-icons/Search';
 
 import validate from '../../../modules/validate';
 import PlateImages from '../../../api/PlateImages/PlateImages';
+
 
 const danger = red[700];
 
@@ -192,10 +194,10 @@ class PlateEditor extends React.Component {
   }
 
   handleRemoveActual() {
-    const { popTheSnackbar, history, ingredient } = this.props;
+    const { popTheSnackbar, history, plate } = this.props;
 
-    const existingPlate = ingredient && ingredient._id;
-    localStorage.setItem('plateDeleted', ingredient.title);
+    const existingPlate = plate && plate._id;
+    localStorage.setItem('plateDeleted', plate.title);
     const plateDeletedMessage = `${localStorage.getItem('plateDeleted')} deleted from plates.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
@@ -207,7 +209,7 @@ class PlateEditor extends React.Component {
         });
       } else {
         popTheSnackbar({
-          message: ingredientDeletedMessage,
+          message: plateDeletedMessage,
         });
 
         history.push('/plates');
@@ -222,7 +224,7 @@ class PlateEditor extends React.Component {
 
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
-    const existingPlate = this.props.ingredient && this.props.ingredient._id;
+    const existingPlate = this.props.plate && this.props.plate._id;
     const methodToCall = existingPlate ? 'plates.update' : 'plates.insert';
 
     const plate = {
@@ -233,17 +235,6 @@ class PlateEditor extends React.Component {
     };
 
     if (existingPlate) plate._id = existingPlate;
-
-    // const typeName = this.state.valueTypes.trim();
-    // const typeActual = null;
-
-    // if (typeName) {
-    //   typeActual = this.props.ingredientTypes.find(el => el.title === typeName);
-    // } else {
-    //   typeActual = this.props.ingredientTypes.find(el => el.title === 'N/A');
-    // }
-
-    // ingredient.typeId = typeActual._id;
 
     console.log(plate);
 
@@ -262,6 +253,8 @@ class PlateEditor extends React.Component {
         if (this.state.imageFieldChanged) {
           if (existingPlate) {
             PlateImages.remove({ _id: existingPlate.imageId });
+            this.uploadFile(document.getElementById('plateImage').files[0], plateId, confirmation);
+            
           } else {
             this.uploadFile(document.getElementById('plateImage').files[0], plateId, confirmation);
           }
@@ -340,11 +333,11 @@ class PlateEditor extends React.Component {
     return (
       <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
         <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-        Delete {this.props.plate.title.toLowerCase()}?
+        Delete {this.props.plate ? this.props.plate.title.toLowerCase() : ''}?
         </Typography>
         <DialogContent>
           <DialogContentText className="subheading">
-          Are you sure you want to delete {this.props.plate.title.toLowerCase()}?
+          Are you sure you want to delete {this.props.plate ? this.props.plate.title.toLowerCase() : ''}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -449,10 +442,6 @@ class PlateEditor extends React.Component {
 
   render() {
     const { plate, history } = this.props;
-
-    if (!plate) {
-      return ('<h1>Loading</h1>');
-    }
 
     return (
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
@@ -682,12 +671,8 @@ class PlateEditor extends React.Component {
   }
 }
 
-PlateEditor.defaultProps = {
-  plate: { title: '' },
-};
-
 PlateEditor.propTypes = {
-  plate: PropTypes.object,
+  plate: PropTypes.object,  
   potentialSubIngredients: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,

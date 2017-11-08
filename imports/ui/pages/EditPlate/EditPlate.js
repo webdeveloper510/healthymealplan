@@ -44,7 +44,7 @@ export default createContainer(({ match }) => {
   const subscription2 = Meteor.subscribe('plates.view', plateId);
 
   return {
-    newPlate: true,
+    newPlate: false,
     loading: !subscription.ready() || !subscription2.ready(),
     plate: Plates.findOne(plateId),
     potentialSubIngredients: Ingredients.find().fetch(),
