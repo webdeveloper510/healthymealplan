@@ -185,16 +185,17 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            {/* 
-            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/lifestyles')}>
-              <ListItemIcon>
-                <LifestylesIcon className="side-nav-icon" />
-              </ListItemIcon>
-              <ListItemText className="subheading" primary="Lifestyles" />
-            </ListItem>
-            */}
+            <NavLink to="/lifestyles">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <LifestylesIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Lifestyles" />
+              </ListItem>
+            </NavLink>
+
             <NavLink to="/restrictions">
-              <ListItem className="padding-left-nested-item" button onClick={() => history.push('/restrictions')}>
+              <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <RestrictionsIcon className="side-nav-icon" />
                 </ListItemIcon>

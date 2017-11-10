@@ -27,10 +27,10 @@ import Button from 'material-ui/Button';
 
 
 import { createContainer } from 'meteor/react-meteor-data';
-import IngredientsCollection from '../../../api/Ingredients/Ingredients';
+// import IngredientsCollection from '../../../api/Ingredients/Ingredients';
 import Loading from '../../components/Loading/Loading';
 
-class IngredientsTable extends React.Component {
+class LifestylesTable extends React.Component {
   constructor(props) {
     super(props);
 
@@ -41,15 +41,15 @@ class IngredientsTable extends React.Component {
     };
   }
 
-  renderSubIngredientsNumber(subIngredient) {
-    if (subIngredient && subIngredient.length > 1) {
-      return `${subIngredient.length} sub-ingredients`;
-    } else if (subIngredient && subIngredient.length == 1) {
-      return `${subIngredient.length} sub-ingredient`;
-    }
+  // renderSubIngredientsNumber(subIngredient) {
+  //   if (subIngredient && subIngredient.length > 1) {
+  //     return `${subIngredient.length} sub-ingredients`;
+  //   } else if (subIngredient && subIngredient.length == 1) {
+  //     return `${subIngredient.length} sub-ingredient`;
+  //   }
 
-    return '';
-  }
+  //   return '';
+  // }
 
   renderType(type) {
     console.log(type);
@@ -119,13 +119,13 @@ class IngredientsTable extends React.Component {
   deleteSelectedRows() {
     console.log('Delete selected rows');
 
-    localStorage.setItem('ingredientTableDeleted', this.state.selectedCheckboxesNumber);
+    localStorage.setItem('LifestylesTableDeleted', this.state.selectedCheckboxesNumber);
 
-    const ingredientIds = this.state.selectedCheckboxes;
+    const categoryIds = this.state.selectedCheckboxes;
 
-    console.log(ingredientIds);
+    console.log(categoryIds);
 
-    Meteor.call('ingredients.batchRemove', ingredientIds, (error) => {
+    Meteor.call('categories.batchRemove', categoryIds, (error) => {
       console.log('inside method');
       if (error) {
         this.props.popTheSnackbar({
@@ -133,7 +133,7 @@ class IngredientsTable extends React.Component {
         });
       } else {
         this.props.popTheSnackbar({
-          message: `${localStorage.getItem('ingredientTableDeleted')} ingredients deleted.`,
+          message: `${localStorage.getItem('LifestylesTableDeleted')} categories deleted.`,
         });
       }
     });
@@ -152,7 +152,7 @@ class IngredientsTable extends React.Component {
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No ingredient found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
+        <p style={{ padding: '25px' }} className="subheading">No category found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
       );
     }
   }
@@ -189,7 +189,7 @@ class IngredientsTable extends React.Component {
           {this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container">
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
-                {this.state.selectedCheckboxesNumber} ingredient{this.state.selectedCheckboxes.length > 1 ? ('s') : ''} selected
+                {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'} selected
               </Typography>
               <Button style={{ color: '#FFF' }} onClick={this.deleteDialogHandleClickOpen.bind(this)}>Delete</Button>
             </div>
@@ -205,11 +205,9 @@ class IngredientsTable extends React.Component {
                     <Checkbox onChange={this.selectAllRows.bind(this)} /></TableCell>
                   <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.sortByOptions('SKU')}>
                     <Typography className="body2" type="body2">SKU</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '38%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Ingredient</Typography></TableCell>
-                  <TableCell style={{ width: '38%' }} onClick={() => this.props.sortByOptions('type')}>
-                    <Typography className="body2" type="body2">Type</Typography>
-                  </TableCell>
+                  <TableCell padding="none" style={{ width: '76%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Category</Typography></TableCell>
+
                 </TableRow>
               </TableHead>)
               : ''
@@ -236,28 +234,29 @@ class IngredientsTable extends React.Component {
                         />
                       </TableCell>
 
-                      <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.history.push(`ingredients/${e._id}/edit`)}>
+                      <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
                         <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
                       </TableCell>
 
                       <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '38%' }}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '76%' }}
                         padding="none"
-                        onClick={() => this.props.history.push(`ingredients/${e._id}/edit`)}
+                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                       >
 
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
                           {e.title}
                         </Typography>
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {this.renderSubIngredientsNumber(e.subIngredients)}
+                          {e.joinedTypes ?
+                            (
+                              e.joinedTypes.length > 1 ? (
+                                `${e.joinedTypes.length} types`
+                              ) : (`${e.joinedTypes.length} type`)
+                            )
+
+                            : '-'}
                         </Typography>
-
-                      </TableCell>
-                      <TableCell style={{ width: '38%' }}>
-                        {e.typeMain ? (<Typography type="subheading" className="subheading">{e.typeMain.title}</Typography>)
-                          : (<Typography className="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>)}
-
 
                       </TableCell>
                     </TableRow>
@@ -273,10 +272,9 @@ class IngredientsTable extends React.Component {
               <TableRow>
                 <TableCell>
                   <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                    {this.props.count} of {this.props.ingredientCount} ingredients
+                    {this.props.count} of {this.props.categoryCount} categories
                   </Typography>
                 </TableCell>
-                <TableCell />
                 <TableCell />
                 {
                   this.props.hasMore ?
@@ -290,10 +288,10 @@ class IngredientsTable extends React.Component {
         </Paper>
         <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-      Delete {this.state.selectedCheckboxesNumber} ingredients?
+      Delete {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?
           </Typography>
           <DialogContent>
-            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} ingredients?</DialogContentText>
+            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} categories?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
@@ -309,21 +307,22 @@ class IngredientsTable extends React.Component {
   }
 }
 
-IngredientsTable.propTypes = {
+LifestylesTable.propTypes = {
   // results: PropType.isRequired,
   history: PropTypes.func.isRequired,
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,
   loadMore: PropTypes.func.isRequired,
-  ingredientCount: PropTypes.number.isRequired,
+  categoryCount: PropTypes.number.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 
 export default createContainer(() => {
-  const ingredientCountSub = Meteor.subscribe('ingredients-all-count');
+  const categoryCountSub = Meteor.subscribe('categories-all-count');
 
   return {
     // ingredientTypes: IngredientsWithTypes.find().fetch(),
-    ingredientCount: Counts.get('ingredients'),
+    categoryCount: Counts.get('categories'),
   };
-}, IngredientsTable);
+}, LifestylesTable);

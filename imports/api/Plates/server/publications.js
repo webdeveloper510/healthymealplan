@@ -18,7 +18,7 @@ Meteor.publish('plates-all-count', function () {
   Counts.publish(this, 'plates', Plates.find());
 });
 
-// Note: Ingredients.view is also used when editing an existing document.
+// Note: Plates.view is also used when editing an existing plate.
 Meteor.publish('plates.view', (plateId) => {
   check(plateId, String);
   return Plates.find({ _id: plateId });

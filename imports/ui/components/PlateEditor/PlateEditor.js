@@ -58,7 +58,7 @@ class PlateEditor extends React.Component {
     super(props);
 
     this.state = {
-      plateImageSrc: '',
+      plateImageSrc: this.props.newPlate == false && this.props.document ? this.props.document.image.link() : '',
       value: '', // Autosuggest
       valueMealType: this.props.plate ? this.props.plate.mealType : 'Breakfast',
       suggestions: [],
@@ -254,7 +254,6 @@ class PlateEditor extends React.Component {
           if (existingPlate) {
             PlateImages.remove({ _id: existingPlate.imageId });
             this.uploadFile(document.getElementById('plateImage').files[0], plateId, confirmation);
-            
           } else {
             this.uploadFile(document.getElementById('plateImage').files[0], plateId, confirmation);
           }
@@ -672,7 +671,7 @@ class PlateEditor extends React.Component {
 }
 
 PlateEditor.propTypes = {
-  plate: PropTypes.object,  
+  plate: PropTypes.object,
   potentialSubIngredients: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,

@@ -62,6 +62,10 @@ import Ingredients from '../../pages/Ingredients/Ingredients';
 import NewIngredient from '../../pages/NewIngredient/NewIngredient';
 import EditIngredient from '../../pages/EditIngredient/EditIngredient';
 
+import Lifestyles from '../../pages/Lifestyles/Lifestyles';
+import NewLifestyle from '../../pages/NewLifestyle/NewLifestyle';
+import EditLifestyle from '../../pages/EditLifestyle/EditLifestyle';
+
 import Plates from '../../pages/Plates/Plates';
 import NewPlate from '../../pages/NewPlate/NewPlate';
 import EditPlate from '../../pages/EditPlate/EditPlate';
@@ -387,6 +391,10 @@ class App extends React.Component {
                       <Authenticated exact path="/ingredients" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Ingredients} {...this.props} />
                       <Authenticated exact path="/ingredients/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewIngredient} {...this.props} />
                       <Authenticated exact path="/ingredients/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditIngredient} {...this.props} />
+
+                      <Authenticated exact path="/lifestyles" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Lifestyles} {...this.props} />
+                      <Authenticated exact path="/lifestyles/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewLifestyle} {...this.props} />
+                      <Authenticated exact path="/lifestyles/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditLifestyle} {...this.props} />
 
                       <Authenticated exact path="/meals" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Meals} {...this.props} />
                       <Authenticated exact path="/meals/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewMeal} {...this.props} />

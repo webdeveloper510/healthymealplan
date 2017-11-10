@@ -16,15 +16,6 @@ import Input from 'material-ui/Input';
 
 import $ from 'jquery';
 
-import Table, {
-  TableBody,
-  TableCell,
-  TableFooter,
-  TableHead,
-  TablePagination,
-  TableRow,
-  TableSortLabel,
-} from 'material-ui/Table';
 import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
@@ -38,19 +29,12 @@ import ClearIcon from 'material-ui-icons/Clear';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 
-import IngredientsCollection from '../../../api/Ingredients/Ingredients';
+import PlatesCollection from '../../../api/Plates/Plates';
+import PlateImagesCollection from '../../../api/PlateImages/PlateImages';
 
+import PlatesGrid from './PlatesGrid.js';
 
 import Loading from '../../components/Loading/Loading';
-
-const styles = {
-  card: {
-    maxWidth: '33%',
-  },
-  media: {
-    height: '240px',
-  },
-};
 
 
 const primary = teal[500];
@@ -195,26 +179,41 @@ class Plates extends React.Component {
             </div>
 
 
-            {/* <ListContainer
-              limit={50}
-              collection={IngredientsCollection}
-              publication="ingredients"
+            <ListContainer
+              limit={20}
+              collection={PlatesCollection}
+              joins={[{
+                localProperty: 'imageId',
+                collection: PlateImagesCollection,
+                joinAs: 'image',
+              }]}
+
               options={this.state.options}
               selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
                 { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
+
             >
 
-              <IngredientsTable
+              <PlatesGrid
                 popTheSnackbar={this.props.popTheSnackbar}
                 searchTerm={this.state.searchSelector}
                 history={this.props.history}
                 sortByOptions={this.sortByOption.bind(this)}
               />
 
-            </ListContainer> */}
+            </ListContainer>
 
 
-            {/* 
+            {/*    options={this.state.options}
+              selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+                { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
+
+                 joins={[{
+                localProperty: 'imageId',
+                collection: PlateImages,
+                joinAs: 'image',
+              }]}
+
                 joins={[{
                     localProperty: "typeId",
                     collection: IngredientTypes,
@@ -225,7 +224,7 @@ class Plates extends React.Component {
                   joinAs: "subs"
                 }]}
             */}
-            <Grid container style={{ marginTop: '60px' }} spacing={16}>
+            {/* <Grid container style={{ marginTop: '60px' }} spacing={16}>
               <Grid item xs={12} sm={6} md={4} lg={4}>
                 <Card>
                   <CardMedia
@@ -316,7 +315,7 @@ class Plates extends React.Component {
                 </Card>
 
               </Grid>
-            </Grid>
+            </Grid> */}
           </Grid>
         </div>
       ) : <Loading />)
@@ -331,16 +330,15 @@ Plates.propTypes = {
   loading: PropTypes.bool.isRequired,
   // ingredients: PropTypes.arrayOf(PropTypes.object),
   // ingredientTypes: PropTypes.isRequired,
-  match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
 };
 
 export default createContainer(() => {
-  // const subscription = Meteor.subscribe('plates');
-  const subscription = Meteor.subscribe('ingredients');
+  const subscription = Meteor.subscribe('plates', {}, {});
+  const subscription2 = Meteor.subscribe('plateImages.all', {}, {});
 
   return {
-    loading: !subscription.ready(),
-    ingredients: IngredientsCollection.find().fetch(),
+    loading: !subscription.ready() && !subscription2.ready(),
+    // plates: PlatesCollection.find().fetch(),
   };
 }, Plates);
