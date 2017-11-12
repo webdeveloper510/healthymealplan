@@ -198,7 +198,7 @@ class PlateEditor extends React.Component {
 
     const existingPlate = plate && plate._id;
     localStorage.setItem('plateDeleted', plate.title);
-    const plateDeletedMessage = `${localStorage.getItem('plateDeleted')} deleted from plates.`;
+    const plateDeletedMessage = `${localStorage.getItem('plateDeleted')} deleted from main courses.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
@@ -247,8 +247,8 @@ class PlateEditor extends React.Component {
       } else {
         localStorage.setItem('plateForSnackbar', plate.title || $('[name="title"]').val());
 
-        const confirmation = existingPlate ? (`${localStorage.getItem('plateForSnackbar')} plate updated.`)
-          : `${localStorage.getItem('plateForSnackbar')} plate added.`;
+        const confirmation = existingPlate ? (`${localStorage.getItem('plateForSnackbar')} main course updated.`)
+          : `${localStorage.getItem('plateForSnackbar')} main course added.`;
 
         if (this.state.imageFieldChanged) {
           if (existingPlate) {
@@ -449,7 +449,7 @@ class PlateEditor extends React.Component {
 
             <Button onClick={() => this.props.history.push('/plates')} className="button button-secondary button-secondary--top">
               <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                <ChevronLeft style={{ marginRight: '4px' }} /> Plates</Typography>
+                <ChevronLeft style={{ marginRight: '4px' }} /> Main Courses</Typography>
             </Button>
 
           </Grid>
@@ -457,7 +457,7 @@ class PlateEditor extends React.Component {
 
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={4}>
-            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{plate && plate._id ? `${plate.title}` : 'Add plate'}</Typography>
+            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{plate && plate._id ? `${plate.title}` : 'Add main course'}</Typography>
 
             {this.props.plate ?
               (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1"> SKU {plate.SKU ? plate.SKU : ''} </Typography>)
@@ -478,7 +478,7 @@ class PlateEditor extends React.Component {
             <Grid container>
               <Grid item xs={12} sm={4}>
                 <Typography type="subheading" className="subheading font-medium">
-                Plate
+                Main course
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>

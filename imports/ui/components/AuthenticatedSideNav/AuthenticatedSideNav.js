@@ -144,7 +144,7 @@ class AuthenticatedSideNav extends Component {
                 <ListItemIcon>
                   <PlatesIcon className="side-nav-icon" />
                 </ListItemIcon>
-                <ListItemText className="subheading" primary="Plates" />
+                <ListItemText className="subheading" primary="Main Courses" />
               </ListItem>
             </NavLink>
             <NavLink to="/meals">

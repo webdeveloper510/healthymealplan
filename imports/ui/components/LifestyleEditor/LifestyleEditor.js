@@ -807,7 +807,7 @@ class LifestyleEditor extends React.Component {
                           <TableRow>
 
                             <TableCell>
-                              <Typography type="subheading" style={{ marginTop: '10px' }}>Two people</Typography>
+                              <Typography type="subheading" style={{ marginTop: '10px' }}>Two</Typography>
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
@@ -847,7 +847,7 @@ class LifestyleEditor extends React.Component {
                           <TableRow>
 
                             <TableCell>
-                              <Typography type="subheading" style={{ marginTop: '10px' }}>Three people</Typography>
+                              <Typography type="subheading" style={{ marginTop: '10px' }}>Three</Typography>
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
@@ -887,7 +887,7 @@ class LifestyleEditor extends React.Component {
                           <TableRow>
 
                             <TableCell>
-                              <Typography type="subheading" style={{ marginTop: '10px' }}>Four people</Typography>
+                              <Typography type="subheading" style={{ marginTop: '10px' }}>Four</Typography>
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
@@ -927,7 +927,7 @@ class LifestyleEditor extends React.Component {
                           <TableRow>
 
                             <TableCell>
-                              <Typography type="subheading" style={{ marginTop: '10px' }}>Five people</Typography>
+                              <Typography type="subheading" style={{ marginTop: '10px' }}>Five</Typography>
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
@@ -967,7 +967,7 @@ class LifestyleEditor extends React.Component {
                           <TableRow>
 
                             <TableCell>
-                              <Typography type="subheading" style={{ marginTop: '10px' }}>Six people</Typography>
+                              <Typography type="subheading" style={{ marginTop: '10px' }}>Six</Typography>
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
@@ -1007,7 +1007,7 @@ class LifestyleEditor extends React.Component {
                           <TableRow>
 
                             <TableCell>
-                              <Typography type="subheading" style={{ marginTop: '10px' }}>Seven people</Typography>
+                              <Typography type="subheading" style={{ marginTop: '10px' }}>Seven</Typography>
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
@@ -1047,7 +1047,7 @@ class LifestyleEditor extends React.Component {
                           <TableRow>
 
                             <TableCell>
-                              <Typography type="subheading" style={{ marginTop: '10px' }}>Eight People</Typography>
+                              <Typography type="subheading" style={{ marginTop: '10px' }}>Eight</Typography>
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>

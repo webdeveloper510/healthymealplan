@@ -180,7 +180,7 @@ class PlatesGrid extends React.Component {
     console.log(this.props);
 
     return (
-      <div>
+      <div style={{ width: '100%' }}>
 
         <Grid container style={{ marginTop: '60px' }} spacing={16}>
 
@@ -189,18 +189,21 @@ class PlatesGrid extends React.Component {
               // const isSelected = this.isCheckboxSelected(e._id);
 
               (
-                <Grid item xs={12} sm={6} md={4} lg={4}>
-                  <Card>
+                <Grid item xs={12} sm={6} md={4} lg={4} style={{ minWidth: '320px' }}>
+                  <Card style={{ width: '100%' }}>
                     <CardMedia
                       style={styles.media}
-                      image={e.image.link()}
+                      image={e.image ? e.image.link() : ''}
                       title="Contemplative Reptile"
                     />
                     <CardContent>
-                      <Typography type="headline" component="h2">
-                        {e.title} {e.SKU}
+                      <Typography type="body1" className="font-uppercase font-medium" style={{ marginBottom: '16px', fontSize: '14px', color: 'rgba(0, 0, 0, .54)' }}>
+                        {e.mealType}
                       </Typography>
-                      <Typography component="p">
+                      <Typography type="headline" component="h2">
+                        {e.title}
+                      </Typography>
+                      <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
                         {e.subtitle}
                       </Typography>
                     </CardContent>
@@ -217,8 +220,8 @@ class PlatesGrid extends React.Component {
           }
         </Grid>
 
-        <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-          {this.props.count} of {this.props.plateCount} plates
+        <Typography className="font-medium" type="body2" style={{ marginTop: '25px', color: 'rgba(0, 0, 0, .54)' }}>
+          Showing {this.props.count} of {this.props.plateCount} plates
         </Typography>
 
         { this.props.hasMore ? <Button onClick={this.props.loadMore}>Load More</Button> : '' }

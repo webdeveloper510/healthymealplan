@@ -76,12 +76,12 @@ class Plates extends React.Component {
     // console.log(searchValue);
 
     this.setState({
-      searchSelector: $('#search-ingredient-text').val(),
+      searchSelector: $('#search-type-text').val(),
     });
   }
 
   clearSearchBox() {
-    $('#search-ingredient-text').val('');
+    $('#search-type-text').val('');
 
     this.setState({
       searchSelector: {},
@@ -160,10 +160,10 @@ class Plates extends React.Component {
           <Grid container className="SideContent SideContent--spacer-2x--top SideContent--spacer-2x--horizontal">
             <Grid container className="clearfix">
               <Grid item xs={6}>
-                <Typography type="headline" gutterBottom className="pull-left headline" style={{ fontWeight: 500 }} color="inherit">Plates</Typography>
+                <Typography type="headline" gutterBottom className="pull-left headline" style={{ fontWeight: 500 }} color="inherit">Main Courses</Typography>
               </Grid>
               <Grid item xs={6}>
-                <Button className="btn btn-primary" raised color="primary" style={{ float: 'right' }} onClick={() => this.props.history.push('/plates/new')}>Add plate</Button>
+                <Button className="btn btn-primary" raised color="primary" style={{ float: 'right' }} onClick={() => this.props.history.push('/plates/new')}>Add main course</Button>
               </Grid>
             </Grid>
 
@@ -172,13 +172,46 @@ class Plates extends React.Component {
               <AppBar position="static" className="appbar--no-background appbar--no-shadow">
                 <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
                   <Tab label="All" />
-                  <Tab label="Main Course" />
-                  <Tab label="Add-ons" />
+                  <Tab label="Breakfast" />
+                  <Tab label="Lunch" />
+                  <Tab label="Dinner" />
                 </Tabs>
               </AppBar>
             </div>
 
+            <div style={{ width: '100%',
+              background: '#FFF',
+              borderTopRightRadius: '2px',
+              borderTopLeftRadius: '2px',
+              marginTop: '3em',
+              padding: '16px 25px 1em',
+              boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
+              position: 'relative' }}
+            >
 
+              <SearchIcon
+                className="autoinput-icon autoinput-icon--search"
+                style={{ display: (this.state.searchSelector.length > 0) ? 'none' : 'block', top: '33%', right: '1.8em !important' }}
+              />
+
+              <ClearIcon
+                className="autoinput-icon--clear"
+                onClick={this.clearSearchBox.bind(this)}
+                style={{ cursor: 'pointer',
+                  display: (this.state.searchSelector.length > 0) ? 'block' : 'none' }}
+              />
+
+              <Input
+                className="input-box"
+                style={{ width: '100%', position: 'relative' }}
+                placeholder="Search main courses"
+                onKeyUp={this.searchByName.bind(this)}
+                inputProps={{
+                  id: 'search-type-text',
+                  'aria-label': 'Description',
+                }}
+              />
+            </div>
             <ListContainer
               limit={20}
               collection={PlatesCollection}

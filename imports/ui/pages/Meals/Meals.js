@@ -61,7 +61,7 @@ class Meals extends React.Component {
     // console.log(searchValue);
 
     this.setState({
-      searchSelector: $('#search-type-text').val(),
+      searchSelector: $('#search-meal-text').val(),
     });
 
     // const query = {
@@ -177,10 +177,10 @@ class Meals extends React.Component {
             <Input
               className="input-box"
               style={{ width: '100%', position: 'relative' }}
-              placeholder="Search types"
+              placeholder="Search meals"
               onKeyUp={this.searchByName.bind(this)}
               inputProps={{
-                id: 'search-type-text',
+                id: 'search-meal-text',
                 'aria-label': 'Description',
               }}
             />
