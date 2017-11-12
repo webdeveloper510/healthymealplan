@@ -137,7 +137,7 @@ class RestrictionsTable extends React.Component {
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No restriction found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
+        <p style={{ padding: '25px' }} className="subheading">No restriction found for <span className="font-medium">{this.props.searchTerm.length > 0 ? `&lsquo;${this.props.searchTerm}&rsquo;` : ''}</span></p>
       );
     }
   }
@@ -167,7 +167,7 @@ class RestrictionsTable extends React.Component {
     if (e.discount) {
       return `${e.discountOrExtraType == 'Fixed amount' ? '$' : ''}${e.discount}${e.discountOrExtraType == 'Percentage' ? '%' : ''}`;
     } else if (e.extra) {
-      return `${e.e.discountOrExtraType == 'Fixed amount' ? '$' : ''}${e.extra}${e.discountOrExtraType == 'Percentage' ? '%' : ''}`;
+      return `${e.discountOrExtraType == 'Fixed amount' ? '$' : ''}${e.extra}${e.discountOrExtraType == 'Percentage' ? '%' : ''}`;
     }
     return 'N/A';
   }
@@ -311,8 +311,14 @@ class RestrictionsTable extends React.Component {
   }
 }
 
+
+RestrictionsTable.defaultProps = {
+  searchTerm: '',
+};
+
 RestrictionsTable.propTypes = {
   // results: PropType.isRequired,
+  searchTerm: PropTypes.string,
   history: PropTypes.func.isRequired,
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,

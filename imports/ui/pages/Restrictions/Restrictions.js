@@ -34,6 +34,8 @@ class Restrictions extends React.Component {
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
+
+      searchByKey: '',
       options: { sort: { SKU: -1 } },
       searchSelector: '',
       currentTabValue: 0,
@@ -108,6 +110,22 @@ class Restrictions extends React.Component {
     // console.log(this.state.options);
   }
 
+  searchByKey(restrictionType = '', key = '') {
+    if (key.length && restrictionType.length) {
+      const searchSelector = {};
+
+      searchSelector[restrictionType] = key;
+
+      this.setState({
+        searchByKey: searchSelector,
+      });
+    } else {
+      this.setState({
+        searchByKey: '',
+      });
+    }
+  }
+
   handleTabChange(event, value) {
     this.setState({ currentTabValue: value });
   }
@@ -132,10 +150,10 @@ class Restrictions extends React.Component {
           <div style={{ marginTop: '25px' }}>
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
               <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
-                <Tab label="All" />
-                <Tab label="Allergies" />
-                <Tab label="Dietary" />
-                <Tab label="Religious" />
+                <Tab label="All" onClick={() => this.searchByKey('', '')} />
+                <Tab label="Allergies" onClick={() => this.searchByKey('restrictionType', 'allergy')} />
+                <Tab label="Dietary" onClick={() => this.searchByKey('restrictionType', 'dietary')} />
+                <Tab label="Religious" onClick={() => this.searchByKey('restrictionType', 'religious')} />
 
               </Tabs>
             </AppBar>
@@ -183,7 +201,7 @@ class Restrictions extends React.Component {
             collection={RestrictionsCollection}
             publication="restrictions"
             options={this.state.options}
-            selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+            selector={typeof (this.state.searchByKey) === 'object' ? this.state.searchByKey : { $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
               { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
           >
             <RestrictionsTable
