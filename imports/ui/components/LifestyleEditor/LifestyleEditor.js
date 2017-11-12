@@ -70,7 +70,7 @@ class LifestyleEditor extends React.Component {
       valueTypes: '',
       // suggestions: [],
       suggestionsTypes: [],
-      types: this.props.category && this.props.ingredientTypes && !this.props.newLifestyle ? _.sortBy(this.props.ingredientTypes.filter((e, i) => this.props.category.types.indexOf(e._id) !== -1), 'title') : [],
+      restrictions: this.props.category && this.props.restrictions && !this.props.newLifestyle ? _.sortBy(this.props.restrictions.filter((e, i) => this.props.category.types.indexOf(e._id) !== -1), 'title') : [],
       // subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
       // selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
@@ -126,44 +126,16 @@ class LifestyleEditor extends React.Component {
   }
 
 
-  // Use your imagination to render suggestions.
-  onChange(event, { newValue }) {
-    this.setState({
-      value: newValue,
-    });
-  }
-
   onChangeTypes(event, { newValue }) {
     this.setState({
       valueTypes: newValue,
     });
   }
 
-  onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
-    const clonedSubIngredients = this.state.subIngredients ? this.state.subIngredients.slice() : [];
-
-    let isThere = false;
-
-    if (clonedSubIngredients.length > 0) {
-      isThere = clonedSubIngredients.filter(present => suggestion._id === present._id);
-    }
-
-    if (isThere != false) {
-      return;
-    }
-
-    clonedSubIngredients.push({ _id: suggestion._id, title: suggestion.title });
-
-    this.setState({
-      subIngredients: clonedSubIngredients,
-      hasFormChanged: true,
-    });
-  }
-
   onSuggestionSelectedTypes(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
     console.log(suggestion);
 
-    const clonedTypes = this.state.types ? this.state.types.slice() : [];
+    const clonedTypes = this.state.restrictions ? this.state.restrictions.slice() : [];
 
     let isThere = false;
 
@@ -185,22 +157,10 @@ class LifestyleEditor extends React.Component {
 
   // Autosuggest will call this function every time you need to update suggestions.
   // You already implemented this logic above, so just use it.
-  onSuggestionsFetchRequested({ value }) {
-    this.setState({
-      suggestions: this.getSuggestions(value),
-    });
-  }
 
   onSuggestionsFetchRequestedTypes({ value }) {
     this.setState({
       suggestionsTypes: this.getSuggestionsTypes(value),
-    });
-  }
-
-  // Autosuggest will call this function every time you need to clear suggestions.
-  onSuggestionsClearRequested() {
-    this.setState({
-      suggestions: [],
     });
   }
 
@@ -212,20 +172,11 @@ class LifestyleEditor extends React.Component {
 
 
   // Teach Autosuggest how to calculate suggestions for any given input value.
-  getSuggestions(value) {
-    const inputValue = value.trim().toLowerCase();
-    const inputLength = inputValue.length;
-
-    return inputLength === 0 ? [] : this.props.potentialSubIngredients.filter(ingredient =>
-      ingredient.title.toLowerCase().slice(0, inputLength) === inputValue,
-    );
-  }
-
   getSuggestionsTypes(value) {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
-    return inputLength === 0 ? [] : this.props.ingredientTypes.filter(type =>
+    return inputLength === 0 ? [] : this.props.restrictions.filter(type =>
       type.title.toLowerCase().slice(0, inputLength) === inputValue,
     );
   }
@@ -233,10 +184,6 @@ class LifestyleEditor extends React.Component {
   // When suggestion is clicked, Autosuggest needs to populate the input
   // based on the clicked suggestion. Teach Autosuggest how to calculate the
   // input value for every given suggestion.
-  getSuggestionValue(suggestion) {
-    return suggestion.title;
-  }
-
   getSuggestionValueTypes(suggestion) {
     return suggestion.title;
   }
@@ -244,23 +191,23 @@ class LifestyleEditor extends React.Component {
   handleRemoveActual() {
     const { popTheSnackbar, history, category } = this.props;
 
-    const exisitingCategory = category && category._id;
-    localStorage.setItem('categoryDeleted', category.title);
-    const categoryDeletedMessage = `${localStorage.getItem('categoryDeleted')} deleted from categories.`;
+    const existingLifestyle = category && category._id;
+    localStorage.setItem('lifestyleDeleted', category.title);
+    const lifestyleDeletedMessage = `${localStorage.getItem('lifestyleDeleted')} deleted from lifestyles.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('categories.remove', exisitingCategory, (error) => {
+    Meteor.call('lifestyles.remove', existingLifestyle, (error) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
         });
       } else {
         popTheSnackbar({
-          message: categoryDeletedMessage,
+          message: lifestyleDeletedMessage,
         });
 
-        history.push('/categories');
+        history.push('/lifestyles');
       }
     });
   }
@@ -353,29 +300,19 @@ class LifestyleEditor extends React.Component {
 
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
-    const existingCategory = this.props.category && this.props.category._id;
-    const methodToCall = existingCategory ? 'categories.update' : 'categories.insert';
+    const existingLifestyle = this.props.category && this.props.category._id;
+    const methodToCall = existingLifestyle ? 'lifestyles.update' : 'lifestyles.insert';
 
     const category = {
       title: document.querySelector('#title').value.trim(),
       // subIngredients: this.state.subIngredients || [],
-      types: this.state.types.map((e, i) => e._id),
+      types: this.state.restrictions.map((e, i) => e._id),
     };
 
-    if (existingCategory) category._id = existingCategory;
+    if (existingLifestyle) category._id = existingLifestyle;
 
     console.log(category);
 
-    // const typeName = this.state.valueTypes.trim();
-    // let typeActual = null;
-
-    // if (typeName) {
-    //   typeActual = this.props.ingredientTypes.find(el => el.title === typeName);
-    // } else {
-    //   typeActual = this.props.ingredientTypes.find(el => el.title === 'N/A');
-    // }
-
-    // ingredient.typeId = typeActual._id;
 
     Meteor.call(methodToCall, category, (error, categoryId) => {
       if (error) {
@@ -385,17 +322,17 @@ class LifestyleEditor extends React.Component {
       } else {
         localStorage.setItem('categoryForSnackbar', category.title || $('[name="title"]').val());
 
-        const confirmation = existingCategory ? (`${localStorage.getItem('categoryForSnackbar')} category updated.`)
-          : `${localStorage.getItem('categoryForSnackbar')} category added.`;
+        const confirmation = existingLifestyle ? (`${localStorage.getItem('categoryForSnackbar')} category updated.`)
+          : `${localStorage.getItem('categoryForSnackbar')} lifestyle added.`;
         // this.form.reset();
 
         popTheSnackbar({
           message: confirmation,
           buttonText: 'View',
-          buttonLink: `/categories/${categoryId}/edit`,
+          buttonLink: `/lifestyles/${categoryId}/edit`,
         });
 
-        history.push('/categories');
+        history.push('/lifestyles');
       }
     });
   }
@@ -518,7 +455,7 @@ class LifestyleEditor extends React.Component {
   handleTypeChipDelete(type) {
     console.log(type);
 
-    const stateCopy = this.state.types.slice();
+    const stateCopy = this.state.restrictions.slice();
 
     stateCopy.splice(stateCopy.indexOf(type), 1);
 
@@ -560,8 +497,8 @@ class LifestyleEditor extends React.Component {
       return type.title;
     }
 
-    if (this.props.ingredientTypes) {
-      return this.props.ingredientTypes.find(el => el._id === type);
+    if (this.props.restrictions) {
+      return this.props.restrictions.find(el => el._id === type);
     }
   }
 
@@ -570,8 +507,8 @@ class LifestyleEditor extends React.Component {
       return type.title.charAt(0);
     }
 
-    if (this.props.ingredientTypes) {
-      const avatarToReturn = this.props.ingredientTypes.find(el => el._id === type._id);
+    if (this.props.restrictions) {
+      const avatarToReturn = this.props.restrictions.find(el => el._id === type._id);
       return avatarToReturn.title.charAt(0);
     }
   }
@@ -588,12 +525,7 @@ class LifestyleEditor extends React.Component {
 
   render() {
     console.log(this.props);
-    const { category, ingredientTypes, history } = this.props;
-
-    if (!category || !ingredientTypes) {
-      return ('<h1>Loading</h1>');
-    }
-
+    const { category, history } = this.props;
     return (
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
         <Grid container justify="center">
@@ -709,7 +641,7 @@ class LifestyleEditor extends React.Component {
                   />
 
                   <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '25px' }}>
-                    {this.state.types.length ? this.state.types.map((type, i) => (
+                    {this.state.restrictions.length ? this.state.restrictions.map((type, i) => (
 
                       <Chip
                         avatar={<Avatar> {this.getTypeAvatar(type)} </Avatar>}
@@ -776,8 +708,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_1"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_breakfast_1"
                               />
                             </TableCell>
 
@@ -787,8 +719,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_2"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_lunch_1"
                               />
                             </TableCell>
 
@@ -798,8 +730,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_3"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_dinner_1"
                               />
                             </TableCell>
 
@@ -816,8 +748,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_1"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_breakfast_2"
                               />
                             </TableCell>
 
@@ -827,8 +759,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_2"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_lunch_2"
                               />
                             </TableCell>
 
@@ -838,8 +770,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_3"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_dinner_2"
                               />
                             </TableCell>
 
@@ -856,8 +788,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_1"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_breakfast_3"
                               />
                             </TableCell>
 
@@ -867,8 +799,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_2"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_lunch_3"
                               />
                             </TableCell>
 
@@ -878,8 +810,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_3"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_dinner_3"
                               />
                             </TableCell>
 
@@ -896,8 +828,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_1"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_breakfast_4"
                               />
                             </TableCell>
 
@@ -907,8 +839,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_2"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_lunch_4"
                               />
                             </TableCell>
 
@@ -918,8 +850,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_3"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_dinner_4"
                               />
                             </TableCell>
 
@@ -936,8 +868,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_1"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_breakfast_5"
                               />
                             </TableCell>
 
@@ -947,8 +879,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_2"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_lunch_5"
                               />
                             </TableCell>
 
@@ -958,11 +890,10 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_3"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_dinner_5"
                               />
                             </TableCell>
-
                           </TableRow>
                           <TableRow>
 
@@ -976,8 +907,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_1"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_breakfast_6"
                               />
                             </TableCell>
 
@@ -987,8 +918,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_2"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_lunch_6"
                               />
                             </TableCell>
 
@@ -998,8 +929,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_3"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_dinner_6"
                               />
                             </TableCell>
 
@@ -1016,8 +947,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_1"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_breakfast_7"
                               />
                             </TableCell>
 
@@ -1027,8 +958,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_2"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_lunch_7"
                               />
                             </TableCell>
 
@@ -1038,8 +969,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_3"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_dinner_7"
                               />
                             </TableCell>
 
@@ -1056,8 +987,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_1"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_breakfast_8"
                               />
                             </TableCell>
 
@@ -1067,8 +998,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_2"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_lunch_8"
                               />
                             </TableCell>
 
@@ -1078,8 +1009,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                name="price_3"
+                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                name="price_dinner_8"
                               />
                             </TableCell>
 
@@ -1316,8 +1247,7 @@ LifestyleEditor.defaultProps = {
 
 LifestyleEditor.propTypes = {
   category: PropTypes.object,
-  ingredientTypes: PropTypes.array.isRequired,
-  potentialSubIngredients: PropTypes.array.isRequired,
+  restrictions: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };

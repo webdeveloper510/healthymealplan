@@ -1,62 +1,62 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import Categories from './Categories';
+import Lifestyles from './Lifestyles';
 import rateLimit from '../../modules/rate-limit';
 import { getNextSequence } from '../../modules/server/get-next-sequence';
 
 Meteor.methods({
-  'categories.insert': function categoriesInsert(cat) {
-    check(cat, {
+  'lifestyles.insert': function lifestylesInsert(lifestyle) {
+    check(lifestyle, {
       title: String,
-      types: Array,
+      restrictions: Array,
     });
 
-    const existsCategory = Categories.findOne({ title: cat.title });
+    const existsLifestyle = Lifestyles.findOne({ title: lifestyle.title });
 
-    if (existsCategory) {
-      throw new Meteor.Error('500', `${cat.title} is already present`);
+    if (existsLifestyle) {
+      throw new Meteor.Error('500', `${lifestyle.title} is already present`);
     }
 
-    let nextSeqItem = getNextSequence('categories');
+    let nextSeqItem = getNextSequence('lifestyles');
     nextSeqItem = nextSeqItem.toString();
 
     try {
-      return Categories.insert({ SKU: nextSeqItem, title: cat.title, types: cat.types, owner: this.userId });
+      return Lifestyles.insert({ SKU: nextSeqItem, title: lifestyle.title, restrictions: lifestyle.types, owner: this.userId });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
 
-  'categories.update': function categoriesUpdate(cat) {
-    check(cat, {
+  'lifestyles.update': function lifestylesUpdate(lifestyle) {
+    check(lifestyle, {
       _id: String,
       title: String,
-      types: Array,
+      restrictions: Array,
     });
 
     try {
-      const catId = cat._id;
-      Categories.update(catId, { $set: cat });
-      return catId; // Return _id so we can redirect to document after update.
+      const lifestyleId = lifestyle._id;
+      Lifestyles.update(lifestyleId, { $set: lifestyle });
+      return lifestyleId; // Return _id so we can redirect to document after update.
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
-  'categories.remove': function categoriesRemove(catId) {
-    check(catId, String);
+  'lifestyles.remove': function lifestylesRemove(lifestyleId) {
+    check(lifestyleId, String);
 
     try {
-      return Categories.remove(catId);
+      return Lifestyles.remove(lifestyleId);
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
-  'categories.batchRemove': function categoriesBatchRemove(ingredientIds) {
-    check(ingredientIds, Array);
-    console.log('Server: categories.batchRemove');
+  'lifestyles.batchRemove': function lifestylesBatchRemove(lifestyleIds) {
+    check(lifestyleIds, Array);
+    console.log('Server: lifestyles.batchRemove');
 
     try {
-      return Categories.remove({ _id: { $in: ingredientIds } });
+      return Lifestyles.remove({ _id: { $in: lifestyleIds } });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
@@ -65,10 +65,10 @@ Meteor.methods({
 
 rateLimit({
   methods: [
-    'categories.insert',
-    'categories.update',
-    'categories.remove',
-    'categories.batchRemove',
+    'lifestyles.insert',
+    'lifestyles.update',
+    'lifestyles.remove',
+    'lifestyles.batchRemove',
   ],
   limit: 5,
   timeRange: 1000,

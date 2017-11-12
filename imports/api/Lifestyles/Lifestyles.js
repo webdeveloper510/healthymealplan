@@ -62,6 +62,51 @@ Lifestyles.schema = new SimpleSchema({
     type: Number,
     label: 'Price of the meal type for each person. Index is the number of people 0 - 7.',
   },
+  discountAthletic: {
+    type: Number,
+    label: 'The amount of discount',
+    optional: true,
+  },
+  extraAthletic: {
+    type: Number,
+    label: 'The amount of extra',
+    optional: true,
+  },
+  discountOrExtraTypeAthletic: {
+    type: String,
+    label: 'Percentage or Fixed amount',
+    optional: true,
+  },
+  discountStudent: {
+    type: Number,
+    label: 'The amount of discount',
+    optional: true,
+  },
+  extraStudent: {
+    type: Number,
+    label: 'The amount of extra',
+    optional: true,
+  },
+  discountOrExtraTypeStudent: {
+    type: String,
+    label: 'Percentage or Fixed amount',
+    optional: true,
+  },
+  discountSenior: {
+    type: Number,
+    label: 'The amount of discount',
+    optional: true,
+  },
+  extraSenior: {
+    type: Number,
+    label: 'The amount of extra',
+    optional: true,
+  },
+  discountOrExtraTypeSenior: {
+    type: String,
+    label: 'Percentage or Fixed amount',
+    optional: true,
+  },
   owner: {
     type: String,
     label: 'The ID of the user this category belongs to.',

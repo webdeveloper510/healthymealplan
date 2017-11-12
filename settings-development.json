@@ -1,5 +1,7 @@
 {
-  "public": {},
+  "public": {
+    "filesURL": "/Healthy Meal Plan/data"
+  },
   "private": {
     "MAIL_URL": "smtps://postmaster@sandboxf5538b27bf3f458ea825bc8f3cbe365e.mailgun.org:0884b10f11de32a9c33bc4a90fc2f9a2@smtp.mailgun.org:587",
     "OAuth": {
