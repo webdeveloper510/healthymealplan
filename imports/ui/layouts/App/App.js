@@ -349,8 +349,8 @@ class App extends React.Component {
                     }}
                   >
                     <div style={{ padding: '10px 20px 0', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
-                      <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Healthy Meal Plan</Typography>
-                      <Typography style={{ color: 'rgba(0, 0, 0, 0.38)' }} type="body2" className="body2">v 0.10</Typography>
+                      <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Vittle</Typography>
+                      <Typography style={{ color: 'rgba(0, 0, 0, 0.38)' }} type="body2" className="body2">v 0.25</Typography>
                     </div>
 
                     <AuthenticatedSideNav {...this.props} />
@@ -367,8 +367,8 @@ class App extends React.Component {
                     }}
                   >
                     <div style={{ padding: '10px 20px 0', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
-                      <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Healthy Meal Plan</Typography>
-                      <Typography style={{ color: 'rgba(0, 0, 0, 0.38)' }} type="body2" className="body2">v 0.10</Typography>
+                      <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Vittle</Typography>
+                      <Typography style={{ color: 'rgba(0, 0, 0, 0.38)' }} type="body2" className="body2">v 0.25</Typography>
                     </div>
                     <AuthenticatedSideNav {...this.props} />
 
