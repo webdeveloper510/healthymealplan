@@ -36,6 +36,8 @@ class Meals extends React.Component {
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
+      searchByKey: '',
+
       options: { sort: { SKU: -1 } },
       searchSelector: '',
       currentTabValue: 0,
@@ -119,6 +121,21 @@ class Meals extends React.Component {
     });
   }
 
+  searchByKey(mealType = '', key = '') {
+    if (key.length && mealType.length) {
+      const searchSelector = {};
+
+      searchSelector[mealType] = key;
+
+      this.setState({
+        searchByKey: searchSelector,
+      });
+    } else {
+      this.setState({
+        searchByKey: '',
+      });
+    }
+  }
 
   handleTabChange(event, value) {
     this.setState({ currentTabValue: value });
@@ -146,10 +163,10 @@ class Meals extends React.Component {
           <div style={{ marginTop: '25px' }}>
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
               <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
-                <Tab label="All" />
-                <Tab label="Main Courses" />
-                <Tab label="Sides" />
 
+                <Tab label="All" onClick={() => this.searchByKey('', '')} />
+                <Tab label="Main Courses" onClick={() => this.searchByKey('type', 'Main Course')} />
+                <Tab label="Sides" onClick={() => this.searchByKey('type', 'Side')} />
               </Tabs>
             </AppBar>
           </div>
@@ -192,7 +209,7 @@ class Meals extends React.Component {
             collection={MealsCollection}
             publication="Meals"
             options={this.state.options}
-            selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+            selector={typeof (this.state.searchByKey) === 'object' ? this.state.searchByKey : { $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
               { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
           >
             <MealsTableNew
