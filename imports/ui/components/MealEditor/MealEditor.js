@@ -6,6 +6,7 @@ import { Meteor } from 'meteor/meteor';
 import Grid from 'material-ui/Grid';
 import Button from 'material-ui/Button';
 import Typography from 'material-ui/Typography';
+import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
 import $ from 'jquery';
 
@@ -39,7 +40,7 @@ class MealEditor extends React.Component {
     this.state = {
       deleteDialogOpen: false,
       hasFormChanged: false,
-
+      mealType: this.props.newMeal ? '' : this.props.meal.type,
     };
   }
 
@@ -77,20 +78,20 @@ class MealEditor extends React.Component {
 
     const existingMeal = meal && meal._id;
 
-    localStorage.setItem('mealDeleted', ingredientType.title);
+    localStorage.setItem('mealDeleted', meal.title);
 
     const mealDeletedMessage = `${localStorage.getItem('mealDeleted')} deleted from meals.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('meals.remove', existingIngredientType, (error) => {
+    Meteor.call('meals.remove', existingMeal, (error) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
         });
       } else {
         popTheSnackbar({
-          message: ingredientTypeDeletedMessage,
+          message: mealDeletedMessage,
         });
 
         history.push('/meals');
@@ -110,16 +111,12 @@ class MealEditor extends React.Component {
 
     const meal = {
       title: document.querySelector('#title').value.trim(),
+      type: this.state.mealType,
     };
 
-    console.log(meal);
+    if (existingMeal) { meal._id = existingMeal; }
 
-    if (existingMeal) {
-      meal._id = existingMeal;
-      localStorage.setItem('meal', existingMeal.title);
-    } else {
-      localStorage.setItem('meal', meal.title);
-    }
+    localStorage.setItem('meal', existingMeal ? this.props.meal.title : meal.title);
 
 
     Meteor.call(methodToCall, meal, (error, mealId) => {
@@ -129,7 +126,6 @@ class MealEditor extends React.Component {
         });
       } else {
         const confirmation = existingMeal ? `${localStorage.getItem('meal')} meal updated` : `${localStorage.getItem('meal')} meal added.`;
-        this.form.reset();
 
         popTheSnackbar({
           message: confirmation,
@@ -152,6 +148,18 @@ class MealEditor extends React.Component {
     });
   }
 
+  handleMealTypeChange() {
+
+  }
+
+  handleMealTypeChange(event, value) {
+    // console.log(event.target.value);
+
+    this.setState({
+      mealType: event.target.value,
+      hasFormChanged: true,
+    });
+  }
 
   render() {
     const { meal, history } = this.props;
@@ -202,6 +210,32 @@ class MealEditor extends React.Component {
                 defaultValue={meal && meal.title}
                 ref={title => (this.title = title)}
               />
+            </Paper>
+          </Grid>
+        </Grid>
+
+
+        <Grid container style={{ marginBottom: '50px' }}>
+          <Grid item xs={12} sm={4}>
+            <Typography type="subheading" className="subheading font-medium">
+              Type
+            </Typography>
+          </Grid>
+          <Grid item xs={12} sm={8}>
+            <Paper elevation={2} className="paper-for-fields">
+              <TextField
+                fullWidth
+                id="select-discount-type"
+                select
+                label="Type"
+                value={this.state.mealType ? this.state.mealType : ''}
+                onChange={this.handleMealTypeChange.bind(this)}
+                SelectProps={{ native: false }}
+              >
+                <MenuItem key={1} value="Main Course">Main Course</MenuItem>
+                <MenuItem key={2} value="Side">Side</MenuItem>
+              </TextField>
+
             </Paper>
           </Grid>
         </Grid>

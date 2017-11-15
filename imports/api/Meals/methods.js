@@ -8,6 +8,7 @@ Meteor.methods({
   'meals.insert': function mealsInsert(meal) {
     check(meal, {
       title: String,
+      type: String,
     });
 
     let nextSeqItem = getNextSequence('meals');
@@ -23,6 +24,7 @@ Meteor.methods({
     check(meal, {
       _id: String,
       title: String,
+      type: String,
     });
 
     try {

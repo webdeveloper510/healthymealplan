@@ -3,7 +3,7 @@ import { Roles } from 'meteor/alanning:roles';
 
 const PlateImages = new FilesCollection({
   collectionName: 'PlateImages',
-  // storagePath: '/Healthy Meal Plan/data',
+  storagePath: '/Healthy Meal Plan/data',
   allowClientCode: false, // Disallow remove files from Client
   onBeforeUpload(file) {
     // Allow upload files under 10MB, and only in png/jpg/jpeg formats

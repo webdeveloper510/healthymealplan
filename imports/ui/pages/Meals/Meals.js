@@ -147,6 +147,8 @@ class Meals extends React.Component {
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
               <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
                 <Tab label="All" />
+                <Tab label="Main Courses" />
+                <Tab label="Sides" />
 
               </Tabs>
             </AppBar>

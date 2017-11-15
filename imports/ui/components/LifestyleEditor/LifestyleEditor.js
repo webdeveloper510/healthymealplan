@@ -303,33 +303,32 @@ class LifestyleEditor extends React.Component {
     const existingLifestyle = this.props.category && this.props.category._id;
     const methodToCall = existingLifestyle ? 'lifestyles.update' : 'lifestyles.insert';
 
-    const category = {
+    const lifestyle = {
       title: document.querySelector('#title').value.trim(),
-      // subIngredients: this.state.subIngredients || [],
-      types: this.state.restrictions.map((e, i) => e._id),
+      restrictions: this.state.restrictions.map((e, i) => e._id),
     };
 
-    if (existingLifestyle) category._id = existingLifestyle;
+    if (existingLifestyle) lifestyle._id = existingLifestyle;
 
-    console.log(category);
+    console.log(lifestyle);
 
 
-    Meteor.call(methodToCall, category, (error, categoryId) => {
+    Meteor.call(methodToCall, lifestyle, (error, lifestyleId) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
         });
       } else {
-        localStorage.setItem('categoryForSnackbar', category.title || $('[name="title"]').val());
+        localStorage.setItem('lifestyleForSnackbar', lifestyle.title || $('[name="title"]').val());
 
-        const confirmation = existingLifestyle ? (`${localStorage.getItem('categoryForSnackbar')} category updated.`)
-          : `${localStorage.getItem('categoryForSnackbar')} lifestyle added.`;
+        const confirmation = existingLifestyle ? (`${localStorage.getItem('lifestyleForSnackbar')} lifestyle updated.`)
+          : `${localStorage.getItem('lifestyleForSnackbar')} lifestyle added.`;
         // this.form.reset();
 
         popTheSnackbar({
           message: confirmation,
           buttonText: 'View',
-          buttonLink: `/lifestyles/${categoryId}/edit`,
+          buttonLink: `/lifestyles/${lifestyleId}/edit`,
         });
 
         history.push('/lifestyles');

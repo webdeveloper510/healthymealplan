@@ -26,6 +26,10 @@ Meals.schema = new SimpleSchema({
     type: String,
     label: 'The title of the meal.',
   },
+  type: {
+    type: String,
+    label: 'The type of the meal.',
+  },
   createdAt: {
     type: String,
     label: 'The date this meal was created.',

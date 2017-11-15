@@ -158,7 +158,7 @@ class MealsTable extends React.Component {
   }
 
   render() {
-    console.log("meals table");
+    console.log('meals table');
     console.log(this.props.results);
 
     return (
@@ -198,6 +198,14 @@ class MealsTable extends React.Component {
                     >
                   Meal</Typography>
                   </TableCell>
+
+                  <TableCell padding="none" style={{ width: '44%' }} onClick={() => this.props.sortByOptions('title')}>
+
+                    <Typography
+                      className="body2 table-head-col-hover"
+                      type="body2"
+                    >Category</Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>)
               : ''
@@ -218,6 +226,10 @@ class MealsTable extends React.Component {
 
                       <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '44%' }} padding="none" onClick={() => this.props.history.push(`meals/${e._id}/edit`)}>
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>{e.title}</Typography>
+                      </TableCell>
+
+                      <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '44%' }} padding="none" onClick={() => this.props.history.push(`meals/${e._id}/edit`)}>
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>{e.type}</Typography>
                       </TableCell>
 
                     </TableRow>
