@@ -177,6 +177,28 @@ class LifestylesTable extends React.Component {
   //   );
   // }
 
+  renderExtraAthletic(e) {
+    if (e.extraAthletic) {
+      return `${e.discountOrExtraTypeAthletic == 'Fixed amount' ? '$' : ''}${e.extraAthletic}${e.discountOrExtraTypeAthletic == 'Percentage' ? '%' : ''}`;
+    }
+    return <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>;
+  }
+
+  renderDiscountStudent(e) {
+    if (e.discountStudent) {
+      return `${e.discountOrExtraTypeStudent == 'Fixed amount' ? '$' : ''}${e.discountStudent}${e.discountOrExtraTypeStudent == 'Percentage' ? '%' : ''}`;
+    }
+    return <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>;
+  }
+
+  renderDiscountSenior(e) {
+    if (e.discountSenior) {
+      return `${e.discountOrExtraTypeSenior == 'Fixed amount' ? '$' : ''}${e.discountSenior}${e.discountOrExtraTypeSenior == 'Percentage' ? '%' : ''}`;
+    }
+    return <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>;
+  }
+
+
   render() {
     return (
       <div>
@@ -184,7 +206,7 @@ class LifestylesTable extends React.Component {
           {this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container">
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
-                {this.state.selectedCheckboxesNumber} lifestyle{this.state.selectedCheckboxes.length > 1 ? ('') : 's'} selected
+                {this.state.selectedCheckboxesNumber} lifestyle{this.state.selectedCheckboxes.length > 1 ? ('s') : ''} selected
               </Typography>
               <Button style={{ color: '#FFF' }} onClick={this.deleteDialogHandleClickOpen.bind(this)}>Delete</Button>
             </div>
@@ -196,12 +218,40 @@ class LifestylesTable extends React.Component {
             {this.props.count > 0 ?
               (<TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox" style={{ width: '12%' }}>
-                    <Checkbox onChange={this.selectAllRows.bind(this)} /></TableCell>
-                  <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                    <Typography className="body2" type="body2">SKU</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '76%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Lifestyle</Typography></TableCell>
+                  <TableCell padding="checkbox" style={{ width: '7%' }}>
+                    <Checkbox onChange={this.selectAllRows.bind(this)} />
+                  </TableCell>
+                  <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.sortByOptions('SKU')}>
+                    <Typography className="body2" type="body2">SKU</Typography>
+                  </TableCell>
+                  <TableCell padding="none" style={{ width: '22%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Lifestyle</Typography>
+                  </TableCell>
+                  <TableCell padding="none" style={{ width: '9%' }}>
+                    <Typography className="body2" type="body2">Breakfast</Typography>
+                  </TableCell>
+                  <TableCell padding="none" style={{ width: '9%' }}>
+                    <Typography className="body2" type="body2">Lunch</Typography>
+                  </TableCell>
+                  <TableCell padding="none" style={{ width: '9%' }}>
+                    <Typography className="body2" type="body2">Dinner</Typography>
+                  </TableCell>
+
+                  <TableCell padding="none" style={{ width: '9%' }}>
+                    <Typography className="body2" type="body2">Athletic</Typography>
+                  </TableCell>
+
+                  <TableCell padding="none" style={{ width: '9%' }}>
+                    <Typography className="body2" type="body2">Student</Typography>
+                  </TableCell>
+
+                  <TableCell padding="none" style={{ width: '9%' }}>
+                    <Typography className="body2" type="body2">Senior</Typography>
+                  </TableCell>
+
+
+
+
 
                 </TableRow>
               </TableHead>)
@@ -216,7 +266,7 @@ class LifestylesTable extends React.Component {
 
                   return (
                     <TableRow hover className={e._id} key={e._id}>
-                      <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
+                      <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '7%' }} padding="checkbox">
                         <Checkbox
                           className="row-checkbox"
                           id={e._id}
@@ -225,12 +275,12 @@ class LifestylesTable extends React.Component {
                         />
                       </TableCell>
 
-                      <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}>
+                      <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}>
                         <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
                       </TableCell>
 
                       <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '76%' }}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '22%' }}
                         padding="none"
                         onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
                       >
@@ -246,10 +296,121 @@ class LifestylesTable extends React.Component {
                               ) : (`${e.joinedRestrictions.length} restriction`)
                             )
 
-                            : '-'}
+                            : ''}
                         </Typography>
 
                       </TableCell>
+
+                      <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
+                        padding="none"
+                        onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
+                      >
+
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          ${e.prices.breakfast[0]}
+                          <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                              Individual
+                          </Typography>
+                        </Typography>
+                     
+
+                      </TableCell>
+
+                      <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
+                        padding="none"
+                        onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
+                      >
+
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          ${e.prices.lunch[0]}
+                          <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                              Individual
+                          </Typography>
+                        </Typography>
+                     
+
+                      </TableCell>
+
+                      <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
+                        padding="none"
+                        onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
+                      >
+
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          ${e.prices.dinner[0]}
+                          <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                              Individual
+                          </Typography>
+                        </Typography>
+                     
+
+                      </TableCell>
+
+                      <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
+                        padding="none"
+                        onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
+                      >
+
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          
+                          {this.renderExtraAthletic(e)}
+
+                          {e.extraAthletic ? 
+
+                            <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>Extra</Typography>
+                             :''
+                          }
+                          
+                        </Typography>
+
+                      </TableCell>
+
+                      <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
+                        padding="none"
+                        onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
+                      >
+
+                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                      
+                      {this.renderDiscountStudent(e)}
+
+                      {e.discountStudent ? 
+
+                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>Discount</Typography>
+                         :''
+                      }
+                      
+                    </Typography>
+                     
+
+                      </TableCell>
+
+                       <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
+                        padding="none"
+                        onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
+                      >
+
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          
+                          {this.renderDiscountSenior(e)}
+
+                          {e.discountSenior ? 
+
+                            <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>Discount</Typography>
+                            :''
+                          }
+                          
+                        </Typography>
+                      
+
+                      </TableCell>
+
                     </TableRow>
                   );
                 },
@@ -279,7 +440,7 @@ class LifestylesTable extends React.Component {
         </Paper>
         <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-      Delete {this.state.selectedCheckboxesNumber} lifestyle{this.state.selectedCheckboxes.length > 1 ? '' : 's'}?
+      Delete {this.state.selectedCheckboxesNumber} lifestyle{this.state.selectedCheckboxes.length > 1 ? 's' : ''}?
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} lifestyles?</DialogContentText>
