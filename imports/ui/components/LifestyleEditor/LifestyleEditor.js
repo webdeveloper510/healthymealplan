@@ -68,25 +68,45 @@ class LifestyleEditor extends React.Component {
       valueDiscountOrExtraSenior: 'none',
 
       valueTypes: '',
-      // suggestions: [],
       suggestionsTypes: [],
-      restrictions: this.props.category && this.props.restrictions && !this.props.newLifestyle ? _.sortBy(this.props.restrictions.filter((e, i) => this.props.category.types.indexOf(e._id) !== -1), 'title') : [],
-      // subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
-      // selectedType: this.props.ingredient.typeId,
+      restrictions: this.props.lifestyle && this.props.restrictions && !this.props.newLifestyle ? _.sortBy(this.props.restrictions.filter((e, i) => this.props.lifestyle.restrictions.indexOf(e._id) !== -1), 'title') : [],
       deleteDialogOpen: false,
       hasFormChanged: false,
 
-      discountOrExtraSelectedAthletic: false,
-      discountOrExtraSelectedStudent: false,
-      discountOrExtraSelectedSenior: false,
+      // discountOrExtraSelectedAthletic: false,
+      discountOrExtraSelectedAthletic: !!((!this.props.newLifestyle && this.props.lifestyle &&
+        (this.props.lifestyle.hasOwnProperty('discountAthletic') || this.props.lifestyle.hasOwnProperty('extraAthletic')))),
 
-      discountTypeAthletic: 'Percentage',
-      discountTypeStudent: 'Percentage',
-      discountTypeSenior: 'Percentage',
+      // discountOrExtraSelectedStudent: false,
+      discountOrExtraSelectedStudent: !!((!this.props.newLifestyle && this.props.lifestyle &&
+        (this.props.lifestyle.hasOwnProperty('discountStudent') || this.props.lifestyle.hasOwnProperty('extraStudent')))),
 
-      discountOrExtraAmountAthletic: '',
-      discountOrExtraAmountStudent: '',
-      discountOrExtraAmountSenior: '',
+      // discountOrExtraSelectedSenior: false,
+      discountOrExtraSelectedSenior: !!((!this.props.newLifestyle && this.props.lifestyle &&
+        (this.props.lifestyle.hasOwnProperty('discountSenior') || this.props.lifestyle.hasOwnProperty('extraSenior')))),
+
+      // discountTypeAthletic: 'Percentage',
+      discountTypeAthletic: (!this.props.newLifestyle && this.props.lifestyle && this.props.lifestyle.discountOrExtraTypeAthletic) ? this.props.lifestyle.discountOrExtraTypeAthletic : 'Percentage',
+
+      // discountTypeStudent: 'Percentage',
+      discountTypeStudent: (!this.props.newLifestyle && this.props.lifestyle && this.props.lifestyle.discountOrExtraTypeStudent) ? this.props.lifestyle.discountOrExtraTypeStudent : 'Percentage',
+
+      // discountTypeSenior: 'Percentage',
+      discountTypeSenior: (!this.props.newLifestyle && this.props.lifestyle && this.props.lifestyle.discountOrExtraTypeSenior) ? this.props.lifestyle.discountOrExtraTypeSenior : 'Percentage',
+
+
+      // discountOrExtraAmountAthletic: '',
+      discountOrExtraAmountAthletic: (!this.props.newLifestyle && this.props.lifestyle && (this.props.lifestyle.hasOwnProperty('discountAthletic') || this.props.lifestyle.hasOwnProperty('extraAthletic'))) ?
+        (this.props.lifestyle.hasOwnProperty('discountAthletic') ? this.props.lifestyle.discountAthletic : this.props.lifestyle.extraAthletic) : '',
+
+      // discountOrExtraAmountStudent: '',
+      discountOrExtraAmountAthletic: (!this.props.newLifestyle && this.props.lifestyle && (this.props.lifestyle.hasOwnProperty('discountStudent') || this.props.lifestyle.hasOwnProperty('extraStudent'))) ?
+        (this.props.lifestyle.hasOwnProperty('discountStudent') ? this.props.lifestyle.discountStudent : this.props.lifestyle.extraStudent) : '',
+
+
+      // discountOrExtraAmountSenior: '',
+      discountOrExtraAmountAthletic: (!this.props.newLifestyle && this.props.lifestyle && (this.props.lifestyle.hasOwnProperty('discountSenior') || this.props.lifestyle.hasOwnProperty('extraSenior'))) ?
+        (this.props.lifestyle.hasOwnProperty('discountSenior') ? this.props.lifestyle.discountSenior : this.props.lifestyle.extraSenior) : '',
 
     };
   }
@@ -135,23 +155,23 @@ class LifestyleEditor extends React.Component {
   onSuggestionSelectedTypes(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
     console.log(suggestion);
 
-    const clonedTypes = this.state.restrictions ? this.state.restrictions.slice() : [];
+    const clonedRestrictions = this.state.restrictions ? this.state.restrictions.slice() : [];
 
     let isThere = false;
 
-    if (clonedTypes.length > 0) {
-      isThere = clonedTypes.filter(present => suggestion._id === present._id);
+    if (clonedRestrictions.length > 0) {
+      isThere = clonedRestrictions.filter(present => suggestion._id === present._id);
     }
 
     if (isThere != false) {
       return;
     }
 
-    clonedTypes.push({ _id: suggestion._id, title: suggestion.title });
+    clonedRestrictions.push({ _id: suggestion._id, title: suggestion.title });
 
     this.setState({
       hasFormChanged: true,
-      types: clonedTypes,
+      restrictions: clonedRestrictions,
     });
   }
 
@@ -300,30 +320,69 @@ class LifestyleEditor extends React.Component {
 
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
-    const existingLifestyle = this.props.category && this.props.category._id;
+    const existingLifestyle = this.props.lifestyle && this.props.lifestyle._id;
     const methodToCall = existingLifestyle ? 'lifestyles.update' : 'lifestyles.insert';
 
     const lifestyle = {
       title: document.querySelector('#title').value.trim(),
       restrictions: this.state.restrictions.map((e, i) => e._id),
+      prices: {
+        breakfast: [],
+        lunch: [],
+        dinner: [],
+      },
     };
 
-    if (existingLifestyle) lifestyle._id = existingLifestyle;
+    if (this.state.discountOrExtraSelectedAthletic) {
+      const discountOrExtraAthletic = `${this.state.valueDiscountOrExtraAthletic}Athletic`;
 
-    console.log(lifestyle);
+      lifestyle[discountOrExtraAthletic] = parseFloat(this.state.discountOrExtraAmountAthletic);
+      lifestyle.discountOrExtraTypeAthletic = this.state.discountTypeAthletic;
+    }
 
+    if (this.state.discountOrExtraSelectedStudent) {
+      const discountOrExtraStudent = `${this.state.valueDiscountOrExtraStudent}Student`;
+
+      lifestyle[discountOrExtraStudent] = parseFloat(this.state.discountOrExtraAmountStudent);
+      lifestyle.discountOrExtraTypeStudent = this.state.discountTypeStudent;
+    }
+
+    if (this.state.discountOrExtraSelectedSenior) {
+      const discountOrExtraSenior = `${this.state.valueDiscountOrExtraSenior}Senior`;
+      lifestyle[discountOrExtraSenior] = parseFloat(this.state.discountOrExtraAmountSenior);
+      lifestyle.discountOrExtraTypeSenior = this.state.discountTypeSenior;
+    }
+
+    for (let i = 1; i <= 8; i += 1) {
+      const brekafastInput = `input[name='price_breakfast_${i}']`;
+      const lunchInput = `input[name='price_lunch_${i}']`;
+      const dinnerInput = `input[name='price_dinner_${i}']`;
+
+      lifestyle.prices.breakfast.push(parseFloat($(brekafastInput).val()));
+      lifestyle.prices.lunch.push(parseFloat($(lunchInput).val()));
+      lifestyle.prices.dinner.push(parseFloat($(dinnerInput).val()));
+    }
+
+    if (existingLifestyle) {
+      lifestyle._id = existingLifestyle;
+    }
 
     Meteor.call(methodToCall, lifestyle, (error, lifestyleId) => {
+
+      console.log("Inside Method");
+
       if (error) {
+        console.log(error);
+
         popTheSnackbar({
           message: error.reason,
         });
+
       } else {
         localStorage.setItem('lifestyleForSnackbar', lifestyle.title || $('[name="title"]').val());
 
         const confirmation = existingLifestyle ? (`${localStorage.getItem('lifestyleForSnackbar')} lifestyle updated.`)
           : `${localStorage.getItem('lifestyleForSnackbar')} lifestyle added.`;
-        // this.form.reset();
 
         popTheSnackbar({
           message: confirmation,
@@ -340,12 +399,11 @@ class LifestyleEditor extends React.Component {
     return (
       <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
         <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-        Delete {this.props.category.title.toLowerCase()}?
+        Delete {this.props.lifestyle ? this.props.lifestyle.title.toLowerCase() : ''}?
         </Typography>
         <DialogContent>
           <DialogContentText className="subheading">
-          Are you sure you want to delete {this.props.category.title.toLowerCase()} { (this.props.category && this.props.category.typeMain) ?
-              `from ${this.props.category.typeMain.title.toLowerCase()}?` : '?'}
+          Are you sure you want to delete {this.props.lifestyle ? this.props.lifestyle.title.toLowerCase() : ''}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -523,8 +581,8 @@ class LifestyleEditor extends React.Component {
   }
 
   render() {
-    console.log(this.props);
-    const { category, history } = this.props;
+    // console.log(this.props);
+    const { lifestyle, history } = this.props;
     return (
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
         <Grid container justify="center">
@@ -540,10 +598,10 @@ class LifestyleEditor extends React.Component {
 
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={4}>
-            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{category && category._id ? `${category.title}` : 'Add lifestyle'}</Typography>
+            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{lifestyle && lifestyle._id ? `${lifestyle.title}` : 'Add lifestyle'}</Typography>
 
-            {this.props.category ?
-              (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1">{category.SKU ? (category.SKU) : ''} </Typography>)
+            {lifestyle ?
+              (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1">{lifestyle.SKU ? (lifestyle.SKU) : ''} </Typography>)
               : '' }
 
           </Grid>
@@ -571,7 +629,7 @@ class LifestyleEditor extends React.Component {
                     label="Name"
                     name="title"
                     fullWidth
-                    defaultValue={category && category.title}
+                    defaultValue={lifestyle && lifestyle.title}
                     ref={title => (this.title = title)}
                     inputProps={{}}
                     onChange={this.titleFieldChanged.bind(this)}
@@ -707,7 +765,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[0]}
+
                                 name="price_breakfast_1"
                               />
                             </TableCell>
@@ -716,9 +775,9 @@ class LifestyleEditor extends React.Component {
                               <TextField
                                 fullWidth
                                 margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                                style={{ fontSize: '1rem', maxWidth: '100px',   minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[0]}
                                 name="price_lunch_1"
                               />
                             </TableCell>
@@ -729,7 +788,7 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[0]}
                                 name="price_dinner_1"
                               />
                             </TableCell>
@@ -742,38 +801,38 @@ class LifestyleEditor extends React.Component {
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_breakfast_2"
-                              />
-                            </TableCell>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[1]}
 
-                            <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_lunch_2"
-                              />
-                            </TableCell>
+                              name="price_breakfast_2"
+                            />
+                          </TableCell>
 
-                            <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_dinner_2"
-                              />
-                            </TableCell>
+                          <TableCell style={{ textAlign: 'center' }}>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px',   minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[1]}
+                              name="price_lunch_2"
+                            />
+                          </TableCell>
 
+                          <TableCell style={{ textAlign: 'center' }}>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[1]}
+                              name="price_dinner_2"
+                            />
+                          </TableCell>
                           </TableRow>
                           <TableRow>
 
@@ -782,37 +841,38 @@ class LifestyleEditor extends React.Component {
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_breakfast_3"
-                              />
-                            </TableCell>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[2]}
 
-                            <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_lunch_3"
-                              />
-                            </TableCell>
+                              name="price_breakfast_3"
+                            />
+                          </TableCell>
 
-                            <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_dinner_3"
-                              />
-                            </TableCell>
+                          <TableCell style={{ textAlign: 'center' }}>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px',   minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[2]}
+                              name="price_lunch_3"
+                            />
+                          </TableCell>
+
+                          <TableCell style={{ textAlign: 'center' }}>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[2]}
+                              name="price_dinner_3"
+                            />
+                          </TableCell>
 
                           </TableRow>
                           <TableRow>
@@ -822,37 +882,38 @@ class LifestyleEditor extends React.Component {
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_breakfast_4"
-                              />
-                            </TableCell>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[3]}
 
-                            <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_lunch_4"
-                              />
-                            </TableCell>
+                              name="price_breakfast_4"
+                            />
+                          </TableCell>
 
-                            <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_dinner_4"
-                              />
-                            </TableCell>
+                          <TableCell style={{ textAlign: 'center' }}>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px',   minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[3]}
+                              name="price_lunch_4"
+                            />
+                          </TableCell>
+
+                          <TableCell style={{ textAlign: 'center' }}>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[3]}
+                              name="price_dinner_4"
+                            />
+                          </TableCell>
 
                           </TableRow>
                           <TableRow>
@@ -867,7 +928,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[4]}
+
                                 name="price_breakfast_5"
                               />
                             </TableCell>
@@ -876,9 +938,9 @@ class LifestyleEditor extends React.Component {
                               <TextField
                                 fullWidth
                                 margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                                style={{ fontSize: '1rem', maxWidth: '100px',   minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[4]}
                                 name="price_lunch_5"
                               />
                             </TableCell>
@@ -889,7 +951,7 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[4]}
                                 name="price_dinner_5"
                               />
                             </TableCell>
@@ -906,7 +968,8 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[5]}
+
                                 name="price_breakfast_6"
                               />
                             </TableCell>
@@ -915,9 +978,9 @@ class LifestyleEditor extends React.Component {
                               <TextField
                                 fullWidth
                                 margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                                style={{ fontSize: '1rem', maxWidth: '100px',   minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[5]}
                                 name="price_lunch_6"
                               />
                             </TableCell>
@@ -928,7 +991,7 @@ class LifestyleEditor extends React.Component {
                                 margin="normal"
                                 style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
                                 inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
+                                value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[5]}
                                 name="price_dinner_6"
                               />
                             </TableCell>
@@ -941,38 +1004,38 @@ class LifestyleEditor extends React.Component {
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_breakfast_7"
-                              />
-                            </TableCell>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[6]}
 
-                            <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_lunch_7"
-                              />
-                            </TableCell>
+                              name="price_breakfast_7"
+                            />
+                          </TableCell>
 
-                            <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_dinner_7"
-                              />
-                            </TableCell>
+                          <TableCell style={{ textAlign: 'center' }}>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px',   minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[6]}
+                              name="price_lunch_7"
+                            />
+                          </TableCell>
 
+                          <TableCell style={{ textAlign: 'center' }}>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[6]}
+                              name="price_dinner_7"
+                            />
+                          </TableCell>
                           </TableRow>
                           <TableRow>
 
@@ -981,37 +1044,38 @@ class LifestyleEditor extends React.Component {
                             </TableCell>
 
                             <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_breakfast_8"
-                              />
-                            </TableCell>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[7]}
 
-                            <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_lunch_8"
-                              />
-                            </TableCell>
+                              name="price_breakfast_8"
+                            />
+                          </TableCell>
 
-                            <TableCell style={{ textAlign: 'center' }}>
-                              <TextField
-                                fullWidth
-                                margin="normal"
-                                style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
-                                inputProps={{ type: 'number' }}
-                                startAdornment={() => <InputAdornment position="start">$</InputAdornment>}
-                                name="price_dinner_8"
-                              />
-                            </TableCell>
+                          <TableCell style={{ textAlign: 'center' }}>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px',   minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[7]}
+                              name="price_lunch_8"
+                            />
+                          </TableCell>
+
+                          <TableCell style={{ textAlign: 'center' }}>
+                            <TextField
+                              fullWidth
+                              margin="normal"
+                              style={{ fontSize: '1rem', maxWidth: '100px', minWidth: '100px' }}
+                              inputProps={{ type: 'number' }}
+                              value={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[7]}
+                              name="price_dinner_8"
+                            />
+                          </TableCell>
 
                           </TableRow>
                         </TableBody>
@@ -1214,7 +1278,7 @@ class LifestyleEditor extends React.Component {
                     <Button
                       style={{ backgroundColor: danger, color: '#FFFFFF' }}
                       raised
-                      onClick={category && category._id ? this.handleRemove.bind(this) : () => this.props.history.push('/categories')}
+                      onClick={lifestyle && lifestyle._id ? this.handleRemove.bind(this) : () => this.props.history.push('/categories')}
                     >
                     Delete
                     </Button>

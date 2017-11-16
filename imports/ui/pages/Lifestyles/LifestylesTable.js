@@ -206,7 +206,7 @@ class LifestylesTable extends React.Component {
                   <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.sortByOptions('SKU')}>
                     <Typography className="body2" type="body2">SKU</Typography></TableCell>
                   <TableCell padding="none" style={{ width: '76%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Category</Typography></TableCell>
+                    <Typography className="body2" type="body2">Lifestyle</Typography></TableCell>
 
                 </TableRow>
               </TableHead>)

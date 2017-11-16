@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { Match } from 'meteor/check';
 import { check } from 'meteor/check';
 import Lifestyles from './Lifestyles';
 import rateLimit from '../../modules/rate-limit';
@@ -9,7 +10,24 @@ Meteor.methods({
     check(lifestyle, {
       title: String,
       restrictions: Array,
+      prices: Object,
+      discountAthletic: Match.Maybe(Number),
+      extraAthletic: Match.Maybe(Number),
+      discountOrExtraTypeAthletic: Match.Maybe(String),
+      discountStudent: Match.Maybe(Number),
+      extraStudent: Match.Maybe(Number),
+      discountOrExtraTypeStudent: Match.Maybe(String),
+      discountSenior: Match.Maybe(Number),
+      extraSenior: Match.Maybe(Number),
+      discountOrExtraTypeSenior: Match.Maybe(String),
     });
+
+    check(lifestyle.prices, {
+      breakfast: [Number],
+      lunch: [Number],
+      dinner: [Number],
+    });
+
 
     const existsLifestyle = Lifestyles.findOne({ title: lifestyle.title });
 
@@ -20,8 +38,14 @@ Meteor.methods({
     let nextSeqItem = getNextSequence('lifestyles');
     nextSeqItem = nextSeqItem.toString();
 
+    const lifestyleToInsert = {
+        SKU: nextSeqItem,
+        ...lifestyle,
+        owner: this.userId,
+    };
+
     try {
-      return Lifestyles.insert({ SKU: nextSeqItem, title: lifestyle.title, restrictions: lifestyle.types, owner: this.userId });
+      return Lifestyles.insert(lifestyleToInsert);
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }

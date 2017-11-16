@@ -6,18 +6,19 @@ import { Meteor } from 'meteor/meteor';
 
 import Grid from 'material-ui/Grid';
 
-import Categories from '../../../api/Categories/Categories';
-import IngredientTypes from '../../../api/IngredientTypes/IngredientTypes';
+import Lifestyles from '../../../api/Lifestyles/Lifestyles';
+import Restrictions from '../../../api/Restrictions/Restrictions';
 
 import LifestyleEditor from '../../components/LifestyleEditor/LifestyleEditor';
 
 import NotFound from '../NotFound/NotFound';
 
-const EditLifestyle = ({ category, history, ingredientTypes, popTheSnackbar }) => (category ? (
+const EditLifestyle = ({ lifestyle, history, restrictions, ingredientTypes, popTheSnackbar }) => (lifestyle ? (
   <div>
     <Grid container className="EditLifestyle SideContent SideContent--spacer-2x--horizontal">
       <LifestyleEditor
-        category={category}
+        lifestyle={lifestyle}
+        restrictions={restrictions}
         potentialSubIngredients={[]}
         popTheSnackbar={popTheSnackbar}
         ingredientTypes={ingredientTypes}
@@ -29,34 +30,28 @@ const EditLifestyle = ({ category, history, ingredientTypes, popTheSnackbar }) =
 ) : <NotFound />);
 
 EditLifestyle.defaultProps = {
-  category: null,
+  lifestyle: null,
 };
 
 EditLifestyle.propTypes = {
-  category: PropTypes.object,
+  lifestyle: PropTypes.object,
   history: PropTypes.object.isRequired,
-  // potentialSubIngredients: PropTypes.isRequired,
-  ingredientTypes: PropTypes.array.isRequired,
-  popTheSnackbar: PropTypes.func.isRequired,
+  newLifestyle: PropTypes.bool.isRequired,
+  // popTheSnackbar: PropTypes.func.isRequired,
+  restrictions: PropTypes.array.requried
 };
 
 export default createContainer(({ match }) => {
-  const categoryId = match.params._id;
-  const subscription = Meteor.subscribe('categories.view', categoryId);
-  const subscription2 = Meteor.subscribe('ingredientTypes');
-
+  const lifestyleId = match.params._id;
+  const subscription = Meteor.subscribe('lifestyles.view', lifestyleId);
+  const subscription2 = Meteor.subscribe('restrictions');
+  
   // let categorySubReady = new ReactiveVar(false);
 
-  // if(subscription.ready()){
-  //   currentIngredientTypes = 
-  // }
 
   return {
     loading: !subscription.ready() && !subscription2.ready(),
-    category: Categories.findOne(categoryId),
-    // allIngredients: Categories.find().fetch(),
-    // potentialSubIngredients: Ingredients.find().fetch(),
-    // currentIngredientTypes: IngredientTypes.find({_id: {$in: ingredient.types }}),
-    ingredientTypes: IngredientTypes.find().fetch(),
+    lifestyle: Lifestyles.findOne(lifestyleId),
+    restrictions: Restrictions.find().fetch(),
   };
 }, EditLifestyle);

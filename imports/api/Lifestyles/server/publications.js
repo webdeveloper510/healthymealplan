@@ -1,23 +1,23 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { Match } from 'meteor/check';
-import Categories from '../Categories';
+import Lifestyles from '../Lifestyles';
 
-Meteor.publish('categories', (selector, options) => {
+Meteor.publish('lifestyles', (selector, options) => {
   check(selector, Match.Any);
   check(options, Match.Any);
 
-  return Categories.find();
+  return Lifestyles.find();
 });
 
 // Note: IngredientTypes.view is also used when editing an existing document.
-Meteor.publish('categories.view', (categoryId) => {
-  check(categoryId, String);
+Meteor.publish('lifestyles.view', (lifestyleId) => {
+  check(lifestyleId, String);
 
-  return Categories.find({ _id: categoryId });
+  return Lifestyles.find({ _id: lifestyleId });
 });
 
-Meteor.publish('categories-all-count', function categoryCount() {
-  Counts.publish(this, 'categories', Categories.find());
+Meteor.publish('lifestyles-all-count', function categoryCount() {
+  Counts.publish(this, 'lifestyles', Lifestyles.find());
 });
 

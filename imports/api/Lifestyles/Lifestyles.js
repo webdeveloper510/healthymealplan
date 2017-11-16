@@ -8,7 +8,7 @@ const Lifestyles = new Mongo.Collection('Lifestyles');
 Lifestyles.allow({
   insert: () => false,
   update: () => false,
-  remove: () => false,
+  remove: () => false,  
 });
 
 Lifestyles.deny({
@@ -35,7 +35,7 @@ Lifestyles.schema = new SimpleSchema({
     label: 'The id of each type',
   },
   prices: {
-    type: Array,
+    type: Object,
     label: 'Prices for this type of lifestyle.',
   },
   'prices.breakfast': {
