@@ -13,7 +13,7 @@ import LifestyleEditor from '../../components/LifestyleEditor/LifestyleEditor';
 
 import NotFound from '../NotFound/NotFound';
 
-const EditLifestyle = ({ lifestyle, history, restrictions, ingredientTypes, popTheSnackbar }) => (lifestyle ? (
+const EditLifestyle = ({ lifestyle, history, restrictions, ingredientTypes, popTheSnackbar, newLifestyle }) => (lifestyle ? (
   <div>
     <Grid container className="EditLifestyle SideContent SideContent--spacer-2x--horizontal">
       <LifestyleEditor
@@ -23,7 +23,7 @@ const EditLifestyle = ({ lifestyle, history, restrictions, ingredientTypes, popT
         popTheSnackbar={popTheSnackbar}
         ingredientTypes={ingredientTypes}
         history={history}
-        newCategory={false}
+        newLifestyle={newLifestyle}
       />
     </Grid>
   </div>
@@ -31,6 +31,7 @@ const EditLifestyle = ({ lifestyle, history, restrictions, ingredientTypes, popT
 
 EditLifestyle.defaultProps = {
   lifestyle: null,
+  newLifestyle: false,
 };
 
 EditLifestyle.propTypes = {
@@ -50,6 +51,7 @@ export default createContainer(({ match }) => {
 
 
   return {
+    newLifestyle: false,
     loading: !subscription.ready() && !subscription2.ready(),
     lifestyle: Lifestyles.findOne(lifestyleId),
     restrictions: Restrictions.find().fetch(),

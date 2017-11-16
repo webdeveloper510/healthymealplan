@@ -56,11 +56,44 @@ Meteor.methods({
       _id: String,
       title: String,
       restrictions: Array,
+      prices: Object,
+      discountAthletic: Match.Maybe(Number),
+      extraAthletic: Match.Maybe(Number),
+      discountOrExtraTypeAthletic: Match.Maybe(String),
+      discountStudent: Match.Maybe(Number),
+      extraStudent: Match.Maybe(Number),
+      discountOrExtraTypeStudent: Match.Maybe(String),
+      discountSenior: Match.Maybe(Number),
+      extraSenior: Match.Maybe(Number),
+      discountOrExtraTypeSenior: Match.Maybe(String),
     });
 
+    let keysToUnset = {};
+
+    if(!lifestyle.hasOwnProperty('extraAthletic') && !lifestyle.hasOwnProperty('discountOrExtraTypeAthletic')){
+      keysToUnset.extraAthletic = '';
+      keysToUnset.discountOrExtraTypeAthletic = '';
+    }
+
+    if(!lifestyle.hasOwnProperty('discountStudent') && !lifestyle.hasOwnProperty('discountOrExtraTypeStudent')){
+      keysToUnset.discountStudent = '';
+      keysToUnset.discountOrExtraTypeStudent = '';
+    }
+
+    if(!lifestyle.hasOwnProperty('discountSenior') && !lifestyle.hasOwnProperty('discountOrExtraTypeSenior')){
+      keysToUnset.discountSenior = '';
+      keysToUnset.discountOrExtraTypeSenior = '';
+    }
+  
+    check(lifestyle.prices, {
+      breakfast: [Number],
+      lunch: [Number],
+      dinner: [Number],
+    });
+    
     try {
       const lifestyleId = lifestyle._id;
-      Lifestyles.update(lifestyleId, { $set: lifestyle });
+      Lifestyles.update(lifestyleId, { $unset: keysToUnset, $set: lifestyle });
       return lifestyleId; // Return _id so we can redirect to document after update.
     } catch (exception) {
       throw new Meteor.Error('500', exception);

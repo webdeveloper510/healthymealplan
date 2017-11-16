@@ -18,6 +18,6 @@ Meteor.publish('lifestyles.view', (lifestyleId) => {
 });
 
 Meteor.publish('lifestyles-all-count', function categoryCount() {
-  Counts.publish(this, 'lifestyles', Lifestyles.find());
+  Counts.publish(this, 'lifestyles-count', Lifestyles.find());
 });
 

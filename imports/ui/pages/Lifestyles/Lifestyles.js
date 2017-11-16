@@ -15,8 +15,8 @@ import ClearIcon from 'material-ui-icons/Clear';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 
-import CategoriesCollection from '../../../api/Categories/Categories';
-import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
+import LifestylesCollection from '../../../api/Lifestyles/Lifestyles';
+import RestrictionsCollection from '../../../api/Restrictions/Restrictions';
 
 import Loading from '../../components/Loading/Loading';
 import LifestylesTable from './LifestylesTable';
@@ -46,14 +46,14 @@ class Lifestyles extends React.Component {
     // console.log(searchValue);
 
     this.setState({
-      searchSelector: $('#search-type-text').val(),
+      searchSelector: $('#search-lifestyles-text').val(),
     });
 
     // const query = {
     //   title: { $regex: searchValue },
     // };
 
-    // if ($('#search-type-text').val() > 1) {
+    // if ($('#search-lifestyles-text').val() > 1) {
     //   this.setState({
     //     searchSelector: query,
     //   });
@@ -69,7 +69,7 @@ class Lifestyles extends React.Component {
   }
 
   clearSearchBox() {
-    $('#search-type-text').val('');
+    $('#search-lifestyles-text').val('');
 
     this.setState({
       searchSelector: {},
@@ -163,23 +163,23 @@ class Lifestyles extends React.Component {
             <Input
               className="input-box"
               style={{ width: '100%', position: 'relative' }}
-              placeholder="Search categories"
+              placeholder="Search lifestyles"
               onKeyUp={this.searchByName.bind(this)}
               inputProps={{
-                id: 'search-type-text',
+                id: 'search-lifestyles-text',
                 'aria-label': 'Description',
               }}
             />
           </div>
           <ListContainer
             limit={50}
-            collection={CategoriesCollection}
-            publication="categories"
+            collection={LifestylesCollection}
+            publication="lifestyles"
             joins={[
               {
-                localProperty: 'types',
-                collection: IngredientTypesCollection,
-                joinAs: 'joinedTypes',
+                localProperty: 'restrictions',
+                collection: RestrictionsCollection,
+                joinAs: 'joinedRestrictions',
               },
             ]}
             options={this.state.options}
@@ -205,17 +205,17 @@ class Lifestyles extends React.Component {
 
 Lifestyles.propTypes = {
   loading: PropTypes.bool.isRequired,
-  categories: PropTypes.arrayOf(PropTypes.object).isRequired,
+  lifestyles: PropTypes.arrayOf(PropTypes.object).isRequired,
   match: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
+  history: PropTypes.isRequired,
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe('categories');
-  const subscription2 = Meteor.subscribe('ingredientTypes');
+  const subscription = Meteor.subscribe('lifestyles');
+  const subscription2 = Meteor.subscribe('restrictions');
 
   return {
     loading: !subscription.ready() && !subscription2.ready(),
-    categories: CategoriesCollection.find().fetch(),
+    lifestyles: LifestylesCollection.find().fetch(),
   };
 }, Lifestyles);

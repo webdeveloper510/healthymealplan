@@ -1,6 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import React from 'react';
+import { createContainer } from 'meteor/react-meteor-data';
 import PropTypes from 'prop-types';
+
 import Table, {
   TableBody,
   TableCell,
@@ -21,13 +23,6 @@ import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
 
-// import DeleteIcon from 'material-ui-icons/Delete';
-// import Tooltip from 'material-ui/Tooltip';
-// import IconButton from 'material-ui/IconButton';
-
-
-import { createContainer } from 'meteor/react-meteor-data';
-// import IngredientsCollection from '../../../api/Ingredients/Ingredients';
 import Loading from '../../components/Loading/Loading';
 
 class LifestylesTable extends React.Component {
@@ -121,11 +116,11 @@ class LifestylesTable extends React.Component {
 
     localStorage.setItem('LifestylesTableDeleted', this.state.selectedCheckboxesNumber);
 
-    const categoryIds = this.state.selectedCheckboxes;
+    const lifestyleIds = this.state.selectedCheckboxes;
 
-    console.log(categoryIds);
+    console.log(lifestyleIds);
 
-    Meteor.call('categories.batchRemove', categoryIds, (error) => {
+    Meteor.call('lifestyles.batchRemove', lifestyleIds, (error) => {
       console.log('inside method');
       if (error) {
         this.props.popTheSnackbar({
@@ -133,7 +128,7 @@ class LifestylesTable extends React.Component {
         });
       } else {
         this.props.popTheSnackbar({
-          message: `${localStorage.getItem('LifestylesTableDeleted')} categories deleted.`,
+          message: `${localStorage.getItem('LifestylesTableDeleted')} lifestyles deleted.`,
         });
       }
     });
@@ -152,7 +147,7 @@ class LifestylesTable extends React.Component {
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No category found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
+        <p style={{ padding: '25px' }} className="subheading">No lifestyle found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
       );
     }
   }
@@ -189,7 +184,7 @@ class LifestylesTable extends React.Component {
           {this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container">
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
-                {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'} selected
+                {this.state.selectedCheckboxesNumber} lifestyle{this.state.selectedCheckboxes.length > 1 ? ('') : 's'} selected
               </Typography>
               <Button style={{ color: '#FFF' }} onClick={this.deleteDialogHandleClickOpen.bind(this)}>Delete</Button>
             </div>
@@ -214,11 +209,7 @@ class LifestylesTable extends React.Component {
             }
             <TableBody>
 
-              {/* <CSSTransitionGroup
-              transitionName="example"
-              transitionEnterTimeout={500}
-              transitionLeaveTimeout={300}
-            > */}
+        
               {
                 this.props.results.map((e, i) => {
                   const isSelected = this.isCheckboxSelected(e._id);
@@ -234,25 +225,25 @@ class LifestylesTable extends React.Component {
                         />
                       </TableCell>
 
-                      <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
+                      <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}>
                         <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
                       </TableCell>
 
                       <TableCell
                         style={{ paddingTop: '10px', paddingBottom: '10px', width: '76%' }}
                         padding="none"
-                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
+                        onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
                       >
 
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
                           {e.title}
                         </Typography>
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {e.joinedTypes ?
+                          {e.joinedRestrictions ?
                             (
-                              e.joinedTypes.length > 1 ? (
-                                `${e.joinedTypes.length} types`
-                              ) : (`${e.joinedTypes.length} type`)
+                              e.joinedRestrictions.length > 1 ? (
+                                `${e.joinedRestrictions.length} restrictions`
+                              ) : (`${e.joinedRestrictions.length} restriction`)
                             )
 
                             : '-'}
@@ -272,7 +263,7 @@ class LifestylesTable extends React.Component {
               <TableRow>
                 <TableCell>
                   <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                    {this.props.count} of {this.props.categoryCount} categories
+                    {this.props.count} of {this.props.lifestyleCount} lifestyles
                   </Typography>
                 </TableCell>
                 <TableCell />
@@ -288,10 +279,10 @@ class LifestylesTable extends React.Component {
         </Paper>
         <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-      Delete {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?
+      Delete {this.state.selectedCheckboxesNumber} lifestyle{this.state.selectedCheckboxes.length > 1 ? '' : 's'}?
           </Typography>
           <DialogContent>
-            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} categories?</DialogContentText>
+            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} lifestyles?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
@@ -313,16 +304,16 @@ LifestylesTable.propTypes = {
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,
   loadMore: PropTypes.func.isRequired,
-  categoryCount: PropTypes.number.isRequired,
+  lifestyleCount: PropTypes.number.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
 
 export default createContainer(() => {
-  const categoryCountSub = Meteor.subscribe('categories-all-count');
+  const lifestyleCountSub = Meteor.subscribe('lifestyles-all-count');
 
   return {
     // ingredientTypes: IngredientsWithTypes.find().fetch(),
-    categoryCount: Counts.get('categories'),
+    lifestyleCount: Counts.get('lifestyles-count'),
   };
 }, LifestylesTable);
