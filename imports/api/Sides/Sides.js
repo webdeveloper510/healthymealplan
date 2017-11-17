@@ -3,21 +3,21 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-const Plates = new Mongo.Collection('Plates');
+const Sides = new Mongo.Collection('Sides');
 
-Plates.allow({
+Sides.allow({
   insert: () => false,
   update: () => false,
   remove: () => false,
 });
 
-Plates.deny({
+Sides.deny({
   insert: () => true,
   update: () => true,
   remove: () => true,
 });
 
-Plates.schema = new SimpleSchema({
+Sides.schema = new SimpleSchema({
 
   SKU: {
     type: String,
@@ -32,6 +32,7 @@ Plates.schema = new SimpleSchema({
   subtitle: {
     type: String,
     label: 'Subtitle of the plate.',
+    optional: true
   },
 
   imageId: {
@@ -42,18 +43,18 @@ Plates.schema = new SimpleSchema({
 
   mealType: {
     type: String,
-    label: 'Meal type of the plate.',
+    label: 'Meal type of the side.',
   },
 
   ingredients: {
     type: Array,
-    label: 'Ingredients belonging to the plate.'
+    label: 'Ingredients belonging to the side.',
   },
 
-  // 'ingredients.$': {
-  //   type: 'String',
-  //   optional: true,
-  // },
+  'ingredients.$': {
+    type: Object,
+    optional: true,
+  },
 
   'ingredients.$._id': {
     type: String,
@@ -88,6 +89,6 @@ Plates.schema = new SimpleSchema({
 
 });
 
-Plates.attachSchema(Plates.schema);
+Sides.attachSchema(Sides.schema);
 
-export default Plates;
+export default Sides;

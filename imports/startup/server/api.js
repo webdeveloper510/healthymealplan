@@ -23,8 +23,12 @@ import '../../api/OAuth/server/methods';
 
 import '../../api/Plates/methods';
 import '../../api/Plates/server/publications';
-
 import '../../api/PlateImages/server/publications';
+
+import '../../api/Sides/methods';
+import '../../api/Sides/server/publications';
+import '../../api/SideImages/server/publications';
+
 
 import '../../api/Users/server/methods';
 import '../../api/Users/server/publications';

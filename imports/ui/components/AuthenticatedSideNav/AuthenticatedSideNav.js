@@ -12,14 +12,15 @@ import ExpandMore from 'material-ui-icons/ExpandMore';
 import HomeIcon from 'material-ui-icons/Home';
 import KitchenIcon from 'material-ui-icons/Kitchen';
 import OrderIcon from 'material-ui-icons/AttachMoney';
-import MealsIcon from 'material-ui-icons/LocalPizza';
+import MealsIcon from 'material-ui-icons/LocalDining';
 import IngredientsIcon from 'material-ui-icons/Layers';
 import TypesIcon from 'material-ui-icons/List';
 import FolderIcon from 'material-ui-icons/Folder';
 
 import LifestylesIcon from 'material-ui-icons/FitnessCenter';
 import RestrictionsIcon from 'material-ui-icons/DoNotDisturbAlt';
-import PlatesIcon from 'material-ui-icons/RoomService';
+import PlatesIcon from 'material-ui-icons/LocalPizza';
+import SidesIcon from 'material-ui-icons/LibraryAdd';
 
 import DeliveryIcon from 'material-ui-icons/LocalShipping';
 import DirectionsIcon from 'material-ui-icons/Directions';
@@ -176,6 +177,15 @@ class AuthenticatedSideNav extends Component {
                   <PlatesIcon className="side-nav-icon" />
                 </ListItemIcon>
                 <ListItemText className="subheading" primary="Mains" />
+              </ListItem>
+            </NavLink>
+
+            <NavLink to="/sides">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <SidesIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Sides" />
               </ListItem>
             </NavLink>
 

@@ -42,7 +42,7 @@ import ChevronLeft from 'material-ui-icons/ChevronLeft';
 import Search from 'material-ui-icons/Search';
 
 import validate from '../../../modules/validate';
-import PlateImages from '../../../api/PlateImages/PlateImages';
+import SideImages from '../../../api/SideImages/SideImages';
 
 
 const danger = red[700];
@@ -53,14 +53,14 @@ const styles = theme => ({
 });
 
 
-class PlateEditor extends React.Component {
+class SideEditor extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
       plateImageSrc: this.props.newPlate == false && this.props.document && this.props.document.image ? this.props.document.image.link() : '',
       value: '', // Autosuggest
-      valueMealType: this.props.plate ? this.props.plate.mealType : 'Breakfast',
+      valueMealType: this.props.plate ? this.props.plate.mealType : 'Desserts',
       suggestions: [],
       subIngredients: this.props.plate && this.props.plate.ingredients ? _.sortBy(this.props.plate.ingredients, 'title') : [],
       deleteDialogOpen: false,
@@ -82,9 +82,9 @@ class PlateEditor extends React.Component {
           required: true,
         },
 
-        subtitle: {
-          required: true,
-        },
+        // subtitle: {
+        //   required: true,
+        // },
 
         // plateImage: {
         //   required: true,
@@ -198,11 +198,11 @@ class PlateEditor extends React.Component {
 
     const existingPlate = plate && plate._id;
     localStorage.setItem('plateDeleted', plate.title);
-    const plateDeletedMessage = `${localStorage.getItem('plateDeleted')} deleted from main courses.`;
+    const plateDeletedMessage = `${localStorage.getItem('plateDeleted')} deleted from sides.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('plates.remove', existingPlate, (error) => {
+    Meteor.call('sides.remove', existingPlate, (error) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
@@ -212,7 +212,7 @@ class PlateEditor extends React.Component {
           message: plateDeletedMessage,
         });
 
-        history.push('/plates');
+        history.push('/sides');
       }
     });
   }
@@ -225,19 +225,18 @@ class PlateEditor extends React.Component {
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
     const existingPlate = this.props.plate && this.props.plate._id;
-    const methodToCall = existingPlate ? 'plates.update' : 'plates.insert';
+    const methodToCall = existingPlate ? 'sides.update' : 'sides.insert';
 
     const plate = {
       title: document.querySelector('#title').value.trim(),
       subtitle: document.querySelector('#subtitle').value.trim(),
       mealType: this.state.valueMealType.trim(),
-      ingredients: this.state.subIngredients || [],
+      ingredients: this.state.subIngredients,
     };
 
     if (existingPlate) plate._id = existingPlate;
 
     console.log(plate);
-
 
     Meteor.call(methodToCall, plate, (error, plateId) => {
       if (error) {
@@ -247,12 +246,12 @@ class PlateEditor extends React.Component {
       } else {
         localStorage.setItem('plateForSnackbar', plate.title || $('[name="title"]').val());
 
-        const confirmation = existingPlate ? (`${localStorage.getItem('plateForSnackbar')} main course updated.`)
-          : `${localStorage.getItem('plateForSnackbar')} main course added.`;
+        const confirmation = existingPlate ? (`${localStorage.getItem('plateForSnackbar')} side updated.`)
+          : `${localStorage.getItem('plateForSnackbar')} side added.`;
 
         if (this.state.imageFieldChanged) {
           if (existingPlate) {
-            PlateImages.remove({ _id: existingPlate.imageId });
+            SideImages.remove({ _id: existingPlate.imageId });
             this.uploadFile(document.getElementById('plateImage').files[0], plateId, confirmation);
           } else {
             this.uploadFile(document.getElementById('plateImage').files[0], plateId, confirmation);
@@ -261,26 +260,18 @@ class PlateEditor extends React.Component {
           popTheSnackbar({
             message: confirmation,
             buttonText: 'View',
-            buttonLink: `/plates/${plateId}/edit`,
+            buttonLink: `/sides/${plateId}/edit`,
           });
 
-          history.push('/plates');
+          history.push('/sides');
         }
       }
-
-      // popTheSnackbar({
-      //   message: confirmation,
-      //   buttonText: 'View',
-      //   buttonLink: `/plates/${plateId}/edit`,
-      // });
-
-      // history.push('/plates');
     });
   }
 
   uploadFile(file, plateId, confirmation) {
     // console.log(plateImage);
-    const upload = PlateImages.insert({
+    const upload = SideImages.insert({
       file,
       streams: 'dynamic',
       chunkSize: 'dynamic',
@@ -307,17 +298,17 @@ class PlateEditor extends React.Component {
       // };
       console.log(plateId);
 
-      Meteor.call('plates.updateImageId', { _id: plateId, imageId: upload.config.fileId }, (err, plateId) => {
+      Meteor.call('sides.updateImageId', { _id: plateId, imageId: upload.config.fileId }, (err, plateId) => {
         if (err) {
           console.log(err);
         } else {
           this.props.popTheSnackbar({
             message: confirmation,
             buttonText: 'View',
-            buttonLink: `/plates/${plateId}/edit`,
+            buttonLink: `/sides/${plateId}/edit`,
           });
 
-          this.props.history.push('/plates');
+          this.props.history.push('/sides');
         }
       });
 
@@ -447,9 +438,9 @@ class PlateEditor extends React.Component {
         <Grid container justify="center">
           <Grid item xs={12}>
 
-            <Button onClick={() => this.props.history.push('/plates')} className="button button-secondary button-secondary--top">
+            <Button onClick={() => this.props.history.push('/sides')} className="button button-secondary button-secondary--top">
               <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                <ChevronLeft style={{ marginRight: '4px' }} /> Mains</Typography>
+                <ChevronLeft style={{ marginRight: '4px' }} /> Sides</Typography>
             </Button>
 
           </Grid>
@@ -457,7 +448,7 @@ class PlateEditor extends React.Component {
 
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={4}>
-            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{plate && plate._id ? `${plate.title}` : 'Add main'}</Typography>
+            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{plate && plate._id ? `${plate.title}` : 'Add side'}</Typography>
 
             {this.props.plate ?
               (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1"> SKU {plate.SKU ? plate.SKU : ''} </Typography>)
@@ -466,7 +457,7 @@ class PlateEditor extends React.Component {
           </Grid>
           <Grid item xs={8}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/plates')}>Cancel</Button>
+              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/sides')}>Cancel</Button>
               <Button disabled={!this.state.hasFormChanged} className="btn btn-primary" raised type="submit" color="contrast">Save</Button>
             </div>
           </Grid>
@@ -478,7 +469,7 @@ class PlateEditor extends React.Component {
             <Grid container>
               <Grid item xs={12} sm={4}>
                 <Typography type="subheading" className="subheading font-medium">
-                Main
+                Side
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
@@ -516,9 +507,7 @@ class PlateEditor extends React.Component {
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
-                <Typography type="subheading" className="subheading font-medium">
-                Meal type
-                </Typography>
+                <Typography type="subheading" className="subheading font-medium">Meal type</Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
@@ -532,9 +521,9 @@ class PlateEditor extends React.Component {
                     SelectProps={{ native: false }}
                     name="type"
                   >
-                    <MenuItem key={2} value="Breakfast">Breakfast</MenuItem>
-                    <MenuItem key={3} value="Lunch">Lunch</MenuItem>
-                    <MenuItem key={4} value="Dinner">Dinner</MenuItem>
+                    <MenuItem key={2} value="Desserts">Desserts</MenuItem>
+                    <MenuItem key={3} value="Snacks">Snacks</MenuItem>
+                    <MenuItem key={4} value="Juices">Juices</MenuItem>
 
                   </TextField>
                 </Paper>
@@ -670,11 +659,11 @@ class PlateEditor extends React.Component {
   }
 }
 
-PlateEditor.propTypes = {
+SideEditor.propTypes = {
   plate: PropTypes.object,
   potentialSubIngredients: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
-export default PlateEditor;
+export default SideEditor;

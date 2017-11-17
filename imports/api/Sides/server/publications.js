@@ -4,22 +4,22 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import { Match } from 'meteor/check';
 
-import Plates from '../Plates';
+import Sides from '../Sides';
 
-Meteor.publish('plates', (selector, options) => {
+Meteor.publish('sides', (selector, options) => {
   check(selector, Match.Any);
   check(options, Match.Any);
 
-  return Plates.find(selector, options);
+  return Sides.find(selector, options);
 });
 
 
-Meteor.publish('plates-all-count', function () {
-  Counts.publish(this, 'plates', Plates.find());
+Meteor.publish('sides-all-count', function () {
+  Counts.publish(this, 'sides', Sides.find());
 });
 
 // Note: Plates.view is also used when editing an existing plate.
-Meteor.publish('plates.view', (plateId) => {
+Meteor.publish('sides.view', (plateId) => {
   check(plateId, String);
-  return Plates.find({ _id: plateId });
+  return Sides.find({ _id: plateId });
 });

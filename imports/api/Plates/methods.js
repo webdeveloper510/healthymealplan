@@ -14,6 +14,8 @@ Meteor.methods({
       ingredients: Array,
     });
 
+    console.log(plate);
+
     console.log('Reaching here');
 
     const existingPlate = Plates.findOne({ title: plate.title });
@@ -47,6 +49,13 @@ Meteor.methods({
       mealType: String,
       ingredients: Array,
     });
+
+    // check(plate.ingredients, {
+    //   _id: String,
+    //   title: String,
+    // });
+
+    console.log(plate);
 
     try {
       const plateId = plate._id;

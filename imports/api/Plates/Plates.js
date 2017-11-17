@@ -47,13 +47,13 @@ Plates.schema = new SimpleSchema({
 
   ingredients: {
     type: Array,
-    label: 'Ingredients belonging to the plate.'
+    label: 'Ingredients belonging to the plate.',
   },
 
-  // 'ingredients.$': {
-  //   type: 'String',
-  //   optional: true,
-  // },
+  'ingredients.$': {
+    type: Object,
+    optional: true,
+  },
 
   'ingredients.$._id': {
     type: String,

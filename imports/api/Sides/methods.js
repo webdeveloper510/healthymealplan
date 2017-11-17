@@ -1,46 +1,53 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
-import Plates from './Plates';
+import Sides from './Sides';
 import rateLimit from '../../modules/rate-limit';
 
 import { getNextSequence } from '../../modules/server/get-next-sequence';
 
 Meteor.methods({
-  'plates.insert': function platesInsert(plate) {
-    check(plate, {
+  'sides.insert': function sidesInsert(side) {
+    check(side, {
       title: String,
       subtitle: String,
       mealType: String,
       ingredients: Array,
     });
 
+    // check(side.ingredients, {
+    //   _id: String,
+    //   title: String,
+    // });
+
+    console.log(side);
+
     console.log('Reaching here');
 
-    const existingPlate = Plates.findOne({ title: plate.title });
-    console.log(existingPlate);
+    const existingSide = Sides.findOne({ title: side.title });
+    console.log(existingSide);
 
-    if (existingPlate) {
-      throw new Meteor.Error('500', `${plate.title} is already present`);
+    if (existingSide) {
+      throw new Meteor.Error('500', `${side.title} is already present`);
     }
 
-    let nextSeqItem = getNextSequence('plates');
+    let nextSeqItem = getNextSequence('sides');
     nextSeqItem = nextSeqItem.toString();
 
     try {
-      return Plates.insert({
+      return Sides.insert({
         SKU: nextSeqItem,
-        title: plate.title,
-        subtitle: plate.subtitle,
-        ingredients: plate.ingredients,
-        mealType: plate.mealType,
+        title: side.title,
+        subtitle: side.subtitle,
+        ingredients: side.ingredients,
+        mealType: side.mealType,
         createdBy: this.userId,
       });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
-  'plates.update': function platesUpdate(plate) {
-    check(plate, {
+  'sides.update': function sidesUpdate(side) {
+    check(side, {
       _id: String,
       title: String,
       subtitle: String,
@@ -49,56 +56,56 @@ Meteor.methods({
     });
 
     try {
-      const plateId = plate._id;
+      const sideId = side._id;
 
-      Plates.update(plateId, {
+      Sides.update(sideId, {
         $set: {
-          ...plate,
+          ...side,
         },
       });
 
-      return plateId; // Return _id so we can redirect to document after update.
+      return sideId; // Return _id so we can redirect to document after update.
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
 
-  'plates.updateImageId': function platesUpdate(plate) {
-    check(plate, {
+  'sides.updateImageId': function sidesUpdate(side) {
+    check(side, {
       _id: String,
       imageId: String,
     });
 
     try {
-      const plateId = plate._id;
+      const sideId = side._id;
 
-      Plates.update(plateId, {
+      Sides.update(sideId, {
         $set: {
-          imageId: plate.imageId,
+          imageId: side.imageId,
         },
       });
 
-      return plateId; // Return _id so we can redirect to document after update.
+      return sideId; // Return _id so we can redirect to document after update.
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
-  'plates.remove': function platesRemove(plateId) {
-    check(plateId, String);
+  'sides.remove': function sidesRemove(sideId) {
+    check(sideId, String);
 
     try {
-      return Plates.remove(plateId);
+      return Sides.remove(sideId);
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
 
-  'plates.batchRemove': function platesBatchRemove(plateIds) {
-    check(plateIds, Array);
-    console.log('Server: plates.batchRemove');
+  'sides.batchRemove': function sidesBatchRemove(sideIds) {
+    check(sideIds, Array);
+    console.log('Server: sides.batchRemove');
 
     try {
-      return Plates.remove({ _id: { $in: plateIds } });
+      return Sides.remove({ _id: { $in: sideIds } });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
@@ -109,11 +116,11 @@ Meteor.methods({
 
 rateLimit({
   methods: [
-    'plates.insert',
-    'plates.update',
-    'plates.remove',
-    'plates.batchRemove',
-    'plates.updateImageId',
+    'sides.insert',
+    'sides.update',
+    'sides.remove',
+    'sides.batchRemove',
+    'sides.updateImageId',
   ],
   limit: 5,
   timeRange: 1000,
