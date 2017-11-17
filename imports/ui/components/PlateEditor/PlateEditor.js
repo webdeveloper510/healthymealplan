@@ -449,7 +449,7 @@ class PlateEditor extends React.Component {
 
             <Button onClick={() => this.props.history.push('/plates')} className="button button-secondary button-secondary--top">
               <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                <ChevronLeft style={{ marginRight: '4px' }} /> Main Courses</Typography>
+                <ChevronLeft style={{ marginRight: '4px' }} /> Mains</Typography>
             </Button>
 
           </Grid>
@@ -457,7 +457,7 @@ class PlateEditor extends React.Component {
 
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={4}>
-            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{plate && plate._id ? `${plate.title}` : 'Add main course'}</Typography>
+            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{plate && plate._id ? `${plate.title}` : 'Add main'}</Typography>
 
             {this.props.plate ?
               (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1"> SKU {plate.SKU ? plate.SKU : ''} </Typography>)
@@ -478,7 +478,7 @@ class PlateEditor extends React.Component {
             <Grid container>
               <Grid item xs={12} sm={4}>
                 <Typography type="subheading" className="subheading font-medium">
-                Main course
+                Main
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>

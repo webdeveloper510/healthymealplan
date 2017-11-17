@@ -12,7 +12,7 @@ import ExpandMore from 'material-ui-icons/ExpandMore';
 import HomeIcon from 'material-ui-icons/Home';
 import KitchenIcon from 'material-ui-icons/Kitchen';
 import OrderIcon from 'material-ui-icons/AttachMoney';
-import MealsIcon from 'material-ui-icons/LocalDining';
+import MealsIcon from 'material-ui-icons/LocalPizza';
 import IngredientsIcon from 'material-ui-icons/Layers';
 import TypesIcon from 'material-ui-icons/List';
 import FolderIcon from 'material-ui-icons/Folder';
@@ -43,6 +43,7 @@ class AuthenticatedSideNav extends Component {
       settingsOpen: false,
       kitchenOpen: false,
       deliveryOpen: false,
+      ordersOpen: false
     };
   }
 
@@ -67,6 +68,12 @@ class AuthenticatedSideNav extends Component {
   handleToggleDelivery() {
     this.setState({
       deliveryOpen: !this.state.deliveryOpen,
+    });
+  }
+
+  handleToggleOrder() {
+    this.setState({
+      ordersOpen: !this.state.ordersOpen,
     });
   }
 
@@ -121,8 +128,32 @@ class AuthenticatedSideNav extends Component {
             </ListItem>
           </NavLink>
 
+          <ListItem button onClick={this.handleToggleOrder.bind(this)}>
+            <ListItemIcon>
+              <OrderIcon className="side-nav-icon" />
+            </ListItemIcon>
 
-          <ListItem button className={this.isListItemActive(['/ingredients', '/types'])} onClick={this.handleToggleKitchen.bind(this)}>
+            <ListItemText className="subheading" primary="Orders" />
+            {this.state.ordersOpen ? <ExpandLess /> : <ExpandMore />}
+
+          </ListItem>
+
+          <Collapse in={this.state.ordersOpen} transitionDuration="auto" unmountOnExit>
+
+            <NavLink to="/lifestyles">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <LifestylesIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Lifestyles" />
+              </ListItem>
+            </NavLink>
+
+
+          </Collapse>
+
+
+          <ListItem button onClick={this.handleToggleKitchen.bind(this)}>
 
             <ListItemIcon>
               <KitchenIcon className="side-nav-icon" />
@@ -144,9 +175,10 @@ class AuthenticatedSideNav extends Component {
                 <ListItemIcon>
                   <PlatesIcon className="side-nav-icon" />
                 </ListItemIcon>
-                <ListItemText className="subheading" primary="Main Courses" />
+                <ListItemText className="subheading" primary="Mains" />
               </ListItem>
             </NavLink>
+
             <NavLink to="/meals">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
@@ -182,15 +214,6 @@ class AuthenticatedSideNav extends Component {
                 </ListItemIcon>
 
                 <ListItemText className="subheading" primary="Categories" />
-              </ListItem>
-            </NavLink>
-
-            <NavLink to="/lifestyles">
-              <ListItem className="padding-left-nested-item" button>
-                <ListItemIcon>
-                  <LifestylesIcon className="side-nav-icon" />
-                </ListItemIcon>
-                <ListItemText className="subheading" primary="Lifestyles" />
               </ListItem>
             </NavLink>
 

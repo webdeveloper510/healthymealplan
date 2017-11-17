@@ -141,6 +141,15 @@ class LifestyleEditor extends React.Component {
       },
       submitHandler() { component.handleSubmit(); },
     });
+
+    $('[name*="price_"]').on('change', () => {
+
+      this.setState({
+        hasFormChanged: true,
+        restrictions: clonedRestrictions,
+      });
+
+    });
   }
 
 
@@ -362,7 +371,7 @@ class LifestyleEditor extends React.Component {
 
     }
 
-    if (this.state.discountOrExtraSelectedStudent && this.state.value) {
+    if (this.state.discountOrExtraSelectedStudent) {
       const discountOrExtraStudent = `${this.state.valueDiscountOrExtraStudent}Student`;
 
       lifestyle[discountOrExtraStudent] = parseFloat(this.state.discountOrExtraAmountStudent);
@@ -587,6 +596,12 @@ class LifestyleEditor extends React.Component {
     });
   }
 
+  changeTableField(){
+    this.setState({
+      hasFormChanged: true
+    });  
+  }
+
   render() {
     // console.log(this.props);
     const { lifestyle, history } = this.props;
@@ -775,6 +790,7 @@ class LifestyleEditor extends React.Component {
                                 defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[0]}
 
                                 name="price_breakfast_1"
+                                onChange={this.changeTableField.bind(this)}
                               />
                             </TableCell>
 
@@ -786,6 +802,7 @@ class LifestyleEditor extends React.Component {
                                 inputProps={{ type: 'number' }}
                                 defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[0]}
                                 name="price_lunch_1"
+                                onChange={this.changeTableField.bind(this)}
                               />
                             </TableCell>
 
@@ -797,6 +814,7 @@ class LifestyleEditor extends React.Component {
                                 inputProps={{ type: 'number' }}
                                 defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[0]}
                                 name="price_dinner_1"
+                                onChange={this.changeTableField.bind(this)}
                               />
                             </TableCell>
 
@@ -816,6 +834,7 @@ class LifestyleEditor extends React.Component {
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[1]}
 
                               name="price_breakfast_2"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -827,6 +846,7 @@ class LifestyleEditor extends React.Component {
                               inputProps={{ type: 'number' }}
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[1]}
                               name="price_lunch_2"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -838,6 +858,7 @@ class LifestyleEditor extends React.Component {
                               inputProps={{ type: 'number' }}
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[1]}
                               name="price_dinner_2"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
                           </TableRow>
@@ -856,6 +877,7 @@ class LifestyleEditor extends React.Component {
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[2]}
 
                               name="price_breakfast_3"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -867,6 +889,7 @@ class LifestyleEditor extends React.Component {
                               inputProps={{ type: 'number' }}
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[2]}
                               name="price_lunch_3"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -878,6 +901,7 @@ class LifestyleEditor extends React.Component {
                               inputProps={{ type: 'number' }}
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[2]}
                               name="price_dinner_3"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -897,6 +921,7 @@ class LifestyleEditor extends React.Component {
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[3]}
 
                               name="price_breakfast_4"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -908,6 +933,7 @@ class LifestyleEditor extends React.Component {
                               inputProps={{ type: 'number' }}
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[3]}
                               name="price_lunch_4"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -919,6 +945,7 @@ class LifestyleEditor extends React.Component {
                               inputProps={{ type: 'number' }}
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[3]}
                               name="price_dinner_4"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -938,6 +965,7 @@ class LifestyleEditor extends React.Component {
                                 defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[4]}
 
                                 name="price_breakfast_5"
+                                onChange={this.changeTableField.bind(this)}
                               />
                             </TableCell>
 
@@ -949,6 +977,7 @@ class LifestyleEditor extends React.Component {
                                 inputProps={{ type: 'number' }}
                                 defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[4]}
                                 name="price_lunch_5"
+                                onChange={this.changeTableField.bind(this)}
                               />
                             </TableCell>
 
@@ -960,6 +989,7 @@ class LifestyleEditor extends React.Component {
                                 inputProps={{ type: 'number' }}
                                 defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[4]}
                                 name="price_dinner_5"
+                                onChange={this.changeTableField.bind(this)}
                               />
                             </TableCell>
                           </TableRow>
@@ -978,6 +1008,7 @@ class LifestyleEditor extends React.Component {
                                 defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[5]}
 
                                 name="price_breakfast_6"
+                                onChange={this.changeTableField.bind(this)}
                               />
                             </TableCell>
 
@@ -989,6 +1020,7 @@ class LifestyleEditor extends React.Component {
                                 inputProps={{ type: 'number' }}
                                 defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[5]}
                                 name="price_lunch_6"
+                                onChange={this.changeTableField.bind(this)}
                               />
                             </TableCell>
 
@@ -1000,6 +1032,7 @@ class LifestyleEditor extends React.Component {
                                 inputProps={{ type: 'number' }}
                                 defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[5]}
                                 name="price_dinner_6"
+                                onChange={this.changeTableField.bind(this)}
                               />
                             </TableCell>
 
@@ -1019,6 +1052,7 @@ class LifestyleEditor extends React.Component {
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[6]}
 
                               name="price_breakfast_7"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -1030,6 +1064,7 @@ class LifestyleEditor extends React.Component {
                               inputProps={{ type: 'number' }}
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[6]}
                               name="price_lunch_7"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -1041,6 +1076,7 @@ class LifestyleEditor extends React.Component {
                               inputProps={{ type: 'number' }}
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[6]}
                               name="price_dinner_7"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
                           </TableRow>
@@ -1059,6 +1095,7 @@ class LifestyleEditor extends React.Component {
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.breakfast[7]}
 
                               name="price_breakfast_8"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -1070,6 +1107,7 @@ class LifestyleEditor extends React.Component {
                               inputProps={{ type: 'number' }}
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.lunch[7]}
                               name="price_lunch_8"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -1081,6 +1119,7 @@ class LifestyleEditor extends React.Component {
                               inputProps={{ type: 'number' }}
                               defaultValue={this.props.newLifestyle ? '' : this.props.lifestyle.prices.dinner[7]}
                               name="price_dinner_8"
+                              onChange={this.changeTableField.bind(this)}
                             />
                           </TableCell>
 
@@ -1277,12 +1316,13 @@ class LifestyleEditor extends React.Component {
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={4}>
-                {
+                { //                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
                   this.props.newLifestyle ? '' : (
                     <Button
-                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
+
                       raised
                       onClick={lifestyle && lifestyle._id ? this.handleRemove.bind(this) : () => this.props.history.push('/categories')}
+                      disabled={true}
                     >
                     Delete
                     </Button>

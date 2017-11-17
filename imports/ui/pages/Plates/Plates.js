@@ -160,10 +160,10 @@ class Plates extends React.Component {
           <Grid container className="SideContent SideContent--spacer-2x--top SideContent--spacer-2x--horizontal">
             <Grid container className="clearfix">
               <Grid item xs={6}>
-                <Typography type="headline" gutterBottom className="pull-left headline" style={{ fontWeight: 500 }} color="inherit">Main Courses</Typography>
+                <Typography type="headline" gutterBottom className="pull-left headline" style={{ fontWeight: 500 }} color="inherit">Mains</Typography>
               </Grid>
               <Grid item xs={6}>
-                <Button className="btn btn-primary" raised color="primary" style={{ float: 'right' }} onClick={() => this.props.history.push('/plates/new')}>Add main course</Button>
+                <Button className="btn btn-primary" raised color="primary" style={{ float: 'right' }} onClick={() => this.props.history.push('/plates/new')}>Add main</Button>
               </Grid>
             </Grid>
 
