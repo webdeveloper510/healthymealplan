@@ -165,7 +165,7 @@ class Meals extends React.Component {
               <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
 
                 <Tab label="All" onClick={() => this.searchByKey('', '')} />
-                <Tab label="Main Courses" onClick={() => this.searchByKey('type', 'Main Course')} />
+                <Tab label="Mains" onClick={() => this.searchByKey('type', 'Main')} />
                 <Tab label="Sides" onClick={() => this.searchByKey('type', 'Side')} />
               </Tabs>
             </AppBar>

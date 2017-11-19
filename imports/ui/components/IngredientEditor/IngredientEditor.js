@@ -29,6 +29,11 @@ import Dialog, {
 } from 'material-ui/Dialog';
 
 
+import classNames from 'classnames';
+import { withStyles } from 'material-ui/styles';
+import { CircularProgress } from 'material-ui/Progress';
+import green from 'material-ui/colors/green';
+
 import Chip from 'material-ui/Chip';
 import Paper from 'material-ui/Paper';
 
@@ -47,8 +52,35 @@ const primary = teal[500];
 const danger = red[700];
 
 const styles = theme => ({
-
-
+  root: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  wrapper: {
+    margin: theme.spacing.unit,
+    position: 'relative',
+  },
+  buttonSuccess: {
+    backgroundColor: green[500],
+    '&:hover': {
+      backgroundColor: green[700],
+    },
+  },
+  fabProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: -6,
+    left: -6,
+    zIndex: 1,
+  },
+  buttonProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  },
 });
 
 
@@ -66,6 +98,8 @@ class IngredientEditor extends React.Component {
       selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
       hasFormChanged: false,
+      submitLoading: false,
+      submitSuccess: false,
     };
   }
 
@@ -246,6 +280,11 @@ class IngredientEditor extends React.Component {
   }
 
   handleSubmit() {
+    this.setState({
+        submitSuccess: false,
+        submitLoading: true
+    });
+
     const { history, popTheSnackbar } = this.props;
     const existingIngredient = this.props.ingredient && this.props.ingredient._id;
     const methodToCall = existingIngredient ? 'ingredients.update' : 'ingredients.insert';
@@ -276,7 +315,18 @@ class IngredientEditor extends React.Component {
         popTheSnackbar({
           message: error.reason,
         });
+
+        this.setState({
+          submitSuccess: false,
+          submitLoading: false,
+      });
       } else {
+
+        this.setState({
+          submitSuccess: true,
+          submitLoading: false
+        })
+
         localStorage.setItem('ingredientForSnackbar', ingredient.title || $('[name="title"]').val());
 
         const confirmation = existingIngredient ? (`${localStorage.getItem('ingredientForSnackbar')} ingredient updated.`)
@@ -292,6 +342,7 @@ class IngredientEditor extends React.Component {
         history.push('/ingredients');
       }
     });
+    
   }
 
   renderDeleteDialog() {
@@ -443,12 +494,15 @@ class IngredientEditor extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     const { ingredient, ingredientTypes, history } = this.props;
 
     if (!ingredient || !ingredientTypes) {
       return ('<h1>Loading</h1>');
     }
+
+    const buttonClassname = classNames({
+      [this.props.classes.buttonSuccess]: this.state.submitSuccess,
+    });
 
     return (
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
@@ -475,7 +529,12 @@ class IngredientEditor extends React.Component {
           <Grid item xs={8}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
               <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
-              <Button disabled={!this.state.hasFormChanged} className="btn btn-primary" raised type="submit" color="contrast">Save</Button>
+              <Button disabled={ this.state.submitLoading || !this.state.hasFormChanged} className={`btn btn-primary ${buttonClassname}`} raised type="submit" color="contrast">
+              Save
+
+              {this.state.submitLoading && <CircularProgress size={24} className={this.props.classes.buttonProgress} />}
+
+              </Button>
             </div>
           </Grid>
         </Grid>
@@ -681,8 +740,10 @@ class IngredientEditor extends React.Component {
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                   <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
-                  <Button disabled={!this.state.hasFormChanged} type="submit" className="btn btn-primary" raised color="contrast">
+                  <Button disabled={ this.state.submitLoading || !this.state.hasFormChanged} type="submit" className={`btn btn-primary ${buttonClassname}`} raised color="contrast">
                    Save
+                   {this.state.submitLoading && <CircularProgress size={24} className={this.props.classes.buttonProgress} />}
+
                   </Button>
                 </div>
               </Grid>
@@ -707,4 +768,4 @@ IngredientEditor.propTypes = {
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
-export default IngredientEditor;
+export default withStyles(styles)(IngredientEditor);

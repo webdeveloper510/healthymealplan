@@ -232,7 +232,7 @@ class MealEditor extends React.Component {
                 onChange={this.handleMealTypeChange.bind(this)}
                 SelectProps={{ native: false }}
               >
-                <MenuItem key={1} value="Main Course">Main Course</MenuItem>
+                <MenuItem key={1} value="Main Course">Main</MenuItem>
                 <MenuItem key={2} value="Side">Side</MenuItem>
               </TextField>
 

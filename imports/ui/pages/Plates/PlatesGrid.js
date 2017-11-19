@@ -221,7 +221,7 @@ class PlatesGrid extends React.Component {
         </Grid>
 
         <Typography className="font-medium" type="body2" style={{ marginTop: '25px', color: 'rgba(0, 0, 0, .54)' }}>
-          Showing {this.props.count} of {this.props.plateCount} plates
+          Showing {this.props.count} of {this.props.plateCount} mains
         </Typography>
 
         { this.props.hasMore ? <Button onClick={this.props.loadMore}>Load More</Button> : '' }
@@ -231,7 +231,7 @@ class PlatesGrid extends React.Component {
               Delete {this.state.selectedCheckboxesNumber} ingredients?
           </Typography>
           <DialogContent>
-            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} ingredients?</DialogContentText>
+            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} mains?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">

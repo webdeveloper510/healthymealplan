@@ -25,6 +25,8 @@ import SidesIcon from 'material-ui-icons/LibraryAdd';
 import DeliveryIcon from 'material-ui-icons/LocalShipping';
 import DirectionsIcon from 'material-ui-icons/Directions';
 import RoutesIcon from 'material-ui-icons/MyLocation';
+import DriversIcon from 'material-ui-icons/DriveEta';
+
 import CustomersIcon from 'material-ui-icons/People';
 import SettingsIcon from 'material-ui-icons/Settings';
 import TeamIcon from 'material-ui-icons/SupervisorAccount';
@@ -153,6 +155,15 @@ class AuthenticatedSideNav extends Component {
 
           </Collapse>
 
+          <NavLink to="/customers">
+            <ListItem button>
+              <ListItemIcon>
+                <CustomersIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Customers" />
+            </ListItem>
+          </NavLink>
+
 
           <ListItem button onClick={this.handleToggleKitchen.bind(this)}>
 
@@ -171,6 +182,7 @@ class AuthenticatedSideNav extends Component {
               </ListItemIcon>
               <ListItemText className="subheading" primary="Orders" />
             </ListItem> */}
+            
             <NavLink to="/plates">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
@@ -237,6 +249,48 @@ class AuthenticatedSideNav extends Component {
             </NavLink>
 
           </Collapse>
+
+          <ListItem button onClick={this.handleToggleDelivery.bind(this)}>
+
+            <ListItemIcon>
+              <DeliveryIcon className="side-nav-icon" />
+            </ListItemIcon>
+            <ListItemText className="subheading" primary="Delivery" />
+            {this.state.deliveryOpen ? <ExpandLess /> : <ExpandMore />}
+
+          </ListItem>
+
+          <Collapse in={this.state.deliveryOpen} transitionDuration="auto" unmountOnExit>
+
+            <NavLink to="/directions">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <DirectionsIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Directions" />
+              </ListItem>
+            </NavLink>
+
+            <NavLink to="/routes">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <RoutesIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Routes" />
+              </ListItem>
+            </NavLink>
+
+            <NavLink to="/drivers">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <DriversIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Drivers" />
+              </ListItem>
+            </NavLink>
+
+          </Collapse>
+
 
           {/* <ListItem button onClick={this.handleToggleDelivery.bind(this)}>
 

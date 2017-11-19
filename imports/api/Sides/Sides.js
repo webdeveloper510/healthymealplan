@@ -32,7 +32,7 @@ Sides.schema = new SimpleSchema({
   subtitle: {
     type: String,
     label: 'Subtitle of the plate.',
-    optional: true
+    optional: true,
   },
 
   imageId: {
