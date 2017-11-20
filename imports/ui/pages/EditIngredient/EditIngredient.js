@@ -13,7 +13,7 @@ import IngredientEditor from '../../components/IngredientEditor/IngredientEditor
 
 import NotFound from '../NotFound/NotFound';
 
-const EditIngredient = ({ ingredient, history, potentialSubIngredients, ingredientTypes, popTheSnackbar }) => (ingredient ? (
+const EditIngredient = ({ ingredient, history, potentialSubIngredients, newIngredient, ingredientTypes, popTheSnackbar }) => (ingredient ? (
   <div>
     <Grid container className="EditIngredient SideContent SideContent--spacer-2x--horizontal">
       <IngredientEditor
@@ -22,6 +22,7 @@ const EditIngredient = ({ ingredient, history, potentialSubIngredients, ingredie
         popTheSnackbar={popTheSnackbar}
         ingredientTypes={ingredientTypes}
         history={history}
+        newIngredient={newIngredient}
       />
     </Grid>
   </div>
@@ -45,6 +46,7 @@ export default createContainer(({ match }) => {
   const subscription2 = Meteor.subscribe('ingredientTypes');
 
   return {
+    newIngredient: false,
     loading: !subscription.ready() || !subscription2.ready(),
     ingredient: Ingredients.findOne(ingredientId),
     allIngredients: Ingredients.find().fetch(),
