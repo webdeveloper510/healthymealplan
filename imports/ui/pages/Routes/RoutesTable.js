@@ -276,7 +276,7 @@ class RoutesTable extends React.Component {
               <TableRow>
                 <TableCell>
                   <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                    {this.props.count} of {this.props.categoryCount} restrictions
+                    {this.props.count} of {this.props.categoryCount} routes
                   </Typography>
                 </TableCell>
                 <TableCell />
@@ -295,7 +295,7 @@ class RoutesTable extends React.Component {
       Delete {this.state.selectedCheckboxesNumber} restriction{this.state.selectedCheckboxes.length > 1 ? ('s') : ''}?
           </Typography>
           <DialogContent>
-            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} restrictions?</DialogContentText>
+            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} route?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
@@ -329,9 +329,9 @@ RoutesTable.propTypes = {
 
 
 export default createContainer(() => {
-  const restrictionsCountSub = Meteor.subscribe('restrictions-all-count');
+  const restrictionsCountSub = Meteor.subscribe('routes-all-count');
 
   return {
-    categoryCount: Counts.get('restrictions-count'),
+    categoryCount: Counts.get('routes-count'),
   };
 }, RoutesTable);
