@@ -150,6 +150,7 @@ class RestrictionEditor extends React.Component {
 
   handleDiscountOrExtraValueChange(event, value) {
     this.setState({
+      hasFormChanged: true,
       discountOrExtraAmount: event.target.value,
     });
   }
@@ -164,6 +165,7 @@ class RestrictionEditor extends React.Component {
     this.setState({
       discountOrExtraSelected,
       valueDiscountOrExtra: value,
+      hasFormChanged: true,
     });
   }
 
@@ -171,6 +173,7 @@ class RestrictionEditor extends React.Component {
   handleRestrictionTypeChange(event, value) {
     this.setState({
       valueRestriction: value,
+      hasFormChanged: true,
     });
   }
   // Use your imagination to render suggestions.
@@ -340,21 +343,21 @@ class RestrictionEditor extends React.Component {
       restriction.discountOrExtraType = this.state.discountType;
     }
 
-    if (existingRestriction) restriction._id = existingRestriction;
+
+    if (existingRestriction) {
+
+      restriction._id = existingRestriction;
+
+      if (this.state.valueDiscountOrExtra === 'none') {
+        delete restriction.discount;
+        delete restriction.extra;
+        delete restriction.discountOrExtraType;
+      }
+    }
+
 
     console.log(restriction);
 
-
-    // const typeName = this.state.valueTypes.trim();
-    // let typeActual = null;
-
-    // if (typeName) {
-    //   typeActual = this.props.ingredientTypes.find(el => el.title === typeName);
-    // } else {
-    //   typeActual = this.props.ingredientTypes.find(el => el.title === 'N/A');
-    // }
-
-    // ingredient.typeId = typeActual._id;
 
     Meteor.call(methodToCall, restriction, (error, restrictionId) => {
       if (error) {

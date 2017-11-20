@@ -73,17 +73,29 @@ Meteor.methods({
       owner: this.userId,
     };
 
+    let keysToUnset = {};
+
     if (restriction.discount) {
       restrictionToInsert.discount = restriction.discount;
       restrictionToInsert.discountOrExtraType = restriction.discountOrExtraType;
+
+      keysToUnset.extra = "";
+      
     } else if (restriction.extra) {
       restrictionToInsert.extra = restriction.extra;
       restrictionToInsert.discountOrExtraType = restriction.discountOrExtraType;
+      
+      keysToUnset.discount = "";
+      
+    } else{
+      keysToUnset.extra = "";
+      keysToUnset.discount = "";
+      keysToUnset.discountOrExtraType = "";
     }
 
     try {
       const restrictionId = restriction._id;
-      Restrictions.update(restrictionId, { $set: restriction });
+      Restrictions.update(restrictionId, { $unset: keysToUnset, $set: restriction });
       return restrictionId; // Return _id so we can redirect to document after update.
     } catch (exception) {
       throw new Meteor.Error('500', exception);

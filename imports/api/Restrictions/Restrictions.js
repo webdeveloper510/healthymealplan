@@ -36,6 +36,7 @@ Restrictions.schema = new SimpleSchema({
   },
   types: {
     type: Array,
+    
     label: 'The types that belong to this category',
   },
   'types.$': {
