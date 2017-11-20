@@ -118,7 +118,7 @@ class RoutesTable extends React.Component {
         });
       } else {
         this.props.popTheSnackbar({
-          message: `${localStorage.getItem('RoutesTableDeleted')} restrictions deleted.`,
+          message: `${localStorage.getItem('RoutesTableDeleted')} routes deleted.`,
         });
       }
     });
@@ -137,7 +137,7 @@ class RoutesTable extends React.Component {
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No restriction found for <span className="font-medium">{this.props.searchTerm.length > 0 ? `&lsquo;${this.props.searchTerm}&rsquo;` : ''}</span></p>
+        <p style={{ padding: '25px' }} className="subheading">No route found for <span className="font-medium">{this.props.searchTerm.length > 0 ? `&lsquo;${this.props.searchTerm}&rsquo;` : ''}</span></p>
       );
     }
   }
@@ -164,12 +164,10 @@ class RoutesTable extends React.Component {
 
 
   renderDiscountOrExtra(e) {
-    if (e.discount) {
-      return `${e.discountOrExtraType == 'Fixed amount' ? '$' : ''}${e.discount}${e.discountOrExtraType == 'Percentage' ? '%' : ''}`;
-    } else if (e.extra) {
-      return `${e.discountOrExtraType == 'Fixed amount' ? '$' : ''}${e.extra}${e.discountOrExtraType == 'Percentage' ? '%' : ''}`;
+    if (e.extraSurcharge) {
+      return `${e.extraSurchargeType == 'Fixed amount' ? '$' : ''}${e.extraSurcharge}${e.extraSurchargeType == 'Percentage' ? '%' : ''}`;
     }
-    return 'N/A';
+    return <Typography className="body1" type="body1" style={{ textTransform: 'capitalize', color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>;
   }
 
   render() {
@@ -194,14 +192,14 @@ class RoutesTable extends React.Component {
                   <TableCell padding="checkbox" style={{ width: '12%' }}>
                     <Checkbox onChange={this.selectAllRows.bind(this)} />
                   </TableCell>
-                  <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                    <Typography className="body2" type="body2">SKU</Typography>
+                  <TableCell padding="none" style={{ width: '27.33%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Route</Typography>
                   </TableCell>
-                  <TableCell padding="none" style={{ width: '35.33%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Restriction</Typography>
+                  <TableCell padding="none" style={{ width: '20.33%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">City</Typography>
                   </TableCell>
                   <TableCell padding="none" style={{ width: '20.33%' }} onClick={() => this.props.sortByOptions('restrictionType')}>
-                    <Typography className="body2" type="body2">Category</Typography>
+                    <Typography className="body2" type="body2">Limited</Typography>
                   </TableCell>
                   <TableCell padding="none" style={{ width: '20.33%' }} onClick={() => this.props.sortByOptions('title')}>
                     <Typography className="body2" type="body2">Value</Typography>
@@ -215,7 +213,6 @@ class RoutesTable extends React.Component {
               {
                 this.props.results.map((e, i) => {
                   const isSelected = this.isCheckboxSelected(e._id);
-                  console.log(e);
 
                   return (
                     <TableRow hover className={e._id} key={e._id}>
@@ -228,14 +225,10 @@ class RoutesTable extends React.Component {
                         />
                       </TableCell>
 
-                      <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.history.push(`/restrictions/${e._id}/edit`)}>
-                        <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
-                      </TableCell>
-
                       <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '35.33%' }}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '27.33%' }}
                         padding="none"
-                        onClick={() => this.props.history.push(`/restrictions/${e._id}/edit`)}
+                        onClick={() => this.props.history.push(`/routes/${e._id}/edit`)}
                       >
 
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
@@ -245,23 +238,41 @@ class RoutesTable extends React.Component {
 
                       </TableCell>
                       <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '20.33%' }}
+                        padding="none"
+                        onClick={() => this.props.history.push(`/routes/${e._id}/edit`)}
+                      >
+
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          {e.city}
+                        </Typography>
+
+
+                      </TableCell>
+                      <TableCell
                         padding="none"
                         style={{ paddingTop: '10px', paddingBottom: '10px', width: '20.33%' }}
-                        onClick={() => this.props.history.push(`/restrictions/${e._id}/edit`)}
+                        onClick={() => this.props.history.push(`/routes/${e._id}/edit`)}
                       >
-                        <Typography className="body1" type="body1" style={{ textTransform: 'capitalize', color: 'rgba(0, 0, 0, .54)' }}>
-                          {e.restrictionType}
+                        <Typography className="body1" type="body1" style={{ textTransform: 'capitalize'}}>
+                          {e.limited ? 'Yes' : 'No'}
                         </Typography>
                       </TableCell>
 
                       <TableCell
                         padding="none"
                         style={{ paddingTop: '10px', paddingBottom: '10px', width: '20.33%' }}
-                        onClick={() => this.props.history.push(`/restrictions/${e._id}/edit`)}
+                        onClick={() => this.props.history.push(`/routes/${e._id}/edit`)}
                       >
-                        <Typography className="body1" type="body1" style={{ textTransform: 'capitalize', color: 'rgba(0, 0, 0, .54)' }}>
-                          {this.renderDiscountOrExtra(e)}
+                        <Typography type="subheading" className="subheading">
+                        {this.renderDiscountOrExtra(e)}
                         </Typography>
+                        {e.extraSurcharge ? (
+                            <Typography className="body1" type="body1" style={{ textTransform: 'capitalize', color: 'rgba(0, 0, 0, .54)' }}>
+                            Extra
+                            </Typography>
+                        ) : ''}
+                      
                       </TableCell>
                     </TableRow>
                   );

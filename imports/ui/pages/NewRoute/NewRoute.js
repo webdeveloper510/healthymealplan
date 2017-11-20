@@ -4,16 +4,16 @@ import Grid from 'material-ui/Grid';
 
 import RouteEditor from '../../components/RouteEditor/RouteEditor';
 
-const NewRoute = ({ history, popTheSnackbar, newMeal }) => (
+const NewRoute = ({ history, popTheSnackbar, newRoute }) => (
   <div>
     <Grid container className="NewRoute SideContent SideContent--spacer-2x--horizontal">
-      <RouteEditor newMeal={true} popTheSnackbar={popTheSnackbar} history={history} />
+      <RouteEditor newRoute={true} popTheSnackbar={popTheSnackbar} history={history} />
     </Grid>
   </div>
 );
 
 NewRoute.propTypes = {
-  newMeal: PropTypes.bool.isRequired,
+  newRoute: PropTypes.bool.isRequired,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };

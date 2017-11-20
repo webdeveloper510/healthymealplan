@@ -9,7 +9,9 @@ import Typography from 'material-ui/Typography';
 import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
 import $ from 'jquery';
-import { FormGroup, FormControlLabel } from 'material-ui/Form';
+import { FormGroup, FormControlLabel, FormControl } from 'material-ui/Form';
+import Radio, { RadioGroup } from 'material-ui/Radio';
+
 import Checkbox from 'material-ui/Checkbox';
 
 import Dialog, {
@@ -34,6 +36,11 @@ const styles = theme => ({
 });
 
 
+$.validator.addMethod("cdnPostalStart", function(postal, element) {
+  return this.optional(element) || 
+  postal.match(/[a-zA-Z][0-9][a-zA-Z]/);
+}, "Please specify a valid postal code.");
+
 class RouteEditor extends React.Component {
   constructor(props) {
     super(props);
@@ -42,8 +49,13 @@ class RouteEditor extends React.Component {
     this.state = {
       deleteDialogOpen: false,
       hasFormChanged: false,
-      mealType: this.props.newMeal ? '' : this.props.meal.type,
-      limitedChecked: false,
+      city: this.props.newRoute ? 'Ottawa' : this.props.route.city,
+      limitedChecked: this.props.newRoute ? false : this.props.route.limited,
+      extraSelected: !!((!this.props.newRoute && this.props.route && this.props.route.hasOwnProperty('extraSurcharge') )),
+      extraType: (!this.props.newRoute && this.props.route && this.props.route.extraSurchargeType) ? this.props.route.extraSurchargeType : 'Percentage',
+      valueExtraSurcharge: (!this.props.newRoute && this.props.route && this.props.route.hasOwnProperty('extraSurcharge')) ? 'extra' : 'none',
+      extraAmount: (!this.props.newRoute && this.props.route && this.props.route.hasOwnProperty('extraSurcharge')) ? this.props.route.extraSurcharge : '',
+
     };
   }
 
@@ -59,8 +71,14 @@ class RouteEditor extends React.Component {
       rules: {
         title: {
           required: true,
+          cdnPostalStart: true
+        },
+        
+        city: {
+          requred: true,
         },
 
+        
       },
 
       submitHandler() { component.handleSubmit(); },
@@ -76,24 +94,25 @@ class RouteEditor extends React.Component {
     this.setState({ deleteDialogOpen: false });
   }
 
-  handleChange(event,checked){
+  handleChange(event, checked) {
     this.setState({
-      limitedChecked: checked
+      hasFormChanged: true,
+      limitedChecked: checked,
     });
   }
 
   handleRemoveActual() {
     const { popTheSnackbar, history, meal } = this.props;
 
-    const existingMeal = meal && meal._id;
+    const existingRoute = route && route._id;
 
-    localStorage.setItem('mealDeleted', meal.title);
+    localStorage.setItem('routeDeleted', route.title);
 
-    const mealDeletedMessage = `${localStorage.getItem('mealDeleted')} deleted from meals.`;
+    const routeDeletedMessage = `${localStorage.getItem('routeDeleted')} deleted from routes.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('meals.remove', existingMeal, (error) => {
+    Meteor.call('routes.remove', existingRoute, (error) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
@@ -103,7 +122,7 @@ class RouteEditor extends React.Component {
           message: mealDeletedMessage,
         });
 
-        history.push('/meals');
+        history.push('/routes');
       }
     });
   }
@@ -115,41 +134,55 @@ class RouteEditor extends React.Component {
   handleSubmit() {
     // console.log('Reached handle submti');
     const { history, popTheSnackbar } = this.props;
-    const existingMeal = this.props.meal && this.props.meal._id;
-    const methodToCall = existingMeal ? 'meals.update' : 'meals.insert';
+    const existingRoute = this.props.route && this.props.route._id;
+    const methodToCall = existingRoute ? 'routes.update' : 'routes.insert';
 
-    const meal = {
+    let route = {
       title: document.querySelector('#title').value.trim(),
-      type: this.state.mealType,
+      city: this.state.city,
+      limited: this.state.limitedChecked,
     };
 
-    if (existingMeal) { meal._id = existingMeal; }
-
-    localStorage.setItem('meal', existingMeal ? this.props.meal.title : meal.title);
+    localStorage.setItem('route', existingRoute ? this.props.route.title : route.title);
 
 
-    Meteor.call(methodToCall, meal, (error, mealId) => {
+    if (this.state.extraSelected) {
+      route.extraSurcharge = parseFloat(this.state.extraAmount);
+      route.extraSurchargeType = this.state.extraType;
+    }
+
+    if (existingRoute) {
+      route._id = existingRoute;
+
+      if (this.state.valueExtraSurcharge == 'none') {
+        delete route.extraSurcharge;
+        delete route.extraSurchargeType;
+      }
+    }
+
+    console.log(route);
+  
+
+    Meteor.call(methodToCall, route, (error, routeId) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
         });
       } else {
-        const confirmation = existingMeal ? `${localStorage.getItem('meal')} meal updated` : `${localStorage.getItem('meal')} meal added.`;
+        const confirmation = existingRoute ? `${localStorage.getItem('route')} route updated` : `${localStorage.getItem('route')} route added.`;
 
         popTheSnackbar({
           message: confirmation,
           buttonText: 'View',
-          buttonLink: `/meals/${mealId}/edit`,
+          buttonLink: `/routes/${routeId}/edit`,
         });
 
-        history.push('/meals');
+        history.push('/routes');
       }
     });
   }
 
   titleFieldChanged(e) {
-    console.log(e.currentTarget.value.length);
-
     const hasFormChanged = e.currentTarget.value.length > 0;
 
     this.setState({
@@ -157,17 +190,48 @@ class RouteEditor extends React.Component {
     });
   }
 
-  handleMealTypeChange(event, value) {
+  handleCityChange(event, value) {
     // console.log(event.target.value);
 
     this.setState({
-      mealType: event.target.value,
+      city: event.target.value,
       hasFormChanged: true,
     });
   }
 
+  handleExtraTypeChange(event, value) {
+    // console.log(event.target.value);
+
+    this.setState({
+      extraType: event.target.value,
+    });
+  }
+
+  handleExtraValueChange(event, value) {
+    this.setState({
+      extraAmount: event.target.value,
+      hasFormChanged: true,
+
+    });
+  }
+
+  handleExtraRadioChange(event, value) {
+    let extraSelected = true;
+
+    if (value == 'none') {
+      extraSelected = false;
+    }
+
+    this.setState({
+      extraSelected,
+      valueExtraSurcharge: value,
+      hasFormChanged: true,
+
+    });
+  }
+
   render() {
-    const { meal, history } = this.props;
+    const { route, history } = this.props;
     return (
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
 
@@ -212,10 +276,9 @@ class RouteEditor extends React.Component {
                 label="Name"
                 margin="normal"
                 name="title"
-                disabled={!this.props.newMeal}
                 fullWidth
                 onChange={this.titleFieldChanged.bind(this)}
-                defaultValue={meal && meal.title}
+                defaultValue={route && route.title}
                 ref={title => (this.title = title)}
               />
             </Paper>
@@ -236,11 +299,13 @@ class RouteEditor extends React.Component {
                 id="select-discount-type"
                 select
                 label="City"
-                value={this.state.mealType ? this.state.mealType : ''}
-                onChange={this.handleMealTypeChange.bind(this)}
+                value={this.state.city ? this.state.city : ''}
+                onChange={this.handleCityChange.bind(this)}
                 SelectProps={{ native: false }}
               >
-                <MenuItem key={1} value="Main Course">Ottawa/Gatineau</MenuItem>
+                <MenuItem key={1} value="Ottawa">Ottawa</MenuItem>
+                <MenuItem key={2} value="Gatineau">Gatineau</MenuItem>
+
               </TextField>
 
             </Paper>
@@ -255,26 +320,95 @@ class RouteEditor extends React.Component {
           </Grid>
           <Grid item xs={12} sm={8}>
             <Paper elevation={2} className="paper-for-fields">
-            <FormControlLabel
-          control={
-            <Checkbox
-              checked={this.state.limitedChecked}
-              onChange={() => this.handleChange.bind(this)}
-              value="limitedChecked"
-            />
-          }
-          label="Limited"
-        />
+              <FormControlLabel
+                control={
+                  <Checkbox
+                    checked={this.state.limitedChecked}
+                    onChange={this.handleChange.bind(this)}
+                    value="limitedChecked"
+                  />
+                }
+                label="Limited"
+              />
 
             </Paper>
+          </Grid>
+        </Grid>
+
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography type="subheading" className="subheading font-medium">Value</Typography>
+                <Typography style={{ paddingRight: '80px' }}>
+                  Applying an extra will affect the total amount of a lifestyle's price plan if route requires a surcharge.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <Typography type="subheading" className="font-uppercase">Surcharge</Typography>
+                      <FormControl component="fieldset">
+                        <RadioGroup
+                          aria-label="discountOrExtra"
+                          name="discountOrExtra"
+                          value={this.state.valueExtraSurcharge}
+                          onChange={this.handleExtraRadioChange.bind(this)}
+                          style={{ flexDirection: 'row' }}
+                        >
+                          <FormControlLabel className="radiobuttonlabel" value="none" control={<Radio checked={this.state.valueExtraSurcharge === 'none'} />} label="None" />
+                          <FormControlLabel className="radiobuttonlabel" value="extra" control={<Radio checked={this.state.valueExtraSurcharge === 'extra'} />} label="Extra" />
+
+                        </RadioGroup>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={6} sm={6}>
+                      <TextField
+                        disabled={!this.state.extraSelected}
+                        fullWidth
+                        id="select-discount-type"
+                        select
+                        label="Type"
+                        value={this.state.extraType ? this.state.extraType : ''}
+                        onChange={this.handleExtraTypeChange.bind(this)}
+                        SelectProps={{ native: false }}
+                      >
+                        <MenuItem key={1} value="Percentage">Percentage</MenuItem>
+                        <MenuItem key={2} value="Fixed amount">Fixed amount</MenuItem>
+                      </TextField>
+                    </Grid>
+
+                    <Grid item xs={6} sm={6}>
+
+                      <TextField
+                        fullWidth
+                        value={this.state.extraAmount}
+                        id="discountOrExtraValue"
+                        name="discountOrExtraValue"
+                        disabled={!this.state.extraSelected}
+                        onChange={this.handleExtraValueChange.bind(this)}
+                        label="Amount"
+
+                        inputProps={{
+                          'aria-label': 'Description',
+                          type: 'number',
+                        }}
+                      />
+                    </Grid>
+
+                  </Grid>
+                </Paper>
+              </Grid>
+            </Grid>
           </Grid>
         </Grid>
 
 
         <Grid container justify="center">
           <Grid item xs={6}>
-            {meal ? (<Button raised onClick={this.handleRemove.bind(this)} className="btn btn-danger" style={{ backgroundColor: danger, color: '#FFFFFF' }} disabled>Delete</Button>)
-              : (<Button raised onClick={() => history.push('/meals')}>Cancel</Button>)}
+            {route ? (<Button raised onClick={this.handleRemove.bind(this)} className="btn btn-danger" style={{ backgroundColor: danger, color: '#FFFFFF' }} disabled>Delete</Button>)
+              : (<Button raised onClick={() => history.push('/routes')}>Cancel</Button>)}
           </Grid>
 
           <Grid item xs={6}>
@@ -286,13 +420,13 @@ class RouteEditor extends React.Component {
           </Grid>
         </Grid>
 
-        {meal ? (<Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
+        {route ? (<Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-          Delete {meal ? meal.title.toLowerCase() : ''}?
+          Delete {route ? route.title.toLowerCase() : ''}?
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading">
-            There may be ingredients associated with {meal.title}. Are you sure you want to delete {meal.title.toLowerCase()} ?
+            There may be ingredients associated with {route.title}. Are you sure you want to delete {route.title.toLowerCase()} ?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -311,7 +445,7 @@ class RouteEditor extends React.Component {
 
 
 RouteEditor.propTypes = {
-  meal: PropTypes.object.required,
+  route: PropTypes.object.required,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };

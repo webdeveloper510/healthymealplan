@@ -8,20 +8,20 @@ import Routes from '../../../api/Routes/Routes';
 import RouteEditor from '../../components/RouteEditor/RouteEditor';
 import NotFound from '../NotFound/NotFound';
 
-const EditRoute = ({ meal, newMeal, history, popTheSnackbar }) => (meal ? (
+const EditRoute = ({ route, newRoute, history, popTheSnackbar }) => (route ? (
   <div>
     <Grid container className="EditRoute SideContent SideContent--spacer-2x--horizontal">
-      <RouteEditor newMeal={newMeal} meal={meal} popTheSnackbar={popTheSnackbar} history={history} />
+      <RouteEditor newRoute={newRoute} route={route} popTheSnackbar={popTheSnackbar} history={history} />
     </Grid>
   </div>
 ) : <NotFound />);
 
 EditRoute.defaultProps = {
-  meal: null,
+  route: null,
 };
 
 EditRoute.propTypes = {
-  meal: PropTypes.object, 
+  route: PropTypes.object, 
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };
@@ -31,8 +31,8 @@ export default createContainer(({ match }) => {
   const subscription = Meteor.subscribe('routes.view', routeId);
 
   return {
-    newMeal: false,
+    newRoute: false,
     loading: !subscription.ready(),
-    meal: Routes.findOne(routeId),
+    route: Routes.findOne(routeId),
   };
 }, EditRoute);

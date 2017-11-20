@@ -21,7 +21,7 @@ import RestrictionsCollection from '../../../api/Restrictions/Restrictions';
 
 import Loading from '../../components/Loading/Loading';
 import RestrictionsTable from './RestrictionsTable';
-
+  
 import Containers from 'meteor/utilities:react-list-container';
 
 const ListContainer = Containers.ListContainer;

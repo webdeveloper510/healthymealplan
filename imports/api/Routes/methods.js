@@ -1,14 +1,17 @@
 import { Meteor } from 'meteor/meteor';
+import { Match } from 'meteor/check';
 import { check } from 'meteor/check';
 import Routes from './Routes';
 import rateLimit from '../../modules/rate-limit';
-import { getNextSequence } from '../../modules/server/get-next-sequence';
 
 Meteor.methods({
   'routes.insert': function routesInsert(route) {
     check(route, {
       title: String,
-      types: Array,
+      city: String,
+      limited: Boolean,
+      extraSurcharge: Match.Maybe(Number),
+      extraSurchargeType: Match.Maybe(String)
     });
 
     const existsCategory = Routes.findOne({ title: route.title });
@@ -17,11 +20,12 @@ Meteor.methods({
       throw new Meteor.Error('500', `${route.title} is already present`);
     }
 
-    let nextSeqItem = getNextSequence('routes');
-    nextSeqItem = nextSeqItem.toString();
-
     try {
-      return Routes.insert({ SKU: nextSeqItem, title: route.title, types: route.types, owner: this.userId });
+      return Routes.insert({ 
+        ...route,
+        owner: this.userId 
+        
+      });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
@@ -31,12 +35,22 @@ Meteor.methods({
     check(route, {
       _id: String,
       title: String,
-      types: Array,
+      city: String,
+      limited: Boolean,
+      extraSurcharge: Match.Maybe(Number),
+      extraSurchargeType: Match.Maybe(String)
     });
+
+    let keysToUnset = {};
+    
+    if(!route.hasOwnProperty('extraSurcharge') && !route.hasOwnProperty('extraSurchargeType')){
+      keysToUnset.extraSurcharge = '';
+      keysToUnset.extraSurchargeType = '';
+    }
 
     try {
       const routeId = route._id;
-      Routes.update(routeId, { $set: route });
+      Routes.update(routeId, { $unset: keysToUnset, $set: route });
       return routeId; // Return _id so we can redirect to document after update.
     } catch (exception) {
       throw new Meteor.Error('500', exception);

@@ -150,18 +150,11 @@ class Routes extends React.Component {
           <div style={{ marginTop: '25px' }}>
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
               <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
-                <Tab label="All" onClick={() => this.searchByKey('', '')} />
-                <Tab label="Allergies" onClick={() => this.searchByKey('restrictionType', 'allergy')} />
-                <Tab label="Dietary" onClick={() => this.searchByKey('restrictionType', 'dietary')} />
-                <Tab label="Religious" onClick={() => this.searchByKey('restrictionType', 'religious')} />
-
+                <Tab label="All" onClick={() => this.searchByKey('', '').bind(this)} />
+                {/* <Tab label="Limited" onClick={() => this.searchByKey('limited', true).bind(this)} /> */}
               </Tabs>
             </AppBar>
           </div>
-
-          {/* {this.state.currentTabValue === 0 && <div>Item One</div>}
-          {this.state.currentTabValue === 1 && <div>Item Two</div>}
-          {this.state.currentTabValue === 2 && <div>Item Three</div>} */}
 
           <div style={{ width: '100%',
             background: '#FFF',

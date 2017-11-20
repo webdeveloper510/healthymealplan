@@ -18,24 +18,29 @@ Routes.deny({
 });
 
 Routes.schema = new SimpleSchema({
-  SKU: {
-    type: String,
-    label: 'The SKU of the ',
-  },
   title: {
     type: String,
     label: 'The title of the category.',
   },
-  isLimited: {
+  city: {
+    type: String,
+    label: 'City of the route',
+  },
+  limited: {
     type: Boolean,
     label: 'Limited coverage for this route',
   },
-  extra: {
+  extraSurcharge: {
     type: Number,
     label: 'Route surcharge',
+    optional: true,
   },
 
-
+  extraSurchargeType: {
+    type: String,
+    label: 'Percentage or Fixed amount',
+    optional: true,
+  },
   owner: {
     type: String,
     label: 'The ID of the user this category belongs to.',
