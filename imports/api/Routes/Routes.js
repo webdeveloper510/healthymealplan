@@ -31,8 +31,10 @@ Routes.schema = new SimpleSchema({
     label: 'Limited coverage for this route',
   },
   extra: {
-    typ,
+    type: Number,
+    label: 'Route surcharge',
   },
+
 
   owner: {
     type: String,
