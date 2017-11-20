@@ -16,6 +16,9 @@ import '../../api/Lifestyles/server/publications';
 import '../../api/Restrictions/methods';
 import '../../api/Restrictions/server/publications';
 
+import '../../api/Routes/methods';
+import '../../api/Routes/server/publications';
+
 import '../../api/Meals/methods';
 import '../../api/Meals/server/publications';
 

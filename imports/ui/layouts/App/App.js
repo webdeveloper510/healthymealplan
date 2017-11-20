@@ -58,6 +58,11 @@ import Restrictions from '../../pages/Restrictions/Restrictions';
 import NewRestriction from '../../pages/NewRestriction/NewRestriction';
 import EditRestriction from '../../pages/EditRestriction/EditRestriction';
 
+
+import Routes from '../../pages/Routes/Routes';
+import NewRoute from '../../pages/NewRoute/NewRoute';
+import EditRoute from '../../pages/EditRoute/EditRoute';
+
 import Ingredients from '../../pages/Ingredients/Ingredients';
 import NewIngredient from '../../pages/NewIngredient/NewIngredient';
 import EditIngredient from '../../pages/EditIngredient/EditIngredient';
@@ -414,7 +419,11 @@ class App extends React.Component {
                       <Authenticated exact path="/restrictions" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Restrictions} {...this.props} />
                       <Authenticated exact path="/restrictions/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewRestriction} {...this.props} />
                       <Authenticated exact path="/restrictions/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditRestriction} {...this.props} />
-                   
+                      
+                      <Authenticated exact path="/routes" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Routes} {...this.props} />
+                      <Authenticated exact path="/routes/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewRoute} {...this.props} />
+                      <Authenticated exact path="/routes/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditRoute} {...this.props} />
+
                       <Authenticated exact path="/sides" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Sides} {...this.props} />
                       <Authenticated exact path="/sides/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewSide} {...this.props} />
                       <Authenticated exact path="/sides/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditSide} {...this.props} />

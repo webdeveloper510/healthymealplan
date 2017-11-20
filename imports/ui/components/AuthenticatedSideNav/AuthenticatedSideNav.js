@@ -27,7 +27,7 @@ import DirectionsIcon from 'material-ui-icons/Directions';
 import RoutesIcon from 'material-ui-icons/MyLocation';
 import DriversIcon from 'material-ui-icons/DriveEta';
 
-import CustomersIcon from 'material-ui-icons/People';
+import CustomersIcon from 'material-ui-icons/Person';
 import SettingsIcon from 'material-ui-icons/Settings';
 import TeamIcon from 'material-ui-icons/SupervisorAccount';
 
