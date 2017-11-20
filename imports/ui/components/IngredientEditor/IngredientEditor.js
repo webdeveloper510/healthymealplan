@@ -29,7 +29,7 @@ import Dialog, {
 } from 'material-ui/Dialog';
 
 
-import classNames from 'classnames';
+// import classNames from 'classnames';
 import { withStyles } from 'material-ui/styles';
 import { CircularProgress } from 'material-ui/Progress';
 import green from 'material-ui/colors/green';
@@ -500,9 +500,9 @@ class IngredientEditor extends React.Component {
       return ('<h1>Loading</h1>');
     }
 
-    const buttonClassname = classNames({
-      [this.props.classes.buttonSuccess]: this.state.submitSuccess,
-    });
+    // const buttonClassname = classNames({
+    //   [this.props.classes.buttonSuccess]: this.state.submitSuccess,
+    // });
 
     return (
       <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
@@ -740,7 +740,7 @@ class IngredientEditor extends React.Component {
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
                   <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
-                  <Button disabled={ this.state.submitLoading || !this.state.hasFormChanged} type="submit" className={`btn btn-primary ${buttonClassname}`} raised color="contrast">
+                  <Button disabled={ this.state.submitLoading || !this.state.hasFormChanged} type="submit" className={`btn btn-primary`} raised color="contrast">
                    Save
                    {this.state.submitLoading && <CircularProgress size={24} className={this.props.classes.buttonProgress} />}
 
