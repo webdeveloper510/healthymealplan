@@ -94,7 +94,7 @@ class IngredientEditor extends React.Component {
       suggestions: [],
       suggestionsTypes: [],
       types: this.props.ingredientTypes ? this.props.ingredientTypes : [],
-      subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
+      subIngredients: this.props.ingredient ?_.sortBy(this.props.potentialSubIngredients.filter((e, i) => this.props.ingredient.subIngredients.indexOf(e._id) !== -1), 'title')  : [],
       selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
       hasFormChanged: false,
@@ -291,7 +291,7 @@ class IngredientEditor extends React.Component {
 
     const ingredient = {
       title: document.querySelector('#title').value.trim(),
-      subIngredients: this.state.subIngredients || [],
+      subIngredients: this.state.subIngredients.map(e => e._id) || [],
       typeId: this.state.valueTypes.trim(),
     };
 
