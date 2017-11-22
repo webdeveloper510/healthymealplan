@@ -52,7 +52,7 @@ class TypeEditor extends React.Component {
     const component = this;
     validate(component.form, {
 
-      errorPlacement: function(error, element){
+      errorPlacement(error, element){
         error.insertAfter($(element).parent().parent()); 
       },
 
@@ -146,17 +146,16 @@ class TypeEditor extends React.Component {
     });
   }
 
-  titleFieldChanged(e){
-    
-    console.log(e.currentTarget.value.length)
+  titleFieldChanged(e) {
+    console.log(e.currentTarget.value.length);
 
-    const hasFormChanged = e.currentTarget.value.length > 0 ? true : false;
+    const hasFormChanged = e.currentTarget.value.length > 0;
 
     this.setState({
-      hasFormChanged: hasFormChanged
-    })
+      hasFormChanged,
+    });
   }
-    
+
 
   render() {
     const { ingredientType, history } = this.props;
@@ -165,23 +164,23 @@ class TypeEditor extends React.Component {
 
         <Grid container>
           <Grid item xs={12}>
-              <Button onClick={() => this.props.history.push('/types')} className="button button-secondary button-secondary--top">
-                <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', fontWeight: 'medium' }}>
-                <ChevronLeft style={{ marginRight: '4px' }} /> Types</Typography>
-              </Button>
-            </Grid>
-          
+            <Button onClick={() => this.props.history.push('/types')} className="button button-secondary button-secondary--top">
+              <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row', fontWeight: 'medium' }}>
+                  <ChevronLeft style={{ marginRight: '4px' }} /> Types</Typography>
+            </Button>
+          </Grid>
+
         </Grid>
 
 
-        <Grid container style={{ marginBottom: "50px" }}>
+        <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={6}>
             <Typography type="headline" className="headline font-medium">Add type</Typography>
           </Grid>
 
           <Grid item xs={6}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <Button style={{ marginRight: "10px" }} onClick={() => history.push('/ingredients')}>Cancel</Button>
+              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/types')}>Cancel</Button>
               <Button raised disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">Save</Button>
             </div>
           </Grid>
@@ -218,7 +217,7 @@ class TypeEditor extends React.Component {
 
           <Grid item xs={6}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <Button type="submit" raised  disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">
+              <Button type="submit" raised disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">
                 Save
               </Button>
             </div>

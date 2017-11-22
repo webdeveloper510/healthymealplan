@@ -54,10 +54,13 @@ import Categories from '../../pages/Categories/Categories';
 import NewCategory from '../../pages/NewCategory/NewCategory';
 import EditCategory from '../../pages/EditCategory/EditCategory';
 
+import Customers from '../../pages/Customers/Customers';
+import NewCustomer from '../../pages/NewCustomer/NewCustomer';
+// import EditCategory from '../../pages/EditCategory/EditCategory';
+
 import Restrictions from '../../pages/Restrictions/Restrictions';
 import NewRestriction from '../../pages/NewRestriction/NewRestriction';
 import EditRestriction from '../../pages/EditRestriction/EditRestriction';
-
 
 import Routes from '../../pages/Routes/Routes';
 import NewRoute from '../../pages/NewRoute/NewRoute';
@@ -397,6 +400,10 @@ class App extends React.Component {
                       <Authenticated exact path="/categories" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Categories} {...this.props} />
                       <Authenticated exact path="/categories/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewCategory} {...this.props} />
                       <Authenticated exact path="/categories/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditCategory} {...this.props} />
+
+                      <Authenticated exact path="/customers" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Customers} {...this.props} />
+                      <Authenticated exact path="/customers/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewCustomer} {...this.props} />
+                      {/*<Authenticated exact path="/categories/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditCategory} {...this.props} /> */}
 
                       <Authenticated exact path="/ingredients" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Ingredients} {...this.props} />
                       <Authenticated exact path="/ingredients/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewIngredient} {...this.props} />

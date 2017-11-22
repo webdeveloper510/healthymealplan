@@ -1321,7 +1321,7 @@ class LifestyleEditor extends React.Component {
                     <Button
 
                       raised
-                      onClick={lifestyle && lifestyle._id ? this.handleRemove.bind(this) : () => this.props.history.push('/categories')}
+                      onClick={lifestyle && lifestyle._id ? this.handleRemove.bind(this) : () => this.props.history.push('/lifestyles')}
                       disabled={true}
                     >
                     Delete
@@ -1333,7 +1333,7 @@ class LifestyleEditor extends React.Component {
               <Grid item xs={8}>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                  <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
+                  <Button style={{ marginRight: '10px' }} onClick={() => history.push('/lifestyles')}>Cancel</Button>
                   <Button disabled={!this.state.hasFormChanged} type="submit" className="btn btn-primary" raised color="contrast">
                    Save
                   </Button>

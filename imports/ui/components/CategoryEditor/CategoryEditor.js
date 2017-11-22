@@ -1,8 +1,8 @@
 /* eslint-disable max-len, no-return-assign */
 
-/* 
+/*
   Refactor the autocomplete tabs into their own components
-  not a priority for now, but this is an itch that we should really scratch. 
+  not a priority for now, but this is an itch that we should really scratch.
 */
 
 import React from 'react';
@@ -713,7 +713,7 @@ class CategoryEditor extends React.Component {
               <Grid item xs={8}>
 
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                  <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
+                  <Button style={{ marginRight: '10px' }} onClick={() => history.push('/categories')}>Cancel</Button>
                   <Button disabled={!this.state.hasFormChanged} type="submit" className="btn btn-primary" raised color="contrast">
                    Save
                   </Button>

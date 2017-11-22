@@ -184,7 +184,7 @@ class MealEditor extends React.Component {
 
           <Grid item xs={6}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
+              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/meals')}>Cancel</Button>
               <Button raised disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">Save</Button>
             </div>
           </Grid>
@@ -261,7 +261,7 @@ class MealEditor extends React.Component {
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading">
-            There may be ingredients associated with {meal.title}. Are you sure you want to delete {meal.title.toLowerCase()} ?
+            Are you sure you want to delete {meal.title.toLowerCase()} ?
             </DialogContentText>
           </DialogContent>
           <DialogActions>

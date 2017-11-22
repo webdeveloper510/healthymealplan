@@ -36,10 +36,10 @@ const styles = theme => ({
 });
 
 
-$.validator.addMethod("cdnPostalStart", function(postal, element) {
-  return this.optional(element) || 
+$.validator.addMethod('cdnPostalStart', function (postal, element) {
+  return this.optional(element) ||
   postal.match(/[a-zA-Z][0-9][a-zA-Z]/);
-}, "Please specify a valid postal code.");
+}, 'Please specify a valid postal code.');
 
 class RouteEditor extends React.Component {
   constructor(props) {
@@ -51,7 +51,7 @@ class RouteEditor extends React.Component {
       hasFormChanged: false,
       city: this.props.newRoute ? 'Ottawa' : this.props.route.city,
       limitedChecked: this.props.newRoute ? false : this.props.route.limited,
-      extraSelected: !!((!this.props.newRoute && this.props.route && this.props.route.hasOwnProperty('extraSurcharge') )),
+      extraSelected: !!((!this.props.newRoute && this.props.route && this.props.route.hasOwnProperty('extraSurcharge'))),
       extraType: (!this.props.newRoute && this.props.route && this.props.route.extraSurchargeType) ? this.props.route.extraSurchargeType : 'Percentage',
       valueExtraSurcharge: (!this.props.newRoute && this.props.route && this.props.route.hasOwnProperty('extraSurcharge')) ? 'extra' : 'none',
       extraAmount: (!this.props.newRoute && this.props.route && this.props.route.hasOwnProperty('extraSurcharge')) ? this.props.route.extraSurcharge : '',
@@ -71,14 +71,14 @@ class RouteEditor extends React.Component {
       rules: {
         title: {
           required: true,
-          cdnPostalStart: true
+          cdnPostalStart: true,
         },
-        
+
         city: {
           requred: true,
         },
 
-        
+
       },
 
       submitHandler() { component.handleSubmit(); },
@@ -137,7 +137,7 @@ class RouteEditor extends React.Component {
     const existingRoute = this.props.route && this.props.route._id;
     const methodToCall = existingRoute ? 'routes.update' : 'routes.insert';
 
-    let route = {
+    const route = {
       title: document.querySelector('#title').value.trim(),
       city: this.state.city,
       limited: this.state.limitedChecked,
@@ -161,7 +161,7 @@ class RouteEditor extends React.Component {
     }
 
     console.log(route);
-  
+
 
     Meteor.call(methodToCall, route, (error, routeId) => {
       if (error) {
@@ -253,7 +253,7 @@ class RouteEditor extends React.Component {
 
           <Grid item xs={6}>
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/ingredients')}>Cancel</Button>
+              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/routes')}>Cancel</Button>
               <Button raised disabled={!this.state.hasFormChanged} className="btn btn-primary" color="contrast">Save</Button>
             </div>
           </Grid>
@@ -426,7 +426,7 @@ class RouteEditor extends React.Component {
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading">
-            There may be ingredients associated with {route.title}. Are you sure you want to delete {route.title.toLowerCase()} ?
+            Are you sure you want to delete {route.title.toLowerCase()} ?
             </DialogContentText>
           </DialogContent>
           <DialogActions>
