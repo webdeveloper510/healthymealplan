@@ -48,10 +48,8 @@ Meteor.methods({
       firstName: String
     });
 
-    console.log("Reached method");
-
     try {
-      let userId = Accounts.createUser({
+      var userId = Accounts.createUser({
         email: data.email,
         profile: {
           name: {
