@@ -1,4 +1,7 @@
 import React from "react";
+import PropTypes from "prop-types";
+
+import { Meteor } from "meteor/meteor";
 
 import Grid from "material-ui/Grid";
 import Button from "material-ui/Button";
@@ -6,16 +9,61 @@ import { MenuItem } from "material-ui/Menu";
 import TextField from "material-ui/TextField";
 import Paper from "material-ui/Paper";
 import Typography from "material-ui/Typography";
+
+import classNames from "classnames";
+import { withStyles } from "material-ui/styles";
+import { CircularProgress } from "material-ui/Progress";
+import green from "material-ui/colors/green";
+
 import $ from "jquery";
 import validate from "../../../modules/validate";
 
-export default class Step1Eligibility extends React.Component {
+const styles = theme => ({
+  root: {
+    display: "flex",
+    alignItems: "center"
+  },
+  wrapper: {
+    margin: theme.spacing.unit,
+    position: "relative"
+  },
+  buttonSuccess: {
+    backgroundColor: green[500],
+    "&:hover": {
+      backgroundColor: green[700]
+    }
+  },
+  fabProgress: {
+    color: green[500],
+    position: "absolute",
+    top: -6,
+    left: -6,
+    zIndex: 1
+  },
+  buttonProgress: {
+    color: green[500],
+    position: "absolute",
+    top: "50%",
+    left: "50%",
+    marginTop: -12,
+    marginLeft: -12
+  }
+});
+
+class Step1Eligibility extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      submitLoading: false,
+      submitSuccess: false
+    };
+
+    this.handleSubmitStep = this.handleSubmitStep.bind(this);
   }
 
   componentDidMount() {
-    let component = this;
+    const component = this;
 
     validate(component.form, {
       errorPlacement(error, element) {
@@ -49,22 +97,66 @@ export default class Step1Eligibility extends React.Component {
   }
 
   handleSubmitStep() {
-    this.props.saveValues({
-      firstName: $('[name="first_name"]')
-        .val()
-        .trim(),
-      email: $('[name="email"]')
-        .val()
-        .trim(),
-      postalCode: $('[name="postal_code"]')
-        .val()
-        .trim()
+    this.setState({
+      submitSuccess: false,
+      submitLoading: true
     });
 
-    this.props.handleNext();
+    console.log("handleSubmitStep");
+
+    Meteor.call(
+      "customers.step1",
+      {
+        firstName: $('[name="first_name"]')
+          .val()
+          .trim(),
+        postalCode: $('[name="postal_code"]')
+          .val()
+          .trim(),
+        email: $('[name="email"]')
+          .val()
+          .trim()
+      },
+      (err, userId) => {
+        if (!err) {
+          this.setState({
+            submitSuccess: true,
+            submitLoading: false
+          });
+
+          this.props.saveValues({
+            id: userId,
+            firstName: $('[name="first_name"]')
+              .val()
+              .trim(),
+            email: $('[name="email"]')
+              .val()
+              .trim(),
+            postalCode: $('[name="postal_code"]')
+              .val()
+              .trim()
+          });
+
+          this.props.handleNext();
+        } else {
+          this.setState({
+            submitSuccess: false,
+            submitLoading: false
+          });
+
+          this.props.popTheSnackbar({
+            message: err.reason.reason
+          });
+        }
+      }
+    );
   }
 
   render() {
+    const buttonClassname = classNames({
+      [this.props.classes.buttonSuccess]: this.state.submitSuccess
+    });
+
     return (
       <form
         id="step0"
@@ -76,10 +168,6 @@ export default class Step1Eligibility extends React.Component {
           justify="center"
           style={{ marginBottom: "50px", marginTop: "25px" }}
         >
-          <Grid item xs={12} style={{ marginBottom: "25px" }}>
-            <Typography type="title">Eligibility</Typography>
-          </Grid>
-
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
@@ -87,12 +175,13 @@ export default class Step1Eligibility extends React.Component {
                   type="subheading"
                   className="subheading font-medium"
                 >
-                  First name
+                  Eligibility
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
                   <TextField
+                    margin="normal"
                     id="first_name"
                     label="First name"
                     name="first_name"
@@ -100,26 +189,8 @@ export default class Step1Eligibility extends React.Component {
                     defaultValue={this.props.customerInfo.firstName}
                     inputProps={{}}
                   />
-                </Paper>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid item xs={12} sm={4}>
-                <Typography
-                  type="subheading"
-                  className="subheading font-medium"
-                >
-                  Email
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={8}>
-                <Paper elevation={2} className="paper-for-fields">
                   <TextField
+                    margin="normal"
                     id="email"
                     label="Email"
                     name="email"
@@ -127,26 +198,8 @@ export default class Step1Eligibility extends React.Component {
                     defaultValue={this.props.customerInfo.email}
                     inputProps={{}}
                   />
-                </Paper>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid item xs={12} sm={4}>
-                <Typography
-                  type="subheading"
-                  className="subheading font-medium"
-                >
-                  Postal code
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={8}>
-                <Paper elevation={2} className="paper-for-fields">
                   <TextField
+                    margin="normal"
                     id="postalCode"
                     label="Postal code"
                     name="postal_code"
@@ -159,6 +212,7 @@ export default class Step1Eligibility extends React.Component {
             </Grid>
           </Grid>
         </Grid>
+
         <div
           style={{
             display: "flex",
@@ -166,11 +220,31 @@ export default class Step1Eligibility extends React.Component {
             justifyContent: "flex-end"
           }}
         >
-          <Button raised color="primary" type="submit">
+          <Button
+            disabled={this.state.submitLoading}
+            raised
+            className={`${buttonClassname}`}
+            color="primary"
+            type="submit"
+          >
             Next
+            {this.state.submitLoading && (
+              <CircularProgress
+                size={24}
+                className={this.props.classes.buttonProgress}
+              />
+            )}
           </Button>
         </div>
       </form>
     );
   }
 }
+
+Step1Eligibility.defaultProps = {
+  popTheSnackbar: PropTypes.func.isRequired,
+  handleNext: PropTypes.func.isRequired,
+  handleBack: PropTypes.func.isRequired
+};
+
+export default withStyles(styles)(Step1Eligibility);

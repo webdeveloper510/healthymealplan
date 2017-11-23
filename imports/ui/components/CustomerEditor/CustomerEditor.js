@@ -91,6 +91,7 @@ class CustomerEditor extends React.Component {
       activeStep: 0,
       skipped: new Set(),
       customerInfo: {
+        id: "",
         firstName: "",
         email: "",
         postalCode: "",
@@ -108,7 +109,7 @@ class CustomerEditor extends React.Component {
   // }
 
   saveValues(fields) {
-    //taken this from a nice blog article which explained multi step forms
+    // taken this from a nice blog article which explained multi step forms
 
     // Remember, `fieldValues` is set at the top of this file, we are simply appending
     // to and overriding keys in `fieldValues` with the `fields` using Object.assign
@@ -232,9 +233,9 @@ class CustomerEditor extends React.Component {
         return (
           <Step1Eligibility
             handleNext={this.handleNext.bind(this)}
-            handleBack={this.handleBack.bind(this)}
             saveValues={this.saveValues.bind(this)}
             customerInfo={this.state.customerInfo}
+            popTheSnackbar={this.props.popTheSnackbar.bind(this)}
           />
         );
       case 1:
@@ -244,6 +245,7 @@ class CustomerEditor extends React.Component {
             handleBack={this.handleBack.bind(this)}
             saveValues={this.saveValues.bind(this)}
             customerInfo={this.state.customerInfo}
+            popTheSnackbar={this.props.popTheSnackbar.bind(this)}
           />
         );
       case 2:
@@ -310,7 +312,7 @@ class CustomerEditor extends React.Component {
             >
               <Button
                 style={{ marginRight: "10px" }}
-                onClick={() => history.push("/customers")}
+                onClick={() => this.props.history.push("/customers")}
               >
                 Cancel
               </Button>
@@ -327,7 +329,10 @@ class CustomerEditor extends React.Component {
           </Grid>
         </Grid>
 
-        <Stepper activeStep={activeStep}>
+        <Stepper
+          activeStep={activeStep}
+          style={{ background: "none !important" }}
+        >
           {steps.map((label, index) => {
             const props = {};
             return (

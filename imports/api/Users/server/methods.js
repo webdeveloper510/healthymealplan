@@ -42,14 +42,73 @@ Meteor.methods({
   },
 
   "customers.step1": function customerStep1(data) {
-    const userId = Accounts.createUser({
-      email: data.email,
-      postalCode: data.postalCode,
-      "profile.name.first": data.first_name,
-      status: "abandoned"
+    check(data, {
+      email: String,
+      postalCode: String,
+      firstName: String
     });
 
+    console.log("Reached method");
+
+    try {
+      let userId = Accounts.createUser({
+        email: data.email,
+        profile: {
+          name: {
+            first: data.firstName
+          }
+        }
+      });
+    } catch (exception) {
+      throw new Meteor.Error("500", exception);
+    }
+
     Roles.addUsersToRoles(userId, ["customer"]);
+
+    Meteor.users.update(
+      { _id: userId },
+      { $set: { postalCode: data.postalCode, status: "abandoned" } }
+    );
+
+    return userId;
+  },
+
+  "customers.step2": function customerStep1(data) {
+    check(data, {
+      email: String,
+      firstName: String,
+      lastName: String,
+      phoneNumber: String,
+      adultOrChild: String
+    });
+
+    // let userId;
+
+    // try {
+    //   userId = Accounts.createUser({
+    //     email: data.email,
+    //     profile: {
+    //       name: {
+    //         first: data.firstName
+    //       }
+    //     }
+    //   });
+    // } catch (err) {
+    //   throw new Meteor.Error("500", err.reason + "");
+    // }
+
+    Meteor.users.update(
+      { _id: userId },
+      {
+        $set: {
+          email: data.email,
+          firstName: data.firstName,
+          lastName: data.lastName,
+          phone: data.phoneNumber,
+          adultOrChild: data.adultOrChild
+        }
+      }
+    );
 
     return userId;
   }
