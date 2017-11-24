@@ -1,19 +1,18 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Link } from 'react-router-dom';
-import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
-import { teal, red } from 'material-ui/colors';
-import Containers from 'meteor/utilities:react-list-container';
+import React from "react";
+import PropTypes from "prop-types";
+import { Link } from "react-router-dom";
+import { Meteor } from "meteor/meteor";
+import { createContainer } from "meteor/react-meteor-data";
+import { teal, red } from "material-ui/colors";
+import Containers from "meteor/utilities:react-list-container";
 
 const ListContainer = Containers.ListContainer;
 
-import Button from 'material-ui/Button';
-import Grid from 'material-ui/Grid';
-import Input from 'material-ui/Input';
+import Button from "material-ui/Button";
+import Grid from "material-ui/Grid";
+import Input from "material-ui/Input";
 
-
-import $ from 'jquery';
+import $ from "jquery";
 
 import Table, {
   TableBody,
@@ -22,29 +21,27 @@ import Table, {
   TableHead,
   TablePagination,
   TableRow,
-  TableSortLabel,
-} from 'material-ui/Table';
-import Toolbar from 'material-ui/Toolbar';
-import Typography from 'material-ui/Typography';
-import Paper from 'material-ui/Paper';
-import Checkbox from 'material-ui/Checkbox';
-import IconButton from 'material-ui/IconButton';
-import Tooltip from 'material-ui/Tooltip';
-import DeleteIcon from 'material-ui-icons/Delete';
-import FilterListIcon from 'material-ui-icons/FilterList';
-import SearchIcon from 'material-ui-icons/Search';
-import ClearIcon from 'material-ui-icons/Clear';
-import AppBar from 'material-ui/AppBar';
-import Tabs, { Tab } from 'material-ui/Tabs';
+  TableSortLabel
+} from "material-ui/Table";
+import Toolbar from "material-ui/Toolbar";
+import Typography from "material-ui/Typography";
+import Paper from "material-ui/Paper";
+import Checkbox from "material-ui/Checkbox";
+import IconButton from "material-ui/IconButton";
+import Tooltip from "material-ui/Tooltip";
+import DeleteIcon from "material-ui-icons/Delete";
+import FilterListIcon from "material-ui-icons/FilterList";
+import SearchIcon from "material-ui-icons/Search";
+import ClearIcon from "material-ui-icons/Clear";
+import AppBar from "material-ui/AppBar";
+import Tabs, { Tab } from "material-ui/Tabs";
 
-import IngredientsCollection from '../../../api/Ingredients/Ingredients';
-import IngredientTypes from '../../../api/IngredientTypes/IngredientTypes';
+import IngredientsCollection from "../../../api/Ingredients/Ingredients";
+import IngredientTypes from "../../../api/IngredientTypes/IngredientTypes";
 
-
-import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
-import Loading from '../../components/Loading/Loading';
-import IngredientsTable from './IngredientsTable';
-
+import AuthenticatedSideNav from "../../components/AuthenticatedSideNav/AuthenticatedSideNav";
+import Loading from "../../components/Loading/Loading";
+import IngredientsTable from "./IngredientsTable";
 
 const primary = teal[500];
 const danger = red[700];
@@ -52,12 +49,12 @@ const danger = red[700];
 const handleRemove = (event, ingredientId) => {
   event.stopPropagation();
 
-  if (confirm('Are you sure? This is permanent!')) {
-    Meteor.call('ingredients.remove', ingredientId, (error) => {
+  if (confirm("Are you sure? This is permanent!")) {
+    Meteor.call("ingredients.remove", ingredientId, error => {
       if (error) {
-        Bert.alert(error.reason, 'danger');
+        Bert.alert(error.reason, "danger");
       } else {
-        Bert.alert('Ingredient deleted!', 'success');
+        Bert.alert("Ingredient deleted!", "success");
       }
     });
   }
@@ -72,21 +69,19 @@ class Ingredients extends React.Component {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
       options: { sort: { title: 1 } },
-      searchSelector: '',
-      currentTabValue: 0,
+      searchSelector: "",
+      currentTabValue: 0
     };
   }
 
-  componentDidMount() {
-  }
+  componentDidMount() {}
 
   searchByName() {
     // const searchValue = new RegExp(, 'i');
     // console.log(searchValue);
 
-
     this.setState({
-      searchSelector: $('#search-ingredient-text').val(),
+      searchSelector: $("#search-ingredient-text").val()
     });
 
     // const query = {
@@ -109,10 +104,10 @@ class Ingredients extends React.Component {
   }
 
   clearSearchBox() {
-    $('#search-ingredient-text').val('');
+    $("#search-ingredient-text").val("");
 
     this.setState({
-      searchSelector: {},
+      searchSelector: {}
     });
   }
 
@@ -127,7 +122,6 @@ class Ingredients extends React.Component {
     const stateCopyOptions = this.state.options;
     const newOptions = {};
 
-
     // if user has selected to sort by that table column
     if (stateCopyOptions.sort.hasOwnProperty(`${field}`)) {
       if (stateCopyOptions.sort[field] === -1) {
@@ -135,12 +129,13 @@ class Ingredients extends React.Component {
       } else if (stateCopyOptions.sort[field] === 1) {
         newOptions[field] = -1;
       }
-    } else { // if user selects a new table column to sort
+    } else {
+      // if user selects a new table column to sort
       newOptions[field] = 1;
     }
 
     this.setState({
-      options: { sort: newOptions },
+      options: { sort: newOptions }
     });
 
     // console.log('Data sorting changed');
@@ -148,20 +143,22 @@ class Ingredients extends React.Component {
   }
 
   rowSelected(e) {
-    const selectedRowId = e.target.parentNode.parentNode.getAttribute('id');
+    const selectedRowId = e.target.parentNode.parentNode.getAttribute("id");
 
-    $(`.${selectedRowId}`).toggleClass('row-selected');
+    $(`.${selectedRowId}`).toggleClass("row-selected");
 
     const currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber;
 
     this.setState({
       checkboxesSelected: true,
-      selectedCheckboxesNumber: currentlySelectedCheckboxes + 1,
+      selectedCheckboxesNumber: currentlySelectedCheckboxes + 1
     });
   }
 
   renderTableHeadClasses() {
-    const classes = `${this.state.checboxesSelected ? 'table-head--show' : 'table-head--hide'}`;
+    const classes = `${
+      this.state.checboxesSelected ? "table-head--show" : "table-head--hide"
+    }`;
     return classes;
   }
 
@@ -172,99 +169,140 @@ class Ingredients extends React.Component {
       return `${subIngredient.length} sub-ingredient`;
     }
 
-    return '';
+    return "";
   }
-
 
   handleTabChange(event, value) {
     this.setState({ currentTabValue: value });
   }
 
-
   render() {
     // console.log(this.props.ingredients);
-    return (
-      (!this.props.loading ? (
-        <div>
-          {/* <AuthenticatedSideNav history={history} /> */}
+    return !this.props.loading ? (
+      <div>
+        {/* <AuthenticatedSideNav history={history} /> */}
 
-
-          <Grid container className="SideContent SideContent--spacer-2x--top SideContent--spacer-2x--horizontal">
-            <Grid container className="clearfix">
-              <Grid item xs={6}>
-                <Typography type="headline" gutterBottom className="pull-left headline" style={{ fontWeight: 500 }} color="inherit">Ingredients</Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Link to="/ingredients/new">
-                  <Button className="btn btn-primary" raised color="primary" style={{ float: 'right' }}>Add ingredient</Button>
-                </Link>
-              </Grid>
+        <Grid
+          container
+          className="SideContent SideContent--spacer-2x--top SideContent--spacer-2x--horizontal"
+        >
+          <Grid container className="clearfix">
+            <Grid item xs={6}>
+              <Typography
+                type="headline"
+                gutterBottom
+                className="pull-left headline"
+                style={{ fontWeight: 500 }}
+                color="inherit"
+              >
+                Ingredients
+              </Typography>
             </Grid>
+            <Grid item xs={6}>
+              <Link to="/ingredients/new">
+                <Button
+                  className="btn btn-primary"
+                  raised
+                  color="primary"
+                  style={{ float: "right" }}
+                >
+                  Add ingredient
+                </Button>
+              </Link>
+            </Grid>
+          </Grid>
 
-
-            <div style={{ marginTop: '25px' }}>
-              <AppBar position="static" className="appbar--no-background appbar--no-shadow">
-                <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
-                  <Tab label="All" />
-                  {/* <Tab label="Item Two" />
+          <div style={{ marginTop: "25px" }}>
+            <AppBar
+              position="static"
+              className="appbar--no-background appbar--no-shadow"
+            >
+              <Tabs
+                indicatorColor="#000"
+                value={this.state.currentTabValue}
+                onChange={this.handleTabChange.bind(this)}
+              >
+                <Tab label="All" />
+                {/* <Tab label="Item Two" />
                   <Tab label="Item Three" /> */}
-                </Tabs>
-              </AppBar>
-            </div>
+              </Tabs>
+            </AppBar>
+          </div>
 
-            <div style={{ width: '100%',
-              background: '#FFF',
-              borderTopRightRadius: '2px',
-              borderTopLeftRadius: '2px',
-              marginTop: '3em',
-              padding: '16px 25px 1em',
-              boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
-              position: 'relative' }}
-            >
+          <div
+            style={{
+              width: "100%",
+              background: "#FFF",
+              borderTopRightRadius: "2px",
+              borderTopLeftRadius: "2px",
+              marginTop: "3em",
+              padding: "16px 25px 1em",
+              boxShadow:
+                "0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)",
+              position: "relative"
+            }}
+          >
+            <SearchIcon
+              className="autoinput-icon autoinput-icon--search"
+              style={{
+                display:
+                  this.state.searchSelector.length > 0 ? "none" : "block",
+                top: "33%",
+                right: "1.8em !important"
+              }}
+            />
 
-              <SearchIcon
-                className="autoinput-icon autoinput-icon--search"
-                style={{ display: (this.state.searchSelector.length > 0) ? 'none' : 'block', top: '33%', right: '1.8em !important' }}
-              />
+            <ClearIcon
+              className="autoinput-icon--clear"
+              onClick={this.clearSearchBox.bind(this)}
+              style={{
+                cursor: "pointer",
+                display: this.state.searchSelector.length > 0 ? "block" : "none"
+              }}
+            />
 
-              <ClearIcon
-                className="autoinput-icon--clear"
-                onClick={this.clearSearchBox.bind(this)}
-                style={{ cursor: 'pointer',
-                  display: (this.state.searchSelector.length > 0) ? 'block' : 'none' }}
-              />
+            <Input
+              className="input-box"
+              style={{ width: "100%", position: "relative" }}
+              placeholder="Search ingredients"
+              onKeyUp={this.searchByName.bind(this)}
+              inputProps={{
+                id: "search-ingredient-text",
+                "aria-label": "Description"
+              }}
+            />
+          </div>
+          <ListContainer
+            limit={50}
+            collection={IngredientsCollection}
+            publication="ingredients"
+            options={this.state.options}
+            selector={{
+              $or: [
+                {
+                  title: {
+                    $regex: new RegExp(this.state.searchSelector),
+                    $options: "i"
+                  }
+                },
+                {
+                  SKU: {
+                    $regex: RegExp(this.state.searchSelector),
+                    $options: "i"
+                  }
+                }
+              ]
+            }}
+          >
+            <IngredientsTable
+              popTheSnackbar={this.props.popTheSnackbar}
+              searchTerm={this.state.searchSelector}
+              history={this.props.history}
+              sortByOptions={this.sortByOption.bind(this)}
+            />
+          </ListContainer>
 
-              <Input
-                className="input-box"
-                style={{ width: '100%', position: 'relative' }}
-                placeholder="Search ingredients"
-                onKeyUp={this.searchByName.bind(this)}
-                inputProps={{
-                  id: 'search-ingredient-text',
-                  'aria-label': 'Description',
-                }}
-              />
-            </div>
-            <ListContainer
-              limit={50}
-              collection={IngredientsCollection}
-              publication="ingredients"
-              options={this.state.options}
-              selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-                { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
-            >
-
-              <IngredientsTable
-                popTheSnackbar={this.props.popTheSnackbar}
-                searchTerm={this.state.searchSelector}
-                history={this.props.history}
-                sortByOptions={this.sortByOption.bind(this)}
-              />
-
-            </ListContainer>
-
-
-            {/* 
+          {/* 
                 joins={[{
                     localProperty: "typeId",
                     collection: IngredientTypes,
@@ -276,7 +314,7 @@ class Ingredients extends React.Component {
                 }]}
             */}
 
-            {/* <Grid container>
+          {/* <Grid container>
               <Grid item xs={12}>
                 {this.props.ingredients.length ?
                   <Paper elevation={2} className="table-container">
@@ -310,12 +348,12 @@ class Ingredients extends React.Component {
                     </Table>
                   </Paper>
                   : <Alert bsStyle="warning">No Ingredients yet!</Alert>} */}
-            {/* </Grid>
+          {/* </Grid>
             </Grid> */}
-          </Grid>
-        </div>
-      ) : <Loading />)
-
+        </Grid>
+      </div>
+    ) : (
+      <Loading />
     );
   }
 }
@@ -327,16 +365,16 @@ Ingredients.propTypes = {
   ingredients: PropTypes.arrayOf(PropTypes.object),
   // ingredientTypes: PropTypes.isRequired,
   match: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe('ingredients');
-  const subscription2 = Meteor.subscribe('ingredientTypes');
+  const subscription = Meteor.subscribe("ingredients");
+  const subscription2 = Meteor.subscribe("ingredientTypes");
 
   return {
     loading: !subscription.ready() || !subscription2.ready(),
     ingredients: IngredientsCollection.find().fetch(),
-    ingredientTypes: IngredientTypes.find().fetch(),
+    ingredientTypes: IngredientTypes.find().fetch()
   };
 }, Ingredients);

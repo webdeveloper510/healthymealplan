@@ -71,8 +71,9 @@ Meteor.methods({
     return userId;
   },
 
-  "customers.step2": function customerStep1(data) {
+  "customers.step2": function customerStep2(data) {
     check(data, {
+      id: String,
       email: String,
       firstName: String,
       lastName: String,
@@ -80,35 +81,49 @@ Meteor.methods({
       adultOrChild: String
     });
 
-    // let userId;
-
-    // try {
-    //   userId = Accounts.createUser({
-    //     email: data.email,
-    //     profile: {
-    //       name: {
-    //         first: data.firstName
-    //       }
-    //     }
-    //   });
-    // } catch (err) {
-    //   throw new Meteor.Error("500", err.reason + "");
-    // }
-
-    Meteor.users.update(
-      { _id: userId },
-      {
-        $set: {
-          email: data.email,
-          firstName: data.firstName,
-          lastName: data.lastName,
-          phone: data.phoneNumber,
-          adultOrChild: data.adultOrChild
+    try {
+      Meteor.users.update(
+        { _id: data.id },
+        {
+          $set: {
+            "profile.name.first": data.firstName,
+            "profile.name.last": data.lastName,
+            phone: data.phoneNumber,
+            adultOrChild: data.adultOrChild
+          }
         }
-      }
-    );
+      );
+    } catch (exception) {
+      throw new Meteor.Error("500", exception);
+    }
+  },
 
-    return userId;
+  "customers.step3": function customerStep3(data) {
+    check(data, {
+      id: String,
+      lifestyle: Array,
+      extra: String,
+      discount: String,
+      restrictions: Array,
+      preferences: Array
+    });
+
+    try {
+      Meteor.users.update(
+        { _id: data.id },
+        {
+          $set: {
+            lifestyle: data.lifestyle,
+            extra: data.extra,
+            discount: data.discount,
+            restrictions: data.restrictions,
+            preferences: data.preferences
+          }
+        }
+      );
+    } catch (exception) {
+      throw new Meteor.Error("500", exception);
+    }
   }
 });
 

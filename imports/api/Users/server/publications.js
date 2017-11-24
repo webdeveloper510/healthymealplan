@@ -1,8 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
-import {Match} from 'meteor/check';
+import { Match } from 'meteor/check';
 
-import {check} from 'meteor/check';
+import { check } from 'meteor/check';
 
 Meteor.publish('users.editProfile', function usersProfile() {
   return Meteor.users.find(this.userId, {
@@ -14,15 +14,11 @@ Meteor.publish('users.editProfile', function usersProfile() {
   });
 });
 
-
 Meteor.publish('users.owners', () => Meteor.users.find({ roles: ['owner'] }));
 
 Meteor.publish('users.staff', () => Meteor.users.find({ roles: ['staff'] }));
 
-
-
-Meteor.publish('users.customers', function users(query, selector) {
-
+Meteor.publish('users.customers', (query, selector) => {
   check(query, Match.Maybe(Object));
   check(selector, Match.Maybe(Object));
 
@@ -34,11 +30,12 @@ Meteor.publish('users.customers', function users(query, selector) {
   // }
 
   return Meteor.users.find({ roles: ['customer'] });
-  
 });
-
 
 Meteor.publish('customers-all-count', function customersCount() {
-  Counts.publish(this, 'customers-count', Meteor.users.find({ roles: ['customer'] }));
+  Counts.publish(
+    this,
+    'customers-count',
+    Meteor.users.find({ roles: ['customer'] }),
+  );
 });
-

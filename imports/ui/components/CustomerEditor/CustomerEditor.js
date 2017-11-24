@@ -43,6 +43,7 @@ import Stepper, { Step, StepLabel } from "material-ui/Stepper";
 import validate from "../../../modules/validate";
 import Step1Eligibility from "./Step1Eligibility";
 import Step2Contact from "./Step2Contact";
+import Step3LifestyleProfile from "./Step3LifestyleProfile";
 
 import $ from "jquery";
 
@@ -89,7 +90,6 @@ class CustomerEditor extends React.Component {
       deleteDialogOpen: false,
       hasFormChanged: false,
       activeStep: 0,
-      skipped: new Set(),
       customerInfo: {
         id: "",
         firstName: "",
@@ -99,7 +99,17 @@ class CustomerEditor extends React.Component {
         phoneNumber: "",
         adultOrChild: "",
         lifestyle: "",
-        discountAndExtras: {}
+        discount: {},
+        extra: {},
+        restrictions: [],
+        preferences: [],
+        address: {
+          type: "",
+          street: "",
+          postalCode: "",
+          notes: ""
+        },
+        secondaryProfiles: []
       }
     };
   }
@@ -229,7 +239,7 @@ class CustomerEditor extends React.Component {
 
   getStepContent(step) {
     switch (step) {
-      case 0:
+      case 2:
         return (
           <Step1Eligibility
             handleNext={this.handleNext.bind(this)}
@@ -248,8 +258,17 @@ class CustomerEditor extends React.Component {
             popTheSnackbar={this.props.popTheSnackbar.bind(this)}
           />
         );
-      case 2:
-        return "Lifestyle";
+      case 0:
+        return (
+          <Step3LifestyleProfile
+            handleNext={this.handleNext.bind(this)}
+            handleBack={this.handleBack.bind(this)}
+            saveValues={this.saveValues.bind(this)}
+            customerInfo={this.state.customerInfo}
+            popTheSnackbar={this.props.popTheSnackbar.bind(this)}
+            potentialSubIngredients={this.props.potentialSubIngredients}
+          />
+        );
       case 3:
         return "Delivery";
       case 4:

@@ -120,6 +120,7 @@ class Step2Contact extends React.Component {
     Meteor.call(
       "customers.step2",
       {
+        id: this.props.customerInfo.id,
         firstName: $('[name="first_name"]')
           .val()
           .trim(),
@@ -227,7 +228,7 @@ class Step2Contact extends React.Component {
                         id="last_name"
                         label="Last name"
                         name="last_name"
-                        defaultValue={this.props.customerInfo.firstName}
+                        defaultValue={this.props.customerInfo.lastName}
                         inputProps={{}}
                       />
                     </Grid>
@@ -256,7 +257,7 @@ class Step2Contact extends React.Component {
                   <Grid container>
                     <Grid item xs={12}>
                       <FormControl component="fieldset">
-                        <FormLabel component="legend">Type</FormLabel>
+                        {/* <FormLabel component="legend">Type</FormLabel> */}
                         <RadioGroup
                           aria-label="account-type"
                           name="type"
@@ -268,11 +269,14 @@ class Step2Contact extends React.Component {
                             value="adult"
                             control={<Radio />}
                             label="Adult"
+                            selected
+                            disabled
                           />
                           <FormControlLabel
                             value="child"
                             control={<Radio />}
                             label="Child"
+                            disabled
                           />
                         </RadioGroup>
                       </FormControl>
