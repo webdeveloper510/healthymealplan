@@ -127,6 +127,7 @@ class Step3LifestyleProfile extends React.Component {
 
       primaryCollapse: false,
       secondaryCollapses: [false, false, false, false, false, false],
+      secondaryProfileCount: 0,
       secondaryProfilesData: []
     };
   }
@@ -167,6 +168,67 @@ class Step3LifestyleProfile extends React.Component {
       submitHandler() {
         component.handleSubmitStep();
       }
+    });
+  }
+
+  increaseProfileCount() {
+    if (this.state.secondaryProfileCount === 6) {
+      this.popTheSnackbar({
+        message: "Cannot add more than"
+      });
+
+      return;
+    }
+
+    const increasedProfileCount = this.state.secondaryProfileCount + 1;
+
+    let currentSecondaryProfiles = this.state.secondaryProfilesData.slice();
+
+    currentSecondaryProfiles.push({
+      value: "",
+      suggestions: [],
+      submitLoading: false,
+      submitSuccess: false,
+      subIngredients: [],
+      specificRestrictions: [],
+      deleteDialogOpen: false,
+      addRestrictionType: "Restriction",
+      lifestyle: this.props.customerInfo.adultOrChild
+        ? this.props.customerInfo.adultOrChild
+        : "traditional",
+      extra: this.props.customerInfo.extra
+        ? this.props.customerInfo.extra
+        : "none",
+      discount: this.props.customerInfo.discount
+        ? this.props.customerInfo.discount
+        : "none",
+
+      peanuts: false,
+      milk: false,
+      egg: false,
+      wheat: false,
+      soy: false,
+      fish: false,
+      shellfish: false,
+
+      ketogenic: false,
+      glutenfree: false,
+      lowcarb: false,
+      nocarb: false,
+      ovolacto: false,
+      ovo: false,
+      lacto: false,
+      pescatarian: false,
+      paleo: false,
+      vegan: false,
+
+      halal: false,
+      kosher: false,
+    });
+
+    this.setState({
+      secondaryProfileCount: increasedProfileCount,
+      secondaryProfilesData: currentSecondaryProfiles
     });
   }
 
@@ -1066,6 +1128,646 @@ class Step3LifestyleProfile extends React.Component {
                       </Grid>
                     </Grid>
                   </Collapse>
+
+                  {this.state.secondaryProfilesData.map((e, i) => (
+                    <div key={i}>
+                      <ListItem
+                        style={{ marginTop: "15px", marginBottom: "15px" }}
+                        button
+                        onClick={this.handleProfileOpen.bind(this, false, i)}
+                      >
+                        <ListItemText primary={`Profile ${i + 2}`} />
+                        {this.state.secondaryCollapses[i] ? (
+                          <ExpandLess />
+                        ) : (
+                          <ExpandMore />
+                        )}
+                      </ListItem>
+                      <Collapse
+                        in={this.state.secondaryCollapses[i]}
+                        transitionDuration="auto"
+                        component="div"
+                      >
+                        <div style={{ paddingLeft: "16px", paddingRight: "16px" }}>
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                margin="normal"
+                                id="first_name"
+                                label="First name"
+                                name="first_name"
+                                fullWidth
+                                defaultValue={this.props.customerInfo.firstName}
+                                inputProps={{}}
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                margin="normal"
+                                id="last_name"
+                                label="Last name"
+                                name="last_name"
+                                fullWidth
+                                defaultValue={this.props.customerInfo.lastName}
+                                inputProps={{}}
+                              />
+                            </Grid>
+                            <Grid item xs={12}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  Select lifestyle
+                                </FormLabel>
+                                <RadioGroup
+                                  aria-label="lifestyle"
+                                  name="lifestyle"
+                                  value={this.state.lifestyle}
+                                  onChange={this.handleChangeRadioLifestyle.bind(
+                                    this
+                                  )}
+                                  style={{ flexDirection: "row" }}
+                                >
+                                  <FormControlLabel
+                                    value="Traditional"
+                                    control={<Radio />}
+                                    label="Traditional"
+                                    selected
+                                  />
+                                  <FormControlLabel
+                                    value="Vegetarian"
+                                    control={<Radio />}
+                                    label="Vegetarian"
+                                  />
+
+                                  <FormControlLabel
+                                    value="Chef's choice"
+                                    control={<Radio />}
+                                    label="Chef's choice"
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container>
+                            <Grid item xs={12}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">Extras</FormLabel>
+                                <RadioGroup
+                                  aria-label="extra"
+                                  name="extra"
+                                  value={this.state.extra}
+                                  onChange={this.handleChangeRadioExtra.bind(
+                                    this
+                                  )}
+                                  style={{ flexDirection: "row" }}
+                                >
+                                  <FormControlLabel
+                                    value="none"
+                                    control={<Radio />}
+                                    label="None"
+                                    selected
+                                  />
+                                  <FormControlLabel
+                                    value="athletic"
+                                    control={<Radio />}
+                                    label="Athletic"
+                                    selected
+                                  />
+                                  <FormControlLabel
+                                    value="bodybuilder"
+                                    control={<Radio />}
+                                    label="Bodybuilder"
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container>
+                            <Grid item xs={12}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  Discounts
+                                </FormLabel>
+                                <RadioGroup
+                                  aria-label="discount"
+                                  name="discount"
+                                  value={this.state.discount}
+                                  onChange={this.handleChangeRadioDiscount.bind(
+                                    this
+                                  )}
+                                  style={{ flexDirection: "row" }}
+                                >
+                                  <FormControlLabel
+                                    value="none"
+                                    control={<Radio />}
+                                    label="None"
+                                    selected
+                                  />
+                                  <FormControlLabel
+                                    value="student"
+                                    control={<Radio />}
+                                    label="Student"
+                                  />
+                                  <FormControlLabel
+                                    value="senior"
+                                    control={<Radio />}
+                                    label="Senior"
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container>
+                            <Grid item xs={12} style={{ marginTop: "25px" }}>
+                              <Typography type="subheading">
+                                Restrictions
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  Allergies
+                                </FormLabel>
+                                <FormGroup>
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.peanuts}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "peanuts"
+                                        )}
+                                        value="peanuts"
+                                      />
+                                    }
+                                    label="Peanuts"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.milk}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "milk"
+                                        )}
+                                        value="Milk"
+                                      />
+                                    }
+                                    label="Milk"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.egg}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "egg"
+                                        )}
+                                        value="egg"
+                                      />
+                                    }
+                                    label="Egg"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.wheat}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "wheat"
+                                        )}
+                                        value="wheat"
+                                      />
+                                    }
+                                    label="Wheat"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.soy}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "soy"
+                                        )}
+                                        value="soy"
+                                      />
+                                    }
+                                    label="Soy"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.fish}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "fish"
+                                        )}
+                                        value="fish"
+                                      />
+                                    }
+                                    label="Fish"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.shellfish}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "shellfish"
+                                        )}
+                                        value="shellfish"
+                                      />
+                                    }
+                                    label="Shellfish"
+                                  />
+                                </FormGroup>
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  Dietary
+                                </FormLabel>
+                                <FormGroup>
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.ketogenic}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "ketogenic"
+                                        )}
+                                        value="ketogenic"
+                                      />
+                                    }
+                                    label="Ketogenic"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.glutenfree}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "glutenfree"
+                                        )}
+                                        value="Gluten free"
+                                      />
+                                    }
+                                    label="Gluten free"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.lowcarb}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "lowcarb"
+                                        )}
+                                        value="Low carb"
+                                      />
+                                    }
+                                    label="Low carb"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.nocarb}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "nocarb"
+                                        )}
+                                        value="No carb"
+                                      />
+                                    }
+                                    label="No carb"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.ovolacto}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "ovolacto"
+                                        )}
+                                        value="Ovo-lacto"
+                                      />
+                                    }
+                                    label="Ovo-lacto"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.lacto}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "lacto"
+                                        )}
+                                        value="lacto"
+                                      />
+                                    }
+                                    label="Lacto"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.vegan}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "vegan"
+                                        )}
+                                        value="vegan"
+                                      />
+                                    }
+                                    label="Vegan"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.pescatarian}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "pescatarian"
+                                        )}
+                                        value="pescatarian"
+                                      />
+                                    }
+                                    label="Pescatarian"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.paleo}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "paleo"
+                                        )}
+                                        value="paleo"
+                                      />
+                                    }
+                                    label="Paleo"
+                                  />
+                                </FormGroup>
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  Religious
+                                </FormLabel>
+                                <FormGroup>
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.halal}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "halal"
+                                        )}
+                                        value="halal"
+                                      />
+                                    }
+                                    label="Halal"
+                                  />
+                                  <FormControlLabel
+                                    control={
+                                      <Checkbox
+                                        checked={this.state.kosher}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          "kosher"
+                                        )}
+                                        value="Kosher"
+                                      />
+                                    }
+                                    label="Kosher"
+                                  />
+                                </FormGroup>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+                          <Grid container>
+                            <Grid item xs={12}>
+                              <Button
+                                style={{ float: "right" }}
+                                color="primary"
+                                onClick={this.deleteDialogHandleOpen.bind(this)}
+                              >
+                                Add a restriction
+                              </Button>
+                            </Grid>
+                          </Grid>
+                          <Dialog
+                            open={this.state.deleteDialogOpen}
+                            onRequestClose={this.deleteDialogHandleRequestClose.bind(
+                              this
+                            )}
+                          >
+                            <Typography
+                              style={{
+                                flex: "0 0 auto",
+                                margin: "0",
+                                padding: "24px 24px 20px 24px"
+                              }}
+                              className="title font-medium"
+                              type="title"
+                            >
+                              Add a restriction
+                            </Typography>
+
+                            <DialogContent>
+                              <DialogContentText>
+                                Select if it's a preference or if it's a
+                                restriction
+                              </DialogContentText>
+                              <FormControl component="fieldset">
+                                <RadioGroup
+                                  aria-label="restritionOrPref"
+                                  name="restritionOrPref"
+                                  value={this.state.addRestrictionType}
+                                  onChange={this.handleChangeRadioRestriction.bind(
+                                    this
+                                  )}
+                                  style={{ flexDirection: "row" }}
+                                >
+                                  <FormControlLabel
+                                    value="Restriction"
+                                    control={<Radio selected />}
+                                    label="Restriction"
+                                  />
+                                  <FormControlLabel
+                                    value="Preference"
+                                    control={<Radio />}
+                                    label="Preference"
+                                    selected
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+
+                              {/* <Search className="autoinput-icon" /> */}
+                              <Autosuggest
+                                id="2"
+                                className="autosuggest"
+                                theme={{
+                                  container: {
+                                    flexGrow: 1,
+                                    position: "relative",
+                                    marginBottom: "2em"
+                                  },
+                                  suggestionsContainerOpen: {
+                                    position: "absolute",
+                                    left: 0,
+                                    right: 0
+                                  },
+                                  suggestion: {
+                                    display: "block"
+                                  },
+                                  suggestionsList: {
+                                    margin: 0,
+                                    padding: 0,
+                                    listStyleType: "none"
+                                  }
+                                }}
+                                renderInputComponent={this.renderInput.bind(
+                                  this
+                                )}
+                                suggestions={this.state.suggestions}
+                                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
+                                  this
+                                )}
+                                onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
+                                  this
+                                )}
+                                onSuggestionSelected={this.onSuggestionSelected.bind(
+                                  this
+                                )}
+                                getSuggestionValue={this.getSuggestionValue.bind(
+                                  this
+                                )}
+                                renderSuggestion={this.renderSuggestion.bind(
+                                  this
+                                )}
+                                renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                                  this
+                                )}
+                                fullWidth
+                                focusInputOnSuggestionClick={false}
+                                inputProps={{
+                                  placeholder: "Search",
+                                  value: this.state.value,
+                                  onChange: this.onChange.bind(this),
+                                  className: "autoinput"
+                                }}
+                              />
+                            </DialogContent>
+                          </Dialog>
+
+                          <Grid container>
+                            <Grid item xs={12} style={{ marginTop: "25px" }}>
+                              <Typography type="subheading">
+                                Preferences
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} style={{ marginTop: "25px" }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  flexWrap: "wrap"
+                                }}
+                              >
+                                {this.state.subIngredients.length ? (
+                                  this.state.subIngredients.map(
+                                    (subIngredient, i) => (
+                                      <Chip
+                                        avatar={
+                                          <Avatar>
+                                            {" "}
+                                            {this.getSubIngredientAvatar(
+                                              subIngredient
+                                            )}{" "}
+                                          </Avatar>
+                                        }
+                                        style={{
+                                          marginRight: "8px",
+                                          marginBottom: "8px"
+                                        }}
+                                        label={this.getSubIngredientTitle(
+                                          subIngredient
+                                        )}
+                                        key={i}
+                                        onRequestDelete={this.handleSubIngredientChipDelete.bind(
+                                          this,
+                                          subIngredient
+                                        )}
+                                      />
+                                    )
+                                  )
+                                ) : (
+                                  <Chip
+                                    className="chip--bordered"
+                                    label="Ingredient"
+                                  />
+                                )}
+                              </div>
+                            </Grid>
+                            <Grid item xs={12} style={{ marginTop: "25px" }}>
+                              <Typography type="subheading">
+                                Restrictions
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} style={{ marginTop: "25px" }}>
+                              <div
+                                style={{
+                                  display: "flex",
+                                  alignItems: "center",
+                                  flexWrap: "wrap"
+                                }}
+                              >
+                                {this.state.specificRestrictions.length ? (
+                                  this.state.specificRestrictions.map(
+                                    (subIngredient, i) => (
+                                      <Chip
+                                        avatar={
+                                          <Avatar>
+                                            {" "}
+                                            {this.getSubIngredientAvatar(
+                                              subIngredient
+                                            )}{" "}
+                                          </Avatar>
+                                        }
+                                        style={{
+                                          marginRight: "8px",
+                                          marginBottom: "8px"
+                                        }}
+                                        label={this.getSubIngredientTitle(
+                                          subIngredient
+                                        )}
+                                        key={i}
+                                        onRequestDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                                          this,
+                                          subIngredient
+                                        )}
+                                      />
+                                    )
+                                  )
+                                ) : (
+                                  <Chip
+                                    className="chip--bordered"
+                                    label="Ingredient"
+                                  />
+                                )}
+                              </div>
+                            </Grid>
+                          </Grid>
+                        </div>
+                      </Collapse>
+                    </div>
+                  ))}
+                  <Button raised onClick={this.increaseProfileCount.bind(this)} style={{ marginTop: "25px" }}>
+                    Add a profile
+                  </Button>
                 </Paper>
               </Grid>
             </Grid>
