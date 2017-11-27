@@ -8,7 +8,7 @@ const Lifestyles = new Mongo.Collection('Lifestyles');
 Lifestyles.allow({
   insert: () => false,
   update: () => false,
-  remove: () => false,  
+  remove: () => false,
 });
 
 Lifestyles.deny({
@@ -52,15 +52,18 @@ Lifestyles.schema = new SimpleSchema({
   },
   'prices.breakfast.$': {
     type: Number,
-    label: 'Price of the meal type for each person. Index is the number of people 0 - 7.',
+    label:
+      'Price of the meal type for each person. Index is the number of people 0 - 7.',
   },
   'prices.lunch.$': {
     type: Number,
-    label: 'Price of the meal type for each person. Index is the number of people 0 - 7.',
+    label:
+      'Price of the meal type for each person. Index is the number of people 0 - 7.',
   },
   'prices.dinner.$': {
     type: Number,
-    label: 'Price of the meal type for each person. Index is the number of people 0 - 7.',
+    label:
+      'Price of the meal type for each person. Index is the number of people 0 - 7.',
   },
   discountAthletic: {
     type: Number,
@@ -73,6 +76,21 @@ Lifestyles.schema = new SimpleSchema({
     optional: true,
   },
   discountOrExtraTypeAthletic: {
+    type: String,
+    label: 'Percentage or Fixed amount',
+    optional: true,
+  },
+  discountBodybuilder: {
+    type: Number,
+    label: 'The amount of discount',
+    optional: true,
+  },
+  extraBodybuilder: {
+    type: Number,
+    label: 'The amount of extra',
+    optional: true,
+  },
+  discountOrExtraTypeBodybuilder: {
     type: String,
     label: 'Percentage or Fixed amount',
     optional: true,
@@ -115,17 +133,16 @@ Lifestyles.schema = new SimpleSchema({
     type: String,
     label: 'The date this category was created.',
     autoValue() {
-      if (this.isInsert) return (new Date()).toISOString();
+      if (this.isInsert) return new Date().toISOString();
     },
   },
   updatedAt: {
     type: String,
     label: 'The date this category was last updated.',
     autoValue() {
-      if (this.isInsert || this.isUpdate) return (new Date()).toISOString();
+      if (this.isInsert || this.isUpdate) return new Date().toISOString();
     },
   },
-
 });
 
 Lifestyles.attachSchema(Lifestyles.schema);

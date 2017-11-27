@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import { Match } from 'meteor/check';
 import { check } from 'meteor/check';
 import Plates from './Plates';
 import rateLimit from '../../modules/rate-limit';
@@ -11,15 +12,15 @@ Meteor.methods({
       title: String,
       subtitle: String,
       mealType: String,
+      instructionId: Match.Maybe(String),
       ingredients: Array,
     });
 
     console.log(plate);
 
-    console.log('Reaching here');
+    // console.log("Reaching here");
 
     const existingPlate = Plates.findOne({ title: plate.title });
-    console.log(existingPlate);
 
     if (existingPlate) {
       throw new Meteor.Error('500', `${plate.title} is already present`);
@@ -28,15 +29,21 @@ Meteor.methods({
     let nextSeqItem = getNextSequence('plates');
     nextSeqItem = nextSeqItem.toString();
 
+    const plateToInsert = {
+      SKU: nextSeqItem,
+      title: plate.title,
+      subtitle: plate.subtitle,
+      ingredients: plate.ingredients,
+      mealType: plate.mealType,
+      createdBy: this.userId,
+    };
+
+    if (plate.instructionId) {
+      plateToInsert.instructionId = plate.instructionId;
+    }
+
     try {
-      return Plates.insert({
-        SKU: nextSeqItem,
-        title: plate.title,
-        subtitle: plate.subtitle,
-        ingredients: plate.ingredients,
-        mealType: plate.mealType,
-        createdBy: this.userId,
-      });
+      return Plates.insert(plateToInsert);
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
@@ -46,14 +53,16 @@ Meteor.methods({
       _id: String,
       title: String,
       subtitle: String,
+      instructionId: Match.Maybe(String),
       mealType: String,
       ingredients: Array,
     });
 
-    // check(plate.ingredients, {
-    //   _id: String,
-    //   title: String,
-    // });
+    const keysToUnset = {};
+
+    if (!plate.instructionId) {
+      keysToUnset.instructionId = '';
+    }
 
     console.log(plate);
 
@@ -61,6 +70,7 @@ Meteor.methods({
       const plateId = plate._id;
 
       Plates.update(plateId, {
+        $unset: keysToUnset,
         $set: {
           ...plate,
         },
@@ -112,8 +122,6 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
-
-
 });
 
 rateLimit({

@@ -4,6 +4,9 @@ import '../../api/Documents/server/publications';
 import '../../api/Ingredients/methods';
 import '../../api/Ingredients/server/publications';
 
+import '../../api/Instructions/methods';
+import '../../api/Instructions/server/publications';
+
 import '../../api/IngredientTypes/methods';
 import '../../api/IngredientTypes/server/publications';
 

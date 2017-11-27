@@ -1,5 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
+import { Match } from 'meteor/check';
+
 import Sides from './Sides';
 import rateLimit from '../../modules/rate-limit';
 
@@ -11,13 +13,9 @@ Meteor.methods({
       title: String,
       subtitle: String,
       mealType: String,
+      instructionId: Match.Maybe(String),
       ingredients: Array,
     });
-
-    // check(side.ingredients, {
-    //   _id: String,
-    //   title: String,
-    // });
 
     console.log(side);
 
@@ -33,15 +31,21 @@ Meteor.methods({
     let nextSeqItem = getNextSequence('sides');
     nextSeqItem = nextSeqItem.toString();
 
+    const plateToInsert = {
+      SKU: nextSeqItem,
+      title: side.title,
+      subtitle: side.subtitle,
+      ingredients: side.ingredients,
+      mealType: side.mealType,
+      createdBy: this.userId,
+    };
+
+    if (side.instructionId) {
+      plateToInsert.instructionId = side.instructionId;
+    }
+
     try {
-      return Sides.insert({
-        SKU: nextSeqItem,
-        title: side.title,
-        subtitle: side.subtitle,
-        ingredients: side.ingredients,
-        mealType: side.mealType,
-        createdBy: this.userId,
-      });
+      return Sides.insert(plateToInsert);
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
@@ -52,13 +56,21 @@ Meteor.methods({
       title: String,
       subtitle: String,
       mealType: String,
+      instructionId: Match.Maybe(String),
       ingredients: Array,
     });
+
+    const keysToUnset = {};
+
+    if (!side.instructionId) {
+      keysToUnset.instructionId = '';
+    }
 
     try {
       const sideId = side._id;
 
       Sides.update(sideId, {
+        $unset: keysToUnset,
         $set: {
           ...side,
         },
@@ -110,8 +122,6 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
-
-
 });
 
 rateLimit({

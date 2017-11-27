@@ -3,43 +3,57 @@ import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { Meteor } from "meteor/meteor";
 import { createContainer } from "meteor/react-meteor-data";
-import $ from "jquery";
+import { teal, red } from "material-ui/colors";
+import Containers from "meteor/utilities:react-list-container";
+
+const ListContainer = Containers.ListContainer;
 
 import Button from "material-ui/Button";
 import Grid from "material-ui/Grid";
+import Input from "material-ui/Input";
+
+import $ from "jquery";
+
+import Table, {
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TablePagination,
+  TableRow,
+  TableSortLabel
+} from "material-ui/Table";
 import Toolbar from "material-ui/Toolbar";
 import Typography from "material-ui/Typography";
 import Paper from "material-ui/Paper";
-import Input from "material-ui/Input";
-import { teal, red } from "material-ui/colors";
+import Checkbox from "material-ui/Checkbox";
+import IconButton from "material-ui/IconButton";
+import Tooltip from "material-ui/Tooltip";
+import DeleteIcon from "material-ui-icons/Delete";
+import FilterListIcon from "material-ui-icons/FilterList";
 import SearchIcon from "material-ui-icons/Search";
 import ClearIcon from "material-ui-icons/Clear";
 import AppBar from "material-ui/AppBar";
 import Tabs, { Tab } from "material-ui/Tabs";
 
-import IngredientTypesCollection from "../../../api/IngredientTypes/IngredientTypes";
-import CategoriesCollection from "../../../api/Categories/Categories";
+import InstructionsCollection from "../../../api/Instructions/Instructions";
 
 import AuthenticatedSideNav from "../../components/AuthenticatedSideNav/AuthenticatedSideNav";
 import Loading from "../../components/Loading/Loading";
-
-import Containers from "meteor/utilities:react-list-container";
-
-const ListContainer = Containers.ListContainer;
-
-import TypesTable from "./TypesTable";
+import InstructionsTable from "./InstructionsTable";
 
 const primary = teal[500];
 const danger = red[700];
 
-class Types extends React.Component {
+class Instructions extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
+      checkboxesSelected: false,
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      options: { sort: { SKU: -1 } },
+      options: { sort: { title: 1 } },
       searchSelector: "",
       currentTabValue: 0
     };
@@ -47,31 +61,19 @@ class Types extends React.Component {
 
   componentDidMount() {}
 
-  handleRemove(ingredientId) {
-    if (confirm("Are you sure? This is permanent!")) {
-      Meteor.call("ingredientTypes.remove", ingredientId, error => {
-        if (error) {
-          Bert.alert(error.reason, "danger");
-        } else {
-          Bert.alert("Type deleted!", "success");
-        }
-      });
-    }
-  }
-
   searchByName() {
     // const searchValue = new RegExp(, 'i');
     // console.log(searchValue);
 
     this.setState({
-      searchSelector: $("#search-type-text").val()
+      searchSelector: $("#search-instruction-text").val()
     });
 
     // const query = {
     //   title: { $regex: searchValue },
     // };
 
-    // if ($('#search-type-text').val() > 1) {
+    // if ($('#search-instruction-text').val() > 1) {
     //   this.setState({
     //     searchSelector: query,
     //   });
@@ -87,7 +89,7 @@ class Types extends React.Component {
   }
 
   clearSearchBox() {
-    $("#search-type-text").val("");
+    $("#search-instruction-text").val("");
 
     this.setState({
       searchSelector: {}
@@ -121,8 +123,38 @@ class Types extends React.Component {
       options: { sort: newOptions }
     });
 
-    console.log("Data sorting changed");
-    console.log(this.state.options);
+    // console.log('Data sorting changed');
+    // console.log(this.state.options);
+  }
+
+  rowSelected(e) {
+    const selectedRowId = e.target.parentNode.parentNode.getAttribute("id");
+
+    $(`.${selectedRowId}`).toggleClass("row-selected");
+
+    const currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber;
+
+    this.setState({
+      checkboxesSelected: true,
+      selectedCheckboxesNumber: currentlySelectedCheckboxes + 1
+    });
+  }
+
+  renderTableHeadClasses() {
+    const classes = `${
+      this.state.checboxesSelected ? "table-head--show" : "table-head--hide"
+    }`;
+    return classes;
+  }
+
+  renderSubIngredientsNumber(subIngredient) {
+    if (subIngredient && subIngredient.length > 1) {
+      return `${subIngredient.length} sub-ingredients`;
+    } else if (subIngredient && subIngredient.length == 1) {
+      return `${subIngredient.length} sub-ingredient`;
+    }
+
+    return "";
   }
 
   handleTabChange(event, value) {
@@ -130,35 +162,36 @@ class Types extends React.Component {
   }
 
   render() {
-    const { loading, ingredients, match, history } = this.props;
-
-    return !loading ? (
+    return !this.props.loading ? (
       <div>
+
         <Grid
           container
-          className="SideContent SideContent--spacer-2x--horizontal SideContent--spacer-2x--top"
+          className="SideContent SideContent--spacer-2x--top SideContent--spacer-2x--horizontal"
         >
           <Grid container className="clearfix">
             <Grid item xs={6}>
               <Typography
                 type="headline"
                 gutterBottom
-                className="headline pull-left"
+                className="pull-left headline"
                 style={{ fontWeight: 500 }}
+                color="inherit"
               >
-                Types
+                Instructions
               </Typography>
             </Grid>
             <Grid item xs={6}>
-              <Button
-                className="btn btn-primary"
-                onClick={() => history.push("/types/new")}
-                raised
-                color="primary"
-                style={{ float: "right" }}
-              >
-                Add type
-              </Button>
+              <Link to="/instructions/new">
+                <Button
+                  className="btn btn-primary"
+                  raised
+                  color="primary"
+                  style={{ float: "right" }}
+                >
+                  Add instruction
+                </Button>
+              </Link>
             </Grid>
           </Grid>
 
@@ -173,8 +206,7 @@ class Types extends React.Component {
                 onChange={this.handleTabChange.bind(this)}
               >
                 <Tab label="All" />
-                {/* <Tab label="Item Two" />
-                  <Tab label="Item Three" /> */}
+     
               </Tabs>
             </AppBar>
           </div>
@@ -214,18 +246,18 @@ class Types extends React.Component {
             <Input
               className="input-box"
               style={{ width: "100%", position: "relative" }}
-              placeholder="Search types"
+              placeholder="Search instructions"
               onKeyUp={this.searchByName.bind(this)}
               inputProps={{
-                id: "search-type-text",
+                id: "search-instruction-text",
                 "aria-label": "Description"
               }}
             />
           </div>
           <ListContainer
             limit={50}
-            collection={IngredientTypesCollection}
-            publication="ingredientTypes"
+            collection={InstructionsCollection}
+            publication="instructions"
             options={this.state.options}
             selector={{
               $or: [
@@ -236,62 +268,34 @@ class Types extends React.Component {
                   }
                 },
                 {
-                  SKU: {
-                    $regex: new RegExp(this.state.searchSelector),
+                  description: {
+                    $regex: RegExp(this.state.searchSelector),
                     $options: "i"
                   }
                 }
               ]
             }}
           >
-            <TypesTable
+            <InstructionsTable
               popTheSnackbar={this.props.popTheSnackbar}
               searchTerm={this.state.searchSelector}
-              rowsLimit={this.state.rowsVisible}
               history={this.props.history}
               sortByOptions={this.sortByOption.bind(this)}
             />
           </ListContainer>
 
-          {/* selector={{ $or: [{ title: new RegExp(this.state.searchSelector) }, { SKU: new RegExp(this.state.searchSelector) }] }} */}
+          {/* 
+                joins={[{
+                    localProperty: "typeId",
+                    collection: IngredientTypes,
+                    joinAs: "typeMain"
+                },{
+                  localProperty: "subIngredients",
+                  collection: IngredientsCollection,
+                  joinAs: "subs"
+                }]}
+            */}
 
-          {/* <Grid container>
-        <Grid item xs={12}>
-          <Paper elevation={2} className="table-container">
-            {ingredients.length ?
-              <Table>
-                <TableHead>
-                <TableRow>
-                    <TableCell padding="checkbox" style={{ width: '100px' }}><Checkbox /></TableCell>
-
-                    <TableCell><Typography type="body2">Type</Typography></TableCell>
-                  </TableRow>
-              </TableHead>
-                <TableBody>
-                {ingredients.map(({ _id, title, createdAt }) => (
-                    <TableRow hover key={_id} i>
-                      <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '100px' }} padding="checkbox">
-                        <Checkbox id={_id} onChange={this.rowSelected} />
-                      </TableCell>
-                      <TableCell onClick={() => history.push(`${match.url}/${_id}`)}><Typography type="subheading">{title}</Typography></TableCell> */}
-          {/* <TableCell>
-                        <Button
-                          raised
-                          color="primary"
-                          onClick={() => history.push(`${match.url}/${_id}`)}
-                        >View</Button>
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          raised
-                          onClick={() => handleRemove(_id)}
-                        >Delete</Button>
-                      </TableCell> */}
-          {/* </TableRow> </TableBody>
-              </Table> : <Alert bsStyle="warning">No Types yet!</Alert>}
-          </Paper>
-        </Grid>
-      </Grid> */}
         </Grid>
       </div>
     ) : (
@@ -300,19 +304,18 @@ class Types extends React.Component {
   }
 }
 
-Types.propTypes = {
+Instructions.propTypes = {
   loading: PropTypes.bool.isRequired,
-  ingredients: PropTypes.arrayOf(PropTypes.object).isRequired,
+  instructions: PropTypes.arrayOf(PropTypes.object),
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe("ingredientTypes");
-  const subscription2 = Meteor.subscribe("ingredients");
+  const subscription = Meteor.subscribe("instructions");
 
   return {
-    loading: !subscription.ready() || !subscription2.ready(),
-    ingredients: IngredientTypesCollection.find().fetch()
+    loading: !subscription.ready(),
+    instructions: InstructionsCollection.find().fetch(),
   };
-}, Types);
+}, Instructions);

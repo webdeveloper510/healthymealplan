@@ -1,42 +1,46 @@
-import React, { Component } from 'react';
-import PropTypes from 'prop-types';
-import { withRouter, Link, NavLink } from 'react-router-dom';
-import Button from 'material-ui/Button';
-import { LinkContainer } from 'react-router-bootstrap';
+import React, { Component } from "react";
+import PropTypes from "prop-types";
+import { withRouter, Link, NavLink } from "react-router-dom";
+import Button from "material-ui/Button";
+import { LinkContainer } from "react-router-bootstrap";
 // import { Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
-import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
-import Divider from 'material-ui/Divider';
-import ExpandLess from 'material-ui-icons/ExpandLess';
-import ExpandMore from 'material-ui-icons/ExpandMore';
+import List, { ListItem, ListItemIcon, ListItemText } from "material-ui/List";
+import Divider from "material-ui/Divider";
+import ExpandLess from "material-ui-icons/ExpandLess";
+import ExpandMore from "material-ui-icons/ExpandMore";
 
-import HomeIcon from 'material-ui-icons/Home';
-import KitchenIcon from 'material-ui-icons/Kitchen';
-import OrderIcon from 'material-ui-icons/AttachMoney';
-import MealsIcon from 'material-ui-icons/LocalDining';
-import IngredientsIcon from 'material-ui-icons/Layers';
-import TypesIcon from 'material-ui-icons/List';
-import FolderIcon from 'material-ui-icons/Folder';
+import HomeIcon from "material-ui-icons/Home";
+import KitchenIcon from "material-ui-icons/Kitchen";
+import OrderIcon from "material-ui-icons/AttachMoney";
+import MealsIcon from "material-ui-icons/LocalDining";
+import IngredientsIcon from "material-ui-icons/Layers";
+import TypesIcon from "material-ui-icons/List";
+import FolderIcon from "material-ui-icons/Folder";
 
-import LifestylesIcon from 'material-ui-icons/FitnessCenter';
-import RestrictionsIcon from 'material-ui-icons/DoNotDisturbAlt';
-import PlatesIcon from 'material-ui-icons/LocalPizza';
-import SidesIcon from 'material-ui-icons/LibraryAdd';
+import LifestylesIcon from "material-ui-icons/FitnessCenter";
+import PlatingIcon from "material-ui-icons/RoomService";
+import SubscriptionsIcon from "material-ui-icons/CreditCard";
+import DiscountsIcon from "material-ui-icons/LocalOffer";
 
-import DeliveryIcon from 'material-ui-icons/LocalShipping';
-import DirectionsIcon from 'material-ui-icons/Directions';
-import RoutesIcon from 'material-ui-icons/MyLocation';
-import DriversIcon from 'material-ui-icons/DriveEta';
+import RestrictionsIcon from "material-ui-icons/DoNotDisturbAlt";
+import PlatesIcon from "material-ui-icons/LocalPizza";
+import SidesIcon from "material-ui-icons/LibraryAdd";
+import InstructionsIcon from "material-ui-icons/Note";
 
-import CustomersIcon from 'material-ui-icons/Person';
-import SettingsIcon from 'material-ui-icons/Settings';
-import TeamIcon from 'material-ui-icons/SupervisorAccount';
+import DeliveryIcon from "material-ui-icons/LocalShipping";
+import DirectionsIcon from "material-ui-icons/Directions";
+import RoutesIcon from "material-ui-icons/MyLocation";
+import DriversIcon from "material-ui-icons/DriveEta";
 
-import Collapse from 'material-ui/transitions/Collapse';
+import CustomersIcon from "material-ui-icons/Person";
+import SettingsIcon from "material-ui-icons/Settings";
+import TeamIcon from "material-ui-icons/SupervisorAccount";
 
-import { Meteor } from 'meteor/meteor';
+import Collapse from "material-ui/transitions/Collapse";
 
-import './AuthenticatedSideNav.scss';
+import { Meteor } from "meteor/meteor";
 
+import "./AuthenticatedSideNav.scss";
 
 class AuthenticatedSideNav extends Component {
   constructor(props) {
@@ -52,37 +56,37 @@ class AuthenticatedSideNav extends Component {
 
   handleToggle() {
     this.setState({
-      open: !this.state.open,
+      open: !this.state.open
     });
   }
 
   handleToggleSettings() {
     this.setState({
-      settingsOpen: !this.state.settingsOpen,
+      settingsOpen: !this.state.settingsOpen
     });
   }
 
   handleToggleKitchen() {
     this.setState({
-      kitchenOpen: !this.state.kitchenOpen,
+      kitchenOpen: !this.state.kitchenOpen
     });
   }
 
   handleToggleDelivery() {
     this.setState({
-      deliveryOpen: !this.state.deliveryOpen,
+      deliveryOpen: !this.state.deliveryOpen
     });
   }
 
   handleToggleOrder() {
     this.setState({
-      ordersOpen: !this.state.ordersOpen,
+      ordersOpen: !this.state.ordersOpen
     });
   }
 
   handleNestedListToggle(item) {
     this.setState({
-      open: item.state.open,
+      open: item.state.open
     });
   }
 
@@ -90,10 +94,10 @@ class AuthenticatedSideNav extends Component {
     return this.props.location.pathname;
 
     if (expected.indexOf(this.props.location.pathname) !== -1) {
-      return 'list-item-active';
+      return "list-item-active";
     }
 
-    return '';
+    return "";
 
     // switch (currentPath) {
     //   case '/':
@@ -120,8 +124,7 @@ class AuthenticatedSideNav extends Component {
 
     return (
       <div className="page-container__side-nav">
-
-        <List style={{ paddingTop: '0 !important' }}>
+        <List style={{ paddingTop: "0 !important" }}>
           <NavLink exact to="/">
             <ListItem button>
               <ListItemIcon>
@@ -138,11 +141,13 @@ class AuthenticatedSideNav extends Component {
 
             <ListItemText className="subheading" primary="Orders" />
             {this.state.ordersOpen ? <ExpandLess /> : <ExpandMore />}
-
           </ListItem>
 
-          <Collapse in={this.state.ordersOpen} transitionDuration="auto" unmountOnExit>
-
+          <Collapse
+            in={this.state.ordersOpen}
+            transitionDuration="auto"
+            unmountOnExit
+          >
             <NavLink to="/lifestyles">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
@@ -152,7 +157,32 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
+            <NavLink to="/plating">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <PlatingIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Plating" />
+              </ListItem>
+            </NavLink>
 
+            <NavLink to="/subscriptions">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <SubscriptionsIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Subscriptions" />
+              </ListItem>
+            </NavLink>
+
+            <NavLink to="/discounts">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <DiscountsIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Discounts" />
+              </ListItem>
+            </NavLink>
           </Collapse>
 
           <NavLink to="/customers">
@@ -164,25 +194,26 @@ class AuthenticatedSideNav extends Component {
             </ListItem>
           </NavLink>
 
-
           <ListItem button onClick={this.handleToggleKitchen.bind(this)}>
-
             <ListItemIcon>
               <KitchenIcon className="side-nav-icon" />
             </ListItemIcon>
             <ListItemText className="subheading" primary="Kitchen" />
             {this.state.kitchenOpen ? <ExpandLess /> : <ExpandMore />}
-
           </ListItem>
 
-          <Collapse in={this.state.kitchenOpen} transitionDuration="auto" unmountOnExit>
+          <Collapse
+            in={this.state.kitchenOpen}
+            transitionDuration="auto"
+            unmountOnExit
+          >
             {/* <ListItem className="padding-left-nested-item" button onClick={() => history.push('/orders')}>
               <ListItemIcon>
                 <OrderIcon className="side-nav-icon" />
               </ListItemIcon>
               <ListItemText className="subheading" primary="Orders" />
             </ListItem> */}
-            
+
             <NavLink to="/plates">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
@@ -201,6 +232,15 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
+            <NavLink to="/instructions">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <InstructionsIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Instructions" />
+              </ListItem>
+            </NavLink>
+
             <NavLink to="/meals">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
@@ -212,7 +252,7 @@ class AuthenticatedSideNav extends Component {
 
             <NavLink to="/ingredients">
               <ListItem className="padding-left-nested-item" button>
-                <ListItemIcon >
+                <ListItemIcon>
                   <IngredientsIcon className="side-nav-icon" />
                 </ListItemIcon>
                 <ListItemText className="subheading" primary="Ingredients" />
@@ -247,21 +287,21 @@ class AuthenticatedSideNav extends Component {
                 <ListItemText className="subheading" primary="Restrictions" />
               </ListItem>
             </NavLink>
-
           </Collapse>
 
           <ListItem button onClick={this.handleToggleDelivery.bind(this)}>
-
             <ListItemIcon>
               <DeliveryIcon className="side-nav-icon" />
             </ListItemIcon>
             <ListItemText className="subheading" primary="Delivery" />
             {this.state.deliveryOpen ? <ExpandLess /> : <ExpandMore />}
-
           </ListItem>
 
-          <Collapse in={this.state.deliveryOpen} transitionDuration="auto" unmountOnExit>
-
+          <Collapse
+            in={this.state.deliveryOpen}
+            transitionDuration="auto"
+            unmountOnExit
+          >
             <NavLink to="/directions">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
@@ -288,9 +328,7 @@ class AuthenticatedSideNav extends Component {
                 <ListItemText className="subheading" primary="Drivers" />
               </ListItem>
             </NavLink>
-
           </Collapse>
-
 
           {/* <ListItem button onClick={this.handleToggleDelivery.bind(this)}>
 
@@ -319,7 +357,7 @@ class AuthenticatedSideNav extends Component {
             </ListItem>
 
           </Collapse> */}
-          {/* 
+          {/*
           <ListItem button onClick={() => history.push('/customers')}>
             <ListItemIcon>
               <CustomersIcon className="side-nav-icon" />
@@ -335,10 +373,12 @@ class AuthenticatedSideNav extends Component {
 
             <ListItemText className="subheading" primary="Settings" />
             {this.state.settingsOpen ? <ExpandLess /> : <ExpandMore />}
-
           </ListItem>
-          <Collapse in={this.state.settingsOpen} transitionDuration="auto" unmountOnExit>
-
+          <Collapse
+            in={this.state.settingsOpen}
+            transitionDuration="auto"
+            unmountOnExit
+          >
             <NavLink to="/team">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
@@ -348,7 +388,6 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
           </Collapse>
-
         </List>
       </div>
     );
@@ -356,7 +395,7 @@ class AuthenticatedSideNav extends Component {
 }
 
 AuthenticatedSideNav.propTypes = {
-  history: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
 };
 
 export default withRouter(AuthenticatedSideNav);
