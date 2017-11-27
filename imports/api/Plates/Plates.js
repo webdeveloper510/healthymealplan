@@ -69,6 +69,70 @@ Plates.schema = new SimpleSchema({
     type: String,
     optional: true
   },
+  nutritional: {
+    type: Object,
+    optional: true
+  },
+  "nutritional.regular": {
+    type: Object,
+    optional: true
+  },
+  "nutritional.regular.calories": {
+    type: String,
+    optional: true
+  },
+  "nutritional.regular.proteins": {
+    type: String,
+    optional: true
+  },
+  "nutritional.regular.carbs": {
+    type: String,
+    optional: true
+  },
+  "nutritional.regular.fat": {
+    type: String,
+    optional: true
+  },
+  "nutritional.athletic": {
+    type: Object,
+    optional: true
+  },
+  "nutritional.athletic.calories": {
+    type: String,
+    optional: true
+  },
+  "nutritional.athletic.proteins": {
+    type: String,
+    optional: true
+  },
+  "nutritional.athletic.carbs": {
+    type: String,
+    optional: true
+  },
+  "nutritional.athletic.fat": {
+    type: String,
+    optional: true
+  },
+  "nutritional.bodybuilder": {
+    type: Object,
+    optional: true
+  },
+  "nutritional.bodybuilder.calories": {
+    type: String,
+    optional: true
+  },
+  "nutritional.bodybuilder.proteins": {
+    type: String,
+    optional: true
+  },
+  "nutritional.bodybuilder.carbs": {
+    type: String,
+    optional: true
+  },
+  "nutritional.bodybuilder.fat": {
+    type: String,
+    optional: true
+  },
 
   createdAt: {
     type: String,
