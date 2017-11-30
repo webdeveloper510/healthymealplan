@@ -1449,24 +1449,24 @@ class Step3LifestyleProfile extends React.Component {
                                           ) != -1
                                         : false;
                                       return (
-                                        <FormControlLabel
-                                          key={i}
-                                          disabled={isAlreadyChecked}
-                                          control={
-                                            <Checkbox
-                                              checked={
-                                                isSelected || isAlreadyChecked
-                                              }
-                                              onChange={this.handleChangeSecondary.bind(
-                                                this,
-                                                profileIndex,
-                                                e._id
-                                              )}
-                                              value={e.title.toLowerCase()}
-                                            />
-                                          }
-                                          label={e.title}
-                                        />
+                                          <FormControlLabel
+                                            key={i}
+                                            disabled={isAlreadyChecked}
+                                            control={
+                                              <Checkbox
+                                                checked={
+                                                  isSelected || isAlreadyChecked
+                                                }
+                                                onChange={this.handleChangeSecondary.bind(
+                                                  this,
+                                                  profileIndex,
+                                                  e._id
+                                                )}
+                                                value={e.title.toLowerCase()}
+                                              />
+                                            }
+                                            label={e.title}
+                                          />
                                       );
                                     })}
                                 </FormGroup>

@@ -10,6 +10,8 @@ import TextField from "material-ui/TextField";
 import Paper from "material-ui/Paper";
 import Typography from "material-ui/Typography";
 import Radio, { RadioGroup } from "material-ui/Radio";
+
+import Checkbox from "material-ui/Checkbox";
 import {
   FormLabel,
   FormControl,
@@ -64,9 +66,9 @@ class Step4Delivery extends React.Component {
     this.state = {
       submitLoading: false,
       submitSuccess: false,
-      adultOrChildValue: this.props.customerInfo.adultOrChild
-        ? this.props.customerInfo.adultOrChild
-        : "adult"
+      addressType: "hotel",
+      dormName: "Algonquin College",
+      dormResidence: "Algonquin College"
     };
   }
 
@@ -83,22 +85,7 @@ class Step4Delivery extends React.Component {
       },
 
       rules: {
-        first_name: {
-          required: true
-        },
-        last_name: {
-          required: true
-        },
-        email: {
-          required: true,
-          email: true
-        },
-        phoneNumber: {
-          minlength: 10,
-          maxlength: 10,
-          number: true
-        },
-        type: {
+        addressType: {
           required: true
         }
       },
@@ -121,19 +108,7 @@ class Step4Delivery extends React.Component {
       "customers.step2",
       {
         id: this.props.customerInfo.id,
-        firstName: $('[name="first_name"]')
-          .val()
-          .trim(),
-        lastName: $('[name="last_name"]')
-          .val()
-          .trim(),
-        email: $('[name="email"]')
-          .val()
-          .trim(),
-        phoneNumber: $('[name="phoneNumber"]')
-          .val()
-          .trim(),
-        adultOrChild: this.state.adultOrChildValue
+        addressType: this.state.addressType
       },
       (err, returnVal) => {
         if (err) {
@@ -155,21 +130,7 @@ class Step4Delivery extends React.Component {
 
           console.log("Reached no error");
 
-          this.props.saveValues({
-            firstName: $('[name="first_name"]')
-              .val()
-              .trim(),
-            lastName: $('[name="last_name"]')
-              .val()
-              .trim(),
-            email: $('[name="email"]')
-              .val()
-              .trim(),
-            phoneNumber: $('[name="phoneNumber"]')
-              .val()
-              .trim(),
-            adultOrChild: this.state.adultOrChildValue
-          });
+          this.props.saveValues({});
 
           this.props.handleNext();
         }
@@ -177,9 +138,40 @@ class Step4Delivery extends React.Component {
     );
   }
 
-  handleChangeRadio(event, value) {
+  handleChangeRadioAddressType(event, value) {
     this.setState({
-      adultOrChildValue: value
+      addressType: value
+    });
+  }
+
+  changeDormName(event, value) {
+    let changedResidence = "";
+
+    switch (event.target.value) {
+      case "Algonquin College":
+        changedResidence = "Student Residence";
+
+      case "Carleton University":
+        changedResidence = "Dundas House";
+
+      case "University of Ottawa":
+        changedResidence = "90 U Residence";
+
+      default:
+        changedResidence = "Student Residence";
+    }
+
+    this.setState({
+      dormName: event.target.value,
+      dormResidence: changedResidence
+    });
+  }
+
+  changeDormResidence(event, value) {
+    console.log(event.target.value);
+
+    this.setState({
+      dormResidence: event.target.value
     });
   }
 
@@ -213,13 +205,20 @@ class Step4Delivery extends React.Component {
                 <Paper elevation={2} className="paper-for-fields">
                   <Grid container>
                     <Grid item xs={12}>
+                      <Typography type="subheading" className="font-uppercase">
+                        Address Type
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
                       <FormControl component="fieldset">
                         {/* <FormLabel component="legend">Type</FormLabel> */}
                         <RadioGroup
                           aria-label="account-type"
                           name="type"
                           value={this.state.addressType}
-                          onChange={this.handleChangeRadio.bind(this)}
+                          onChange={this.handleChangeRadioAddressType.bind(
+                            this
+                          )}
                           style={{ flexDirection: "row" }}
                         >
                           <FormControlLabel
@@ -231,7 +230,6 @@ class Step4Delivery extends React.Component {
                             value="business"
                             control={<Radio />}
                             label="Business"
-                            disabled
                           />
 
                           <FormControlLabel
@@ -255,149 +253,422 @@ class Step4Delivery extends React.Component {
                       </FormControl>
                     </Grid>
                   </Grid>
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <Typography type="subheading">Apartment</Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        margin="normal"
-                        id="apartmentName"
-                        label="Apartment name"
-                        name="apartment_name"
-                        fullWidth
-                        defaultValue={
-                          this.props.customerInfo.address.apartmentName
-                        }
-                        inputProps={{}}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        margin="normal"
-                        id="unit"
-                        label="Unit"
-                        name="unit"
-                        fullWidth
-                        defaultValue={this.props.customerInfo.address.unit}
-                        inputProps={{}}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        margin="normal"
-                        id="buzzer"
-                        label="Buzzer"
-                        name="buzzer"
-                        fullWidth
-                        defaultValue={this.props.customerInfo.address.buzzer}
-                        inputProps={{}}
-                      />
-                    </Grid>
-                  </Grid>
 
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <Typography type="subheading">Business</Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        margin="normal"
-                        id="businessName"
-                        label="Business name"
-                        name="business_name"
-                        fullWidth
-                        defaultValue={
-                          this.props.customerInfo.address.businessName
-                        }
-                        inputProps={{}}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid container>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        margin="normal"
-                        id="businessUnit"
-                        label="Unit"
-                        name="businessUnit"
-                        fullWidth
-                        defaultValue={
-                          this.props.customerInfo.address.businessUnit
-                        }
-                        inputProps={{}}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        margin="normal"
-                        id="businessBuzzer"
-                        label="Buzzer"
-                        name="businessBuzzer"
-                        fullWidth
-                        defaultValue={
-                          this.props.customerInfo.address.businessBuzzer
-                        }
-                        inputProps={{}}
-                      />
-                    </Grid>
-                  </Grid>
+                  {this.state.addressType == "apartment" ? (
+                    <div>
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <Typography
+                            type="subheading"
+                            className="font-uppercase"
+                          >
+                            Apartment
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            margin="normal"
+                            id="apartmentName"
+                            label="Apartment name"
+                            name="apartment_name"
+                            fullWidth
+                            defaultValue={
+                              this.props.customerInfo.address.apartmentName
+                            }
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                      <Grid container>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="unit"
+                            label="Unit"
+                            name="unit"
+                            fullWidth
+                            defaultValue={this.props.customerInfo.address.unit}
+                            inputProps={{}}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="buzzer"
+                            label="Buzzer"
+                            name="buzzer"
+                            fullWidth
+                            defaultValue={
+                              this.props.customerInfo.address.buzzer
+                            }
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ) : (
+                    ""
+                  )}
 
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <Typography type="subheading">Dormitory</Typography>
+                  {this.state.addressType == "business" ? (
+                    <div>
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <Typography
+                            type="subheading"
+                            className="font-uppercase"
+                          >
+                            Business
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            margin="normal"
+                            id="businessName"
+                            label="Business name"
+                            name="business_name"
+                            fullWidth
+                            defaultValue={
+                              this.props.customerInfo.address.businessName
+                            }
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                      <Grid container>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="businessUnit"
+                            label="Unit"
+                            name="businessUnit"
+                            fullWidth
+                            defaultValue={
+                              this.props.customerInfo.address.businessUnit
+                            }
+                            inputProps={{}}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="businessBuzzer"
+                            label="Buzzer"
+                            name="businessBuzzer"
+                            fullWidth
+                            defaultValue={
+                              this.props.customerInfo.address.businessBuzzer
+                            }
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+
+                  {this.state.addressType == "dormitory" ? (
+                    <div>
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <Typography
+                            type="subheading"
+                            className="font-uppercase"
+                          >
+                            Dormitory
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            margin="normal"
+                            id="dormitoryName"
+                            label="Dormitory name"
+                            name="dormitory_name"
+                            select
+                            value={
+                              this.state.dormName
+                                ? this.state.dormName
+                                : "Algonquin College"
+                            }
+                            onChange={this.changeDormName.bind(this)}
+                            fullWidth
+                            SelectProps={{ native: false }}
+                          >
+                            <MenuItem key={1} value="Algonquin College">
+                              Algonquin College
+                            </MenuItem>
+
+                            <MenuItem key={3} value="Carleton University">
+                              Carleton University
+                            </MenuItem>
+                            <MenuItem key={4} value="University of Ottawa">
+                              University of Ottawa
+                            </MenuItem>
+                          </TextField>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          {this.state.dormName &&
+                          this.state.dormName === "Algonquin College" ? (
+                            <TextField
+                              margin="normal"
+                              id="dormResidence"
+                              label="Dormitory Residence"
+                              name="dormitory_residence"
+                              select
+                              value={
+                                this.state.dormResidence
+                                  ? this.state.dormResidence
+                                  : "Student Residence"
+                              }
+                              fullWidth
+                              onChange={this.changeDormResidence.bind(this)}
+                            >
+                              <div>
+                                <MenuItem key={1} value="Student Residence">
+                                  Student Residence
+                                </MenuItem>
+                              </div>
+                            </TextField>
+                          ) : (
+                            ""
+                          )}
+                          {this.state.dormName &&
+                          this.state.dormName === "Carleton University" ? (
+                            <TextField
+                              margin="normal"
+                              id="dormResidence"
+                              label="Dormitory Residence"
+                              name="dormitory_residence"
+                              select
+                              value={
+                                this.state.dormResidence
+                                  ? this.state.dormResidence
+                                  : "Dundas House"
+                              }
+                              fullWidth
+                              onChange={this.changeDormResidence.bind(this)}
+                            >
+                              <MenuItem key={1} value="Dundas House">
+                                Dundas House
+                              </MenuItem>
+                              <MenuItem key={2} value="Glengarry House">
+                                Glengarry House
+                              </MenuItem>
+                              <MenuItem key={3} value="Grenville House">
+                                Grenville House
+                              </MenuItem>
+                              <MenuItem key={4} value="Lanark House">
+                                Lanark House
+                              </MenuItem>
+                              <MenuItem
+                                key={5}
+                                value="Lennox & Addington House"
+                              >
+                                Lennox & Addington House
+                              </MenuItem>
+                              <MenuItem key={6} value="Renfrew House">
+                                Renfrew House
+                              </MenuItem>
+                              <MenuItem key={7} value="Russell House">
+                                Russell House
+                              </MenuItem>
+                              <MenuItem key={8} value="Stormont House">
+                                Stormont House
+                              </MenuItem>
+                            </TextField>
+                          ) : (
+                            ""
+                          )}
+
+                          {this.state.dormName &&
+                          this.state.dormName === "University of Ottawa" ? (
+                            <TextField
+                              margin="normal"
+                              id="dormResidence"
+                              label="Dormitory Residence"
+                              name="dormitory_residence"
+                              select
+                              value={
+                                this.state.dormResidence
+                                  ? this.state.dormResidence
+                                  : "90 U Residence"
+                              }
+                              fullWidth
+                              onChange={this.changeDormResidence.bind(this)}
+                            >
+                              <MenuItem key={1} value="90 U Residence">
+                                90 U Residence
+                              </MenuItem>
+                              <MenuItem key={2} value="Hyman Soloway Residence">
+                                Hyman Soloway Residence
+                              </MenuItem>
+                              <MenuItem key={3} value="Marchand Residence">
+                                Marchand Residence
+                              </MenuItem>
+                              <MenuItem key={4} value="Stanton Residence">
+                                Stanton Residence
+                              </MenuItem>
+                              <MenuItem key={5} value="Thompson Residence">
+                                Thompson Residence
+                              </MenuItem>
+                            </TextField>
+                          ) : (
+                            ""
+                          )}
+                        </Grid>
+                      </Grid>
+                      <Grid container>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="roomNumber"
+                            label="Room number"
+                            name="roomNumber"
+                            fullWidth
+                            defaultValue={
+                              this.props.customerInfo.address.roomNumber
+                            }
+                            inputProps={{}}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="buzzer"
+                            label="Buzzer"
+                            name="buzzer"
+                            fullWidth
+                            defaultValue={
+                              this.props.customerInfo.address.buzzer
+                            }
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+
+                  {this.state.addressType &&
+                  this.state.addressType === "hotel" ? (
+                    <Grid container>
+                      <Grid item xs={12}>
+                        <Typography
+                          type="subheading"
+                          className="font-uppercase"
+                        >
+                          Hotel
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          margin="normal"
+                          id="hotelName"
+                          label="Hotel name"
+                          name="hotelName"
+                          fullWidth
+                          defaultValue={
+                            this.props.customerInfo.address.hotelNumber
+                          }
+                          inputProps={{}}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          margin="normal"
+                          id="roomNumber"
+                          label="Room number"
+                          name="roomNumber"
+                          fullWidth
+                          defaultValue={
+                            this.props.customerInfo.address.roomNumber
+                          }
+                          inputProps={{}}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <FormControlLabel
+                          control={<Checkbox value="leaveAtFrontDesk" />}
+                          label="Leave at front desk"
+                        />
+                      </Grid>
                     </Grid>
-                    <Grid item xs={12}>
-                      <TextField
-                        margin="normal"
-                        id="dormitoryName"
-                        label="Dormitory name"
-                        name="dormitory_name"
-                        select
-                        value="Algonquin College"
-                        fullWidth
-                        defaultValue={
-                          this.props.customerInfo.address.dormName || ""
-                        }
-                        inputProps={{}}
-                      >
-                        <MenuItem key={1} value="Algonquin College" />
-                        Algonquin College
-                        <MenuItem key={3} value="Carleton University">
-                          Carleton University
-                        </MenuItem>
-                        <MenuItem key={4} value="University of Ottawa">
-                          University of Ottawa
-                        </MenuItem>
-                      </TextField>
-                    </Grid>
-                  </Grid>
-                  <Grid container>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        margin="normal"
-                        id="unit"
-                        label="Unit"
-                        name="unit"
-                        fullWidth
-                        defaultValue={this.props.customerInfo.address.unit}
-                        inputProps={{}}
-                      />
-                    </Grid>
-                    <Grid item xs={12} sm={6}>
-                      <TextField
-                        margin="normal"
-                        id="buzzer"
-                        label="Buzzer"
-                        name="buzzer"
-                        fullWidth
-                        defaultValue={this.props.customerInfo.address.buzzer}
-                        inputProps={{}}
-                      />
-                    </Grid>
-                  </Grid>
+                  ) : (
+                    ""
+                  )}
+
+                  {this.state.addressType &&
+                  this.state.addressType === "house" ? (
+                    <div>
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <Typography
+                            type="subheading"
+                            className="font-uppercase"
+                          >
+                            House
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            margin="normal"
+                            id="unitHouse"
+                            label="Unit"
+                            name="unitHouse"
+                            fullWidth
+                            defaultValue={
+                              this.props.customerInfo.address.unitHouse
+                            }
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+
+                  {this.state.addressType ? (
+                    <div>
+                      <Grid container>
+                        <Grid item xs={12} sm={8}>
+                          <TextField
+                            label="Street Address"
+                            id="streetAddress"
+                            name="streetAddress"
+                            fullWidth
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                          <TextField
+                            label="Postal Code"
+                            id="postalCode"
+                            name="postalCode"
+                            defaultValue={this.props.customerInfo.postalCode}
+                            fullWidth
+                          />
+                        </Grid>
+                      </Grid>
+
+                      <Grid container>
+                        <Grid item xs={12} sm={12}>
+                          <TextField
+                            label="Notes"
+                            id="notes"
+                            name="notes"
+                            fullWidth
+                            multiline
+                            defaultValue={this.props.customerInfo.address.notes}
+                          />
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ) : (
+                    ""
+                  )}
                 </Paper>
               </Grid>
             </Grid>
