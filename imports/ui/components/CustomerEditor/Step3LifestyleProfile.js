@@ -44,6 +44,8 @@ import Avatar from "material-ui/Avatar";
 
 import $ from "jquery";
 
+import update from "react-addons-update";
+
 import validate from "../../../modules/validate";
 
 const styles = theme => ({
@@ -101,31 +103,32 @@ class Step3LifestyleProfile extends React.Component {
         ? this.props.customerInfo.discount
         : "none",
 
-      peanuts: false,
-      milk: false,
-      egg: false,
-      wheat: false,
-      soy: false,
-      fish: false,
-      shellfish: false,
+      restrictions: [],
 
-      ketogenic: false,
-      glutenfree: false,
-      lowcarb: false,
-      nocarb: false,
-      ovolacto: false,
-      ovo: false,
-      lacto: false,
-      pescatarian: false,
-      paleo: false,
-      vegan: false,
+      // peanuts: false,
+      // milk: false,
+      // egg: false,
+      // wheat: false,
+      // soy: false,
+      // fish: false,
+      // shellfish: false,
 
-      halal: false,
-      kosher: false,
+      // ketogenic: false,
+      // glutenfree: false,
+      // lowcarb: false,
+      // nocarb: false,
+      // ovolacto: false,
+      // ovo: false,
+      // lacto: false,
+      // pescatarian: false,
+      // paleo: false,
+      // vegan: false,
+
+      // halal: false,
+      // kosher: false,
 
       // collapse
-
-      primaryCollapse: false,
+      primaryCollapse: true,
       secondaryCollapses: [false, false, false, false, false, false],
       secondaryProfileCount: 0,
       secondaryProfilesData: []
@@ -182,17 +185,13 @@ class Step3LifestyleProfile extends React.Component {
 
     const increasedProfileCount = this.state.secondaryProfileCount + 1;
 
-    let currentSecondaryProfiles = this.state.secondaryProfilesData.slice();
+    const currentSecondaryProfiles = this.state.secondaryProfilesData.slice();
 
     currentSecondaryProfiles.push({
-      value: "",
-      suggestions: [],
-      submitLoading: false,
-      submitSuccess: false,
+      first_name: "",
+      last_name: "",
       subIngredients: [],
       specificRestrictions: [],
-      deleteDialogOpen: false,
-      addRestrictionType: "Restriction",
       lifestyle: this.props.customerInfo.adultOrChild
         ? this.props.customerInfo.adultOrChild
         : "traditional",
@@ -202,33 +201,28 @@ class Step3LifestyleProfile extends React.Component {
       discount: this.props.customerInfo.discount
         ? this.props.customerInfo.discount
         : "none",
-
-      peanuts: false,
-      milk: false,
-      egg: false,
-      wheat: false,
-      soy: false,
-      fish: false,
-      shellfish: false,
-
-      ketogenic: false,
-      glutenfree: false,
-      lowcarb: false,
-      nocarb: false,
-      ovolacto: false,
-      ovo: false,
-      lacto: false,
-      pescatarian: false,
-      paleo: false,
-      vegan: false,
-
-      halal: false,
-      kosher: false,
+      restrictions: []
     });
 
     this.setState({
       secondaryProfileCount: increasedProfileCount,
       secondaryProfilesData: currentSecondaryProfiles
+    });
+  }
+
+  removeProfile(index) {
+    if (this.secondaryProfileCount < 1) {
+      return;
+    }
+
+    const decreasedProfileCount = this.state.secondaryProfileCount - 1;
+    const profileToRemove = this.state.secondaryProfilesData.slice();
+
+    profileToRemove.splice(profileToRemove.indexOf(index), 1);
+
+    this.setState({
+      secondaryProfileCount: decreasedProfileCount,
+      secondaryProfilesData: profileToRemove
     });
   }
 
@@ -238,7 +232,7 @@ class Step3LifestyleProfile extends React.Component {
         primaryCollapse: !this.state.primaryCollapse
       });
     } else {
-      let currentCollapseArr = this.state.secondaryCollapses.slice();
+      const currentCollapseArr = this.state.secondaryCollapses.slice();
 
       currentCollapseArr[index] = !currentCollapseArr[index];
 
@@ -329,9 +323,41 @@ class Step3LifestyleProfile extends React.Component {
   }
 
   handleChangeRadioLifestyle(event, value) {
+    const getLifestyleRestrictions = this.props.lifestyles.find(
+      el => el.title === value
+    );
+
+    const currentRestrictionsIds = this.state.restrictions.length
+      ? this.state.restrictions.slice()
+      : [];
+
+    currentRestrictionsIds.push(...getLifestyleRestrictions.restrictions);
+
     this.setState({
-      lifestyle: value
+      lifestyle: value,
+      lifestyleRestrictions: currentRestrictionsIds
     });
+  }
+
+  handleChangeRadioLifestyleSecondary(i, event, value) {
+    this.state.secondaryProfilesData[i].lifestyle = value;
+
+    const getLifestyleRestrictions = this.props.lifestyles.find(
+      el => el.title === value
+    );
+
+    const currentRestrictionsIds = this.state.secondaryProfilesData[i]
+      .restrictions.length
+      ? this.state.secondaryProfilesData[i].restrictions.slice()
+      : [];
+
+    currentRestrictionsIds.push(...getLifestyleRestrictions.restrictions);
+
+    this.state.secondaryProfilesData[
+      i
+    ].lifestyleRestrictions = currentRestrictionsIds;
+
+    this.forceUpdate();
   }
 
   handleChangeRadioRestriction(event, value) {
@@ -346,16 +372,53 @@ class Step3LifestyleProfile extends React.Component {
     });
   }
 
+  handleChangeRadioExtraSecondary(i, event, value) {
+    this.state.secondaryProfilesData[i].extra = value;
+    this.forceUpdate();
+  }
+
   handleChangeRadioDiscount(event, value) {
     this.setState({
       discount: value
     });
   }
 
-  handleChange(name, event, checked) {
+  handleChangeRadioDiscountSecondary(i, event, value) {
+    this.state.secondaryProfilesData[i].discount = value;
+    this.forceUpdate();
+  }
+
+  handleChange(id, event, checked) {
+    const clonedRestrictionIds = this.state.restrictions
+      ? this.state.restrictions.slice()
+      : [];
+
+    if (clonedRestrictionIds.indexOf(id) != -1) {
+      clonedRestrictionIds.splice(clonedRestrictionIds.indexOf(id), 1);
+    } else {
+      clonedRestrictionIds.push(id);
+    }
+
     this.setState({
-      [name]: checked
+      restrictions: clonedRestrictionIds
     });
+  }
+
+  handleChangeSecondary(index, id, event, checked) {
+    const clonedRestrictionIds = this.state.secondaryProfilesData[index]
+      .restrictions
+      ? this.state.secondaryProfilesData[index].restrictions.slice()
+      : [];
+
+    if (clonedRestrictionIds.indexOf(id) != -1) {
+      clonedRestrictionIds.splice(clonedRestrictionIds.indexOf(id), 1);
+    } else {
+      clonedRestrictionIds.push(id);
+    }
+
+    this.state.secondaryProfilesData[index].restrictions = clonedRestrictionIds;
+
+    this.forceUpdate();
   }
 
   onChange(event, { newValue }) {
@@ -397,7 +460,6 @@ class Step3LifestyleProfile extends React.Component {
       </Paper>
     );
   }
-
   onSuggestionSelected(
     event,
     { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
@@ -440,6 +502,65 @@ class Step3LifestyleProfile extends React.Component {
         specificRestrictions: clonedSubIngredients
       });
     }
+
+    this.deleteDialogHandleRequestClose();
+  }
+
+  onSuggestionSelectedSecondary(
+    index,
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+  ) {
+    let clonedSubIngredients;
+
+    console.log(index);
+
+    if (this.state.addRestrictionType == "Preference") {
+      // subingredients
+      let isThere = false;
+
+      if (this.state.secondaryProfilesData[index].subIngredients.length > 0) {
+        isThere = this.state.secondaryProfilesData[index].subIngredients.filter(
+          present => suggestion._id === present._id
+        );
+      }
+
+      if (isThere != false) {
+        return;
+      }
+
+      this.state.secondaryProfilesData[index].subIngredients.push({
+        _id: suggestion._id,
+        title: suggestion.title
+      });
+    } else {
+      // specificRestrictions
+
+      let isThere = false;
+
+      if (
+        this.state.secondaryProfilesData[index].specificRestrictions.length > 0
+      ) {
+        isThere = this.state.secondaryProfilesData[
+          index
+        ].specificRestrictions.filter(
+          present => suggestion._id === present._id
+        );
+      }
+
+      if (isThere != false) {
+        return;
+      }
+
+      this.state.secondaryProfilesData[index].specificRestrictions.push({
+        _id: suggestion._id,
+        title: suggestion.title
+      });
+    }
+
+    this.deleteDialogHandleRequestClose();
+
+    this.forceUpdate();
   }
 
   onSuggestionsFetchRequested({ value }) {
@@ -581,23 +702,14 @@ class Step3LifestyleProfile extends React.Component {
                             )}
                             style={{ flexDirection: "row" }}
                           >
-                            <FormControlLabel
-                              value="Traditional"
-                              control={<Radio />}
-                              label="Traditional"
-                              selected
-                            />
-                            <FormControlLabel
-                              value="Vegetarian"
-                              control={<Radio />}
-                              label="Vegetarian"
-                            />
-
-                            <FormControlLabel
-                              value="Chef's choice"
-                              control={<Radio />}
-                              label="Chef's choice"
-                            />
+                            {this.props.lifestyles.map(e => (
+                              <FormControlLabel
+                                value={e.title}
+                                control={<Radio />}
+                                label={e.title}
+                                selected
+                              />
+                            ))}
                           </RadioGroup>
                         </FormControl>
                       </Grid>
@@ -618,18 +730,41 @@ class Step3LifestyleProfile extends React.Component {
                               value="none"
                               control={<Radio />}
                               label="None"
-                              selected
+                              disabled={
+                                this.state.lifestyle &&
+                                this.props.lifestyles.find(
+                                  element =>
+                                    element.title == this.state.lifestyle &&
+                                    !element.extraAthletic &&
+                                    !element.extraBodybuilder
+                                )
+                              }
                             />
                             <FormControlLabel
                               value="athletic"
                               control={<Radio />}
                               label="Athletic"
-                              selected
+                              disabled={
+                                this.state.lifestyle &&
+                                this.props.lifestyles.find(
+                                  element =>
+                                    element.title == this.state.lifestyle &&
+                                    !element.extraAthletic
+                                )
+                              }
                             />
                             <FormControlLabel
                               value="bodybuilder"
                               control={<Radio />}
                               label="Bodybuilder"
+                              disabled={
+                                this.state.lifestyle &&
+                                this.props.lifestyles.find(
+                                  element =>
+                                    element.title == this.state.lifestyle &&
+                                    !element.extraBodybuilder
+                                )
+                              }
                             />
                           </RadioGroup>
                         </FormControl>
@@ -652,16 +787,41 @@ class Step3LifestyleProfile extends React.Component {
                               control={<Radio />}
                               label="None"
                               selected
+                              disabled={
+                                this.state.lifestyle &&
+                                this.props.lifestyles.find(
+                                  element =>
+                                    element.title == this.state.lifestyle &&
+                                    !element.discountStudent &&
+                                    !element.discountSenior
+                                )
+                              }
                             />
                             <FormControlLabel
                               value="student"
                               control={<Radio />}
                               label="Student"
+                              disabled={
+                                this.state.lifestyle &&
+                                this.props.lifestyles.find(
+                                  element =>
+                                    element.title == this.state.lifestyle &&
+                                    !element.discountStudent
+                                )
+                              }
                             />
                             <FormControlLabel
                               value="senior"
                               control={<Radio />}
                               label="Senior"
+                              disabled={
+                                this.state.lifestyle &&
+                                this.props.lifestyles.find(
+                                  element =>
+                                    element.title == this.state.lifestyle &&
+                                    !element.discountSenior
+                                )
+                              }
                             />
                           </RadioGroup>
                         </FormControl>
@@ -676,91 +836,38 @@ class Step3LifestyleProfile extends React.Component {
                         <FormControl component="fieldset">
                           <FormLabel component="legend">Allergies</FormLabel>
                           <FormGroup>
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.peanuts}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "peanuts"
-                                  )}
-                                  value="peanuts"
-                                />
-                              }
-                              label="Peanuts"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.milk}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "milk"
-                                  )}
-                                  value="Milk"
-                                />
-                              }
-                              label="Milk"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.egg}
-                                  onChange={this.handleChange.bind(this, "egg")}
-                                  value="egg"
-                                />
-                              }
-                              label="Egg"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.wheat}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "wheat"
-                                  )}
-                                  value="wheat"
-                                />
-                              }
-                              label="Wheat"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.soy}
-                                  onChange={this.handleChange.bind(this, "soy")}
-                                  value="soy"
-                                />
-                              }
-                              label="Soy"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.fish}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "fish"
-                                  )}
-                                  value="fish"
-                                />
-                              }
-                              label="Fish"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.shellfish}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "shellfish"
-                                  )}
-                                  value="shellfish"
-                                />
-                              }
-                              label="Shellfish"
-                            />
+                            {this.props.restrictions
+                              .filter(e => e.restrictionType === "allergy")
+                              .map((e, i) => {
+                                const isSelected = this.state.restrictions
+                                  .length
+                                  ? this.state.restrictions.indexOf(e._id) != -1
+                                  : false;
+
+                                const isAlreadyChecked = this.state
+                                  .lifestyleRestrictions
+                                  ? this.state.lifestyleRestrictions.indexOf(
+                                      e._id
+                                    ) != -1
+                                  : false;
+                                return (
+                                  <FormControlLabel
+                                    key={i}
+                                    disabled={isAlreadyChecked}
+                                    control={
+                                      <Checkbox
+                                        checked={isSelected || isAlreadyChecked}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          e._id
+                                        )}
+                                        value={e.title.toLowerCase()}
+                                      />
+                                    }
+                                    label={e.title}
+                                  />
+                                );
+                              })}
                           </FormGroup>
                         </FormControl>
                       </Grid>
@@ -768,123 +875,38 @@ class Step3LifestyleProfile extends React.Component {
                         <FormControl component="fieldset">
                           <FormLabel component="legend">Dietary</FormLabel>
                           <FormGroup>
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.ketogenic}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "ketogenic"
-                                  )}
-                                  value="ketogenic"
-                                />
-                              }
-                              label="Ketogenic"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.glutenfree}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "glutenfree"
-                                  )}
-                                  value="Gluten free"
-                                />
-                              }
-                              label="Gluten free"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.lowcarb}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "lowcarb"
-                                  )}
-                                  value="Low carb"
-                                />
-                              }
-                              label="Low carb"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.nocarb}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "nocarb"
-                                  )}
-                                  value="No carb"
-                                />
-                              }
-                              label="No carb"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.ovolacto}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "ovolacto"
-                                  )}
-                                  value="Ovo-lacto"
-                                />
-                              }
-                              label="Ovo-lacto"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.lacto}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "lacto"
-                                  )}
-                                  value="lacto"
-                                />
-                              }
-                              label="Lacto"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.vegan}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "vegan"
-                                  )}
-                                  value="vegan"
-                                />
-                              }
-                              label="Vegan"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.pescatarian}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "pescatarian"
-                                  )}
-                                  value="pescatarian"
-                                />
-                              }
-                              label="Pescatarian"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.paleo}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "paleo"
-                                  )}
-                                  value="paleo"
-                                />
-                              }
-                              label="Paleo"
-                            />
+                            {this.props.restrictions
+                              .filter(e => e.restrictionType === "dietary")
+                              .map((e, i) => {
+                                const isSelected = this.state.restrictions
+                                  .length
+                                  ? this.state.restrictions.indexOf(e._id) != -1
+                                  : false;
+
+                                const isAlreadyChecked = this.state
+                                  .lifestyleRestrictions
+                                  ? this.state.lifestyleRestrictions.indexOf(
+                                      e._id
+                                    ) != -1
+                                  : false;
+                                return (
+                                  <FormControlLabel
+                                    key={i}
+                                    disabled={isAlreadyChecked}
+                                    control={
+                                      <Checkbox
+                                        checked={isSelected || isAlreadyChecked}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          e._id
+                                        )}
+                                        value={e.title.toLowerCase()}
+                                      />
+                                    }
+                                    label={e.title}
+                                  />
+                                );
+                              })}
                           </FormGroup>
                         </FormControl>
                       </Grid>
@@ -892,32 +914,38 @@ class Step3LifestyleProfile extends React.Component {
                         <FormControl component="fieldset">
                           <FormLabel component="legend">Religious</FormLabel>
                           <FormGroup>
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.halal}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "halal"
-                                  )}
-                                  value="halal"
-                                />
-                              }
-                              label="Halal"
-                            />
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  checked={this.state.kosher}
-                                  onChange={this.handleChange.bind(
-                                    this,
-                                    "kosher"
-                                  )}
-                                  value="Kosher"
-                                />
-                              }
-                              label="Kosher"
-                            />
+                            {this.props.restrictions
+                              .filter(e => e.restrictionType === "religious")
+                              .map((e, i) => {
+                                const isSelected = this.state.restrictions
+                                  .length
+                                  ? this.state.restrictions.indexOf(e._id) != -1
+                                  : false;
+
+                                const isAlreadyChecked = this.state
+                                  .lifestyleRestrictions
+                                  ? this.state.lifestyleRestrictions.indexOf(
+                                      e._id
+                                    ) != -1
+                                  : false;
+                                return (
+                                  <FormControlLabel
+                                    key={i}
+                                    disabled={isAlreadyChecked}
+                                    control={
+                                      <Checkbox
+                                        checked={isSelected || isAlreadyChecked}
+                                        onChange={this.handleChange.bind(
+                                          this,
+                                          e._id
+                                        )}
+                                        value={e.title.toLowerCase()}
+                                      />
+                                    }
+                                    label={e.title}
+                                  />
+                                );
+                              })}
                           </FormGroup>
                         </FormControl>
                       </Grid>
@@ -979,7 +1007,6 @@ class Step3LifestyleProfile extends React.Component {
                           </RadioGroup>
                         </FormControl>
 
-                        {/* <Search className="autoinput-icon" /> */}
                         <Autosuggest
                           id="2"
                           className="autosuggest"
@@ -1129,26 +1156,42 @@ class Step3LifestyleProfile extends React.Component {
                     </Grid>
                   </Collapse>
 
-                  {this.state.secondaryProfilesData.map((e, i) => (
-                    <div key={i}>
+                  {this.state.secondaryProfilesData.map((e, profileIndex) => (
+                    <div key={profileIndex}>
                       <ListItem
                         style={{ marginTop: "15px", marginBottom: "15px" }}
                         button
-                        onClick={this.handleProfileOpen.bind(this, false, i)}
+                        onClick={this.handleProfileOpen.bind(
+                          this,
+                          false,
+                          profileIndex
+                        )}
                       >
-                        <ListItemText primary={`Profile ${i + 2}`} />
-                        {this.state.secondaryCollapses[i] ? (
+                        <ListItemText
+                          primary={
+                            this.state.secondaryProfilesData[profileIndex]
+                              .first_name
+                              ? `${
+                                  this.state.secondaryProfilesData[profileIndex]
+                                    .first_name
+                                }'s Profile`
+                              : `Profile ${profileIndex + 2}`
+                          }
+                        />
+                        {this.state.secondaryCollapses[profileIndex] ? (
                           <ExpandLess />
                         ) : (
                           <ExpandMore />
                         )}
                       </ListItem>
                       <Collapse
-                        in={this.state.secondaryCollapses[i]}
+                        in={this.state.secondaryCollapses[profileIndex]}
                         transitionDuration="auto"
                         component="div"
                       >
-                        <div style={{ paddingLeft: "16px", paddingRight: "16px" }}>
+                        <div
+                          style={{ paddingLeft: "16px", paddingRight: "16px" }}
+                        >
                           <Grid container>
                             <Grid item xs={12} sm={6}>
                               <TextField
@@ -1159,6 +1202,13 @@ class Step3LifestyleProfile extends React.Component {
                                 fullWidth
                                 defaultValue={this.props.customerInfo.firstName}
                                 inputProps={{}}
+                                onChange={event => {
+                                  this.state.secondaryProfilesData[
+                                    profileIndex
+                                  ].first_name =
+                                    event.target.value;
+                                  this.forceUpdate();
+                                }}
                               />
                             </Grid>
                             <Grid item xs={12} sm={6}>
@@ -1180,29 +1230,25 @@ class Step3LifestyleProfile extends React.Component {
                                 <RadioGroup
                                   aria-label="lifestyle"
                                   name="lifestyle"
-                                  value={this.state.lifestyle}
-                                  onChange={this.handleChangeRadioLifestyle.bind(
-                                    this
+                                  value={
+                                    this.state.secondaryProfilesData[
+                                      profileIndex
+                                    ].lifestyle
+                                  }
+                                  onChange={this.handleChangeRadioLifestyleSecondary.bind(
+                                    this,
+                                    profileIndex
                                   )}
                                   style={{ flexDirection: "row" }}
                                 >
-                                  <FormControlLabel
-                                    value="Traditional"
-                                    control={<Radio />}
-                                    label="Traditional"
-                                    selected
-                                  />
-                                  <FormControlLabel
-                                    value="Vegetarian"
-                                    control={<Radio />}
-                                    label="Vegetarian"
-                                  />
-
-                                  <FormControlLabel
-                                    value="Chef's choice"
-                                    control={<Radio />}
-                                    label="Chef's choice"
-                                  />
+                                  {this.props.lifestyles.map(e => (
+                                    <FormControlLabel
+                                      value={e.title}
+                                      control={<Radio />}
+                                      label={e.title}
+                                      selected
+                                    />
+                                  ))}
                                 </RadioGroup>
                               </FormControl>
                             </Grid>
@@ -1215,9 +1261,14 @@ class Step3LifestyleProfile extends React.Component {
                                 <RadioGroup
                                   aria-label="extra"
                                   name="extra"
-                                  value={this.state.extra}
-                                  onChange={this.handleChangeRadioExtra.bind(
-                                    this
+                                  value={
+                                    this.state.secondaryProfilesData[
+                                      profileIndex
+                                    ].extra
+                                  }
+                                  onChange={this.handleChangeRadioExtraSecondary.bind(
+                                    this,
+                                    profileIndex
                                   )}
                                   style={{ flexDirection: "row" }}
                                 >
@@ -1226,17 +1277,56 @@ class Step3LifestyleProfile extends React.Component {
                                     control={<Radio />}
                                     label="None"
                                     selected
+                                    disabled={
+                                      this.state.secondaryProfilesData[
+                                        profileIndex
+                                      ].lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                            this.state.secondaryProfilesData[
+                                              profileIndex
+                                            ].lifestyle &&
+                                          !element.extraAthletic &&
+                                          !element.extraBodybuilder
+                                      )
+                                    }
                                   />
                                   <FormControlLabel
                                     value="athletic"
                                     control={<Radio />}
                                     label="Athletic"
-                                    selected
+                                    disabled={
+                                      this.state.secondaryProfilesData[
+                                        profileIndex
+                                      ].lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                            this.state.secondaryProfilesData[
+                                              profileIndex
+                                            ].lifestyle &&
+                                          !element.extraAthletic
+                                      )
+                                    }
                                   />
                                   <FormControlLabel
                                     value="bodybuilder"
                                     control={<Radio />}
                                     label="Bodybuilder"
+                                    disabled={
+                                      this.state.secondaryProfilesData[
+                                        profileIndex
+                                      ].lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                            this.state.secondaryProfilesData[
+                                              profileIndex
+                                            ].lifestyle &&
+                                          !element.extraBodybuilder
+                                      )
+                                    }
                                   />
                                 </RadioGroup>
                               </FormControl>
@@ -1252,9 +1342,14 @@ class Step3LifestyleProfile extends React.Component {
                                 <RadioGroup
                                   aria-label="discount"
                                   name="discount"
-                                  value={this.state.discount}
-                                  onChange={this.handleChangeRadioDiscount.bind(
-                                    this
+                                  value={
+                                    this.state.secondaryProfilesData[
+                                      profileIndex
+                                    ].discount
+                                  }
+                                  onChange={this.handleChangeRadioDiscountSecondary.bind(
+                                    this,
+                                    profileIndex
                                   )}
                                   style={{ flexDirection: "row" }}
                                 >
@@ -1263,16 +1358,56 @@ class Step3LifestyleProfile extends React.Component {
                                     control={<Radio />}
                                     label="None"
                                     selected
+                                    disabled={
+                                      this.state.secondaryProfilesData[
+                                        profileIndex
+                                      ].lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                            this.state.secondaryProfilesData[
+                                              profileIndex
+                                            ].lifestyle &&
+                                          !element.discountStudent &&
+                                          !element.discountSenior
+                                      )
+                                    }
                                   />
                                   <FormControlLabel
                                     value="student"
                                     control={<Radio />}
                                     label="Student"
+                                    disabled={
+                                      this.state.secondaryProfilesData[
+                                        profileIndex
+                                      ].lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                            this.state.secondaryProfilesData[
+                                              profileIndex
+                                            ].lifestyle &&
+                                          !element.discountStudent
+                                      )
+                                    }
                                   />
                                   <FormControlLabel
                                     value="senior"
                                     control={<Radio />}
                                     label="Senior"
+                                    disabled={
+                                      this.state.secondaryProfilesData[
+                                        profileIndex
+                                      ].lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                            this.state.secondaryProfilesData[
+                                              profileIndex
+                                            ].lifestyle &&
+                                          !element.discountSenior
+                                      )
+                                    }
                                   />
                                 </RadioGroup>
                               </FormControl>
@@ -1291,97 +1426,49 @@ class Step3LifestyleProfile extends React.Component {
                                   Allergies
                                 </FormLabel>
                                 <FormGroup>
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.peanuts}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "peanuts"
-                                        )}
-                                        value="peanuts"
-                                      />
-                                    }
-                                    label="Peanuts"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.milk}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "milk"
-                                        )}
-                                        value="Milk"
-                                      />
-                                    }
-                                    label="Milk"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.egg}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "egg"
-                                        )}
-                                        value="egg"
-                                      />
-                                    }
-                                    label="Egg"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.wheat}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "wheat"
-                                        )}
-                                        value="wheat"
-                                      />
-                                    }
-                                    label="Wheat"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.soy}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "soy"
-                                        )}
-                                        value="soy"
-                                      />
-                                    }
-                                    label="Soy"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.fish}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "fish"
-                                        )}
-                                        value="fish"
-                                      />
-                                    }
-                                    label="Fish"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.shellfish}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "shellfish"
-                                        )}
-                                        value="shellfish"
-                                      />
-                                    }
-                                    label="Shellfish"
-                                  />
+                                  {this.props.restrictions
+                                    .filter(
+                                      e => e.restrictionType === "allergy"
+                                    )
+                                    .map((e, i) => {
+                                      const isSelected = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .restrictions
+                                        ? this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].restrictions.indexOf(e._id) != -1
+                                        : false;
+
+                                      const isAlreadyChecked = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .lifestyleRestrictions
+                                        ? this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].lifestyleRestrictions.indexOf(
+                                            e._id
+                                          ) != -1
+                                        : false;
+                                      return (
+                                        <FormControlLabel
+                                          key={i}
+                                          disabled={isAlreadyChecked}
+                                          control={
+                                            <Checkbox
+                                              checked={
+                                                isSelected || isAlreadyChecked
+                                              }
+                                              onChange={this.handleChangeSecondary.bind(
+                                                this,
+                                                profileIndex,
+                                                e._id
+                                              )}
+                                              value={e.title.toLowerCase()}
+                                            />
+                                          }
+                                          label={e.title}
+                                        />
+                                      );
+                                    })}
                                 </FormGroup>
                               </FormControl>
                             </Grid>
@@ -1391,123 +1478,49 @@ class Step3LifestyleProfile extends React.Component {
                                   Dietary
                                 </FormLabel>
                                 <FormGroup>
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.ketogenic}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "ketogenic"
-                                        )}
-                                        value="ketogenic"
-                                      />
-                                    }
-                                    label="Ketogenic"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.glutenfree}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "glutenfree"
-                                        )}
-                                        value="Gluten free"
-                                      />
-                                    }
-                                    label="Gluten free"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.lowcarb}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "lowcarb"
-                                        )}
-                                        value="Low carb"
-                                      />
-                                    }
-                                    label="Low carb"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.nocarb}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "nocarb"
-                                        )}
-                                        value="No carb"
-                                      />
-                                    }
-                                    label="No carb"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.ovolacto}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "ovolacto"
-                                        )}
-                                        value="Ovo-lacto"
-                                      />
-                                    }
-                                    label="Ovo-lacto"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.lacto}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "lacto"
-                                        )}
-                                        value="lacto"
-                                      />
-                                    }
-                                    label="Lacto"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.vegan}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "vegan"
-                                        )}
-                                        value="vegan"
-                                      />
-                                    }
-                                    label="Vegan"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.pescatarian}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "pescatarian"
-                                        )}
-                                        value="pescatarian"
-                                      />
-                                    }
-                                    label="Pescatarian"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.paleo}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "paleo"
-                                        )}
-                                        value="paleo"
-                                      />
-                                    }
-                                    label="Paleo"
-                                  />
+                                  {this.props.restrictions
+                                    .filter(
+                                      e => e.restrictionType === "dietary"
+                                    )
+                                    .map((e, i) => {
+                                      const isSelected = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .restrictions
+                                        ? this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].restrictions.indexOf(e._id) != -1
+                                        : false;
+                                      const isAlreadyChecked = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .lifestyleRestrictions
+                                        ? this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].lifestyleRestrictions.indexOf(
+                                            e._id
+                                          ) != -1
+                                        : false;
+
+                                      return (
+                                        <FormControlLabel
+                                          key={i}
+                                          disabled={isAlreadyChecked}
+                                          control={
+                                            <Checkbox
+                                              checked={
+                                                isSelected || isAlreadyChecked
+                                              }
+                                              onChange={this.handleChangeSecondary.bind(
+                                                this,
+                                                profileIndex,
+                                                e._id
+                                              )}
+                                              value={e.title.toLowerCase()}
+                                            />
+                                          }
+                                          label={e.title}
+                                        />
+                                      );
+                                    })}
                                 </FormGroup>
                               </FormControl>
                             </Grid>
@@ -1517,32 +1530,48 @@ class Step3LifestyleProfile extends React.Component {
                                   Religious
                                 </FormLabel>
                                 <FormGroup>
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.halal}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "halal"
-                                        )}
-                                        value="halal"
-                                      />
-                                    }
-                                    label="Halal"
-                                  />
-                                  <FormControlLabel
-                                    control={
-                                      <Checkbox
-                                        checked={this.state.kosher}
-                                        onChange={this.handleChange.bind(
-                                          this,
-                                          "kosher"
-                                        )}
-                                        value="Kosher"
-                                      />
-                                    }
-                                    label="Kosher"
-                                  />
+                                  {this.props.restrictions
+                                    .filter(
+                                      e => e.restrictionType === "religious"
+                                    )
+                                    .map((e, i) => {
+                                      const isSelected = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .restrictions
+                                        ? this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].restrictions.indexOf(e._id) != -1
+                                        : false;
+                                      const isAlreadyChecked = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .lifestyleRestrictions
+                                        ? this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].lifestyleRestrictions.indexOf(
+                                            e._id
+                                          ) != -1
+                                        : false;
+                                      return (
+                                        <FormControlLabel
+                                          key={i}
+                                          disabled={isAlreadyChecked}
+                                          control={
+                                            <Checkbox
+                                              checked={
+                                                isSelected || isAlreadyChecked
+                                              }
+                                              onChange={this.handleChangeSecondary.bind(
+                                                this,
+                                                profileIndex,
+                                                e._id
+                                              )}
+                                              value={e.title.toLowerCase()}
+                                            />
+                                          }
+                                          label={e.title}
+                                        />
+                                      );
+                                    })}
                                 </FormGroup>
                               </FormControl>
                             </Grid>
@@ -1605,7 +1634,6 @@ class Step3LifestyleProfile extends React.Component {
                                 </RadioGroup>
                               </FormControl>
 
-                              {/* <Search className="autoinput-icon" /> */}
                               <Autosuggest
                                 id="2"
                                 className="autosuggest"
@@ -1639,8 +1667,9 @@ class Step3LifestyleProfile extends React.Component {
                                 onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
                                   this
                                 )}
-                                onSuggestionSelected={this.onSuggestionSelected.bind(
-                                  this
+                                onSuggestionSelected={this.onSuggestionSelectedSecondary.bind(
+                                  this,
+                                  profileIndex
                                 )}
                                 getSuggestionValue={this.getSuggestionValue.bind(
                                   this
@@ -1677,33 +1706,34 @@ class Step3LifestyleProfile extends React.Component {
                                   flexWrap: "wrap"
                                 }}
                               >
-                                {this.state.subIngredients.length ? (
-                                  this.state.subIngredients.map(
-                                    (subIngredient, i) => (
-                                      <Chip
-                                        avatar={
-                                          <Avatar>
-                                            {" "}
-                                            {this.getSubIngredientAvatar(
-                                              subIngredient
-                                            )}{" "}
-                                          </Avatar>
-                                        }
-                                        style={{
-                                          marginRight: "8px",
-                                          marginBottom: "8px"
-                                        }}
-                                        label={this.getSubIngredientTitle(
-                                          subIngredient
-                                        )}
-                                        key={i}
-                                        onRequestDelete={this.handleSubIngredientChipDelete.bind(
-                                          this,
-                                          subIngredient
-                                        )}
-                                      />
-                                    )
-                                  )
+                                {this.state.secondaryProfilesData[profileIndex]
+                                  .subIngredients.length ? (
+                                  this.state.secondaryProfilesData[
+                                    profileIndex
+                                  ].subIngredients.map((subIngredient, i) => (
+                                    <Chip
+                                      avatar={
+                                        <Avatar>
+                                          {" "}
+                                          {this.getSubIngredientAvatar(
+                                            subIngredient
+                                          )}{" "}
+                                        </Avatar>
+                                      }
+                                      style={{
+                                        marginRight: "8px",
+                                        marginBottom: "8px"
+                                      }}
+                                      label={this.getSubIngredientTitle(
+                                        subIngredient
+                                      )}
+                                      key={i}
+                                      onRequestDelete={this.handleSubIngredientChipDelete.bind(
+                                        this,
+                                        subIngredient
+                                      )}
+                                    />
+                                  ))
                                 ) : (
                                   <Chip
                                     className="chip--bordered"
@@ -1725,8 +1755,11 @@ class Step3LifestyleProfile extends React.Component {
                                   flexWrap: "wrap"
                                 }}
                               >
-                                {this.state.specificRestrictions.length ? (
-                                  this.state.specificRestrictions.map(
+                                {this.state.secondaryProfilesData[profileIndex]
+                                  .specificRestrictions.length ? (
+                                  this.state.secondaryProfilesData[
+                                    profileIndex
+                                  ].specificRestrictions.map(
                                     (subIngredient, i) => (
                                       <Chip
                                         avatar={
@@ -1761,11 +1794,25 @@ class Step3LifestyleProfile extends React.Component {
                               </div>
                             </Grid>
                           </Grid>
+                          <Button
+                            raised
+                            onClick={this.removeProfile.bind(
+                              this,
+                              profileIndex
+                            )}
+                            style={{ float: "right" }}
+                          >
+                            Remove profile
+                          </Button>
                         </div>
                       </Collapse>
                     </div>
                   ))}
-                  <Button raised onClick={this.increaseProfileCount.bind(this)} style={{ marginTop: "25px" }}>
+                  <Button
+                    color="danger"
+                    onClick={this.increaseProfileCount.bind(this)}
+                    style={{ marginTop: "25px" }}
+                  >
                     Add a profile
                   </Button>
                 </Paper>

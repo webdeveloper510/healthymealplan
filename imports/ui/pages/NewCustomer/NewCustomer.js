@@ -7,6 +7,8 @@ import { Meteor } from "meteor/meteor";
 import Grid from "material-ui/Grid";
 import Ingredients from "../../../api/Ingredients/Ingredients";
 import IngredientTypes from "../../../api/IngredientTypes/IngredientTypes";
+import Lifestyles from "../../../api/Lifestyles/Lifestyles";
+import Restrictions from "../../../api/Restrictions/Restrictions";
 
 import CustomerEditor from "../../components/CustomerEditor/CustomerEditor";
 
@@ -15,7 +17,9 @@ const NewCustomer = ({
   ingredientTypes,
   potentialSubIngredients,
   newCategory,
-  popTheSnackbar
+  popTheSnackbar,
+  lifestyles,
+  restrictions
 }) => (
   <div>
     <Grid
@@ -28,6 +32,8 @@ const NewCustomer = ({
         history={history}
         popTheSnackbar={popTheSnackbar}
         newCategory={newCategory}
+        lifestyles={lifestyles}
+        restrictions={restrictions}
       />
     </Grid>
   </div>
@@ -41,10 +47,14 @@ NewCustomer.propTypes = {
 export default createContainer(() => {
   const subscription = Meteor.subscribe("ingredients");
   const subscription2 = Meteor.subscribe("ingredientTypes");
+  const subscription3 = Meteor.subscribe("lifestyles");
+  const subscription4 = Meteor.subscribe("restrictions");
 
   return {
     loading: !subscription2.ready() || !subscription.ready(),
     potentialSubIngredients: Ingredients.find().fetch(),
-    ingredientTypes: IngredientTypes.find().fetch()
+    ingredientTypes: IngredientTypes.find().fetch(),
+    lifestyles: Lifestyles.find().fetch(),
+    restrictions: Restrictions.find().fetch()
   };
 }, NewCustomer);

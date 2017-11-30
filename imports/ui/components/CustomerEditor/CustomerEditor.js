@@ -5,77 +5,79 @@
   not a priority for now, but this is an itch that we should really scratch.
 */
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import Autosuggest from 'react-autosuggest';
+import Autosuggest from "react-autosuggest";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import { Meteor } from 'meteor/meteor';
+import { Meteor } from "meteor/meteor";
 
-import Button from 'material-ui/Button';
-import { MenuItem } from 'material-ui/Menu';
-import TextField from 'material-ui/TextField';
+import Button from "material-ui/Button";
+import { MenuItem } from "material-ui/Menu";
+import TextField from "material-ui/TextField";
 // import Select from 'material-ui/Select';
 // import Input, { InputLabel } from 'material-ui/Input';
 // import { FormControl, FormHelperText } from 'material-ui/Form';
 import Dialog, {
   DialogActions,
   DialogContent,
-  DialogContentText,
-} from 'material-ui/Dialog';
+  DialogContentText
+} from "material-ui/Dialog";
 
-import Chip from 'material-ui/Chip';
-import Paper from 'material-ui/Paper';
+import Chip from "material-ui/Chip";
+import Paper from "material-ui/Paper";
 
-import Grid from 'material-ui/Grid';
-import Typography from 'material-ui/Typography';
-import Divider from 'material-ui/Divider';
-import Avatar from 'material-ui/Avatar';
-import { withStyles } from 'material-ui/styles';
+import Grid from "material-ui/Grid";
+import Typography from "material-ui/Typography";
+import Divider from "material-ui/Divider";
+import Avatar from "material-ui/Avatar";
+import { withStyles } from "material-ui/styles";
 
-import { red } from 'material-ui/colors';
-import ChevronLeft from 'material-ui-icons/ChevronLeft';
-import Search from 'material-ui-icons/Search';
-import Stepper, { Step, StepLabel } from 'material-ui/Stepper';
+import { red } from "material-ui/colors";
+import ChevronLeft from "material-ui-icons/ChevronLeft";
+import Search from "material-ui-icons/Search";
+import Stepper, { Step, StepLabel } from "material-ui/Stepper";
 
-import validate from '../../../modules/validate';
-import Step1Eligibility from './Step1Eligibility';
-import Step2Contact from './Step2Contact';
-import Step3LifestyleProfile from './Step3LifestyleProfile';
+import validate from "../../../modules/validate";
+import Step1Eligibility from "./Step1Eligibility";
+import Step2Contact from "./Step2Contact";
+import Step3LifestyleProfile from "./Step3LifestyleProfile";
+import Step4Delivery from "./Step4Delivery";
+import Step5Review from "./Step5Review";
 
-import $ from 'jquery';
+import $ from "jquery";
 
 // const primary = teal[500];
 const danger = red[700];
 
 const styles = theme => ({
   root: {
-    width: '90%',
+    width: "90%"
   },
   button: {
-    marginRight: theme.spacing.unit,
+    marginRight: theme.spacing.unit
   },
   instructions: {
     marginTop: theme.spacing.unit,
-    marginBottom: theme.spacing.unit,
-  },
+    marginBottom: theme.spacing.unit
+  }
 });
 
 function getSteps() {
-  return ['Eligibility', 'Contact', 'Lifestyle', 'Delivery', 'Payment'];
+  return ["Eligibility", "Contact", "Lifestyle", "Delivery", "Payment"];
 }
 
 $.validator.addMethod(
-  'cdnPostal',
-  function (postal, element) {
+  "cdnPostal",
+  function(postal, element) {
     return (
       this.optional(element) ||
       postal.match(/[a-zA-Z][0-9][a-zA-Z](-| |)[0-9][a-zA-Z][0-9]/)
     );
   },
-  'Please specify a valid postal code.',
+  "Please specify a valid postal code."
 );
 
 class CustomerEditor extends React.Component {
@@ -91,27 +93,27 @@ class CustomerEditor extends React.Component {
       hasFormChanged: false,
       activeStep: 0,
       customerInfo: {
-        id: '',
-        firstName: '',
-        email: '',
-        postalCode: '',
-        lastName: '',
-        phoneNumber: '',
-        adultOrChild: '',
-        lifestyle: '',
+        id: "",
+        firstName: "",
+        lastName: "",
+        email: "",
+        postalCode: "",
+        phoneNumber: "",
+        adultOrChild: "",
+        lifestyle: "",
         discount: {},
         extra: {},
         restrictions: [],
         preferences: [],
         address: {
-          type: '',
-          street: '',
-          postalCode: '',
-          notes: '',
+          type: "",
+          street: "",
+          postalCode: "",
+          notes: ""
         },
         secondaryProfileCount: 0,
-        secondaryProfiles: [],
-      },
+        secondaryProfiles: []
+      }
     };
   }
 
@@ -129,7 +131,7 @@ class CustomerEditor extends React.Component {
     this.state.customerInfo = Object.assign(
       {},
       this.state.customerInfo,
-      fields,
+      fields
     );
   }
 
@@ -137,7 +139,7 @@ class CustomerEditor extends React.Component {
     const { activeStep } = this.state;
 
     this.setState({
-      activeStep: activeStep + 1,
+      activeStep: activeStep + 1
     });
   }
 
@@ -145,14 +147,14 @@ class CustomerEditor extends React.Component {
     const { activeStep } = this.state;
 
     this.setState({
-      activeStep: activeStep - 1,
+      activeStep: activeStep - 1
     });
   }
 
   increaseProfileCount() {
     if (this.state.secondaryProfileCount === 6) {
       this.popTheSnackbar({
-        message: 'Cannot add more than',
+        message: "Cannot add more than"
       });
 
       return;
@@ -161,7 +163,7 @@ class CustomerEditor extends React.Component {
     const increasedProfileCount = this.state.secondaryProfileCount + 1;
 
     this.setState({
-      secondaryProfileCount: increasedProfileCount,
+      secondaryProfileCount: increasedProfileCount
     });
   }
 
@@ -173,24 +175,24 @@ class CustomerEditor extends React.Component {
     const { popTheSnackbar, history, category } = this.props;
 
     const exisitingCategory = category && category._id;
-    localStorage.setItem('categoryDeleted', category.title);
+    localStorage.setItem("categoryDeleted", category.title);
     const categoryDeletedMessage = `${localStorage.getItem(
-      'categoryDeleted',
+      "categoryDeleted"
     )} deleted from categories.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('categories.remove', exisitingCategory, (error) => {
+    Meteor.call("categories.remove", exisitingCategory, error => {
       if (error) {
         popTheSnackbar({
-          message: error.reason,
+          message: error.reason
         });
       } else {
         popTheSnackbar({
-          message: categoryDeletedMessage,
+          message: categoryDeletedMessage
         });
 
-        history.push('/categories');
+        history.push("/categories");
       }
     });
   }
@@ -203,13 +205,13 @@ class CustomerEditor extends React.Component {
     const { history, popTheSnackbar } = this.props;
     const existingCategory = this.props.category && this.props.category._id;
     const methodToCall = existingCategory
-      ? 'categories.update'
-      : 'categories.insert';
+      ? "categories.update"
+      : "categories.insert";
 
     const category = {
-      title: document.querySelector('#title').value.trim(),
+      title: document.querySelector("#title").value.trim(),
       // subIngredients: this.state.subIngredients || [],
-      types: this.state.types.map((e, i) => e._id),
+      types: this.state.types.map((e, i) => e._id)
     };
 
     if (existingCategory) category._id = existingCategory;
@@ -230,26 +232,26 @@ class CustomerEditor extends React.Component {
     Meteor.call(methodToCall, category, (error, categoryId) => {
       if (error) {
         popTheSnackbar({
-          message: error.reason,
+          message: error.reason
         });
       } else {
         localStorage.setItem(
-          'categoryForSnackbar',
-          category.title || $('[name="title"]').val(),
+          "categoryForSnackbar",
+          category.title || $('[name="title"]').val()
         );
 
         const confirmation = existingCategory
-          ? `${localStorage.getItem('categoryForSnackbar')} category updated.`
-          : `${localStorage.getItem('categoryForSnackbar')} category added.`;
+          ? `${localStorage.getItem("categoryForSnackbar")} category updated.`
+          : `${localStorage.getItem("categoryForSnackbar")} category added.`;
         // this.form.reset();
 
         popTheSnackbar({
           message: confirmation,
-          buttonText: 'View',
-          buttonLink: `/categories/${categoryId}/edit`,
+          buttonText: "View",
+          buttonLink: `/categories/${categoryId}/edit`
         });
 
-        history.push('/categories');
+        history.push("/categories");
       }
     });
   }
@@ -275,7 +277,7 @@ class CustomerEditor extends React.Component {
             popTheSnackbar={this.props.popTheSnackbar.bind(this)}
           />
         );
-      case 0:
+      case 3:
         return (
           <Step3LifestyleProfile
             handleNext={this.handleNext.bind(this)}
@@ -284,15 +286,26 @@ class CustomerEditor extends React.Component {
             customerInfo={this.state.customerInfo}
             popTheSnackbar={this.props.popTheSnackbar.bind(this)}
             potentialSubIngredients={this.props.potentialSubIngredients}
+            lifestyles={this.props.lifestyles}
+            restrictions={this.props.restrictions}
             addSecondaryProfile={this.increaseProfileCount.bind(this)}
           />
         );
-      case 3:
-        return 'Delivery';
+      case 0:
+        return (
+          <Step4Delivery
+            handleNext={this.handleNext.bind(this)}
+            handleBack={this.handleBack.bind(this)}
+            saveValues={this.saveValues.bind(this)}
+            customerInfo={this.state.customerInfo}
+            popTheSnackbar={this.props.popTheSnackbar.bind(this)}
+            addSecondaryProfile={this.increaseProfileCount.bind(this)}
+          />
+        );
       case 4:
-        return 'Payment';
+        return "Payment";
       default:
-        return 'Unknown step';
+        return "Unknown step";
     }
   }
 
@@ -307,29 +320,29 @@ class CustomerEditor extends React.Component {
     const { activeStep } = this.state;
 
     return (
-      <div style={{ width: '100%' }}>
+      <div style={{ width: "100%" }}>
         <Grid container justify="center">
           <Grid item xs={12}>
             <Button
-              onClick={() => this.props.history.push('/customers')}
+              onClick={() => this.props.history.push("/customers")}
               className="button button-secondary button-secondary--top"
             >
               <Typography
                 type="subheading"
                 className="subheading font-medium"
                 style={{
-                  display: 'flex',
-                  alignItems: 'center',
-                  flexDirection: 'row',
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: "row"
                 }}
               >
-                <ChevronLeft style={{ marginRight: '4px' }} /> Customers
+                <ChevronLeft style={{ marginRight: "4px" }} /> Customers
               </Typography>
             </Button>
           </Grid>
         </Grid>
 
-        <Grid container style={{ marginBottom: '50px' }}>
+        <Grid container style={{ marginBottom: "50px" }}>
           <Grid item xs={4}>
             <Typography
               type="headline"
@@ -342,14 +355,14 @@ class CustomerEditor extends React.Component {
           <Grid item xs={8}>
             <div
               style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end"
               }}
             >
               <Button
-                style={{ marginRight: '10px' }}
-                onClick={() => this.props.history.push('/customers')}
+                style={{ marginRight: "10px" }}
+                onClick={() => this.props.history.push("/customers")}
               >
                 Cancel
               </Button>
@@ -368,7 +381,7 @@ class CustomerEditor extends React.Component {
 
         <Stepper
           activeStep={activeStep}
-          style={{ background: 'none !important' }}
+          style={{ background: "none !important" }}
         >
           {steps.map((label, index) => {
             const props = {};
@@ -444,12 +457,12 @@ class CustomerEditor extends React.Component {
 }
 
 CustomerEditor.defaultProps = {
-  category: { title: '' },
+  category: { title: "" }
 };
 
 CustomerEditor.propTypes = {
   history: PropTypes.object.isRequired,
-  popTheSnackbar: PropTypes.func.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(CustomerEditor);
