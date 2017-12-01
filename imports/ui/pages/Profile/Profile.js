@@ -2,7 +2,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { Row, Col, FormGroup, ControlLabel, Button } from 'react-bootstrap';
 import _ from 'lodash';
 import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
@@ -31,7 +30,22 @@ function TextMaskCustom(props) {
   return (
     <MaskedInput
       {...props}
-      mask={['(', /[1-9]/, /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
+      mask={[
+        '(',
+        /[1-9]/,
+        /\d/,
+        /\d/,
+        ')',
+        ' ',
+        /\d/,
+        /\d/,
+        /\d/,
+        '-',
+        /\d/,
+        /\d/,
+        /\d/,
+        /\d/,
+      ]}
       placeholderChar={'\u2000'}
       showMask
     />
@@ -49,10 +63,11 @@ class Profile extends React.Component {
     this.renderProfileForm = this.renderProfileForm.bind(this);
     this.dialogHandleClickOpen = this.dialogHandleClickOpen.bind(this);
     this.dialogHandleRequestClose = this.dialogHandleRequestClose.bind(this);
-    this.handlePersonalInfoFormChange = this.handlePersonalInfoFormChange.bind(this);
+    this.handlePersonalInfoFormChange = this.handlePersonalInfoFormChange.bind(
+      this,
+    );
     this.handlePasswordSubmit = this.handlePasswordSubmit.bind(this);
     this.handlePersonalFormSubmit = this.handlePersonalFormSubmit.bind(this);
-
 
     this.state = {
       formDialogOpen: false,
@@ -64,9 +79,12 @@ class Profile extends React.Component {
     const component = this;
 
     validate(component.form, {
-
       errorPlacement(error, element) {
-        error.insertAfter($(element).parent().parent());
+        error.insertAfter(
+          $(element)
+            .parent()
+            .parent(),
+        );
       },
 
       rules: {
@@ -101,10 +119,10 @@ class Profile extends React.Component {
       },
       messages: {
         firstName: {
-          required: 'What\'s your first name?',
+          required: "What's your first name?",
         },
         lastName: {
-          required: 'What\'s your last name?',
+          required: "What's your last name?",
         },
         emailAddress: {
           required: 'Need an email address here.',
@@ -117,13 +135,18 @@ class Profile extends React.Component {
         //   required: 'Need your new password if changing.',
         // },
       },
-      submitHandler() { component.handleSubmit(); },
+      submitHandler() {
+        component.handleSubmit();
+      },
     });
 
     validate(component.passwordForm, {
-
       errorPlacement(error, element) {
-        error.insertAfter($(element).parent().parent());
+        error.insertAfter(
+          $(element)
+            .parent()
+            .parent(),
+        );
       },
 
       rules: {
@@ -142,7 +165,9 @@ class Profile extends React.Component {
           required: 'Need your new password.',
         },
       },
-      submitHandler() { component.handlePasswordSubmit(); },
+      submitHandler() {
+        component.handlePasswordSubmit();
+      },
     });
   }
 
@@ -151,7 +176,6 @@ class Profile extends React.Component {
   }
 
   dialogHandleRequestClose() {
-
     this.setState({ formDialogOpen: false });
   }
 
@@ -171,14 +195,12 @@ class Profile extends React.Component {
   }
 
   handleSubmit() {
-
     const profile = {
       emailAddress: this.emailAddress.value,
       profile: {
         name: {
           first: this.firstName.value,
           last: this.lastName.value,
-
         },
 
         phone: this.phone.value,
@@ -192,32 +214,32 @@ class Profile extends React.Component {
         this.props.popTheSnackbar({ message: 'Profile updated.' });
       }
     });
-
-
   }
 
   handlePasswordSubmit() {
-
     console.log(this.currentPassword.value);
     console.log(this.newPassword.value);
 
-    Accounts.changePassword(this.currentPassword.value, this.newPassword.value, (error) => {
-      if (error) {
-        this.props.popTheSnackbar({
-          message: error.reason,
-        });
-      } else {
-        this.currentPassword.value = '';
-        this.newPassword.value = '';
+    Accounts.changePassword(
+      this.currentPassword.value,
+      this.newPassword.value,
+      (error) => {
+        if (error) {
+          this.props.popTheSnackbar({
+            message: error.reason,
+          });
+        } else {
+          this.currentPassword.value = '';
+          this.newPassword.value = '';
 
-        this.props.popTheSnackbar({
-          message: 'Password updated.',
-        });
+          this.props.popTheSnackbar({
+            message: 'Password updated.',
+          });
 
-        this.dialogHandleRequestClose();
-      }
-    });
-
+          this.dialogHandleRequestClose();
+        }
+      },
+    );
   }
 
   handlePersonalInfoFormChange() {
@@ -226,7 +248,6 @@ class Profile extends React.Component {
         personalFormPristine: false,
       });
     }
-
   }
   // renderOAuthUser(loading, user) {
   //   return !loading ? (<div className="OAuthProfile">
@@ -249,176 +270,218 @@ class Profile extends React.Component {
   // }
 
   renderPasswordUser(loading, user) {
-    return !loading ? (<div>
-      <Grid container>
-        <Grid item xs={12} sm={6}>
-          <TextField
-            onChange={() => this.handlePersonalInfoFormChange()}
-            fullWidth
-            type="text"
+    return !loading ? (
+      <div>
+        <Grid container>
+          <Grid item xs={12} sm={6}>
+            <TextField
+              onChange={() => this.handlePersonalInfoFormChange()}
+              fullWidth
+              type="text"
+              name="firstName"
+              defaultValue={user.profile.name.first}
+              inputRef={firstName => (this.firstName = firstName)}
+            />
+          </Grid>
 
-            name="firstName"
-            defaultValue={user.profile.name.first}
-            inputRef={firstName => (this.firstName = firstName)}
-
-          />
+          <Grid item xs={12} sm={6}>
+            <TextField
+              onChange={() => this.handlePersonalInfoFormChange()}
+              fullWidth
+              type="text"
+              name="lastName"
+              defaultValue={user.profile.name.last}
+              inputRef={lastName => (this.lastName = lastName)}
+            />
+          </Grid>
         </Grid>
 
-        <Grid item xs={12} sm={6}>
-          <TextField
-            onChange={() => this.handlePersonalInfoFormChange()}
+        <Grid container style={{ marginTop: '1em' }}>
+          <Grid item xs={12}>
+            <TextField
+              onChange={() => this.handlePersonalInfoFormChange()}
+              fullWidth
+              type="email"
+              name="emailAddress"
+              disabled
+              defaultValue={user.emails[0].address}
+              inputRef={emailAddress => (this.emailAddress = emailAddress)}
+            />
+          </Grid>
+
+          <Grid item xs={12}>
+            {/* <TextField
             fullWidth
-            type="text"
-            name="lastName"
-            defaultValue={user.profile.name.last}
-            inputRef={lastName => (this.lastName = lastName)}
-          />
-        </Grid>
 
-      </Grid>
-
-      <Grid container style={{ marginTop: '1em' }}>
-        <Grid item xs={12}>
-          <TextField
-            onChange={() => this.handlePersonalInfoFormChange()}
-            fullWidth
-            type="email"
-            name="emailAddress"
-            disabled
-            defaultValue={user.emails[0].address}
-            inputRef={emailAddress => (this.emailAddress = emailAddress)}
-          />
-
-        </Grid>
-
-        <Grid item xs={12}>
-          {/* <TextField
-            fullWidth
-        
 
           /> */}
 
-          <Input
-            fullWidth
-            onChange={() => this.handlePersonalInfoFormChange()}
-            type="tel"
-            name="phone"
-            placeholder="Phone"
-            defaultValue={user.profile.phone}
-            inputRef={phone => (this.phone = phone)}
-            /* inputComponent={TextMaskCustom} */
-            /* onChange={} */
-          />
+            <Input
+              fullWidth
+              onChange={() => this.handlePersonalInfoFormChange()}
+              type="tel"
+              name="phone"
+              placeholder="Phone"
+              defaultValue={user.profile.phone}
+              inputRef={phone => (this.phone = phone)}
+              /* inputComponent={TextMaskCustom} */
+              /* onChange={} */
+            />
+          </Grid>
 
-        </Grid>
-
-        {/* <Grid item xs={12}>
+          {/* <Grid item xs={12}>
           <Button type="submit" disabled={this.state.personalFormPristine} color="primary" raised>Save</Button>
         </Grid> */}
-      </Grid>
-
-
-    </div>) : <div />;
+        </Grid>
+      </div>
+    ) : (
+      <div />
+    );
   }
 
   renderProfileForm(loading, user) {
-    return !loading ? ({
-      password: this.renderPasswordUser,
-      oauth: this.renderOAuthUser,
-    }[this.getUserType(user)])(loading, user) : <div />;
+    return !loading ? (
+      {
+        password: this.renderPasswordUser,
+        oauth: this.renderOAuthUser,
+      }[this.getUserType(user)](loading, user)
+    ) : (
+      <div />
+    );
   }
 
   render() {
     const { loading, user } = this.props;
-    return (<div className="Profile">
-      <Grid container className="SideContent SideContent--spacer-2x--horizontal SideContent--spacer-2x--top">
+    return (
+      <div className="Profile">
+        <Grid
+          container
+          className="SideContent SideContent--spacer-2x--horizontal SideContent--spacer-2x--top"
+        >
+          <Grid container style={{ marginBottom: '50px' }}>
+            <Grid item xs={6}>
+              <Typography type="headline" style={{ fontWeight: 500 }}>
+                Account
+              </Typography>
+            </Grid>
 
-        <Grid container style={{ marginBottom: '50px' }}>
-          <Grid item xs={6}>
-            <Typography type="headline" style={{ fontWeight: 500 }}>Account</Typography>
+            <Grid item xs={6} style={{ textAlign: 'right' }}>
+              <Button
+                type="submit"
+                disabled={this.state.personalFormPristine}
+                onClick={() => this.handlePersonalFormSubmit()}
+                color="primary"
+                raised
+              >
+                Save
+              </Button>
+            </Grid>
           </Grid>
 
-          <Grid item xs={6} style={{ textAlign: 'right' }}>
-            <Button type="submit" disabled={this.state.personalFormPristine} onClick={() => this.handlePersonalFormSubmit()} color="primary" raised>Save</Button>
-          </Grid>
-        </Grid>
+          <Grid container justify="center" style={{ marginBottom: '50px' }}>
+            <Grid item xs={12}>
+              <Grid container>
+                <Grid item xs={12} sm={4}>
+                  <Typography type="subheading" className="font-medium">
+                    {' '}
+                    Personal details
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Paper elevation={2} className="paper-for-fields">
+                    <Typography
+                      type="body2"
+                      className="font-uppercase"
+                      style={{ marginBottom: '30px' }}
+                    >
+                      Perosnal information
+                    </Typography>
+                    <form
+                      ref={form => (this.form = form)}
+                      id="personalForm"
+                      onSubmit={event => event.preventDefault()}
+                    >
+                      {this.renderProfileForm(loading, user)}
+                    </form>
 
-
-        <Grid container justify="center" style={{ marginBottom: '50px' }}>
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid item xs={12} sm={4} >
-                <Typography type="subheading" className="font-medium"> Personal details
-                </Typography>
-
-              </Grid>
-              <Grid item xs={12} sm={8}>
-                <Paper elevation={2} className="paper-for-fields">
-                  <Typography type="body2" className="font-uppercase" style={{ marginBottom: '30px' }}>Perosnal information</Typography>
-                  <form ref={form => (this.form = form)} id="personalForm" onSubmit={event => event.preventDefault()}>
-                    {this.renderProfileForm(loading, user)}
-                  </form>
-
-                  <Grid container style={{ marginTop: '30px' }}>
-                    <Grid item xs={12}>
-                      <Typography type="body2" className="font-uppercase" style={{ marginBottom: '30px' }}>Password</Typography>
-                      <Button color="primary" onClick={() => this.dialogHandleClickOpen()} raised>Change password</Button>
+                    <Grid container style={{ marginTop: '30px' }}>
+                      <Grid item xs={12}>
+                        <Typography
+                          type="body2"
+                          className="font-uppercase"
+                          style={{ marginBottom: '30px' }}
+                        >
+                          Password
+                        </Typography>
+                        <Button
+                          color="primary"
+                          onClick={() => this.dialogHandleClickOpen()}
+                          raised
+                        >
+                          Change password
+                        </Button>
+                      </Grid>
                     </Grid>
-
-                  </Grid>
-
-
-                </Paper>
+                  </Paper>
+                </Grid>
               </Grid>
             </Grid>
           </Grid>
         </Grid>
 
+        <Dialog
+          open={this.state.formDialogOpen}
+          onRequestClose={() => this.dialogHandleRequestClose()}
+        >
+          <DialogTitle>Change your password</DialogTitle>
+          <DialogContent>
+            <DialogContentText />
+            <form
+              ref={passwordForm => (this.passwordForm = passwordForm)}
+              onSubmit={event => event.preventDefault()}
+            >
+              <TextField
+                margin="dense"
+                fullWidth
+                label="Current password"
+                type="password"
+                name="currentPassword"
+                helperText="Enter the password you currently use to login."
+                inputRef={currentPassword =>
+                  (this.currentPassword = currentPassword)
+                }
+              />
 
-      </Grid>
-
-
-      <Dialog open={this.state.formDialogOpen} onRequestClose={() => this.dialogHandleRequestClose()}>
-        <DialogTitle>Change your password</DialogTitle>
-        <DialogContent>
-          <DialogContentText />
-          <form ref={passwordForm => (this.passwordForm = passwordForm)} onSubmit={event => event.preventDefault()}>
-
-            <TextField
-              margin="dense"
-              fullWidth
-              label="Current password"
-              type="password"
-              name="currentPassword"
-              helperText="Enter the password you currently use to login."
-              inputRef={currentPassword => (this.currentPassword = currentPassword)}
-            />
-
-            <TextField
-              margin="dense"
-              fullWidth
-              label="New password"
-              type="password"
-              name="newPassword"
-              helperText="Enter a new password of 6 or more characters."
-
-              inputRef={newPassword => (this.newPassword = newPassword)}
-            />
-
-
-          </form>
-
-        </DialogContent>
-        <DialogActions>
-
-          <Button style={{ marginTop: '1em' }} color="default" onClick={() => this.dialogHandleRequestClose()}>Cancel</Button>
-          <Button type="submit" style={{ marginTop: '1em' }} onClick={() => this.handlePasswordSubmit()} color="primary">Save</Button>
-
-        </DialogActions>
-
-      </Dialog>
-    </div>
-
+              <TextField
+                margin="dense"
+                fullWidth
+                label="New password"
+                type="password"
+                name="newPassword"
+                helperText="Enter a new password of 6 or more characters."
+                inputRef={newPassword => (this.newPassword = newPassword)}
+              />
+            </form>
+          </DialogContent>
+          <DialogActions>
+            <Button
+              style={{ marginTop: '1em' }}
+              color="default"
+              onClick={() => this.dialogHandleRequestClose()}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              style={{ marginTop: '1em' }}
+              onClick={() => this.handlePasswordSubmit()}
+              color="primary"
+            >
+              Save
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
     );
   }
 }

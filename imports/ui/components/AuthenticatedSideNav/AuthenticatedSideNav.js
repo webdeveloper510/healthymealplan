@@ -2,8 +2,6 @@ import React, { Component } from "react";
 import PropTypes from "prop-types";
 import { withRouter, Link, NavLink } from "react-router-dom";
 import Button from "material-ui/Button";
-import { LinkContainer } from "react-router-bootstrap";
-// import { Nav, NavItem, NavDropdown, MenuItem } from 'react-bootstrap';
 import List, { ListItem, ListItemIcon, ListItemText } from "material-ui/List";
 import Divider from "material-ui/Divider";
 import ExpandLess from "material-ui-icons/ExpandLess";

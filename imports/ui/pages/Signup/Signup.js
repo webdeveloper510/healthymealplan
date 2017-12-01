@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, FormGroup, ControlLabel, Button } from 'react-bootstrap';
+// import { Row, Col, FormGroup, ControlLabel, Button } from 'react-bootstrap';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import { Meteor } from 'meteor/meteor';
@@ -8,6 +8,7 @@ import { Accounts } from 'meteor/accounts-base';
 import InputHint from '../../components/InputHint/InputHint';
 import AccountPageFooter from '../../components/AccountPageFooter/AccountPageFooter';
 import validate from '../../../modules/validate';
+import Button from 'material-ui/Button';
 
 class Signup extends React.Component {
   constructor(props) {
@@ -37,10 +38,10 @@ class Signup extends React.Component {
       },
       messages: {
         firstName: {
-          required: 'What\'s your first name?',
+          required: "What's your first name?",
         },
         lastName: {
-          required: 'What\'s your last name?',
+          required: "What's your last name?",
         },
         emailAddress: {
           required: 'Need an email address here.',
@@ -51,39 +52,43 @@ class Signup extends React.Component {
           minlength: 'Please use at least six characters.',
         },
       },
-      submitHandler() { component.handleSubmit(); },
+      submitHandler() {
+        component.handleSubmit();
+      },
     });
   }
 
   handleSubmit() {
     const { history } = this.props;
 
-    Accounts.createUser({
-      email: this.emailAddress.value,
-      password: this.password.value,
-      profile: {
-        name: {
-          first: this.firstName.value,
-          last: this.lastName.value,
+    Accounts.createUser(
+      {
+        email: this.emailAddress.value,
+        password: this.password.value,
+        profile: {
+          name: {
+            first: this.firstName.value,
+            last: this.lastName.value,
+          },
         },
       },
-    }, (error) => {
-      if (error) {
-        // Bert.alert(error.reason, 'danger');
-      } else {
-        // Meteor.call('users.sendVerificationEmail');
-        // Bert.alert('Welcome!', 'success');
-        // history.push('/documents');
-      }
-    });
+      (error) => {
+        if (error) {
+          // Bert.alert(error.reason, 'danger');
+        } else {
+          // Meteor.call('users.sendVerificationEmail');
+          // Bert.alert('Welcome!', 'success');
+          // history.push('/documents');
+        }
+      },
+    );
   }
 
   render() {
-    return (<div className="Signup">
-      <Row>
-        <Col xs={12} sm={6} md={5} lg={4}>
-          <h4 className="page-header">Sign Up</h4>
-          {/* <Row>
+    return (
+      <div className="Signup">
+        <h4 className="page-header">Sign Up</h4>
+        {/* <Row>
             <Col xs={12}>
               <OAuthLoginButtons
                 services={['facebook', 'github', 'google']}
@@ -94,58 +99,44 @@ class Signup extends React.Component {
               />
             </Col>
           </Row> */}
-          <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
-            <Row>
-              <Col xs={6}>
-                <FormGroup>
-                  <ControlLabel>First Name</ControlLabel>
-                  <input
-                    type="text"
-                    name="firstName"
-                    ref={firstName => (this.firstName = firstName)}
-                    className="form-control"
-                  />
-                </FormGroup>
-              </Col>
-              <Col xs={6}>
-                <FormGroup>
-                  <ControlLabel>Last Name</ControlLabel>
-                  <input
-                    type="text"
-                    name="lastName"
-                    ref={lastName => (this.lastName = lastName)}
-                    className="form-control"
-                  />
-                </FormGroup>
-              </Col>
-            </Row>
-            <FormGroup>
-              <ControlLabel>Email Address</ControlLabel>
-              <input
-                type="email"
-                name="emailAddress"
-                ref={emailAddress => (this.emailAddress = emailAddress)}
-                className="form-control"
-              />
-            </FormGroup>
-            <FormGroup>
-              <ControlLabel>Password</ControlLabel>
-              <input
-                type="password"
-                name="password"
-                ref={password => (this.password = password)}
-                className="form-control"
-              />
-              <InputHint>Use at least six characters.</InputHint>
-            </FormGroup>
-            <Button type="submit" bsStyle="success">Sign Up</Button>
-            <AccountPageFooter>
-              <p>Already have an account? <Link to="/login">Log In</Link>.</p>
-            </AccountPageFooter>
-          </form>
-        </Col>
-      </Row>
-    </div>);
+        <form
+          ref={form => (this.form = form)}
+          onSubmit={event => event.preventDefault()}
+        >
+          <input
+            type="text"
+            name="firstName"
+            ref={firstName => (this.firstName = firstName)}
+            className="form-control"
+          />
+          Last Name
+          <input
+            type="text"
+            name="lastName"
+            ref={lastName => (this.lastName = lastName)}
+            className="form-control"
+          />
+          <input
+            type="email"
+            name="emailAddress"
+            ref={emailAddress => (this.emailAddress = emailAddress)}
+            className="form-control"
+          />
+          Password
+          <input
+            type="password"
+            name="password"
+            ref={password => (this.password = password)}
+            className="form-control"
+          />
+          Use at least six characters.
+          <Button raised>Sign Up</Button>
+          <p>
+            Already have an account? <Link to="/login">Log In</Link>.
+          </p>
+        </form>
+      </div>
+    );
   }
 }
 

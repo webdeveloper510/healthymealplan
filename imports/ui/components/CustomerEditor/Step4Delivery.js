@@ -6,10 +6,13 @@ import { Meteor } from "meteor/meteor";
 import Grid from "material-ui/Grid";
 import Button from "material-ui/Button";
 import { MenuItem } from "material-ui/Menu";
+import Input from "material-ui/Input";
 import TextField from "material-ui/TextField";
 import Paper from "material-ui/Paper";
 import Typography from "material-ui/Typography";
 import Radio, { RadioGroup } from "material-ui/Radio";
+import Geosuggest from "react-geosuggest";
+import "./GeoSuggest.scss";
 
 import Checkbox from "material-ui/Checkbox";
 import {
@@ -182,7 +185,7 @@ class Step4Delivery extends React.Component {
 
     return (
       <form
-        id="step1"
+        id="step4"
         ref={form => (this.form = form)}
         onSubmit={event => event.preventDefault()}
       >
@@ -635,12 +638,11 @@ class Step4Delivery extends React.Component {
                     <div>
                       <Grid container>
                         <Grid item xs={12} sm={8}>
-                          <TextField
-                            label="Street Address"
-                            id="streetAddress"
-                            name="streetAddress"
-                            fullWidth
-                          />
+                          {/* <TextField
+
+                          /> */}
+
+                          <Geosuggest className="geosuggest-input-material" />
                         </Grid>
                         <Grid item xs={12} sm={4}>
                           <TextField

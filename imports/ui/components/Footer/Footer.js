@@ -1,7 +1,6 @@
 import React from 'react';
 import { year } from '@cleverbeagle/dates';
 import { Link } from 'react-router-dom';
-import { Grid } from 'react-bootstrap';
 
 import './Footer.scss';
 
@@ -15,8 +14,16 @@ const Footer = () => (
     <Grid>
       <p className="pull-left">&copy; {copyrightYear()} Healthy Meal Plan</p>
       <ul className="pull-right">
-        <li><Link to="/terms">Terms<span className="hidden-xs"> of Service</span></Link></li>
-        <li><Link to="/privacy">Privacy<span className="hidden-xs"> Policy</span></Link></li>
+        <li>
+          <Link to="/terms">
+            Terms<span className="hidden-xs"> of Service</span>
+          </Link>
+        </li>
+        <li>
+          <Link to="/privacy">
+            Privacy<span className="hidden-xs"> Policy</span>
+          </Link>
+        </li>
       </ul>
     </Grid>
   </div>

@@ -1,6 +1,4 @@
 import React from 'react';
-import { LinkContainer } from 'react-router-bootstrap';
-import { Nav, NavItem } from 'react-bootstrap';
 import Button from 'material-ui/Button';
 import { Link } from 'react-router-dom';
 

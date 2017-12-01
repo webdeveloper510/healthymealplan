@@ -2,8 +2,12 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import { BrowserRouter as Router, Switch, Route, history } from 'react-router-dom';
-// import { Grid, Alert, Button } from 'react-bootstrap';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  history,
+} from 'react-router-dom';
 import { CSSTransitionGroup } from 'react-transition-group';
 
 import { Meteor } from 'meteor/meteor';
@@ -32,7 +36,6 @@ import MenuIcon from 'material-ui-icons/Menu';
 import ExitToAppIcon from 'material-ui-icons/ExitToApp';
 import CloseIcon from 'material-ui-icons/Close';
 import { blueGrey, green, red } from 'material-ui/colors';
-
 
 import { Link } from 'react-router-dom';
 import Navigation from '../../components/Navigation/Navigation';
@@ -86,7 +89,6 @@ import Sides from '../../pages/Sides/Sides';
 import NewSide from '../../pages/NewSide/NewSide';
 import EditSide from '../../pages/EditSide/EditSide';
 
-
 import Types from '../../pages/Types/Types';
 import NewType from '../../pages/NewType/NewType';
 // import ViewType from '../../pages/ViewType/ViewType';
@@ -97,7 +99,6 @@ import NewMeal from '../../pages/NewMeal/NewMeal';
 import EditMeal from '../../pages/EditMeal/EditMeal';
 
 import Team from '../../pages/Team/Team';
-
 
 import Signup from '../../pages/Signup/Signup';
 import Login from '../../pages/Login/Login';
@@ -110,9 +111,6 @@ import NotFound from '../../pages/NotFound/NotFound';
 // import Footer from '../../components/Footer/Footer';
 import Terms from '../../pages/Terms/Terms';
 import Privacy from '../../pages/Privacy/Privacy';
-
-
-
 
 import './App.scss';
 
@@ -223,7 +221,6 @@ const themeRoot = createMuiTheme({
     primary: {
       ...blueGrey,
       A500: '#000000',
-
     }, // Purple and green play nicely together.
     secondary: {
       ...green,
@@ -234,11 +231,9 @@ const themeRoot = createMuiTheme({
   },
 });
 
-
 // {!this.state.snackbarButtonText ? (<CloseIcon onClick={this.handleRequestClose.bind(this)} />) : ''}
 
 class App extends React.Component {
-
   constructor(props) {
     super(props);
 
@@ -254,7 +249,6 @@ class App extends React.Component {
   }
 
   popTheSnackbar(snackbarVariables) {
-
     const { message, buttonText, duration, buttonLink } = snackbarVariables;
 
     this.setState({
@@ -263,7 +257,6 @@ class App extends React.Component {
       snackbarButtonText: buttonText,
       snackbarButtonLink: buttonLink,
     });
-
   }
 
   handleDrawerToggle() {
@@ -281,7 +274,6 @@ class App extends React.Component {
   }
 
   getInitials(name) {
-
     if (name) {
       const split = name.split(' ');
 
@@ -292,7 +284,6 @@ class App extends React.Component {
   }
 
   render() {
-
     const { vertical, horizontal } = this.state;
 
     const { classes, theme } = this.props;
@@ -302,29 +293,61 @@ class App extends React.Component {
     return (
       <MuiThemeProvider theme={themeRoot}>
         <Router>
-          <div className={this.props.authenticated ? classes.root : classes.rootNotAuthenticated}>
+          <div
+            className={
+              this.props.authenticated
+                ? classes.root
+                : classes.rootNotAuthenticated
+            }
+          >
             <Snackbar
               anchorOrigin={{ vertical, horizontal }}
               open={this.state.snackbarOpen}
               autoHideDuration={4000}
               onRequestClose={this.handleRequestClose.bind(this)}
-              action={[(this.state.snackbarButtonText ?
-                (<Link to={this.state.snackbarButtonLink} className="link--no-hover">
-                  <Button color="accent" dense>{this.state.snackbarButtonText}</Button>
-                </Link>) : ''),
+              action={[
+                this.state.snackbarButtonText ? (
+                  <Link
+                    to={this.state.snackbarButtonLink}
+                    className="link--no-hover"
+                  >
+                    <Button color="accent" dense>
+                      {this.state.snackbarButtonText}
+                    </Button>
+                  </Link>
+                ) : (
+                  ''
+                ),
                 <IconButton
-                key="close"
-                aria-label="Close"
-                color="inherit"
-                onClick={this.handleRequestClose.bind(this)}
-              >
-                <CloseIcon />
-              </IconButton>]}
-              message={<span id="message-id" className="body2">{this.state.snackbarMessageText}</span>}
+                  key="close"
+                  aria-label="Close"
+                  color="inherit"
+                  onClick={this.handleRequestClose.bind(this)}
+                >
+                  <CloseIcon />
+                </IconButton>,
+              ]}
+              message={
+                <span id="message-id" className="body2">
+                  {this.state.snackbarMessageText}
+                </span>
+              }
             />
-            <div className={this.props.authenticated ? classes.appFrame : classes.appFrameNotAuthenticated}>
-              { this.props.authenticated ? (
-                <AppBar className={this.props.authenticated ? classes.appBar : 'appbar--no-shadow appbar-no-auth'}>
+            <div
+              className={
+                this.props.authenticated
+                  ? classes.appFrame
+                  : classes.appFrameNotAuthenticated
+              }
+            >
+              {this.props.authenticated ? (
+                <AppBar
+                  className={
+                    this.props.authenticated
+                      ? classes.appBar
+                      : 'appbar--no-shadow appbar-no-auth'
+                  }
+                >
                   <Toolbar>
                     <IconButton
                       color="contrast"
@@ -335,64 +358,138 @@ class App extends React.Component {
                       <MenuIcon />
                     </IconButton>
 
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', width: '100%', alignItems: 'center' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'flex-end',
+                        width: '100%',
+                        alignItems: 'center',
+                      }}
+                    >
                       <Link to="/profile" className="link--no-hover">
-                        <Typography type="subheading" className="subheading font-medium" style={{ color: '#FFF', alignItems: 'center', display: 'flex', paddingRight: '15px' }}>
-                          <Avatar style={{ marginRight: '.8em' }}>{this.getInitials(this.props.name ? this.props.name : '')}</Avatar>{this.props.name}
+                        <Typography
+                          type="subheading"
+                          className="subheading font-medium"
+                          style={{
+                            color: '#FFF',
+                            alignItems: 'center',
+                            display: 'flex',
+                            paddingRight: '15px',
+                          }}
+                        >
+                          <Avatar style={{ marginRight: '.8em' }}>
+                            {this.getInitials(
+                              this.props.name ? this.props.name : '',
+                            )}
+                          </Avatar>
+                          {this.props.name}
                         </Typography>
                       </Link>
                       <Tooltip title="Log out">
                         <Link to="/logout">
                           <IconButton>
-                            <ExitToAppIcon className="logout-icon" style={{ fillOpacity: '0.54', fill: '#FFFFFF' }} />
+                            <ExitToAppIcon
+                              className="logout-icon"
+                              style={{ fillOpacity: '0.54', fill: '#FFFFFF' }}
+                            />
                           </IconButton>
                         </Link>
                       </Tooltip>
                     </div>
                   </Toolbar>
-                </AppBar>) : '' }
-              {this.props.authenticated ? (<div style={{ backgroundColor: '#FFFFFF' }}>
-                <Hidden mdUp>
-                  <Drawer
-                    type="temporary"
-                    anchor={theme.direction === 'rtl' ? 'right' : 'left'}
-                    open={this.state.mobileOpen}
-                    classes={{
-                      paper: classes.drawerPaper,
-                    }}
-                    onRequestClose={this.handleDrawerToggle.bind(this)}
-                    ModalProps={{
-                      keepMounted: true, // Better open performance on mobile.
-                    }}
-                  >
-                    <div style={{ padding: '10px 20px 0', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
-                      <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Vittle</Typography>
-                      <Typography style={{ color: 'rgba(0, 0, 0, 0.38)' }} type="body2" className="body2">v 0.25</Typography>
-                    </div>
+                </AppBar>
+              ) : (
+                ''
+              )}
+              {this.props.authenticated ? (
+                <div style={{ backgroundColor: '#FFFFFF' }}>
+                  <Hidden mdUp>
+                    <Drawer
+                      type="temporary"
+                      anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+                      open={this.state.mobileOpen}
+                      classes={{
+                        paper: classes.drawerPaper,
+                      }}
+                      onRequestClose={this.handleDrawerToggle.bind(this)}
+                      ModalProps={{
+                        keepMounted: true, // Better open performance on mobile.
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: '10px 20px 0',
+                          display: 'flex',
+                          flexDirection: 'column',
+                        }}
+                        className={classes.drawerHeader}
+                      >
+                        <Typography
+                          type="headline"
+                          style={{ color: 'rgba(0, 0, 0, 0.38)' }}
+                          className="headline font-medium"
+                        >
+                          Vittle
+                        </Typography>
+                        <Typography
+                          style={{ color: 'rgba(0, 0, 0, 0.38)' }}
+                          type="body2"
+                          className="body2"
+                        >
+                          v 0.25
+                        </Typography>
+                      </div>
 
-                    <AuthenticatedSideNav {...this.props} />
-                  </Drawer>
-                </Hidden>
+                      <AuthenticatedSideNav {...this.props} />
+                    </Drawer>
+                  </Hidden>
 
-                <Hidden mdDown implementation="css">
+                  <Hidden mdDown implementation="css">
+                    <Drawer
+                      type="permanent"
+                      open
+                      classes={{
+                        paper: classes.drawerPaper,
+                      }}
+                    >
+                      <div
+                        style={{
+                          padding: '10px 20px 0',
+                          display: 'flex',
+                          flexDirection: 'column',
+                        }}
+                        className={classes.drawerHeader}
+                      >
+                        <Typography
+                          type="headline"
+                          style={{ color: 'rgba(0, 0, 0, 0.38)' }}
+                          className="headline font-medium"
+                        >
+                          Vittle
+                        </Typography>
+                        <Typography
+                          style={{ color: 'rgba(0, 0, 0, 0.38)' }}
+                          type="body2"
+                          className="body2"
+                        >
+                          v 0.25
+                        </Typography>
+                      </div>
+                      <AuthenticatedSideNav {...this.props} />
+                    </Drawer>
+                  </Hidden>
+                </div>
+              ) : (
+                ''
+              )}
 
-                  <Drawer
-                    type="permanent"
-                    open
-                    classes={{
-                      paper: classes.drawerPaper,
-                    }}
-                  >
-                    <div style={{ padding: '10px 20px 0', display: 'flex', flexDirection: 'column' }} className={classes.drawerHeader}>
-                      <Typography type="headline" style={{ color: 'rgba(0, 0, 0, 0.38)' }} className="headline font-medium">Vittle</Typography>
-                      <Typography style={{ color: 'rgba(0, 0, 0, 0.38)' }} type="body2" className="body2">v 0.25</Typography>
-                    </div>
-                    <AuthenticatedSideNav {...this.props} />
-
-                  </Drawer>
-                </Hidden></div>) : '' }
-
-              <main className={this.props.authenticated ? classes.content : classes.contentNotAuthenticated}>
+              <main
+                className={
+                  this.props.authenticated
+                    ? classes.content
+                    : classes.contentNotAuthenticated
+                }
+              >
                 {!this.props.loading ? (
                   <CSSTransitionGroup
                     transitionName="example"
@@ -400,73 +497,310 @@ class App extends React.Component {
                     transitionLeaveTimeout={300}
                   >
                     <Switch key={this.props.key} location={this.props.location}>
+                      <Authenticated
+                        exact
+                        path="/categories"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Categories}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/categories/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewCategory}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/categories/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditCategory}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/categories" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Categories} {...this.props} />
-                      <Authenticated exact path="/categories/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewCategory} {...this.props} />
-                      <Authenticated exact path="/categories/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditCategory} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/customers"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Customers}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/customers/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewCustomer}
+                        {...this.props}
+                      />
+                      {/* <Authenticated exact path="/categories/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditCategory} {...this.props} /> */}
 
-                      <Authenticated exact path="/customers" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Customers} {...this.props} />
-                      <Authenticated exact path="/customers/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewCustomer} {...this.props} />
-                      {/*<Authenticated exact path="/categories/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditCategory} {...this.props} /> */}
+                      <Authenticated
+                        exact
+                        path="/ingredients"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Ingredients}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/ingredients/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewIngredient}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/ingredients/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditIngredient}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/ingredients" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Ingredients} {...this.props} />
-                      <Authenticated exact path="/ingredients/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewIngredient} {...this.props} />
-                      <Authenticated exact path="/ingredients/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditIngredient} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/instructions"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Instructions}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/instructions/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewInstruction}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/instructions/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditInstruction}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/instructions" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Instructions} {...this.props} />
-                      <Authenticated exact path="/instructions/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewInstruction} {...this.props} />
-                      <Authenticated exact path="/instructions/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditInstruction} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/lifestyles"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Lifestyles}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/lifestyles/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewLifestyle}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/lifestyles/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditLifestyle}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/lifestyles" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Lifestyles} {...this.props} />
-                      <Authenticated exact path="/lifestyles/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewLifestyle} {...this.props} />
-                      <Authenticated exact path="/lifestyles/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditLifestyle} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/meals"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Meals}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/meals/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewMeal}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/meals/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditMeal}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/meals" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Meals} {...this.props} />
-                      <Authenticated exact path="/meals/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewMeal} {...this.props} />
-                      <Authenticated exact path="/meals/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditMeal} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/plates"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Plates}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/plates/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewPlate}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/plates/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditPlate}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/plates" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Plates} {...this.props} />
-                      <Authenticated exact path="/plates/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewPlate} {...this.props} />
-                      <Authenticated exact path="/plates/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditPlate} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/profile"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Profile}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/profile" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Profile} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/restrictions"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Restrictions}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/restrictions/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewRestriction}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/restrictions/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditRestriction}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/restrictions" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Restrictions} {...this.props} />
-                      <Authenticated exact path="/restrictions/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewRestriction} {...this.props} />
-                      <Authenticated exact path="/restrictions/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditRestriction} {...this.props} />
-                      
-                      <Authenticated exact path="/routes" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Routes} {...this.props} />
-                      <Authenticated exact path="/routes/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewRoute} {...this.props} />
-                      <Authenticated exact path="/routes/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditRoute} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/routes"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Routes}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/routes/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewRoute}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/routes/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditRoute}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/sides" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Sides} {...this.props} />
-                      <Authenticated exact path="/sides/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewSide} {...this.props} />
-                      <Authenticated exact path="/sides/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditSide} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/sides"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Sides}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/sides/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewSide}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/sides/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditSide}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/team" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Team} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/team"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Team}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/types" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Types} {...this.props} />
-                      <Authenticated exact path="/types/new" popTheSnackbar={this.popTheSnackbar.bind(this)} component={NewType} {...this.props} />
-                      <Authenticated exact path="/types/:_id/edit" popTheSnackbar={this.popTheSnackbar.bind(this)} component={EditType} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/types"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Types}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/types/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewType}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/types/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditType}
+                        {...this.props}
+                      />
 
+                      <Public
+                        path="/signup"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Signup}
+                        {...this.props}
+                      />
+                      <Public
+                        path="/login"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Login}
+                        {...this.props}
+                      />
 
-                      <Public path="/signup" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Signup} {...this.props} />
-                      <Public path="/login" popTheSnackbar={this.popTheSnackbar.bind(this)} component={Login} {...this.props} />
+                      <Authenticated
+                        exact
+                        path="/"
+                        component={Index}
+                        {...this.props}
+                      />
 
-                      <Authenticated exact path="/" component={Index} {...this.props} />
-
-                      <Route path="/logout" component={Logout} {...this.props} />
-                      <Route name="verify-email" path="/verify-email/:token" component={VerifyEmail} />
-                      <Route name="recover-password" path="/recover-password" component={RecoverPassword} />
-                      <Route name="reset-password" path="/reset-password/:token" component={ResetPassword} />
+                      <Route
+                        path="/logout"
+                        component={Logout}
+                        {...this.props}
+                      />
+                      <Route
+                        name="verify-email"
+                        path="/verify-email/:token"
+                        component={VerifyEmail}
+                      />
+                      <Route
+                        name="recover-password"
+                        path="/recover-password"
+                        component={RecoverPassword}
+                      />
+                      <Route
+                        name="reset-password"
+                        path="/reset-password/:token"
+                        component={ResetPassword}
+                      />
                       <Route name="terms" path="/terms" component={Terms} />
-                      <Route name="privacy" path="/privacy" component={Privacy} />
+                      <Route
+                        name="privacy"
+                        path="/privacy"
+                        component={Privacy}
+                      />
                       <Route component={NotFound} />
                     </Switch>
                   </CSSTransitionGroup>
-
-
-                ) : ''}
+                ) : (
+                  ''
+                )}
               </main>
             </div>
           </div>
@@ -476,20 +810,17 @@ class App extends React.Component {
 
     // return (
 
-
-
-
-    //   
+    //
     //     {!this.props.loading ? <div className="App">
     //       {/* Check email verification later */}
     //       {/* {this.props.userId && !this.props.emailVerified ? <Alert className="verify-email text-center"><p>Hey friend! Can you <strong>verify your email address</strong> ({this.props.emailAddress}) for us? <Button bsStyle="link" onClick={() => handleResendVerificationEmail(this.props.emailAddress)} href="#">Re-send verification email</Button></p></Alert> : ''} */}
     //       <div><Navigation {...this.props} /></div>
-    //     
+    //
 
-    //   
+    //
 
     //     </div> : ''}
-    // 
+    //
     // );
   }
 }
@@ -506,17 +837,19 @@ App.propTypes = {
   emailVerified: PropTypes.bool.isRequired,
 };
 
-const getUserName = name => ({
-  string: name,
-  object: `${name.first} ${name.last}`,
-}[typeof name]);
+const getUserName = name =>
+  ({
+    string: name,
+    object: `${name.first} ${name.last}`,
+  }[typeof name]);
 
 export default createContainer(() => {
   const loggingIn = Meteor.loggingIn();
   const user = Meteor.user();
   const userId = Meteor.userId();
   const loading = !Roles.subscription.ready();
-  const name = user && user.profile && user.profile.name && getUserName(user.profile.name);
+  const name =
+    user && user.profile && user.profile.name && getUserName(user.profile.name);
   const emailAddress = user && user.emails && user.emails[0].address;
 
   return {
@@ -527,6 +860,9 @@ export default createContainer(() => {
     roles: !loading && Roles.getRolesForUser(userId),
     userId,
     emailAddress,
-    emailVerified: user && user.emails ? user && user.emails && user.emails[0].verified : true,
+    emailVerified:
+      user && user.emails
+        ? user && user.emails && user.emails[0].verified
+        : true,
   };
 }, withStyles(styles, { withTheme: true })(App));

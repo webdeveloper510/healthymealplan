@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Navbar } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Grid from 'material-ui/Grid';
 import AppBar from 'material-ui/AppBar';
@@ -43,13 +42,15 @@ const Navigation = props => (
   // </Navbar>
   <AppBar className="appbar-primary appbar--no-shadow" position="static">
     <Toolbar>
-      <Grid
-        container
-        align={'center'}
-        justify={'space-between'}
-      >
-        <Typography type="title" color="inherit" className="title">Healthy Meal Plan</Typography>
-        {!props.authenticated ? <PublicNavigation /> : <AuthenticatedNavigation {...props} />}
+      <Grid container align={'center'} justify={'space-between'}>
+        <Typography type="title" color="inherit" className="title">
+          Healthy Meal Plan
+        </Typography>
+        {!props.authenticated ? (
+          <PublicNavigation />
+        ) : (
+          <AuthenticatedNavigation {...props} />
+        )}
       </Grid>
     </Toolbar>
   </AppBar>
