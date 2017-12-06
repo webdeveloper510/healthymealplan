@@ -116,7 +116,21 @@ class Step3LifestyleProfile extends React.Component {
         : "none",
 
       restrictions: [],
-      schedule: [],
+      schedule: [
+        {
+          breakfast: 2,
+          lunch: 1,
+          dinner: 1
+        },
+        {
+          breakfast: 0,
+          lunch: 0,
+          dinner: 0
+        }
+      ],
+      subscriptionStartDate: moment(this.renderStartDays()[0]).format(
+        "dddd, MMMM Do YYYY"
+      ),
       nextFewMondays: null,
 
       // collapse
@@ -169,7 +183,7 @@ class Step3LifestyleProfile extends React.Component {
   increaseProfileCount() {
     if (this.state.secondaryProfileCount === 6) {
       this.popTheSnackbar({
-        message: "Cannot add more than"
+        message: "Cannot add more than 6 profiles"
       });
 
       return;
@@ -194,7 +208,8 @@ class Step3LifestyleProfile extends React.Component {
         ? this.props.customerInfo.discount
         : "none",
       restrictions: [],
-      schedule: []
+      schedule: [],
+      scheduleType: ""
     });
 
     this.setState({
@@ -236,18 +251,20 @@ class Step3LifestyleProfile extends React.Component {
   }
 
   renderStartDays() {
-    let allDates = [];
+    const allDates = [];
 
     function nextDay(x) {
-      var now = new Date();
+      const now = new Date();
       now.setDate(now.getDate() + (x + (7 - now.getDay())) % 7);
       return now;
     }
 
-    let immediateMonday = nextDay(1);
+    const immediateMonday = nextDay(1);
+
+    allDates.push(new Date(immediateMonday));
 
     for (i = 1; i <= 4; i++) {
-      let nextMonday = immediateMonday.setDate(immediateMonday.getDate() + 7);
+      const nextMonday = immediateMonday.setDate(immediateMonday.getDate() + 7);
       allDates.push(new Date(nextMonday));
     }
 
@@ -351,7 +368,7 @@ class Step3LifestyleProfile extends React.Component {
     });
   }
 
-  handleChangeRadioscheduleTypeSecondary(event, value) {
+  handleChangeRadioscheduleType(event, value) {
     if (value == "weekdays") {
       for (let i = 1; i <= 7; i += 1) {
         const brekafastInput = `input[name='breakfast_${i}']`;
@@ -368,6 +385,7 @@ class Step3LifestyleProfile extends React.Component {
         }
       }
     }
+
     if (value == "weekends") {
       for (let i = 1; i <= 7; i += 1) {
         const brekafastInput = `input[name='breakfast_${i}']`;
@@ -399,6 +417,65 @@ class Step3LifestyleProfile extends React.Component {
     this.setState({
       scheduleType: value
     });
+  }
+
+  handleChangeRadioscheduleTypeSecondary(profileIndex, event, value) {
+    console.log(profileIndex);
+
+    if (value == "weekdays") {
+      console.log("Weekdays selected");
+      for (let i = 1; i <= 7; i += 1) {
+        const breakfastInput = `input[name='${profileIndex}_breakfast_${i}']`;
+        const lunchInput = `input[name='${profileIndex}_lunch_${i}']`;
+        const dinnerInput = `input[name='${profileIndex}_dinner_${i}']`;
+
+        console.log(breakfastInput);
+        console.log(lunchInput);
+        console.log(dinnerInput);
+
+        if (i <= 5) {
+          $(breakfastInput).val(1);
+          $(lunchInput).val(1);
+          $(dinnerInput).val(1);
+        } else {
+          $(breakfastInput).val(0);
+          $(lunchInput).val(0);
+          $(dinnerInput).val(0);
+        }
+      }
+    }
+
+    if (value == "weekends") {
+      for (let j = 1; j <= 7; j += 1) {
+        const breakfastInput = `input[name='${profileIndex}_breakfast_${j}']`;
+        const lunchInput = `input[name='${profileIndex}_lunch_${j}']`;
+        const dinnerInput = `input[name='${profileIndex}_dinner_${j}']`;
+        if (j >= 6) {
+          $(breakfastInput).val(1);
+          $(lunchInput).val(1);
+          $(dinnerInput).val(1);
+        } else {
+          $(breakfastInput).val(0);
+          $(lunchInput).val(0);
+          $(dinnerInput).val(0);
+        }
+      }
+    }
+    if (value == "custom") {
+      for (let k = 1; k <= 7; k += 1) {
+        const breakfastInput = `input[name='${profileIndex}_breakfast_${k}']`;
+        const lunchInput = `input[name='${profileIndex}_lunch_${k}']`;
+        const dinnerInput = `input[name='${profileIndex}_dinner_${k}']`;
+
+        $(breakfastInput).val(0);
+        $(lunchInput).val(0);
+        $(dinnerInput).val(0);
+      }
+    }
+
+    this.state.secondaryProfilesData[profileIndex].scheduleType = value;
+
+    this.forceUpdate();
   }
 
   handleChangeRadioLifestyleSecondary(i, event, value) {
@@ -1193,9 +1270,7 @@ class Step3LifestyleProfile extends React.Component {
                         aria-label="scheduleType"
                         name="scheduleType"
                         value={this.state.scheduleType}
-                        onChange={this.handleChangeRadioscheduleTypeSecondary.bind(
-                          this
-                        )}
+                        onChange={this.handleChangeRadioscheduleType.bind(this)}
                         style={{ flexDirection: "row" }}
                       >
                         <FormControlLabel
@@ -2225,10 +2300,547 @@ class Step3LifestyleProfile extends React.Component {
                         </Grid>
                       </Grid>
 
+                      <Grid container style={{ marginTop: "50px" }}>
+                        <Grid item xs={12}>
+                          <Typography
+                            className="font-uppercase"
+                            type="subheading"
+                          >
+                            Schedule
+                          </Typography>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          <FormControl component="fieldset">
+                            <RadioGroup
+                              aria-label="scheduleType"
+                              name="scheduleType"
+                              value={
+                                this.state.secondaryProfilesData[profileIndex]
+                                  .scheduleType
+                              }
+                              onChange={this.handleChangeRadioscheduleTypeSecondary.bind(
+                                this,
+                                profileIndex
+                              )}
+                              style={{ flexDirection: "row" }}
+                            >
+                              <FormControlLabel
+                                value={"weekdays"}
+                                control={<Radio />}
+                                label={"Weekdays"}
+                                selected
+                              />
+
+                              <FormControlLabel
+                                value={"weekends"}
+                                control={<Radio />}
+                                label={"Weekends"}
+                                selected
+                              />
+
+                              <FormControlLabel
+                                value={"custom"}
+                                control={<Radio />}
+                                label={"Custom"}
+                                selected
+                              />
+                            </RadioGroup>
+                          </FormControl>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container style={{ marginTop: "20px" }}>
+                        <Table className="table-lifestyles">
+                          <TableHead>
+                            <TableRow>
+                              <TableCell />
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <Typography
+                                  type="subheading"
+                                  className="font-medium font-uppercase"
+                                >
+                                  Breakfast
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <Typography
+                                  type="subheading"
+                                  className="font-medium font-uppercase"
+                                >
+                                  Lunch
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <Typography
+                                  type="subheading"
+                                  className="font-medium font-uppercase"
+                                >
+                                  Dinner
+                                </Typography>
+                              </TableCell>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody>
+                            <TableRow>
+                              <TableCell>
+                                <Typography
+                                  type="subheading"
+                                  style={{ marginTop: "10px" }}
+                                >
+                                  Monday
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_breakfast_1`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_lunch_1`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_dinner_1`}
+                                />
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <Typography
+                                  type="subheading"
+                                  style={{ marginTop: "10px" }}
+                                >
+                                  Tuesday
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_breakfast_2`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_lunch_2`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_dinner_2`}
+                                />
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <Typography
+                                  type="subheading"
+                                  style={{ marginTop: "10px" }}
+                                >
+                                  Wednesday
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_breakfast_3`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_lunch_3`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_dinner_3`}
+                                />
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <Typography
+                                  type="subheading"
+                                  style={{ marginTop: "10px" }}
+                                >
+                                  Thursday
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_breakfast_4`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_lunch_4`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_dinner_4`}
+                                />
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <Typography
+                                  type="subheading"
+                                  style={{ marginTop: "10px" }}
+                                >
+                                  Friday
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_breakfast_5`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_lunch_5`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_dinner_5`}
+                                />
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <Typography
+                                  type="subheading"
+                                  style={{ marginTop: "10px" }}
+                                >
+                                  Saturday
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_breakfast_6`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_lunch_6`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_dinner_6`}
+                                />
+                              </TableCell>
+                            </TableRow>
+                            <TableRow>
+                              <TableCell>
+                                <Typography
+                                  type="subheading"
+                                  style={{ marginTop: "10px" }}
+                                >
+                                  Sunday
+                                </Typography>
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_breakfast_7`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_lunch_7`}
+                                />
+                              </TableCell>
+
+                              <TableCell style={{ textAlign: "center" }}>
+                                <TextField
+                                  fullWidth
+                                  margin="normal"
+                                  style={{
+                                    fontSize: "1rem",
+                                    maxWidth: "100px",
+                                    minWidth: "100px"
+                                  }}
+                                  inputProps={{
+                                    type: "number",
+                                    min: "0",
+                                    max: "3"
+                                  }}
+                                  name={`${profileIndex}_dinner_7`}
+                                />
+                              </TableCell>
+                            </TableRow>
+                          </TableBody>
+                        </Table>
+                      </Grid>
+
                       <Button
                         raised
                         onClick={this.removeProfile.bind(this, profileIndex)}
-                        style={{ float: "right" }}
+                        style={{ float: "right", marginTop: "25px" }}
                       >
                         Remove profile
                       </Button>
@@ -2257,13 +2869,23 @@ class Step3LifestyleProfile extends React.Component {
                     label="Select a start date"
                     name="startDate"
                     fullWidth
-                    value={this.renderStartDays()[0].toDateString()}
+                    value={this.state.subscriptionStartDate}
                     SelectProps={{ native: false }}
+                    onChange={event => {
+                      this.setState({
+                        subscriptionStartDate: event.target.value
+                      });
+                    }}
                   >
                     {this.renderStartDays().map((e, i) => {
+                      console.log(e);
+
                       return (
-                        <MenuItem key={i} value={e.toDateString()}>
-                          {e.toDateString()}
+                        <MenuItem
+                          key={i}
+                          value={moment(e).format("dddd, MMMM Do YYYY")}
+                        >
+                          {moment(e).format("dddd, MMMM Do YYYY")}
                         </MenuItem>
                       );
                     })}
