@@ -1,4 +1,4 @@
-@import '../../stylesheets/colors';
+@import "../../stylesheets/colors";
 
 .App > .container {
   margin-bottom: 20px;
@@ -20,4 +20,12 @@
   .btn {
     padding: 0;
   }
+}
+
+.show {
+  display: block;
+}
+
+.hidden {
+  display: none;
 }

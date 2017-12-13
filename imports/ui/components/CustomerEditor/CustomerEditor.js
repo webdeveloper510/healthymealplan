@@ -109,7 +109,15 @@ class CustomerEditor extends React.Component {
         restrictions: [],
         specificRestrictions: [],
         preferences: [],
-        schedule: [],
+        schedule: [
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 }
+        ],
         subscriptionStartDate: "",
         secondaryProfileCount: 0,
         secondaryProfiles: [],
@@ -284,7 +292,7 @@ class CustomerEditor extends React.Component {
             popTheSnackbar={this.props.popTheSnackbar.bind(this)}
           />
         );
-      case 2:
+      case 0:
         return (
           <Step3LifestyleProfile
             handleNext={this.handleNext.bind(this)}
@@ -309,7 +317,7 @@ class CustomerEditor extends React.Component {
             addSecondaryProfile={this.increaseProfileCount.bind(this)}
           />
         );
-      case 0:
+      case 6:
         return (
           <Step6Payment
             handleNext={this.handleNext.bind(this)}

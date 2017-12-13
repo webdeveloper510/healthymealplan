@@ -1,65 +1,67 @@
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import { Meteor } from 'meteor/meteor';
+import { Meteor } from "meteor/meteor";
 
-import Grid from 'material-ui/Grid';
-import Button from 'material-ui/Button';
-import { MenuItem } from 'material-ui/Menu';
-import Input from 'material-ui/Input';
-import TextField from 'material-ui/TextField';
-import Paper from 'material-ui/Paper';
-import Typography from 'material-ui/Typography';
-import Radio, { RadioGroup } from 'material-ui/Radio';
-import Geosuggest from 'react-geosuggest';
-import './GeoSuggest.scss';
+import Grid from "material-ui/Grid";
+import Button from "material-ui/Button";
+import { MenuItem } from "material-ui/Menu";
+import Input from "material-ui/Input";
+import TextField from "material-ui/TextField";
+import Paper from "material-ui/Paper";
+import Typography from "material-ui/Typography";
+import Radio, { RadioGroup } from "material-ui/Radio";
+import Geosuggest from "react-geosuggest";
+import "./GeoSuggest.scss";
 
-import Checkbox from 'material-ui/Checkbox';
+import Payment from "payment";
+
+import Checkbox from "material-ui/Checkbox";
 import {
   FormLabel,
   FormControl,
   FormControlLabel,
-  FormHelperText,
-} from 'material-ui/Form';
+  FormHelperText
+} from "material-ui/Form";
 
-import classNames from 'classnames';
-import { withStyles } from 'material-ui/styles';
-import { CircularProgress } from 'material-ui/Progress';
-import green from 'material-ui/colors/green';
+import classNames from "classnames";
+import { withStyles } from "material-ui/styles";
+import { CircularProgress } from "material-ui/Progress";
+import green from "material-ui/colors/green";
 
-import $ from 'jquery';
-import validate from '../../../modules/validate';
+import $ from "jquery";
+import validate from "../../../modules/validate";
 
 const styles = theme => ({
   root: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center"
   },
   wrapper: {
     margin: theme.spacing.unit,
-    position: 'relative',
+    position: "relative"
   },
   buttonSuccess: {
     backgroundColor: green[500],
-    '&:hover': {
-      backgroundColor: green[700],
-    },
+    "&:hover": {
+      backgroundColor: green[700]
+    }
   },
   fabProgress: {
     color: green[500],
-    position: 'absolute',
+    position: "absolute",
     top: -6,
     left: -6,
-    zIndex: 1,
+    zIndex: 1
   },
   buttonProgress: {
     color: green[500],
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
+    position: "absolute",
+    top: "50%",
+    left: "50%",
     marginTop: -12,
-    marginLeft: -12,
-  },
+    marginLeft: -12
+  }
 });
 
 class Step6Payment extends React.Component {
@@ -69,10 +71,10 @@ class Step6Payment extends React.Component {
     this.state = {
       submitLoading: false,
       submitSuccess: false,
-      paymentMethod: '',
-      paymentFrequency: '',
-      dormName: 'Algonquin College',
-      dormResidence: 'Algonquin College',
+      paymentMethod: "",
+      paymentFrequency: "weekly",
+      dormName: "Algonquin College",
+      dormResidence: "Algonquin College"
     };
   }
 
@@ -84,79 +86,108 @@ class Step6Payment extends React.Component {
         error.insertAfter(
           $(element)
             .parent()
-            .parent(),
+            .parent()
         );
       },
 
       rules: {
         addressType: {
-          required: true,
-        },
+          required: true
+        }
       },
 
       submitHandler() {
         component.handleSubmitStep();
-      },
+      }
     });
+
+    Payment.formatCardNumber(document.querySelector("#cardNumber"));
+    Payment.formatCardExpiry(document.querySelector("#expiry"));
+    Payment.formatCardCVC(document.querySelector("#cvc"));
   }
 
   handleSubmitStep() {
-    console.log('Reached');
+    console.log("Reached");
 
     this.setState({
       submitSuccess: false,
-      submitLoading: true,
+      submitLoading: true
     });
 
-    Meteor.call(
-      'customers.step2',
-      {
-        id: this.props.customerInfo.id,
-        addressType: this.state.addressType,
-      },
-      (err, returnVal) => {
-        if (err) {
-          console.log(err);
+    var authData = {};
+    authData.clientKey =
+      "73C59E6vwX3c5DzP8Z5M3dCbr5LrRpQV2wm93297ff4HcbPH562PtN2Aw6tkDAat";
+    authData.apiLoginID = "47cmd9F3DJ";
 
-          // this.props.popTheSnackbar({
-          //   message: err.reason,
-          // });
+    const expiration = document
+      .getElementById("expiry")
+      .value.trim()
+      .split("/");
 
-          this.setState({
-            submitSuccess: false,
-            submitLoading: false,
-          });
-        } else {
-          this.setState({
-            submitSuccess: true,
-            submitLoading: false,
-          });
+    var cardData = {};
+    cardData.cardNumber = document.getElementById("cardNumber").value.trim();
+    cardData.month = parseInt(expiration[0], 10);
+    cardData.year = parseInt(expiration[1], 10);
+    cardData.cardCode = document.getElementById("cvc").value.trim();
 
-          console.log('Reached no error');
+    Accept.dispatchData({ authData, cardData }, response => {
+      console.log(response);
 
-          this.props.saveValues({});
+      this.setState({
+        submitSuccess: false,
+        submitLoading: false
+      });
+    });
 
-          this.props.handleNext();
-        }
-      },
-    );
+    // Meteor.call(
+    //   "customers.step2",
+    //   {
+    //     id: this.props.customerInfo.id,
+    //     addressType: this.state.addressType
+    //   },
+    //   (err, returnVal) => {
+    //     if (err) {
+    //       console.log(err);
+
+    //       // this.props.popTheSnackbar({
+    //       //   message: err.reason,
+    //       // });
+
+    //       this.setState({
+    //         submitSuccess: false,
+    //         submitLoading: false
+    //       });
+    //     } else {
+    //       this.setState({
+    //         submitSuccess: true,
+    //         submitLoading: false
+    //       });
+
+    //       console.log("Reached no error");
+
+    //       this.props.saveValues({});
+
+    //       this.props.handleNext();
+    //     }
+    //   }
+    // );
   }
 
   handleChangeRadioPaymentMethod(event, value) {
     this.setState({
-      paymentMethod: value,
+      paymentMethod: value
     });
   }
 
   handleChangeRadiopaymentFrequency(event, value) {
     this.setState({
-      paymentFrequency: value,
+      paymentFrequency: value
     });
   }
 
   render() {
     const buttonClassname = classNames({
-      [this.props.classes.buttonSuccess]: this.state.submitSuccess,
+      [this.props.classes.buttonSuccess]: this.state.submitSuccess
     });
 
     return (
@@ -168,18 +199,10 @@ class Step6Payment extends React.Component {
         <Grid
           container
           justify="center"
-          style={{ marginBottom: '50px', marginTop: '25px' }}
+          style={{ marginBottom: "50px", marginTop: "25px" }}
         >
           <Grid item xs={12}>
             <Grid container>
-              <Grid item xs={12} sm={4}>
-                <Typography
-                  type="subheading"
-                  className="subheading font-medium"
-                >
-                  Payment
-                </Typography>
-              </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
                   <Grid container>
@@ -196,12 +219,12 @@ class Step6Payment extends React.Component {
                           name="paymentMethod"
                           value={this.state.paymentMethod}
                           onChange={this.handleChangeRadioPaymentMethod.bind(
-                            this,
+                            this
                           )}
-                          style={{ flexDirection: 'row' }}
+                          style={{ flexDirection: "row" }}
                         >
                           <FormControlLabel
-                            value="Credit card"
+                            value="card"
                             control={<Radio />}
                             label="Credit card"
                             checked
@@ -237,17 +260,15 @@ class Step6Payment extends React.Component {
                           name="frequency"
                           value={this.state.paymentFrequency}
                           onChange={this.handleChangeRadiopaymentFrequency.bind(
-                            this,
+                            this
                           )}
-                          style={{ flexDirection: 'row' }}
+                          style={{ flexDirection: "row" }}
                         >
                           <Grid item sm={6}>
                             <FormControlLabel
                               value="monthly"
                               control={<Radio />}
                               label="Monthly"
-                              checkeds
-                              selected
                             />
                           </Grid>
                           <Grid item sm={6}>
@@ -262,25 +283,116 @@ class Step6Payment extends React.Component {
                     </Grid>
                   </Grid>
 
-                  {this.state.paymentMethod == 'interac' ||
-                  this.state.paymentMethod == 'cash' ? (
-                      <div>
-                        <Grid container>
-                          <Grid item xs={12} sm={6}>
-                            <FormControlLabel
-                              control={<Checkbox value="taxExempt" />}
-                              label="Customer is tax exempt"
-                            />
-                            <FormControlLabel
-                              control={<Checkbox value="noReceipts" />}
-                              label="Do not generate receipts"
-                            />
-                          </Grid>
+                  <div
+                    className={
+                      this.state.paymentMethod == "card" ? "show" : "hidden"
+                    }
+                  >
+                    <Grid container>
+                      <Grid item xs={12}>
+                        <Typography
+                          type="subheading"
+                          className="font-uppercase"
+                        >
+                          Payment
+                        </Typography>
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Input
+                          placeholder="Name on card"
+                          inputProps={{
+                            name: "nameOnCard",
+                            id: "nameOnCard"
+                          }}
+                          fullWidth
+                          id="nameOnCard"
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <Input
+                          placeholder="Card number"
+                          inputProps={{
+                            name: "cardNumber",
+                            id: "cardNumber"
+                          }}
+                          fullWidth
+                          id="cardNumber"
+                        />
+                      </Grid>
+                    </Grid>
+                    <Grid container>
+                      <Grid item xs={4}>
+                        <Input
+                          placeholder="Expiration"
+                          inputProps={{ name: "expiry", id: "expiry" }}
+                          fullWidth
+                          id="expiry"
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Input
+                          placeholder="CVC"
+                          inputProps={{ name: "cvc", id: "cvc" }}
+                          fullWidth
+                          id="cvc"
+                        />
+                      </Grid>
+                      <Grid item xs={4}>
+                        <Input
+                          placeholder="Postal code"
+                          inputProps={{
+                            name: "postalCode",
+                            id: "postalCode"
+                          }}
+                          fullWidth
+                          id="postalCode"
+                        />
+                      </Grid>
+                    </Grid>
+
+                    <Grid container>
+                      <Grid item xs={12} sm={6}>
+                        <FormControlLabel
+                          control={<Checkbox value="taxExempt" />}
+                          label="Customer is tax exempt"
+                        />
+                      </Grid>
+                    </Grid>
+                  </div>
+
+                  {this.state.paymentMethod == "interac" ||
+                  this.state.paymentMethod == "cash" ? (
+                    <div>
+                      <Grid container>
+                        <Grid item xs={12} sm={6}>
+                          <FormControlLabel
+                            control={<Checkbox value="taxExempt" />}
+                            label="Customer is tax exempt"
+                          />
+                          <FormControlLabel
+                            control={<Checkbox value="noReceipts" />}
+                            label="Do not generate receipts"
+                          />
                         </Grid>
-                      </div>
-                    ) : (
-                      ''
-                    )}
+                      </Grid>
+                    </div>
+                  ) : (
+                    ""
+                  )}
+                </Paper>
+              </Grid>
+              <Grid item xs={12} sm={4}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Grid container>
+                    <Grid item xs={12} sm={12}>
+                      <Typography
+                        type="subheading"
+                        className="subheading font-medium font-uppercases"
+                      >
+                        Overview
+                      </Typography>
+                    </Grid>
+                  </Grid>
                 </Paper>
               </Grid>
             </Grid>
@@ -289,9 +401,9 @@ class Step6Payment extends React.Component {
 
         <div
           style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-end',
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "flex-end"
           }}
         >
           <Button
@@ -319,7 +431,7 @@ Step6Payment.defaultProps = {
   popTheSnackbar: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
   handleNext: PropTypes.func.isRequired,
-  handleBack: PropTypes.func.isRequired,
+  handleBack: PropTypes.func.isRequired
 };
 
 export default withStyles(styles)(Step6Payment);

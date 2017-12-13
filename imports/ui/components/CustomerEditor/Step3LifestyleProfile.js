@@ -14,6 +14,8 @@ import Typography from "material-ui/Typography";
 import Radio, { RadioGroup } from "material-ui/Radio";
 import Checkbox from "material-ui/Checkbox";
 
+import Divider from "material-ui/Divider";
+
 import moment from "moment";
 
 import {
@@ -117,20 +119,36 @@ class Step3LifestyleProfile extends React.Component {
 
       restrictions: [],
       schedule: [
-        {
-          breakfast: 2,
-          lunch: 1,
-          dinner: 1
-        },
-        {
-          breakfast: 0,
-          lunch: 0,
-          dinner: 0
-        }
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 }
       ],
+      subscriptionSchedule: [
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 }
+      ],
+      subscriptionScheduleDeliveryDays: {
+        monday: "",
+        tuesday: "",
+        wednesday: "",
+        thursday: "",
+        friday: "",
+        saturday: "",
+        sunday: ""
+      },
       subscriptionStartDate: moment(this.renderStartDays()[0]).format(
         "dddd, MMMM Do YYYY"
       ),
+      deliveryType: ["","","","","","",""],
       nextFewMondays: null,
 
       // collapse
@@ -180,6 +198,30 @@ class Step3LifestyleProfile extends React.Component {
     });
   }
 
+  handleSubscriptionScheduleChange() {
+    const finalSchedule = _.cloneDeep(this.state.schedule);
+    const secondarySchedules = [];
+
+    if (this.state.secondaryProfileCount > 0) {
+      this.state.secondaryProfilesData.forEach((e, index) => {
+        for (i = 0; i <= 6; i++) {
+          finalSchedule[i].breakfast =
+            parseInt(finalSchedule[i].breakfast) +
+            parseInt(e.schedule[i].breakfast);
+          finalSchedule[i].lunch =
+            parseInt(finalSchedule[i].lunch) + parseInt(e.schedule[i].lunch);
+          finalSchedule[i].dinner =
+            parseInt(finalSchedule[i].dinner) + parseInt(e.schedule[i].dinner);
+        }
+      });
+    }
+    console.log(finalSchedule);
+
+    this.setState({
+      subscriptionSchedule: finalSchedule
+    });
+  }
+
   increaseProfileCount() {
     if (this.state.secondaryProfileCount === 6) {
       this.popTheSnackbar({
@@ -208,7 +250,15 @@ class Step3LifestyleProfile extends React.Component {
         ? this.props.customerInfo.discount
         : "none",
       restrictions: [],
-      schedule: [],
+      schedule: [
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 }
+      ],
       scheduleType: ""
     });
 
@@ -253,6 +303,7 @@ class Step3LifestyleProfile extends React.Component {
   renderStartDays() {
     const allDates = [];
 
+    // thanks stackoverflow
     function nextDay(x) {
       const now = new Date();
       now.setDate(now.getDate() + (x + (7 - now.getDay())) % 7);
@@ -369,113 +420,575 @@ class Step3LifestyleProfile extends React.Component {
   }
 
   handleChangeRadioscheduleType(event, value) {
+    const scheduleCopy = _.cloneDeep(this.state.schedule);
+    const subscriptionScheduleCopy = _.cloneDeep(
+      this.state.subscriptionSchedule
+    );
+
     if (value == "weekdays") {
-      for (let i = 1; i <= 7; i += 1) {
-        const brekafastInput = `input[name='breakfast_${i}']`;
-        const lunchInput = `input[name='lunch_${i}']`;
-        const dinnerInput = `input[name='dinner_${i}']`;
-        if (i <= 5) {
-          $(brekafastInput).val(1);
-          $(lunchInput).val(1);
-          $(dinnerInput).val(1);
+      for (let i = 0; i <= 6; i += 1) {
+        if (i <= 4) {
+          scheduleCopy[i].breakfast = 1;
+          scheduleCopy[i].lunch = 1;
+          scheduleCopy[i].dinner = 1;
+
+          subscriptionScheduleCopy[i].breakfast = 1;
+          subscriptionScheduleCopy[i].lunch = 1;
+          subscriptionScheduleCopy[i].dinner = 1;
         } else {
-          $(brekafastInput).val(0);
-          $(lunchInput).val(0);
-          $(dinnerInput).val(0);
+          scheduleCopy[i].breakfast = 0;
+          scheduleCopy[i].lunch = 0;
+          scheduleCopy[i].dinner = 0;
+
+          subscriptionScheduleCopy[i].breakfast = 0;
+          subscriptionScheduleCopy[i].lunch = 0;
+          subscriptionScheduleCopy[i].dinner = 0;
         }
       }
     }
 
     if (value == "weekends") {
-      for (let i = 1; i <= 7; i += 1) {
-        const brekafastInput = `input[name='breakfast_${i}']`;
-        const lunchInput = `input[name='lunch_${i}']`;
-        const dinnerInput = `input[name='dinner_${i}']`;
-        if (i >= 6) {
-          $(brekafastInput).val(1);
-          $(lunchInput).val(1);
-          $(dinnerInput).val(1);
+      for (let i = 0; i <= 6; i += 1) {
+        if (i >= 5) {
+          scheduleCopy[i].breakfast = 1;
+          scheduleCopy[i].lunch = 1;
+          scheduleCopy[i].dinner = 1;
+
+          subscriptionScheduleCopy[i].breakfast = 1;
+          subscriptionScheduleCopy[i].lunch = 1;
+          subscriptionScheduleCopy[i].dinner = 1;
         } else {
-          $(brekafastInput).val(0);
-          $(lunchInput).val(0);
-          $(dinnerInput).val(0);
+          scheduleCopy[i].breakfast = 0;
+          scheduleCopy[i].lunch = 0;
+          scheduleCopy[i].dinner = 0;
+
+          subscriptionScheduleCopy[i].breakfast = 0;
+          subscriptionScheduleCopy[i].lunch = 0;
+          subscriptionScheduleCopy[i].dinner = 0;
         }
       }
     }
-    if (value == "custom") {
-      for (let i = 1; i <= 7; i += 1) {
-        const brekafastInput = `input[name='breakfast_${i}']`;
-        const lunchInput = `input[name='lunch_${i}']`;
-        const dinnerInput = `input[name='dinner_${i}']`;
 
-        $(brekafastInput).val(0);
-        $(lunchInput).val(0);
-        $(dinnerInput).val(0);
+    if (value == "custom") {
+      for (let i = 0; i <= 6; i += 1) {
+        scheduleCopy[i].breakfast = 1;
+        scheduleCopy[i].lunch = 1;
+        scheduleCopy[i].dinner = 1;
+
+        subscriptionScheduleCopy[i].breakfast = 1;
+        subscriptionScheduleCopy[i].lunch = 1;
+        subscriptionScheduleCopy[i].dinner = 1;
       }
     }
 
     this.setState({
-      scheduleType: value
+      schedule: scheduleCopy,
+      scheduleType: value,
+      subscriptionSchedule: subscriptionScheduleCopy
     });
   }
 
   handleChangeRadioscheduleTypeSecondary(profileIndex, event, value) {
-    console.log(profileIndex);
-
     if (value == "weekdays") {
-      console.log("Weekdays selected");
-      for (let i = 1; i <= 7; i += 1) {
-        const breakfastInput = `input[name='${profileIndex}_breakfast_${i}']`;
-        const lunchInput = `input[name='${profileIndex}_lunch_${i}']`;
-        const dinnerInput = `input[name='${profileIndex}_dinner_${i}']`;
+      for (let i = 0; i <= 6; i += 1) {
+        if (i <= 4) {
+          this.state.secondaryProfilesData[profileIndex].schedule[
+            i
+          ].breakfast = 1;
+          this.state.secondaryProfilesData[profileIndex].schedule[i].lunch = 1;
+          this.state.secondaryProfilesData[profileIndex].schedule[i].dinner = 1;
 
-        console.log(breakfastInput);
-        console.log(lunchInput);
-        console.log(dinnerInput);
-
-        if (i <= 5) {
-          $(breakfastInput).val(1);
-          $(lunchInput).val(1);
-          $(dinnerInput).val(1);
+          this.state.subscriptionSchedule[i].breakfast = 1;
+          this.state.subscriptionSchedule[i].lunch = 1;
+          this.state.subscriptionSchedule[i].dinner = 1;
         } else {
-          $(breakfastInput).val(0);
-          $(lunchInput).val(0);
-          $(dinnerInput).val(0);
+          this.state.secondaryProfilesData[profileIndex].schedule[
+            i
+          ].breakfast = 0;
+          this.state.secondaryProfilesData[profileIndex].schedule[i].lunch = 0;
+          this.state.secondaryProfilesData[profileIndex].schedule[i].dinner = 0;
+
+          this.state.subscriptionSchedule[i].breakfast = 0;
+          this.state.subscriptionSchedule[i].lunch = 0;
+          this.state.subscriptionSchedule[i].dinner = 0;
         }
       }
     }
 
     if (value == "weekends") {
-      for (let j = 1; j <= 7; j += 1) {
-        const breakfastInput = `input[name='${profileIndex}_breakfast_${j}']`;
-        const lunchInput = `input[name='${profileIndex}_lunch_${j}']`;
-        const dinnerInput = `input[name='${profileIndex}_dinner_${j}']`;
-        if (j >= 6) {
-          $(breakfastInput).val(1);
-          $(lunchInput).val(1);
-          $(dinnerInput).val(1);
+      for (let i = 0; i <= 6; i += 1) {
+        if (i >= 5) {
+          this.state.secondaryProfilesData[profileIndex].schedule[
+            i
+          ].breakfast = 1;
+          this.state.secondaryProfilesData[profileIndex].schedule[i].lunch = 1;
+          this.state.secondaryProfilesData[profileIndex].schedule[i].dinner = 1;
+
+          this.state.subscriptionSchedule[i].breakfast = 1;
+          this.state.subscriptionSchedule[i].lunch = 1;
+          this.state.subscriptionSchedule[i].dinner = 1;
         } else {
-          $(breakfastInput).val(0);
-          $(lunchInput).val(0);
-          $(dinnerInput).val(0);
+          this.state.secondaryProfilesData[profileIndex].schedule[
+            i
+          ].breakfast = 0;
+          this.state.secondaryProfilesData[profileIndex].schedule[i].lunch = 0;
+          this.state.secondaryProfilesData[profileIndex].schedule[i].dinner = 0;
+
+          this.state.subscriptionSchedule[i].breakfast = 0;
+          this.state.subscriptionSchedule[i].lunch = 0;
+          this.state.subscriptionSchedule[i].dinner = 0;
         }
       }
     }
-    if (value == "custom") {
-      for (let k = 1; k <= 7; k += 1) {
-        const breakfastInput = `input[name='${profileIndex}_breakfast_${k}']`;
-        const lunchInput = `input[name='${profileIndex}_lunch_${k}']`;
-        const dinnerInput = `input[name='${profileIndex}_dinner_${k}']`;
 
-        $(breakfastInput).val(0);
-        $(lunchInput).val(0);
-        $(dinnerInput).val(0);
+    if (value == "custom") {
+      for (let i = 0; i <= 6; i += 1) {
+        this.state.secondaryProfilesData[profileIndex].schedule[
+          i
+        ].breakfast = 1;
+        this.state.secondaryProfilesData[profileIndex].schedule[i].lunch = 1;
+        this.state.secondaryProfilesData[profileIndex].schedule[i].dinner = 1;
+
+        this.state.subscriptionSchedule[i].breakfast = 1;
+        this.state.subscriptionSchedule[i].lunch = 1;
+        this.state.subscriptionSchedule[i].dinner = 1;
       }
     }
 
     this.state.secondaryProfilesData[profileIndex].scheduleType = value;
 
     this.forceUpdate();
+  }
+
+  changeRadioDeliveryType(index, element, event, value){
+
+    // console.log(index)
+    // console.log(element)
+    // console.log(value);
+
+    let clonedDeliveryType = this.state.deliveryType.slice();
+
+    clonedDeliveryType[index] = value;
+
+    this.setState({
+      deliveryType: clonedDeliveryType
+    })
+
+    this.forceUpdate();
+  }
+
+  renderOptions(element, index) {
+
+    const currentMealSum = element.breakfast + element.lunch + element.dinner;
+    const previousIndex = index - 1;
+    const daysMealSum = [];
+  
+    this.state.subscriptionSchedule.forEach((e, i) => {
+      daysMealSum.push(e.breakfast + e.lunch + e.dinner);
+    });
+
+    let radioGroup = <RadioGroup
+    aria-label={`delivery_${index}`}
+    name={`delivery_${index}`}
+    style={{ flexDirection: "row" }}
+    value={this.state.deliveryType[index]}
+    onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+    disabled
+    >
+
+      <Typography type="body2">N/a</Typography>
+
+    </RadioGroup>;
+
+    if(currentMealSum >= 1){
+      
+
+        if(index == 0){
+              
+          radioGroup = <RadioGroup
+            aria-label={`delivery_${index}`}
+            name={`delivery_${index}`}
+            style={{ flexDirection: "row" }}
+            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+            value={this.state.deliveryType[index]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+          .add(index, "d")
+          .subtract(1, "d")
+          .format("ddd")} ${moment(this.renderStartDays()[0])
+          .add(index, "d")
+          .subtract(1, "d")
+          .format("D")} - Free`}
+            />
+
+            <FormControlLabel
+              value={"dayOf"}
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("DD")} - $2.50`}
+            />
+      
+          </RadioGroup>;
+        }
+
+       
+        
+        if(index >= 1 && index <= 4){
+
+          if(this.state.deliveryType[previousIndex] == ""){
+            
+              radioGroup = <RadioGroup
+              aria-label={`delivery_${index}`}
+              name={`delivery_${index}`}
+              style={{ flexDirection: "row" }}
+              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+              value={this.state.deliveryType[index]}
+            >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("D")} - Free`}
+            />
+
+            <FormControlLabel
+              value={"dayOf"}
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("DD")} - $2.50`}
+            />
+      
+            </RadioGroup>;
+        }
+        
+        if(this.state.deliveryType[index - 1] == "nightBefore" ){
+            radioGroup = <RadioGroup
+            aria-label={`delivery_${index}`}
+            name={`delivery_${index}`}
+            style={{ flexDirection: "row" }}
+            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+            value={this.state.deliveryType[index]}
+          >
+            <FormControlLabel
+              value="pairing"
+              control={<Radio />} 
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(index + previousIndex + 1, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(index + previousIndex + 1, "d")
+              .format("D")} - Free`}
+            />
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("D")} - Free`}
+            />
+
+            <FormControlLabel
+              value={"dayOf"}
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("DD")} - $2.50`}
+            />
+      
+          </RadioGroup>;
+     
+        }
+        
+        if(this.state.deliveryType[previousIndex] == "dayOf" ){
+            radioGroup = <RadioGroup
+            aria-label={`delivery_${index}`}
+            name={`delivery_${index}`}
+            style={{ flexDirection: "row" }}
+            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+            value={this.state.deliveryType[index]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("D")} - Free`}
+            />
+
+            <FormControlLabel
+              value={"dayOf"}
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("DD")} - $2.50`}
+            />
+      
+          </RadioGroup>;
+     
+        }
+        
+        if(this.state.deliveryType[index - 2] == "nightBefore"
+        && this.state.deliveryType[index - 1] == "pairing"){
+            radioGroup = <RadioGroup 
+            aria-label={`delivery_${index}`}
+            name={`delivery_${index}`}
+            style={{ flexDirection: "row" }}
+            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+            value={this.state.deliveryType[index]}
+          >
+
+           <FormControlLabel
+              value="pairing"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(index + previousIndex, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(index + previousIndex, "d")
+              .format("D")} - Free`}
+            />
+
+           <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("D")} - Free`}
+            />
+            
+            <FormControlLabel
+              value={"dayOf"}
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("DD")} - $2.50`}
+            />
+      
+          </RadioGroup>;
+    
+        }
+        
+        if (this.state.deliveryType[index - 1] == "pairing" && this.state.deliveryType[index - 2] == "pairing"){
+          
+                radioGroup = <RadioGroup
+            aria-label={`delivery_${index}`}
+            name={`delivery_${index}`}
+            style={{ flexDirection: "row" }}
+            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+            value={this.state.deliveryType[index]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("D")} - Free`}
+            />
+
+            <FormControlLabel
+              value={"dayOf"}
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("DD")} - $2.50`}
+            />
+      
+          </RadioGroup>;
+
+
+        }//last else if
+
+         
+        if((this.state.deliveryType[index - 1] == "nightBefore" 
+        && this.state.deliveryType[index - 2] == "pairing" ) || (this.state.deliveryType[index - 1] == "nightBefore" && this.state.deliveryType[index - 2] == "" )){
+            radioGroup = <RadioGroup 
+            aria-label={`delivery_${index}`}
+            name={`delivery_${index}`}
+            style={{ flexDirection: "row" }}
+            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+            value={this.state.deliveryType[index]}
+          >
+
+           <FormControlLabel
+              value="pairing"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(index, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(index, "d")
+              .format("D")} - Free`}
+            />
+
+           <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("D")} - Free`}
+            />
+            
+            <FormControlLabel
+              value={"dayOf"}
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("DD")} - $2.50`}
+            />
+      
+          </RadioGroup>;
+    
+        } 
+
+              if(this.state.deliveryType[index - 1] == "nightBefore" 
+        && this.state.deliveryType[index - 2] == "pairing" && this.state.deliveryType[index - 3] == "pairing"){
+            radioGroup = <RadioGroup 
+            aria-label={`delivery_${index}`}
+            name={`delivery_${index}`}
+            style={{ flexDirection: "row" }}
+            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+            value={this.state.deliveryType[index]}
+          >
+           <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("D")} - Free`}
+            />
+            
+            <FormControlLabel
+              value={"dayOf"}
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("DD")} - $2.50`}
+            />
+      
+          </RadioGroup>;
+    
+        } 
+
+              if(this.state.deliveryType[index - 1] == "pairing" 
+        && this.state.deliveryType[index - 2] == "nightBefore" 
+        && this.state.deliveryType[index - 3] == "pairing"
+        && this.state.deliveryType[index - 4] == "nightBefore"){
+            radioGroup = <RadioGroup 
+            aria-label={`delivery_${index}`}
+            name={`delivery_${index}`}
+            style={{ flexDirection: "row" }}
+            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+            value={this.state.deliveryType[index]}
+          >
+           <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .subtract(1, "d")
+              .format("D")} - Free`}
+            />
+            
+            <FormControlLabel
+              value={"dayOf"}
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("ddd")} ${moment(this.renderStartDays()[0])
+              .add(index, "d")
+              .format("DD")} - $2.50`}
+            />
+      
+          </RadioGroup>;
+    
+        } 
+      } // index >= 1 && index <= 4
+    } //1 or more than 1 meal in this day currentMealSum
+
+    return(
+      <div>
+        <Typography type="subheading" className="font-uppercase font-medium">
+          {moment(this.renderStartDays()[0])
+            .add(index, "d")
+            .format("ddd")}
+        </Typography>
+
+        <Typography type="subheading" className="font-uppercase font-medium">
+          {moment(this.renderStartDays()[0])
+            .add(index, "d")
+            .format("DD")}
+        </Typography>         
+  
+        <FormControl
+          component="fieldset"
+          disabled={currentMealSum == 0}
+        > 
+          {currentMealSum == 0 ? <Typography type="subheading" className="font-medium">N/A</Typography> : ''}
+
+          {currentMealSum >= 1 ? radioGroup : ''}
+        </FormControl>
+
+        <Divider style={{ marginBottom: "25px" }} />
+      </div>
+    )
+
   }
 
   handleChangeRadioLifestyleSecondary(i, event, value) {
@@ -823,12 +1336,13 @@ class Step3LifestyleProfile extends React.Component {
                         onChange={this.handleChangeRadioLifestyle.bind(this)}
                         style={{ flexDirection: "row" }}
                       >
-                        {this.props.lifestyles.map(e => (
+                        {this.props.lifestyles.map((e, i) => (
                           <FormControlLabel
                             value={e.title}
                             control={<Radio />}
                             label={e.title}
                             selected
+                            key={i}
                           />
                         ))}
                       </RadioGroup>
@@ -1333,370 +1847,119 @@ class Step3LifestyleProfile extends React.Component {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            type="subheading"
-                            style={{ marginTop: "10px" }}
-                          >
-                            Monday
-                          </Typography>
-                        </TableCell>
+                      {this.state.schedule.map((e, i) => {
+                        const days = [
+                          "Monday",
+                          "Tuesday",
+                          "Wednesday",
+                          "Thursday",
+                          "Friday",
+                          "Saturday",
+                          "Sunday"
+                        ];
+                        return (
+                          <TableRow key={i}>
+                            <TableCell>
+                              <Typography
+                                type="subheading"
+                                style={{ marginTop: "10px" }}
+                              >
+                                {days[i]}
+                              </Typography>
+                            </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="breakfast_1"
-                          />
-                        </TableCell>
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                value={this.state.schedule[i].breakfast}
+                                onChange={event => {
+                                  const currentSchedule = this.state.schedule.slice();
 
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="lunch_1"
-                          />
-                        </TableCell>
+                                  currentSchedule[i].breakfast =
+                                    event.target.value;
 
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="dinner_1"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            type="subheading"
-                            style={{ marginTop: "10px" }}
-                          >
-                            Tuesday
-                          </Typography>
-                        </TableCell>
+                                  this.setState({
+                                    schedule: currentSchedule
+                                  });
 
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="breakfast_2"
-                          />
-                        </TableCell>
+                                  this.handleSubscriptionScheduleChange();
+                                }}
+                                inputProps={{
+                                  type: "number",
+                                  min: "0",
+                                  max: "3"
+                                }}
+                                name={`breakfast_${i}`}
+                              />
+                            </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="lunch_2"
-                          />
-                        </TableCell>
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                onChange={event => {
+                                  const currentSchedule = this.state.schedule.slice();
 
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="dinner_2"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            type="subheading"
-                            style={{ marginTop: "10px" }}
-                          >
-                            Wednesday
-                          </Typography>
-                        </TableCell>
+                                  currentSchedule[i].lunch = event.target.value;
 
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="breakfast_3"
-                          />
-                        </TableCell>
+                                  this.setState({
+                                    schedule: currentSchedule
+                                  });
+                                  this.handleSubscriptionScheduleChange();
+                                }}
+                                value={this.state.schedule[i].lunch}
+                                inputProps={{
+                                  type: "number",
+                                  min: "0",
+                                  max: "3"
+                                }}
+                                name={`lunch_${i}`}
+                              />
+                            </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="lunch_3"
-                          />
-                        </TableCell>
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                onChange={event => {
+                                  const currentSchedule = this.state.schedule.slice();
 
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="dinner_3"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            type="subheading"
-                            style={{ marginTop: "10px" }}
-                          >
-                            Thursday
-                          </Typography>
-                        </TableCell>
+                                  currentSchedule[i].dinner =
+                                    event.target.value;
 
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="breakfast_4"
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="lunch_4"
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="dinner_4"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            type="subheading"
-                            style={{ marginTop: "10px" }}
-                          >
-                            Friday
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="breakfast_5"
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="lunch_5"
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="dinner_5"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            type="subheading"
-                            style={{ marginTop: "10px" }}
-                          >
-                            Saturday
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="breakfast_6"
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="lunch_6"
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="dinner_6"
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            type="subheading"
-                            style={{ marginTop: "10px" }}
-                          >
-                            Sunday
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="breakfast_7"
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="lunch_7"
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: "center" }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px"
-                            }}
-                            inputProps={{ type: "number", min: "0", max: "3" }}
-                            name="dinner_7"
-                          />
-                        </TableCell>
-                      </TableRow>
+                                  this.setState({
+                                    schedule: currentSchedule
+                                  });
+                                  this.handleSubscriptionScheduleChange();
+                                }}
+                                value={this.state.schedule[i].dinner}
+                                inputProps={{
+                                  type: "number",
+                                  min: "0",
+                                  max: "3"
+                                }}
+                                name={`dinner_${i}`}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </Grid>
@@ -2385,454 +2648,122 @@ class Step3LifestyleProfile extends React.Component {
                             </TableRow>
                           </TableHead>
                           <TableBody>
-                            <TableRow>
-                              <TableCell>
-                                <Typography
-                                  type="subheading"
-                                  style={{ marginTop: "10px" }}
-                                >
-                                  Monday
-                                </Typography>
-                              </TableCell>
+                            {this.state.schedule.map((e, i) => {
+                              const days = [
+                                "Monday",
+                                "Tuesday",
+                                "Wednesday",
+                                "Thursday",
+                                "Friday",
+                                "Saturday",
+                                "Sunday"
+                              ];
+                              return (
+                                <TableRow key={i}>
+                                  <TableCell>
+                                    <Typography
+                                      type="subheading"
+                                      style={{ marginTop: "10px" }}
+                                    >
+                                      {days[i]}
+                                    </Typography>
+                                  </TableCell>
 
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_breakfast_1`}
-                                />
-                              </TableCell>
+                                  <TableCell style={{ textAlign: "center" }}>
+                                    <TextField
+                                      fullWidth
+                                      margin="normal"
+                                      style={{
+                                        fontSize: "1rem",
+                                        maxWidth: "100px",
+                                        minWidth: "100px"
+                                      }}
+                                      value={
+                                        this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].schedule[i].breakfast
+                                      }
+                                      onChange={event => {
+                                        this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].schedule[i].breakfast =
+                                          event.target.value;
+                                        this.forceUpdate();
+                                        this.handleSubscriptionScheduleChange();
+                                      }}
+                                      inputProps={{
+                                        type: "number",
+                                        min: "0",
+                                        max: "3"
+                                      }}
+                                      name={`${profileIndex}_breakfast_${i}`}
+                                    />
+                                  </TableCell>
 
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_lunch_1`}
-                                />
-                              </TableCell>
+                                  <TableCell style={{ textAlign: "center" }}>
+                                    <TextField
+                                      fullWidth
+                                      margin="normal"
+                                      style={{
+                                        fontSize: "1rem",
+                                        maxWidth: "100px",
+                                        minWidth: "100px"
+                                      }}
+                                      onChange={event => {
+                                        this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].schedule[i].lunch =
+                                          event.target.value;
+                                        this.forceUpdate();
+                                        this.handleSubscriptionScheduleChange();
+                                      }}
+                                      value={
+                                        this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].schedule[i].lunch
+                                      }
+                                      inputProps={{
+                                        type: "number",
+                                        min: "0",
+                                        max: "3"
+                                      }}
+                                      name={`${profileIndex}_lunch_${i}`}
+                                    />
+                                  </TableCell>
 
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_dinner_1`}
-                                />
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <Typography
-                                  type="subheading"
-                                  style={{ marginTop: "10px" }}
-                                >
-                                  Tuesday
-                                </Typography>
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_breakfast_2`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_lunch_2`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_dinner_2`}
-                                />
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <Typography
-                                  type="subheading"
-                                  style={{ marginTop: "10px" }}
-                                >
-                                  Wednesday
-                                </Typography>
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_breakfast_3`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_lunch_3`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_dinner_3`}
-                                />
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <Typography
-                                  type="subheading"
-                                  style={{ marginTop: "10px" }}
-                                >
-                                  Thursday
-                                </Typography>
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_breakfast_4`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_lunch_4`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_dinner_4`}
-                                />
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <Typography
-                                  type="subheading"
-                                  style={{ marginTop: "10px" }}
-                                >
-                                  Friday
-                                </Typography>
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_breakfast_5`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_lunch_5`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_dinner_5`}
-                                />
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <Typography
-                                  type="subheading"
-                                  style={{ marginTop: "10px" }}
-                                >
-                                  Saturday
-                                </Typography>
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_breakfast_6`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_lunch_6`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_dinner_6`}
-                                />
-                              </TableCell>
-                            </TableRow>
-                            <TableRow>
-                              <TableCell>
-                                <Typography
-                                  type="subheading"
-                                  style={{ marginTop: "10px" }}
-                                >
-                                  Sunday
-                                </Typography>
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_breakfast_7`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_lunch_7`}
-                                />
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: "center" }}>
-                                <TextField
-                                  fullWidth
-                                  margin="normal"
-                                  style={{
-                                    fontSize: "1rem",
-                                    maxWidth: "100px",
-                                    minWidth: "100px"
-                                  }}
-                                  inputProps={{
-                                    type: "number",
-                                    min: "0",
-                                    max: "3"
-                                  }}
-                                  name={`${profileIndex}_dinner_7`}
-                                />
-                              </TableCell>
-                            </TableRow>
+                                  <TableCell style={{ textAlign: "center" }}>
+                                    <TextField
+                                      fullWidth
+                                      margin="normal"
+                                      style={{
+                                        fontSize: "1rem",
+                                        maxWidth: "100px",
+                                        minWidth: "100px"
+                                      }}
+                                      onChange={event => {
+                                        this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].schedule[i].dinner =
+                                          event.target.value;
+                                        this.forceUpdate();
+                                        this.handleSubscriptionScheduleChange();
+                                      }}
+                                      value={
+                                        this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].schedule[i].dinner
+                                      }
+                                      inputProps={{
+                                        type: "number",
+                                        min: "0",
+                                        max: "3"
+                                      }}
+                                      name={`${profileIndex}_dinner_${i}`}
+                                    />
+                                  </TableCell>
+                                </TableRow>
+                              );
+                            })}
                           </TableBody>
                         </Table>
                       </Grid>
@@ -2877,19 +2808,145 @@ class Step3LifestyleProfile extends React.Component {
                       });
                     }}
                   >
-                    {this.renderStartDays().map((e, i) => {
-                      console.log(e);
-
-                      return (
-                        <MenuItem
-                          key={i}
-                          value={moment(e).format("dddd, MMMM Do YYYY")}
-                        >
-                          {moment(e).format("dddd, MMMM Do YYYY")}
-                        </MenuItem>
-                      );
-                    })}
+                    {this.renderStartDays().map((e, i) => (
+                      <MenuItem
+                        key={i}
+                        value={moment(e).format("dddd, MMMM Do YYYY")}
+                      >
+                        {moment(e).format("dddd, MMMM Do YYYY")}
+                      </MenuItem>
+                    ))}
                   </TextField>
+                </Grid>
+                <Grid item xs={12} style={{ marginTop: "25px" }}>
+                  <Typography type="subheading" className="font-uppercase">
+                    Complete Schedule
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  <Table className="table-lifestyles">
+                    <TableHead>
+                      <TableRow>
+                        <TableCell />
+
+                        <TableCell style={{ textAlign: "center" }}>
+                          <Typography
+                            type="subheading"
+                            className="font-medium font-uppercase"
+                          >
+                            Breakfast
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell style={{ textAlign: "center" }}>
+                          <Typography
+                            type="subheading"
+                            className="font-medium font-uppercase"
+                          >
+                            Lunch
+                          </Typography>
+                        </TableCell>
+
+                        <TableCell style={{ textAlign: "center" }}>
+                          <Typography
+                            type="subheading"
+                            className="font-medium font-uppercase"
+                          >
+                            Dinner
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      {this.state.schedule.map((e, i) => {
+                        const days = [
+                          "Monday",
+                          "Tuesday",
+                          "Wednesday",
+                          "Thursday",
+                          "Friday",
+                          "Saturday",
+                          "Sunday"
+                        ];
+
+                        return (
+                          <TableRow key={i}>
+                            <TableCell>
+                              <Typography
+                                type="subheading"
+                                style={{ marginTop: "10px" }}
+                              >
+                                {days[i]}
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                disabled
+                                value={
+                                  this.state.subscriptionSchedule[i].breakfast
+                                }
+                                name={`all_breakfast_${i}`}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                disabled
+                                value={this.state.subscriptionSchedule[i].lunch}
+                                name={`all_lunch_${i}`}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                disabled
+                                value={
+                                  this.state.subscriptionSchedule[i].dinner
+                                }
+                                name={`all_dinner_${i}`}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </Grid>
+              </Grid>
+
+              <Grid container style={{ marginTop: "25px" }}>
+                <Grid item xs={12}>
+                  <Typography
+                    type="subheading"
+                    className="font-medium font-uppercase"
+                  >
+                    Delivery type
+                  </Typography>
+                </Grid>
+                <Grid item xs={12}>
+                  {this.state.subscriptionSchedule.map((e, i) => this.renderOptions(e, i))}
                 </Grid>
               </Grid>
             </Paper>

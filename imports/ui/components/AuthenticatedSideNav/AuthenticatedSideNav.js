@@ -118,8 +118,6 @@ class AuthenticatedSideNav extends Component {
   render() {
     const { history } = this.props;
 
-    console.log(this.props.location);
-
     return (
       <div className="page-container__side-nav">
         <List style={{ paddingTop: "0 !important" }}>

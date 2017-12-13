@@ -1,50 +1,50 @@
 /* eslint-disable jsx-a11y/no-href */
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 import {
   BrowserRouter as Router,
   Switch,
   Route,
-  history,
-} from 'react-router-dom';
-import { CSSTransitionGroup } from 'react-transition-group';
+  history
+} from "react-router-dom";
+import { CSSTransitionGroup } from "react-transition-group";
 
-import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
-import { Roles } from 'meteor/alanning:roles';
+import { Meteor } from "meteor/meteor";
+import { createContainer } from "meteor/react-meteor-data";
+import { Roles } from "meteor/alanning:roles";
 // import { Bert } from 'meteor/themeteorchef:bert';
 
-import { MuiThemeProvider, createMuiTheme } from 'material-ui/styles';
+import { MuiThemeProvider, createMuiTheme } from "material-ui/styles";
 
-import { withStyles } from 'material-ui/styles';
-import Snackbar from 'material-ui/Snackbar';
-import AppBar from 'material-ui/AppBar';
-import Toolbar from 'material-ui/Toolbar';
-import Drawer from 'material-ui/Drawer';
+import { withStyles } from "material-ui/styles";
+import Snackbar from "material-ui/Snackbar";
+import AppBar from "material-ui/AppBar";
+import Toolbar from "material-ui/Toolbar";
+import Drawer from "material-ui/Drawer";
 
-import Button from 'material-ui/Button';
-import IconButton from 'material-ui/IconButton';
-import List from 'material-ui/List';
-import Typography from 'material-ui/Typography';
-import Hidden from 'material-ui/Hidden';
-import Divider from 'material-ui/Divider';
-import Tooltip from 'material-ui/Tooltip';
-import Avatar from 'material-ui/Avatar';
+import Button from "material-ui/Button";
+import IconButton from "material-ui/IconButton";
+import List from "material-ui/List";
+import Typography from "material-ui/Typography";
+import Hidden from "material-ui/Hidden";
+import Divider from "material-ui/Divider";
+import Tooltip from "material-ui/Tooltip";
+import Avatar from "material-ui/Avatar";
 
-import MenuIcon from 'material-ui-icons/Menu';
-import ExitToAppIcon from 'material-ui-icons/ExitToApp';
-import CloseIcon from 'material-ui-icons/Close';
-import { blueGrey, green, red } from 'material-ui/colors';
+import MenuIcon from "material-ui-icons/Menu";
+import ExitToAppIcon from "material-ui-icons/ExitToApp";
+import CloseIcon from "material-ui-icons/Close";
+import { blueGrey, green, red } from "material-ui/colors";
 
-import { Link } from 'react-router-dom';
-import Navigation from '../../components/Navigation/Navigation';
-import Authenticated from '../../components/Authenticated/Authenticated';
-import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
-import AuthenticatedNavigation from '../../components/AuthenticatedNavigation/AuthenticatedNavigation';
+import { Link } from "react-router-dom";
+import Navigation from "../../components/Navigation/Navigation";
+import Authenticated from "../../components/Authenticated/Authenticated";
+import AuthenticatedSideNav from "../../components/AuthenticatedSideNav/AuthenticatedSideNav";
+import AuthenticatedNavigation from "../../components/AuthenticatedNavigation/AuthenticatedNavigation";
 
-import Public from '../../components/Public/Public';
-import Index from '../../pages/Index/Index';
+import Public from "../../components/Public/Public";
+import Index from "../../pages/Index/Index";
 
 // import AddAccount from '../../pages/Accounts/AddAccount';
 
@@ -53,66 +53,66 @@ import Index from '../../pages/Index/Index';
 // import ViewDocument from '../../pages/ViewDocument/ViewDocument';
 // import EditDocument from '../../pages/EditDocument/EditDocument';
 
-import Categories from '../../pages/Categories/Categories';
-import NewCategory from '../../pages/NewCategory/NewCategory';
-import EditCategory from '../../pages/EditCategory/EditCategory';
+import Categories from "../../pages/Categories/Categories";
+import NewCategory from "../../pages/NewCategory/NewCategory";
+import EditCategory from "../../pages/EditCategory/EditCategory";
 
-import Customers from '../../pages/Customers/Customers';
-import NewCustomer from '../../pages/NewCustomer/NewCustomer';
+import Customers from "../../pages/Customers/Customers";
+import NewCustomer from "../../pages/NewCustomer/NewCustomer";
 // import EditCategory from '../../pages/EditCategory/EditCategory';
 
-import Restrictions from '../../pages/Restrictions/Restrictions';
-import NewRestriction from '../../pages/NewRestriction/NewRestriction';
-import EditRestriction from '../../pages/EditRestriction/EditRestriction';
+import Restrictions from "../../pages/Restrictions/Restrictions";
+import NewRestriction from "../../pages/NewRestriction/NewRestriction";
+import EditRestriction from "../../pages/EditRestriction/EditRestriction";
 
-import Routes from '../../pages/Routes/Routes';
-import NewRoute from '../../pages/NewRoute/NewRoute';
-import EditRoute from '../../pages/EditRoute/EditRoute';
+import Routes from "../../pages/Routes/Routes";
+import NewRoute from "../../pages/NewRoute/NewRoute";
+import EditRoute from "../../pages/EditRoute/EditRoute";
 
-import Ingredients from '../../pages/Ingredients/Ingredients';
-import NewIngredient from '../../pages/NewIngredient/NewIngredient';
-import EditIngredient from '../../pages/EditIngredient/EditIngredient';
+import Ingredients from "../../pages/Ingredients/Ingredients";
+import NewIngredient from "../../pages/NewIngredient/NewIngredient";
+import EditIngredient from "../../pages/EditIngredient/EditIngredient";
 
-import Instructions from '../../pages/Instructions/Instructions';
-import NewInstruction from '../../pages/NewInstruction/NewInstruction';
-import EditInstruction from '../../pages/EditInstruction/EditInstruction';
+import Instructions from "../../pages/Instructions/Instructions";
+import NewInstruction from "../../pages/NewInstruction/NewInstruction";
+import EditInstruction from "../../pages/EditInstruction/EditInstruction";
 
-import Lifestyles from '../../pages/Lifestyles/Lifestyles';
-import NewLifestyle from '../../pages/NewLifestyle/NewLifestyle';
-import EditLifestyle from '../../pages/EditLifestyle/EditLifestyle';
+import Lifestyles from "../../pages/Lifestyles/Lifestyles";
+import NewLifestyle from "../../pages/NewLifestyle/NewLifestyle";
+import EditLifestyle from "../../pages/EditLifestyle/EditLifestyle";
 
-import Plates from '../../pages/Plates/Plates';
-import NewPlate from '../../pages/NewPlate/NewPlate';
-import EditPlate from '../../pages/EditPlate/EditPlate';
+import Plates from "../../pages/Plates/Plates";
+import NewPlate from "../../pages/NewPlate/NewPlate";
+import EditPlate from "../../pages/EditPlate/EditPlate";
 
-import Sides from '../../pages/Sides/Sides';
-import NewSide from '../../pages/NewSide/NewSide';
-import EditSide from '../../pages/EditSide/EditSide';
+import Sides from "../../pages/Sides/Sides";
+import NewSide from "../../pages/NewSide/NewSide";
+import EditSide from "../../pages/EditSide/EditSide";
 
-import Types from '../../pages/Types/Types';
-import NewType from '../../pages/NewType/NewType';
+import Types from "../../pages/Types/Types";
+import NewType from "../../pages/NewType/NewType";
 // import ViewType from '../../pages/ViewType/ViewType';
-import EditType from '../../pages/EditType/EditType';
+import EditType from "../../pages/EditType/EditType";
 
-import Meals from '../../pages/Meals/Meals';
-import NewMeal from '../../pages/NewMeal/NewMeal';
-import EditMeal from '../../pages/EditMeal/EditMeal';
+import Meals from "../../pages/Meals/Meals";
+import NewMeal from "../../pages/NewMeal/NewMeal";
+import EditMeal from "../../pages/EditMeal/EditMeal";
 
-import Team from '../../pages/Team/Team';
+import Team from "../../pages/Team/Team";
 
-import Signup from '../../pages/Signup/Signup';
-import Login from '../../pages/Login/Login';
-import Logout from '../../pages/Logout/Logout';
-import VerifyEmail from '../../pages/VerifyEmail/VerifyEmail';
-import RecoverPassword from '../../pages/RecoverPassword/RecoverPassword';
-import ResetPassword from '../../pages/ResetPassword/ResetPassword';
-import Profile from '../../pages/Profile/Profile';
-import NotFound from '../../pages/NotFound/NotFound';
+import Signup from "../../pages/Signup/Signup";
+import Login from "../../pages/Login/Login";
+import Logout from "../../pages/Logout/Logout";
+import VerifyEmail from "../../pages/VerifyEmail/VerifyEmail";
+import RecoverPassword from "../../pages/RecoverPassword/RecoverPassword";
+import ResetPassword from "../../pages/ResetPassword/ResetPassword";
+import Profile from "../../pages/Profile/Profile";
+import NotFound from "../../pages/NotFound/NotFound";
 // import Footer from '../../components/Footer/Footer';
-import Terms from '../../pages/Terms/Terms';
-import Privacy from '../../pages/Privacy/Privacy';
+import Terms from "../../pages/Terms/Terms";
+import Privacy from "../../pages/Privacy/Privacy";
 
-import './App.scss';
+import "./App.scss";
 
 // const handleResendVerificationEmail = (emailAddress) => {
 //   Meteor.call('users.sendVerificationEmail', (error) => {
@@ -128,107 +128,107 @@ const drawerWidth = 260;
 
 const styles = theme => ({
   root: {
-    width: '100%',
+    width: "100%",
     zIndex: 1,
-    overflow: 'hidden',
-    minHeight: '100%',
+    overflow: "hidden",
+    minHeight: "100%"
   },
   rootNotAuthenticated: {
-    width: '100%',
+    width: "100%",
     zIndex: 1,
-    overflow: 'hidden',
-    minHeight: '100%',
-    justifyContent: 'center',
-    display: 'flex',
-    alignItems: 'center ',
+    overflow: "hidden",
+    minHeight: "100%",
+    justifyContent: "center",
+    display: "flex",
+    alignItems: "center "
   },
   appFrameNotAuthenticated: {
-    width: '100%',
+    width: "100%",
     zIndex: 1,
-    overflow: 'hidden',
-    minHeight: '100%',
-    justifyContent: 'center',
-    display: 'flex',
-    alignItems: 'center',
+    overflow: "hidden",
+    minHeight: "100%",
+    justifyContent: "center",
+    display: "flex",
+    alignItems: "center"
   },
   appFrame: {
-    position: 'relative',
-    display: 'flex',
-    width: '100%',
-    height: '100%',
-    minHeight: '100%',
+    position: "relative",
+    display: "flex",
+    width: "100%",
+    height: "100%",
+    minHeight: "100%"
   },
   appFrameNotAuthenticated: {
-    position: 'relative',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    height: '100%',
-    minHeight: '100%',
+    position: "relative",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
+    height: "100%",
+    minHeight: "100%"
   },
   appBar: {
-    position: 'absolute',
-    boxShadow: 'none',
-    backgroundColor: '#263238',
+    position: "absolute",
+    boxShadow: "none",
+    backgroundColor: "#263238",
     marginLeft: drawerWidth,
-    [theme.breakpoints.up('md')]: {
-      width: `calc(100% - ${drawerWidth}px)`,
-    },
+    [theme.breakpoints.up("md")]: {
+      width: `calc(100% - ${drawerWidth}px)`
+    }
   },
   navIconHide: {
-    [theme.breakpoints.up('md')]: {
-      display: 'none',
-    },
+    [theme.breakpoints.up("md")]: {
+      display: "none"
+    }
   },
   drawerHeader: theme.mixins.toolbar,
   drawerPaper: {
     width: 250,
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up("md")]: {
       width: drawerWidth,
       // position: 'fixed',
-      height: '100%',
-      height: '100vh',
-      minHeight: '100%',
-    },
+      height: "100%",
+      height: "100vh",
+      minHeight: "100%"
+    }
   },
   contentNotAuthenticated: {
     backgroundColor: theme.palette.background.default,
-    width: '100%',
-    height: '100%',
-    minHeight: '100%',
+    width: "100%",
+    height: "100%",
+    minHeight: "100%"
   },
 
   content: {
     backgroundColor: theme.palette.background.default,
-    width: '100%',
+    width: "100%",
     padding: theme.spacing.unit * 3,
-    height: 'calc(100% - 56px)',
+    height: "calc(100% - 56px)",
     marginTop: 56,
     marginLeft: 0,
-    [theme.breakpoints.up('sm')]: {
-      height: 'calc(100% - 64px)',
-      marginTop: 64,
+    [theme.breakpoints.up("sm")]: {
+      height: "calc(100% - 64px)",
+      marginTop: 64
     },
-    [theme.breakpoints.up('md')]: {
-      marginLeft: `${drawerWidth}px`,
-    },
-  },
+    [theme.breakpoints.up("md")]: {
+      marginLeft: `${drawerWidth}px`
+    }
+  }
 });
 
 const themeRoot = createMuiTheme({
   palette: {
     primary: {
       ...blueGrey,
-      A500: '#000000',
+      A500: "#000000"
     }, // Purple and green play nicely together.
     secondary: {
       ...green,
-      A500: '#69f0ae',
+      A500: "#69f0ae"
     },
 
-    error: red,
-  },
+    error: red
+  }
 });
 
 // {!this.state.snackbarButtonText ? (<CloseIcon onClick={this.handleRequestClose.bind(this)} />) : ''}
@@ -238,13 +238,13 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      vertical: 'bottom',
-      horizontal: 'center',
+      vertical: "bottom",
+      horizontal: "center",
       snackbarOpen: false,
-      snackbarMessageText: '',
-      snackbarButtonText: '',
-      snackbarButtonLink: '',
-      mobileOpen: false,
+      snackbarMessageText: "",
+      snackbarButtonText: "",
+      snackbarButtonLink: "",
+      mobileOpen: false
     };
   }
 
@@ -255,7 +255,7 @@ class App extends React.Component {
       snackbarOpen: true,
       snackbarMessageText: message,
       snackbarButtonText: buttonText,
-      snackbarButtonLink: buttonLink,
+      snackbarButtonLink: buttonLink
     });
   }
 
@@ -263,24 +263,24 @@ class App extends React.Component {
     const currentState = this.state.mobileOpen;
 
     this.setState({
-      mobileOpen: !currentState,
+      mobileOpen: !currentState
     });
   }
 
   handleRequestClose() {
     this.setState({
-      snackbarOpen: false,
+      snackbarOpen: false
     });
   }
 
   getInitials(name) {
     if (name) {
-      const split = name.split(' ');
+      const split = name.split(" ");
 
       return split[0].charAt(0) + split[1].charAt(0);
     }
 
-    return '';
+    return "";
   }
 
   render() {
@@ -288,7 +288,7 @@ class App extends React.Component {
 
     const { classes, theme } = this.props;
 
-    console.log(this.props);
+    // console.log(this.props);
 
     return (
       <MuiThemeProvider theme={themeRoot}>
@@ -316,7 +316,7 @@ class App extends React.Component {
                     </Button>
                   </Link>
                 ) : (
-                  ''
+                  ""
                 ),
                 <IconButton
                   key="close"
@@ -325,7 +325,7 @@ class App extends React.Component {
                   onClick={this.handleRequestClose.bind(this)}
                 >
                   <CloseIcon />
-                </IconButton>,
+                </IconButton>
               ]}
               message={
                 <span id="message-id" className="body2">
@@ -345,7 +345,7 @@ class App extends React.Component {
                   className={
                     this.props.authenticated
                       ? classes.appBar
-                      : 'appbar--no-shadow appbar-no-auth'
+                      : "appbar--no-shadow appbar-no-auth"
                   }
                 >
                   <Toolbar>
@@ -360,10 +360,10 @@ class App extends React.Component {
 
                     <div
                       style={{
-                        display: 'flex',
-                        justifyContent: 'flex-end',
-                        width: '100%',
-                        alignItems: 'center',
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        width: "100%",
+                        alignItems: "center"
                       }}
                     >
                       <Link to="/profile" className="link--no-hover">
@@ -371,15 +371,15 @@ class App extends React.Component {
                           type="subheading"
                           className="subheading font-medium"
                           style={{
-                            color: '#FFF',
-                            alignItems: 'center',
-                            display: 'flex',
-                            paddingRight: '15px',
+                            color: "#FFF",
+                            alignItems: "center",
+                            display: "flex",
+                            paddingRight: "15px"
                           }}
                         >
-                          <Avatar style={{ marginRight: '.8em' }}>
+                          <Avatar style={{ marginRight: ".8em" }}>
                             {this.getInitials(
-                              this.props.name ? this.props.name : '',
+                              this.props.name ? this.props.name : ""
                             )}
                           </Avatar>
                           {this.props.name}
@@ -390,7 +390,7 @@ class App extends React.Component {
                           <IconButton>
                             <ExitToAppIcon
                               className="logout-icon"
-                              style={{ fillOpacity: '0.54', fill: '#FFFFFF' }}
+                              style={{ fillOpacity: "0.54", fill: "#FFFFFF" }}
                             />
                           </IconButton>
                         </Link>
@@ -399,40 +399,40 @@ class App extends React.Component {
                   </Toolbar>
                 </AppBar>
               ) : (
-                ''
+                ""
               )}
               {this.props.authenticated ? (
-                <div style={{ backgroundColor: '#FFFFFF' }}>
+                <div style={{ backgroundColor: "#FFFFFF" }}>
                   <Hidden mdUp>
                     <Drawer
                       type="temporary"
-                      anchor={theme.direction === 'rtl' ? 'right' : 'left'}
+                      anchor={theme.direction === "rtl" ? "right" : "left"}
                       open={this.state.mobileOpen}
                       classes={{
-                        paper: classes.drawerPaper,
+                        paper: classes.drawerPaper
                       }}
                       onRequestClose={this.handleDrawerToggle.bind(this)}
                       ModalProps={{
-                        keepMounted: true, // Better open performance on mobile.
+                        keepMounted: true // Better open performance on mobile.
                       }}
                     >
                       <div
                         style={{
-                          padding: '10px 20px 0',
-                          display: 'flex',
-                          flexDirection: 'column',
+                          padding: "10px 20px 0",
+                          display: "flex",
+                          flexDirection: "column"
                         }}
                         className={classes.drawerHeader}
                       >
                         <Typography
                           type="headline"
-                          style={{ color: 'rgba(0, 0, 0, 0.38)' }}
+                          style={{ color: "rgba(0, 0, 0, 0.38)" }}
                           className="headline font-medium"
                         >
                           Vittle
                         </Typography>
                         <Typography
-                          style={{ color: 'rgba(0, 0, 0, 0.38)' }}
+                          style={{ color: "rgba(0, 0, 0, 0.38)" }}
                           type="body2"
                           className="body2"
                         >
@@ -449,26 +449,26 @@ class App extends React.Component {
                       type="permanent"
                       open
                       classes={{
-                        paper: classes.drawerPaper,
+                        paper: classes.drawerPaper
                       }}
                     >
                       <div
                         style={{
-                          padding: '10px 20px 0',
-                          display: 'flex',
-                          flexDirection: 'column',
+                          padding: "10px 20px 0",
+                          display: "flex",
+                          flexDirection: "column"
                         }}
                         className={classes.drawerHeader}
                       >
                         <Typography
                           type="headline"
-                          style={{ color: 'rgba(0, 0, 0, 0.38)' }}
+                          style={{ color: "rgba(0, 0, 0, 0.38)" }}
                           className="headline font-medium"
                         >
                           Vittle
                         </Typography>
                         <Typography
-                          style={{ color: 'rgba(0, 0, 0, 0.38)' }}
+                          style={{ color: "rgba(0, 0, 0, 0.38)" }}
                           type="body2"
                           className="body2"
                         >
@@ -480,7 +480,7 @@ class App extends React.Component {
                   </Hidden>
                 </div>
               ) : (
-                ''
+                ""
               )}
 
               <main
@@ -799,7 +799,7 @@ class App extends React.Component {
                     </Switch>
                   </CSSTransitionGroup>
                 ) : (
-                  ''
+                  ""
                 )}
               </main>
             </div>
@@ -826,21 +826,21 @@ class App extends React.Component {
 }
 
 App.defaultProps = {
-  userId: '',
-  emailAddress: '',
+  userId: "",
+  emailAddress: ""
 };
 
 App.propTypes = {
   loading: PropTypes.bool.isRequired,
   userId: PropTypes.string,
   emailAddress: PropTypes.string,
-  emailVerified: PropTypes.bool.isRequired,
+  emailVerified: PropTypes.bool.isRequired
 };
 
 const getUserName = name =>
   ({
     string: name,
-    object: `${name.first} ${name.last}`,
+    object: `${name.first} ${name.last}`
   }[typeof name]);
 
 export default createContainer(() => {
@@ -863,6 +863,6 @@ export default createContainer(() => {
     emailVerified:
       user && user.emails
         ? user && user.emails && user.emails[0].verified
-        : true,
+        : true
   };
 }, withStyles(styles, { withTheme: true })(App));
