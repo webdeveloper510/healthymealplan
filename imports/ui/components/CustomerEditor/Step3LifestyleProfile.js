@@ -1,97 +1,97 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import { Meteor } from "meteor/meteor";
+import { Meteor } from 'meteor/meteor';
 
-import Grid from "material-ui/Grid";
-import Button from "material-ui/Button";
-import { MenuItem } from "material-ui/Menu";
-import TextField from "material-ui/TextField";
-import Paper from "material-ui/Paper";
+import Grid from 'material-ui/Grid';
+import Button from 'material-ui/Button';
+import { MenuItem } from 'material-ui/Menu';
+import TextField from 'material-ui/TextField';
+import Paper from 'material-ui/Paper';
 
-import Input from "material-ui/Input";
-import Typography from "material-ui/Typography";
-import Radio, { RadioGroup } from "material-ui/Radio";
-import Checkbox from "material-ui/Checkbox";
+import Input from 'material-ui/Input';
+import Typography from 'material-ui/Typography';
+import Radio, { RadioGroup } from 'material-ui/Radio';
+import Checkbox from 'material-ui/Checkbox';
 
-import Divider from "material-ui/Divider";
+import Divider from 'material-ui/Divider';
 
-import moment from "moment";
+import moment from 'moment';
 
 import {
   FormLabel,
   FormControl,
   FormControlLabel,
   FormHelperText,
-  FormGroup
-} from "material-ui/Form";
+  FormGroup,
+} from 'material-ui/Form';
 
 import Table, {
   TableBody,
   TableCell,
   TableFooter,
   TableHead,
-  TableRow
-} from "material-ui/Table";
+  TableRow,
+} from 'material-ui/Table';
 
 import Dialog, {
   DialogActions,
   DialogContent,
-  DialogContentText
-} from "material-ui/Dialog";
+  DialogContentText,
+} from 'material-ui/Dialog';
 
-import classNames from "classnames";
-import { withStyles } from "material-ui/styles";
-import { CircularProgress } from "material-ui/Progress";
-import green from "material-ui/colors/green";
+import classNames from 'classnames';
+import { withStyles } from 'material-ui/styles';
+import { CircularProgress } from 'material-ui/Progress';
+import green from 'material-ui/colors/green';
 
-import List, { ListItem, ListItemText } from "material-ui/List";
-import Collapse from "material-ui/transitions/Collapse";
-import ExpandLess from "material-ui-icons/ExpandLess";
-import ExpandMore from "material-ui-icons/ExpandMore";
+import List, { ListItem, ListItemText } from 'material-ui/List';
+import Collapse from 'material-ui/transitions/Collapse';
+import ExpandLess from 'material-ui-icons/ExpandLess';
+import ExpandMore from 'material-ui-icons/ExpandMore';
 
-import Autosuggest from "react-autosuggest";
-import _ from "lodash";
-import Search from "material-ui-icons/Search";
-import Chip from "material-ui/Chip";
-import Avatar from "material-ui/Avatar";
+import Autosuggest from 'react-autosuggest';
+import _ from 'lodash';
+import Search from 'material-ui-icons/Search';
+import Chip from 'material-ui/Chip';
+import Avatar from 'material-ui/Avatar';
 
-import $ from "jquery";
+import $ from 'jquery';
 
-import update from "react-addons-update";
+import update from 'react-addons-update';
 
-import validate from "../../../modules/validate";
+import validate from '../../../modules/validate';
 
 const styles = theme => ({
   root: {
-    display: "flex",
-    alignItems: "center"
+    display: 'flex',
+    alignItems: 'center',
   },
   wrapper: {
     margin: theme.spacing.unit,
-    position: "relative"
+    position: 'relative',
   },
   buttonSuccess: {
     backgroundColor: green[500],
-    "&:hover": {
-      backgroundColor: green[700]
-    }
+    '&:hover': {
+      backgroundColor: green[700],
+    },
   },
   fabProgress: {
     color: green[500],
-    position: "absolute",
+    position: 'absolute',
     top: -6,
     left: -6,
-    zIndex: 1
+    zIndex: 1,
   },
   buttonProgress: {
     color: green[500],
-    position: "absolute",
-    top: "50%",
-    left: "50%",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
     marginTop: -12,
-    marginLeft: -12
-  }
+    marginLeft: -12,
+  },
 });
 
 class Step3LifestyleProfile extends React.Component {
@@ -99,25 +99,26 @@ class Step3LifestyleProfile extends React.Component {
     super(props);
 
     this.state = {
-      value: "",
+      value: '',
       suggestions: [],
       submitLoading: false,
       submitSuccess: false,
       subIngredients: [],
       specificRestrictions: [],
       deleteDialogOpen: false,
-      addRestrictionType: "Restriction",
+      addRestrictionType: 'Restriction',
       lifestyle: this.props.customerInfo.adultOrChild
         ? this.props.customerInfo.adultOrChild
-        : "traditional",
+        : 'traditional',
       extra: this.props.customerInfo.extra
         ? this.props.customerInfo.extra
-        : "none",
+        : 'none',
       discount: this.props.customerInfo.discount
         ? this.props.customerInfo.discount
-        : "none",
+        : 'none',
 
       restrictions: [],
+
       schedule: [
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
@@ -125,7 +126,7 @@ class Step3LifestyleProfile extends React.Component {
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 }
+        { breakfast: 0, lunch: 0, dinner: 0 },
       ],
       subscriptionSchedule: [
         { breakfast: 0, lunch: 0, dinner: 0 },
@@ -134,28 +135,28 @@ class Step3LifestyleProfile extends React.Component {
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 }
+        { breakfast: 0, lunch: 0, dinner: 0 },
       ],
-      subscriptionScheduleDeliveryDays: {
-        monday: "",
-        tuesday: "",
-        wednesday: "",
-        thursday: "",
-        friday: "",
-        saturday: "",
-        sunday: ""
+      pairings: {
+        monday: [],
+        tuesday: [],
+        wednesday: [],
+        thursday: [],
+        friday: [],
+        saturday: [],
+        sunday: [],
       },
       subscriptionStartDate: moment(this.renderStartDays()[0]).format(
-        "dddd, MMMM Do YYYY"
+        'dddd, MMMM Do YYYY',
       ),
-      deliveryType: ["","","","","","",""],
+      deliveryType: ['', '', '', '', '', '', ''],
       nextFewMondays: null,
 
       // collapse
       primaryCollapse: true,
       secondaryCollapses: [false, false, false, false, false, false],
       secondaryProfileCount: 0,
-      secondaryProfilesData: []
+      secondaryProfilesData: [],
     };
   }
 
@@ -167,34 +168,34 @@ class Step3LifestyleProfile extends React.Component {
         error.insertAfter(
           $(element)
             .parent()
-            .parent()
+            .parent(),
         );
       },
 
       rules: {
         first_name: {
-          required: true
+          required: true,
         },
         last_name: {
-          required: true
+          required: true,
         },
         email: {
           required: true,
-          email: true
+          email: true,
         },
         phoneNumber: {
           minlength: 10,
           maxlength: 10,
-          number: true
+          number: true,
         },
         type: {
-          required: true
-        }
+          required: true,
+        },
       },
 
       submitHandler() {
         component.handleSubmitStep();
-      }
+      },
     });
   }
 
@@ -218,14 +219,14 @@ class Step3LifestyleProfile extends React.Component {
     console.log(finalSchedule);
 
     this.setState({
-      subscriptionSchedule: finalSchedule
+      subscriptionSchedule: finalSchedule,
     });
   }
 
   increaseProfileCount() {
     if (this.state.secondaryProfileCount === 6) {
       this.popTheSnackbar({
-        message: "Cannot add more than 6 profiles"
+        message: 'Cannot add more than 6 profiles',
       });
 
       return;
@@ -236,19 +237,19 @@ class Step3LifestyleProfile extends React.Component {
     const currentSecondaryProfiles = this.state.secondaryProfilesData.slice();
 
     currentSecondaryProfiles.push({
-      first_name: "",
-      last_name: "",
+      first_name: '',
+      last_name: '',
       subIngredients: [],
       specificRestrictions: [],
       lifestyle: this.props.customerInfo.adultOrChild
         ? this.props.customerInfo.adultOrChild
-        : "traditional",
+        : 'traditional',
       extra: this.props.customerInfo.extra
         ? this.props.customerInfo.extra
-        : "none",
+        : 'none',
       discount: this.props.customerInfo.discount
         ? this.props.customerInfo.discount
-        : "none",
+        : 'none',
       restrictions: [],
       schedule: [
         { breakfast: 0, lunch: 0, dinner: 0 },
@@ -257,14 +258,14 @@ class Step3LifestyleProfile extends React.Component {
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 }
+        { breakfast: 0, lunch: 0, dinner: 0 },
       ],
-      scheduleType: ""
+      scheduleType: '',
     });
 
     this.setState({
       secondaryProfileCount: increasedProfileCount,
-      secondaryProfilesData: currentSecondaryProfiles
+      secondaryProfilesData: currentSecondaryProfiles,
     });
   }
 
@@ -280,14 +281,14 @@ class Step3LifestyleProfile extends React.Component {
 
     this.setState({
       secondaryProfileCount: decreasedProfileCount,
-      secondaryProfilesData: profileToRemove
+      secondaryProfilesData: profileToRemove,
     });
   }
 
   handleProfileOpen(primary, index) {
     if (primary) {
       this.setState({
-        primaryCollapse: !this.state.primaryCollapse
+        primaryCollapse: !this.state.primaryCollapse,
       });
     } else {
       const currentCollapseArr = this.state.secondaryCollapses.slice();
@@ -295,7 +296,7 @@ class Step3LifestyleProfile extends React.Component {
       currentCollapseArr[index] = !currentCollapseArr[index];
 
       this.setState({
-        secondaryCollapses: currentCollapseArr
+        secondaryCollapses: currentCollapseArr,
       });
     }
   }
@@ -324,26 +325,26 @@ class Step3LifestyleProfile extends React.Component {
 
   deleteDialogHandleRequestClose() {
     this.setState({
-      deleteDialogOpen: false
+      deleteDialogOpen: false,
     });
   }
 
   deleteDialogHandleOpen() {
     this.setState({
-      deleteDialogOpen: true
+      deleteDialogOpen: true,
     });
   }
 
   handleSubmitStep() {
-    console.log("Reached");
+    console.log('Reached');
 
     this.setState({
       submitSuccess: false,
-      submitLoading: true
+      submitLoading: true,
     });
 
     Meteor.call(
-      "customers.step3",
+      'customers.step3',
       {
         id: this.props.customerInfo.id,
         firstName: $('[name="first_name"]')
@@ -358,7 +359,7 @@ class Step3LifestyleProfile extends React.Component {
         phoneNumber: $('[name="phoneNumber"]')
           .val()
           .trim(),
-        adultOrChild: this.state.adultOrChildValue
+        adultOrChild: this.state.adultOrChildValue,
       },
       (err, returnVal) => {
         if (err) {
@@ -370,15 +371,15 @@ class Step3LifestyleProfile extends React.Component {
 
           this.setState({
             submitSuccess: false,
-            submitLoading: false
+            submitLoading: false,
           });
         } else {
           this.setState({
             submitSuccess: true,
-            submitLoading: false
+            submitLoading: false,
           });
 
-          console.log("Reached no error");
+          console.log('Reached no error');
 
           this.props.saveValues({
             firstName: $('[name="first_name"]')
@@ -393,18 +394,18 @@ class Step3LifestyleProfile extends React.Component {
             phoneNumber: $('[name="phoneNumber"]')
               .val()
               .trim(),
-            adultOrChild: this.state.adultOrChildValue
+            adultOrChild: this.state.adultOrChildValue,
           });
 
           this.props.handleNext();
         }
-      }
+      },
     );
   }
 
   handleChangeRadioLifestyle(event, value) {
     const getLifestyleRestrictions = this.props.lifestyles.find(
-      el => el.title === value
+      el => el.title === value,
     );
 
     const currentRestrictionsIds = this.state.restrictions.length
@@ -415,17 +416,17 @@ class Step3LifestyleProfile extends React.Component {
 
     this.setState({
       lifestyle: value,
-      lifestyleRestrictions: currentRestrictionsIds
+      lifestyleRestrictions: currentRestrictionsIds,
     });
   }
 
   handleChangeRadioscheduleType(event, value) {
     const scheduleCopy = _.cloneDeep(this.state.schedule);
     const subscriptionScheduleCopy = _.cloneDeep(
-      this.state.subscriptionSchedule
+      this.state.subscriptionSchedule,
     );
 
-    if (value == "weekdays") {
+    if (value == 'weekdays') {
       for (let i = 0; i <= 6; i += 1) {
         if (i <= 4) {
           scheduleCopy[i].breakfast = 1;
@@ -447,7 +448,7 @@ class Step3LifestyleProfile extends React.Component {
       }
     }
 
-    if (value == "weekends") {
+    if (value == 'weekends') {
       for (let i = 0; i <= 6; i += 1) {
         if (i >= 5) {
           scheduleCopy[i].breakfast = 1;
@@ -469,7 +470,7 @@ class Step3LifestyleProfile extends React.Component {
       }
     }
 
-    if (value == "custom") {
+    if (value == 'custom') {
       for (let i = 0; i <= 6; i += 1) {
         scheduleCopy[i].breakfast = 1;
         scheduleCopy[i].lunch = 1;
@@ -484,12 +485,12 @@ class Step3LifestyleProfile extends React.Component {
     this.setState({
       schedule: scheduleCopy,
       scheduleType: value,
-      subscriptionSchedule: subscriptionScheduleCopy
+      subscriptionSchedule: subscriptionScheduleCopy,
     });
   }
 
   handleChangeRadioscheduleTypeSecondary(profileIndex, event, value) {
-    if (value == "weekdays") {
+    if (value == 'weekdays') {
       for (let i = 0; i <= 6; i += 1) {
         if (i <= 4) {
           this.state.secondaryProfilesData[profileIndex].schedule[
@@ -515,7 +516,7 @@ class Step3LifestyleProfile extends React.Component {
       }
     }
 
-    if (value == "weekends") {
+    if (value == 'weekends') {
       for (let i = 0; i <= 6; i += 1) {
         if (i >= 5) {
           this.state.secondaryProfilesData[profileIndex].schedule[
@@ -541,7 +542,7 @@ class Step3LifestyleProfile extends React.Component {
       }
     }
 
-    if (value == "custom") {
+    if (value == 'custom') {
       for (let i = 0; i <= 6; i += 1) {
         this.state.secondaryProfilesData[profileIndex].schedule[
           i
@@ -560,55 +561,148 @@ class Step3LifestyleProfile extends React.Component {
     this.forceUpdate();
   }
 
-  changeRadioDeliveryType(index, element, event, value){
-
+  changeRadioDeliveryType(index, element, event, value) {
     // console.log(index)
     // console.log(element)
     // console.log(value);
 
-    let clonedDeliveryType = this.state.deliveryType.slice();
+    const clonedDeliveryType = this.state.deliveryType.slice();
 
     clonedDeliveryType[index] = value;
 
     this.setState({
-      deliveryType: clonedDeliveryType
-    })
+      deliveryType: clonedDeliveryType,
+    });
 
     this.forceUpdate();
   }
 
-  renderOptions(element, index) {
-
-    const currentMealSum = element.breakfast + element.lunch + element.dinner;
-    const previousIndex = index - 1;
+  checkPairings() {
     const daysMealSum = [];
-  
+    const days = [
+      'monday',
+      'tuesday',
+      'wednesday',
+      'thursday',
+      'friday',
+      'saturday',
+      'sunday',
+    ];
+    const pairings = {
+      monday: [],
+      tuesday: [],
+      wednesday: [],
+      thursday: [],
+      friday: [],
+      saturday: [],
+      sunday: [],
+    };
+
     this.state.subscriptionSchedule.forEach((e, i) => {
       daysMealSum.push(e.breakfast + e.lunch + e.dinner);
     });
 
-    let radioGroup = <RadioGroup
-    aria-label={`delivery_${index}`}
-    name={`delivery_${index}`}
-    style={{ flexDirection: "row" }}
-    value={this.state.deliveryType[index]}
-    onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-    disabled
-    >
+    for (let i = 0; i <= daysMealSum.length; i++) {
+      const primary = daysMealSum[i];
+      for (let j = i + 1; j <= daysMealSum.length - 1; j++) {
+        if (j == 3) {
+          break;
+        }
 
-      <Typography type="body2">N/a</Typography>
+        if (primary > 0 && daysMealSum[j] > 0 && daysMealSum[j + 1] > 0) {
+          pairings[days[i]].push(`${i},${j},${j + 1}`);
+        } else if (primary > 0 && daysMealSum[j] > 0) {
+          pairings[days[i]].push(`${i},${j}`);
+        }
+      }
+    }
 
-    </RadioGroup>;
+    // console.log(pairings);
+  }
 
-    if(currentMealSum >= 1){
-      
+  renderOptions(element, index) {
+    const currentMealSum = element.breakfast + element.lunch + element.dinner;
+    const previousIndex = index - 1;
+    const daysMealSum = [];
 
-        if(index == 0){
-              
-          radioGroup = <RadioGroup
+    this.state.subscriptionSchedule.forEach((e, i) => {
+      daysMealSum.push(e.breakfast + e.lunch + e.dinner);
+    });
+
+    let radioGroup = (
+      <RadioGroup
+        aria-label={`delivery_${index}`}
+        name={`delivery_${index}`}
+        style={{ flexDirection: 'row' }}
+        value={this.state.deliveryType[index]}
+        onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+        disabled
+      >
+        <Typography type="body2">N/a</Typography>
+      </RadioGroup>
+    );
+
+    if (index == 0 && currentMealSum == 1) {
+      console.log(moment(this.renderStartDays()[0])
+        .add(index, 'd')
+        .format('ddd'));
+
+      radioGroup = (
+        <RadioGroup
+          aria-label={`delivery_${index}`}
+          name={`delivery_${index}`}
+          style={{ flexDirection: 'row' }}
+          onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+          value={this.state.deliveryType[index]}
+        >
+          <FormControlLabel
+            value="nightBeforePaired"
+            control={<Radio />}
+            label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, 'd')
+              .subtract(1, 'd')
+              .format('ddd')} ${moment(this.renderStartDays()[0])
+              .add(index, 'd')
+              .subtract(1, 'd')
+              .format('D')} - Free (Pair Tuesday or Tuesday & Wednesday)`}
+          />
+
+          <FormControlLabel
+            value="nightBefore"
+            control={<Radio />}
+            label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, 'd')
+              .subtract(1, 'd')
+              .format('ddd')} ${moment(this.renderStartDays()[0])
+              .add(index, 'd')
+              .subtract(1, 'd')
+              .format('D')} - $2.50`}
+          />
+
+          <FormControlLabel
+            value={'dayOf'}
+            control={<Radio />}
+            label={`Delivered ${moment(this.renderStartDays()[0])
+              .add(index, 'd')
+              .format('ddd')} ${moment(this.renderStartDays()[0])
+              .add(index, 'd')
+              .format('DD')} - $2.50`}
+          />
+        </RadioGroup>
+      );
+    }
+
+
+    if (currentMealSum > 1) {
+      if (index == 0) {
+        console.log(moment(this.renderStartDays()[0])
+          .add(index, 'd')
+          .format('ddd'));
+        radioGroup = (
+          <RadioGroup
             aria-label={`delivery_${index}`}
             name={`delivery_${index}`}
-            style={{ flexDirection: "row" }}
+            style={{ flexDirection: 'row' }}
             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
             value={this.state.deliveryType[index]}
           >
@@ -616,386 +710,485 @@ class Step3LifestyleProfile extends React.Component {
               value="nightBefore"
               control={<Radio />}
               label={`Delivered ${moment(this.renderStartDays()[0])
-          .add(index, "d")
-          .subtract(1, "d")
-          .format("ddd")} ${moment(this.renderStartDays()[0])
-          .add(index, "d")
-          .subtract(1, "d")
-          .format("D")} - Free`}
+                .add(index, 'd')
+                .subtract(1, 'd')
+                .format('ddd')} ${moment(this.renderStartDays()[0])
+                .add(index, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
             />
 
             <FormControlLabel
-              value={"dayOf"}
+              value={'dayOf'}
               control={<Radio />}
               label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("DD")} - $2.50`}
+                .add(index, 'd')
+                .format('ddd')} ${moment(this.renderStartDays()[0])
+                .add(index, 'd')
+                .format('DD')} - $2.50`}
             />
-      
-          </RadioGroup>;
-        }
+          </RadioGroup>
+        );
+      }
 
-       
-        
-        if(index >= 1 && index <= 4){
-
-          if(this.state.deliveryType[previousIndex] == ""){
-            
-              radioGroup = <RadioGroup
+      if (index >= 1 && index <= 4) {
+        if (
+          this.state.deliveryType[previousIndex] == '' ||
+          this.state.deliveryType[previousIndex] == 'dayOf'
+        ) {
+          console.log(moment(this.renderStartDays()[0])
+            .add(index, 'd')
+            .format('ddd'));
+          radioGroup = (
+            <RadioGroup
               aria-label={`delivery_${index}`}
               name={`delivery_${index}`}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
               onChange={this.changeRadioDeliveryType.bind(this, index, element)}
               value={this.state.deliveryType[index]}
             >
-            <FormControlLabel
-              value="nightBefore"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("D")} - Free`}
-            />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
 
-            <FormControlLabel
-              value={"dayOf"}
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("DD")} - $2.50`}
-            />
-      
-            </RadioGroup>;
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
         }
-        
-        if(this.state.deliveryType[index - 1] == "nightBefore" ){
-            radioGroup = <RadioGroup
-            aria-label={`delivery_${index}`}
-            name={`delivery_${index}`}
-            style={{ flexDirection: "row" }}
-            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-            value={this.state.deliveryType[index]}
-          >
-            <FormControlLabel
-              value="pairing"
-              control={<Radio />} 
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(index + previousIndex + 1, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(index + previousIndex + 1, "d")
-              .format("D")} - Free`}
-            />
 
-            <FormControlLabel
-              value="nightBefore"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("D")} - Free`}
-            />
+        if (this.state.deliveryType[previousIndex] == 'nightBefore') {
+          console.log(moment(this.renderStartDays()[0])
+            .add(index, 'd')
+            .format('ddd'));
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${index}`}
+              name={`delivery_${index}`}
+              style={{ flexDirection: 'row' }}
+              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+              value={this.state.deliveryType[index]}
+            >
+              <FormControlLabel
+                value="pairing"
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(previousIndex - 1, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(previousIndex - 1, 'd')
+                  .format('D')} - Free`}
+              />
 
-            <FormControlLabel
-              value={"dayOf"}
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("DD")} - $2.50`}
-            />
-      
-          </RadioGroup>;
-     
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
         }
-        
-        if(this.state.deliveryType[previousIndex] == "dayOf" ){
-            radioGroup = <RadioGroup
-            aria-label={`delivery_${index}`}
-            name={`delivery_${index}`}
-            style={{ flexDirection: "row" }}
-            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-            value={this.state.deliveryType[index]}
-          >
-            <FormControlLabel
-              value="nightBefore"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("D")} - Free`}
-            />
 
-            <FormControlLabel
-              value={"dayOf"}
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("DD")} - $2.50`}
-            />
-      
-          </RadioGroup>;
-     
+        if (
+          this.state.deliveryType[previousIndex] == 'pairing' &&
+          this.state.deliveryType[index - 2] == 'pairing'
+        ) {
+          console.log(moment(this.renderStartDays()[0])
+            .add(index, 'd')
+            .format('ddd'));
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${index}`}
+              name={`delivery_${index}`}
+              style={{ flexDirection: 'row' }}
+              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+              value={this.state.deliveryType[index]}
+            >
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } // last else if
+
+        // if (
+        //   (this.state.deliveryType[previousIndex] == "nightBefore" &&
+        //     this.state.deliveryType[index - 2] == "pairing") ||
+        //   (this.state.deliveryType[previousIndex] == "nightBefore" &&
+        //     this.state.deliveryType[index - 2] == "")
+        // ) {
+        //       console.log(moment(this.renderStartDays()[0])
+        //           .add(index, "d")
+        //           .format("ddd"))
+        //   radioGroup = (
+        //     <RadioGroup
+        //       aria-label={`delivery_${index}`}
+        //       name={`delivery_${index}`}
+        //       style={{ flexDirection: "row" }}
+        //       onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+        //       value={this.state.deliveryType[index]}
+        //     >
+        //       <FormControlLabel
+        //         value="pairing"
+        //         control={<Radio />}
+        //         label={`Delivered ${moment(this.renderStartDays()[0])
+        //           .add(index, "d")
+        //           .subtract(index - 2, "d")
+        //           .format("ddd")} ${moment(this.renderStartDays()[0])
+        //           .add(index, "d")
+        //           .subtract(index - 2, "d")
+        //           .format("D")} - Free`}
+        //       />
+
+        //       <FormControlLabel
+        //         value="nightBefore"
+        //         control={<Radio />}
+        //         label={`Delivered ${moment(this.renderStartDays()[0])
+        //           .add(index, "d")
+        //           .subtract(1, "d")
+        //           .format("ddd")} ${moment(this.renderStartDays()[0])
+        //           .add(index, "d")
+        //           .subtract(1, "d")
+        //           .format("D")} - Free`}
+        //       />
+
+        //       <FormControlLabel
+        //         value={"dayOf"}
+        //         control={<Radio />}
+        //         label={`Delivered ${moment(this.renderStartDays()[0])
+        //           .add(index, "d")
+        //           .format("ddd")} ${moment(this.renderStartDays()[0])
+        //           .add(index, "d")
+        //           .format("DD")} - $2.50`}
+        //       />
+        //     </RadioGroup>
+        //   );
+        // }
+
+        if (
+          this.state.deliveryType[previousIndex] == 'nightBefore' &&
+          this.state.deliveryType[index - 2] == 'pairing' &&
+          this.state.deliveryType[index - 3] == 'pairing'
+        ) {
+          console.log(moment(this.renderStartDays()[0])
+            .add(index, 'd')
+            .format('ddd'));
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${index}`}
+              name={`delivery_${index}`}
+              style={{ flexDirection: 'row' }}
+              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+              value={this.state.deliveryType[index]}
+            >
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
         }
-        
-        if(this.state.deliveryType[index - 2] == "nightBefore"
-        && this.state.deliveryType[index - 1] == "pairing"){
-            radioGroup = <RadioGroup 
-            aria-label={`delivery_${index}`}
-            name={`delivery_${index}`}
-            style={{ flexDirection: "row" }}
-            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-            value={this.state.deliveryType[index]}
-          >
 
-           <FormControlLabel
-              value="pairing"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(index + previousIndex, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(index + previousIndex, "d")
-              .format("D")} - Free`}
-            />
+        if (
+          this.state.deliveryType[index - 1] == 'pairing' &&
+          this.state.deliveryType[index - 2] == 'nightBefore' &&
+          this.state.deliveryType[index - 3] == 'pairing' &&
+          this.state.deliveryType[index - 4] == 'nightBefore'
+        ) {
+          console.log(moment(this.renderStartDays()[0])
+            .add(index, 'd')
+            .format('ddd'));
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${index}`}
+              name={`delivery_${index}`}
+              style={{ flexDirection: 'row' }}
+              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+              value={this.state.deliveryType[index]}
+            >
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
 
-           <FormControlLabel
-              value="nightBefore"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("D")} - Free`}
-            />
-            
-            <FormControlLabel
-              value={"dayOf"}
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("DD")} - $2.50`}
-            />
-      
-          </RadioGroup>;
-    
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
         }
-        
-        if (this.state.deliveryType[index - 1] == "pairing" && this.state.deliveryType[index - 2] == "pairing"){
-          
-                radioGroup = <RadioGroup
-            aria-label={`delivery_${index}`}
-            name={`delivery_${index}`}
-            style={{ flexDirection: "row" }}
-            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-            value={this.state.deliveryType[index]}
-          >
-            <FormControlLabel
-              value="nightBefore"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("D")} - Free`}
-            />
 
-            <FormControlLabel
-              value={"dayOf"}
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("DD")} - $2.50`}
-            />
-      
-          </RadioGroup>;
+        if (this.state.deliveryType[previousIndex] == 'nightBeforePaired') {
+          console.log(moment(this.renderStartDays()[0])
+            .add(index, 'd')
+            .format('ddd'));
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${index}`}
+              name={`delivery_${index}`}
+              style={{ flexDirection: 'row' }}
+              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+              value={this.state.deliveryType[index]}
+            >
+              <FormControlLabel
+                value="pairing"
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(previousIndex - 1, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(previousIndex - 1, 'd')
+                  .format('D')} - Free`}
+              />
+
+            </RadioGroup>
+          );
+        }
 
 
-        }//last else if
+        if (
+          this.state.deliveryType[index - 2] != 'pairing' &&
+          this.state.deliveryType[previousIndex] == 'pairing'
+        ) {
+          console.log(moment(this.renderStartDays()[0])
+            .add(index, 'd')
+            .format('ddd'));
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${index}`}
+              name={`delivery_${index}`}
+              style={{ flexDirection: 'row' }}
+              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+              value={this.state.deliveryType[index]}
+            >
+              <FormControlLabel
+                value="pairing"
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(index + previousIndex, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(index + previousIndex, 'd')
+                  .format('D')} - Free`}
+              />
 
-         
-        if((this.state.deliveryType[index - 1] == "nightBefore" 
-        && this.state.deliveryType[index - 2] == "pairing" ) || (this.state.deliveryType[index - 1] == "nightBefore" && this.state.deliveryType[index - 2] == "" )){
-            radioGroup = <RadioGroup 
-            aria-label={`delivery_${index}`}
-            name={`delivery_${index}`}
-            style={{ flexDirection: "row" }}
-            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-            value={this.state.deliveryType[index]}
-          >
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
 
-           <FormControlLabel
-              value="pairing"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(index, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(index, "d")
-              .format("D")} - Free`}
-            />
-
-           <FormControlLabel
-              value="nightBefore"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("D")} - Free`}
-            />
-            
-            <FormControlLabel
-              value={"dayOf"}
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("DD")} - $2.50`}
-            />
-      
-          </RadioGroup>;
-    
-        } 
-
-              if(this.state.deliveryType[index - 1] == "nightBefore" 
-        && this.state.deliveryType[index - 2] == "pairing" && this.state.deliveryType[index - 3] == "pairing"){
-            radioGroup = <RadioGroup 
-            aria-label={`delivery_${index}`}
-            name={`delivery_${index}`}
-            style={{ flexDirection: "row" }}
-            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-            value={this.state.deliveryType[index]}
-          >
-           <FormControlLabel
-              value="nightBefore"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("D")} - Free`}
-            />
-            
-            <FormControlLabel
-              value={"dayOf"}
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("DD")} - $2.50`}
-            />
-      
-          </RadioGroup>;
-    
-        } 
-
-              if(this.state.deliveryType[index - 1] == "pairing" 
-        && this.state.deliveryType[index - 2] == "nightBefore" 
-        && this.state.deliveryType[index - 3] == "pairing"
-        && this.state.deliveryType[index - 4] == "nightBefore"){
-            radioGroup = <RadioGroup 
-            aria-label={`delivery_${index}`}
-            name={`delivery_${index}`}
-            style={{ flexDirection: "row" }}
-            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-            value={this.state.deliveryType[index]}
-          >
-           <FormControlLabel
-              value="nightBefore"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .subtract(1, "d")
-              .format("D")} - Free`}
-            />
-            
-            <FormControlLabel
-              value={"dayOf"}
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("ddd")} ${moment(this.renderStartDays()[0])
-              .add(index, "d")
-              .format("DD")} - $2.50`}
-            />
-      
-          </RadioGroup>;
-    
-        } 
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Delivered ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('ddd')} ${moment(this.renderStartDays()[0])
+                  .add(index, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
       } // index >= 1 && index <= 4
-    } //1 or more than 1 meal in this day currentMealSum
+    } // more than 1 meal in this day currentMealSum
+    else if (currentMealSum == 1) {
+      console.log(moment(this.renderStartDays()[0])
+        .add(index, 'd')
+        .format('ddd'));
+      // if(this.state.deliveryType[previousIndex] == 'nightBeforePaired'){
 
-    return(
+      //   radioGroup = (
+      //     <RadioGroup
+      //       aria-label={`delivery_${index}`}
+      //       name={`delivery_${index}`}
+      //       style={{ flexDirection: "row" }}
+      //       onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+      //       value={this.state.deliveryType[index]}
+      //     >
+      //       <FormControlLabel
+      //         value="pairing"
+      //         control={<Radio />}
+      //         label={`Delivered ${moment(this.renderStartDays()[0])
+      //           .add(previousIndex - 1, "d")
+      //           .format("ddd")} ${moment(this.renderStartDays()[0])
+      //           .add(previousIndex - 1, "d")
+      //           .format("D")} - Free`}
+      //       />
+
+      //     </RadioGroup>
+      //   );
+
+      // }
+
+      if (this.state.deliveryType[previousIndex] == 'nightBefore') {
+        console.log(moment(this.renderStartDays()[0])
+          .add(index, 'd')
+          .format('ddd'));
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${index}`}
+            name={`delivery_${index}`}
+            style={{ flexDirection: 'row' }}
+            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+            value={this.state.deliveryType[index]}
+          >
+            <FormControlLabel
+              value="pairing"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+                .add(previousIndex - 1, 'd')
+                .format('ddd')} ${moment(this.renderStartDays()[0])
+                .add(previousIndex - 1, 'd')
+                .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+                .add(index, 'd')
+                .subtract(1, 'd')
+                .format('ddd')} ${moment(this.renderStartDays()[0])
+                .add(index, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Delivered ${moment(this.renderStartDays()[0])
+                .add(index, 'd')
+                .format('ddd')} ${moment(this.renderStartDays()[0])
+                .add(index, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+      }
+    }
+
+    return (
       <div>
         <Typography type="subheading" className="font-uppercase font-medium">
           {moment(this.renderStartDays()[0])
-            .add(index, "d")
-            .format("ddd")}
+            .add(index, 'd')
+            .format('ddd')}
         </Typography>
 
         <Typography type="subheading" className="font-uppercase font-medium">
           {moment(this.renderStartDays()[0])
-            .add(index, "d")
-            .format("DD")}
-        </Typography>         
-  
-        <FormControl
-          component="fieldset"
-          disabled={currentMealSum == 0}
-        > 
-          {currentMealSum == 0 ? <Typography type="subheading" className="font-medium">N/A</Typography> : ''}
+            .add(index, 'd')
+            .format('DD')}
+        </Typography>
+
+        <FormControl component="fieldset" disabled={currentMealSum == 0}>
+          {currentMealSum == 0 ? (
+            <Typography type="subheading" className="font-medium">
+              N/A
+            </Typography>
+          ) : (
+            ''
+          )}
 
           {currentMealSum >= 1 ? radioGroup : ''}
         </FormControl>
 
-        <Divider style={{ marginBottom: "25px" }} />
+        <Divider style={{ marginBottom: '25px' }} />
       </div>
-    )
-
+    );
   }
 
   handleChangeRadioLifestyleSecondary(i, event, value) {
     this.state.secondaryProfilesData[i].lifestyle = value;
 
     const getLifestyleRestrictions = this.props.lifestyles.find(
-      el => el.title === value
+      el => el.title === value,
     );
 
     const currentRestrictionsIds = this.state.secondaryProfilesData[i]
@@ -1014,13 +1207,13 @@ class Step3LifestyleProfile extends React.Component {
 
   handleChangeRadioRestriction(event, value) {
     this.setState({
-      addRestrictionType: value
+      addRestrictionType: value,
     });
   }
 
   handleChangeRadioExtra(event, value) {
     this.setState({
-      extra: value
+      extra: value,
     });
   }
 
@@ -1031,7 +1224,7 @@ class Step3LifestyleProfile extends React.Component {
 
   handleChangeRadioDiscount(event, value) {
     this.setState({
-      discount: value
+      discount: value,
     });
   }
 
@@ -1052,7 +1245,7 @@ class Step3LifestyleProfile extends React.Component {
     }
 
     this.setState({
-      restrictions: clonedRestrictionIds
+      restrictions: clonedRestrictionIds,
     });
   }
 
@@ -1075,7 +1268,7 @@ class Step3LifestyleProfile extends React.Component {
 
   onChange(event, { newValue }) {
     this.setState({
-      value: newValue
+      value: newValue,
     });
   }
 
@@ -1086,9 +1279,9 @@ class Step3LifestyleProfile extends React.Component {
     return inputLength === 0
       ? []
       : this.props.potentialSubIngredients.filter(
-          ingredient =>
-            ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        ingredient =>
+          ingredient.title.toLowerCase().slice(0, inputLength) === inputValue,
+      );
   }
 
   getSuggestionValue(suggestion) {
@@ -1114,11 +1307,11 @@ class Step3LifestyleProfile extends React.Component {
   }
   onSuggestionSelected(
     event,
-    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
     let clonedSubIngredients;
 
-    if (this.state.addRestrictionType == "Preference") {
+    if (this.state.addRestrictionType == 'Preference') {
       clonedSubIngredients = this.state.subIngredients
         ? this.state.subIngredients.slice()
         : [];
@@ -1132,7 +1325,7 @@ class Step3LifestyleProfile extends React.Component {
 
     if (clonedSubIngredients.length > 0) {
       isThere = clonedSubIngredients.filter(
-        present => suggestion._id === present._id
+        present => suggestion._id === present._id,
       );
     }
 
@@ -1142,16 +1335,16 @@ class Step3LifestyleProfile extends React.Component {
 
     clonedSubIngredients.push({
       _id: suggestion._id,
-      title: suggestion.title
+      title: suggestion.title,
     });
 
-    if (this.state.addRestrictionType == "Preference") {
+    if (this.state.addRestrictionType == 'Preference') {
       this.setState({
-        subIngredients: clonedSubIngredients
+        subIngredients: clonedSubIngredients,
       });
     } else {
       this.setState({
-        specificRestrictions: clonedSubIngredients
+        specificRestrictions: clonedSubIngredients,
       });
     }
 
@@ -1161,19 +1354,19 @@ class Step3LifestyleProfile extends React.Component {
   onSuggestionSelectedSecondary(
     index,
     event,
-    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
     let clonedSubIngredients;
 
     console.log(index);
 
-    if (this.state.addRestrictionType == "Preference") {
+    if (this.state.addRestrictionType == 'Preference') {
       // subingredients
       let isThere = false;
 
       if (this.state.secondaryProfilesData[index].subIngredients.length > 0) {
         isThere = this.state.secondaryProfilesData[index].subIngredients.filter(
-          present => suggestion._id === present._id
+          present => suggestion._id === present._id,
         );
       }
 
@@ -1183,7 +1376,7 @@ class Step3LifestyleProfile extends React.Component {
 
       this.state.secondaryProfilesData[index].subIngredients.push({
         _id: suggestion._id,
-        title: suggestion.title
+        title: suggestion.title,
       });
     } else {
       // specificRestrictions
@@ -1196,7 +1389,7 @@ class Step3LifestyleProfile extends React.Component {
         isThere = this.state.secondaryProfilesData[
           index
         ].specificRestrictions.filter(
-          present => suggestion._id === present._id
+          present => suggestion._id === present._id,
         );
       }
 
@@ -1206,7 +1399,7 @@ class Step3LifestyleProfile extends React.Component {
 
       this.state.secondaryProfilesData[index].specificRestrictions.push({
         _id: suggestion._id,
-        title: suggestion.title
+        title: suggestion.title,
       });
     }
 
@@ -1217,13 +1410,13 @@ class Step3LifestyleProfile extends React.Component {
 
   onSuggestionsFetchRequested({ value }) {
     this.setState({
-      suggestions: this.getSuggestions(value)
+      suggestions: this.getSuggestions(value),
     });
   }
 
   onSuggestionsClearRequested() {
     this.setState({
-      suggestions: []
+      suggestions: [],
     });
   }
 
@@ -1235,7 +1428,7 @@ class Step3LifestyleProfile extends React.Component {
     stateCopy.splice(stateCopy.indexOf(subIngredient), 1);
 
     this.setState({
-      subIngredients: stateCopy
+      subIngredients: stateCopy,
     });
   }
 
@@ -1247,7 +1440,7 @@ class Step3LifestyleProfile extends React.Component {
     stateCopy.splice(stateCopy.indexOf(subIngredient), 1);
 
     this.setState({
-      specificRestrictions: stateCopy
+      specificRestrictions: stateCopy,
     });
   }
 
@@ -1270,7 +1463,7 @@ class Step3LifestyleProfile extends React.Component {
 
     if (this.props.potentialSubIngredients) {
       const avatarToReturn = this.props.potentialSubIngredients.find(
-        el => el._id === subIngredient
+        el => el._id === subIngredient,
       );
       return avatarToReturn.title.charAt(0);
     }
@@ -1283,12 +1476,12 @@ class Step3LifestyleProfile extends React.Component {
       <TextField
         className={styles.textField}
         value={value}
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         InputProps={{
           classes: {
-            input: styles.input
+            input: styles.input,
           },
-          ...other
+          ...other,
         }}
       />
     );
@@ -1296,8 +1489,10 @@ class Step3LifestyleProfile extends React.Component {
 
   render() {
     const buttonClassname = classNames({
-      [this.props.classes.buttonSuccess]: this.state.submitSuccess
+      [this.props.classes.buttonSuccess]: this.state.submitSuccess,
     });
+
+    this.checkPairings();
 
     return (
       <form
@@ -1308,12 +1503,12 @@ class Step3LifestyleProfile extends React.Component {
         <Grid
           container
           justify="center"
-          style={{ marginBottom: "50px", marginTop: "25px" }}
+          style={{ marginBottom: '50px', marginTop: '25px' }}
         >
           <Grid item xs={12}>
             <Paper elevation={2} className="paper-for-fields">
               <ListItem
-                style={{ marginBottom: "25px" }}
+                style={{ marginBottom: '25px' }}
                 button
                 onClick={this.handleProfileOpen.bind(this, true, false)}
               >
@@ -1334,7 +1529,7 @@ class Step3LifestyleProfile extends React.Component {
                         name="lifestyle"
                         value={this.state.lifestyle}
                         onChange={this.handleChangeRadioLifestyle.bind(this)}
-                        style={{ flexDirection: "row" }}
+                        style={{ flexDirection: 'row' }}
                       >
                         {this.props.lifestyles.map((e, i) => (
                           <FormControlLabel
@@ -1359,7 +1554,7 @@ class Step3LifestyleProfile extends React.Component {
                         name="extra"
                         value={this.state.extra}
                         onChange={this.handleChangeRadioExtra.bind(this)}
-                        style={{ flexDirection: "row" }}
+                        style={{ flexDirection: 'row' }}
                       >
                         <FormControlLabel
                           value="none"
@@ -1371,7 +1566,7 @@ class Step3LifestyleProfile extends React.Component {
                               element =>
                                 element.title == this.state.lifestyle &&
                                 !element.extraAthletic &&
-                                !element.extraBodybuilder
+                                !element.extraBodybuilder,
                             )
                           }
                         />
@@ -1384,7 +1579,7 @@ class Step3LifestyleProfile extends React.Component {
                             this.props.lifestyles.find(
                               element =>
                                 element.title == this.state.lifestyle &&
-                                !element.extraAthletic
+                                !element.extraAthletic,
                             )
                           }
                         />
@@ -1397,7 +1592,7 @@ class Step3LifestyleProfile extends React.Component {
                             this.props.lifestyles.find(
                               element =>
                                 element.title == this.state.lifestyle &&
-                                !element.extraBodybuilder
+                                !element.extraBodybuilder,
                             )
                           }
                         />
@@ -1415,7 +1610,7 @@ class Step3LifestyleProfile extends React.Component {
                         name="discount"
                         value={this.state.discount}
                         onChange={this.handleChangeRadioDiscount.bind(this)}
-                        style={{ flexDirection: "row" }}
+                        style={{ flexDirection: 'row' }}
                       >
                         <FormControlLabel
                           value="none"
@@ -1428,7 +1623,7 @@ class Step3LifestyleProfile extends React.Component {
                               element =>
                                 element.title == this.state.lifestyle &&
                                 !element.discountStudent &&
-                                !element.discountSenior
+                                !element.discountSenior,
                             )
                           }
                         />
@@ -1441,7 +1636,7 @@ class Step3LifestyleProfile extends React.Component {
                             this.props.lifestyles.find(
                               element =>
                                 element.title == this.state.lifestyle &&
-                                !element.discountStudent
+                                !element.discountStudent,
                             )
                           }
                         />
@@ -1454,7 +1649,7 @@ class Step3LifestyleProfile extends React.Component {
                             this.props.lifestyles.find(
                               element =>
                                 element.title == this.state.lifestyle &&
-                                !element.discountSenior
+                                !element.discountSenior,
                             )
                           }
                         />
@@ -1464,7 +1659,7 @@ class Step3LifestyleProfile extends React.Component {
                 </Grid>
 
                 <Grid container>
-                  <Grid item xs={12} style={{ marginTop: "25px" }}>
+                  <Grid item xs={12} style={{ marginTop: '25px' }}>
                     <Typography type="subheading">Restrictions</Typography>
                   </Grid>
                   <Grid item xs={4}>
@@ -1472,7 +1667,7 @@ class Step3LifestyleProfile extends React.Component {
                       <FormLabel component="legend">Allergies</FormLabel>
                       <FormGroup>
                         {this.props.restrictions
-                          .filter(e => e.restrictionType === "allergy")
+                          .filter(e => e.restrictionType === 'allergy')
                           .map((e, i) => {
                             const isSelected = this.state.restrictions.length
                               ? this.state.restrictions.indexOf(e._id) != -1
@@ -1481,8 +1676,8 @@ class Step3LifestyleProfile extends React.Component {
                             const isAlreadyChecked = this.state
                               .lifestyleRestrictions
                               ? this.state.lifestyleRestrictions.indexOf(
-                                  e._id
-                                ) != -1
+                                e._id,
+                              ) != -1
                               : false;
                             return (
                               <FormControlLabel
@@ -1493,7 +1688,7 @@ class Step3LifestyleProfile extends React.Component {
                                     checked={isSelected || isAlreadyChecked}
                                     onChange={this.handleChange.bind(
                                       this,
-                                      e._id
+                                      e._id,
                                     )}
                                     value={e.title.toLowerCase()}
                                   />
@@ -1510,7 +1705,7 @@ class Step3LifestyleProfile extends React.Component {
                       <FormLabel component="legend">Dietary</FormLabel>
                       <FormGroup>
                         {this.props.restrictions
-                          .filter(e => e.restrictionType === "dietary")
+                          .filter(e => e.restrictionType === 'dietary')
                           .map((e, i) => {
                             const isSelected = this.state.restrictions.length
                               ? this.state.restrictions.indexOf(e._id) != -1
@@ -1519,8 +1714,8 @@ class Step3LifestyleProfile extends React.Component {
                             const isAlreadyChecked = this.state
                               .lifestyleRestrictions
                               ? this.state.lifestyleRestrictions.indexOf(
-                                  e._id
-                                ) != -1
+                                e._id,
+                              ) != -1
                               : false;
                             return (
                               <FormControlLabel
@@ -1531,7 +1726,7 @@ class Step3LifestyleProfile extends React.Component {
                                     checked={isSelected || isAlreadyChecked}
                                     onChange={this.handleChange.bind(
                                       this,
-                                      e._id
+                                      e._id,
                                     )}
                                     value={e.title.toLowerCase()}
                                   />
@@ -1548,7 +1743,7 @@ class Step3LifestyleProfile extends React.Component {
                       <FormLabel component="legend">Religious</FormLabel>
                       <FormGroup>
                         {this.props.restrictions
-                          .filter(e => e.restrictionType === "religious")
+                          .filter(e => e.restrictionType === 'religious')
                           .map((e, i) => {
                             const isSelected = this.state.restrictions.length
                               ? this.state.restrictions.indexOf(e._id) != -1
@@ -1557,8 +1752,8 @@ class Step3LifestyleProfile extends React.Component {
                             const isAlreadyChecked = this.state
                               .lifestyleRestrictions
                               ? this.state.lifestyleRestrictions.indexOf(
-                                  e._id
-                                ) != -1
+                                e._id,
+                              ) != -1
                               : false;
                             return (
                               <FormControlLabel
@@ -1569,7 +1764,7 @@ class Step3LifestyleProfile extends React.Component {
                                     checked={isSelected || isAlreadyChecked}
                                     onChange={this.handleChange.bind(
                                       this,
-                                      e._id
+                                      e._id,
                                     )}
                                     value={e.title.toLowerCase()}
                                   />
@@ -1585,7 +1780,7 @@ class Step3LifestyleProfile extends React.Component {
                 <Grid container>
                   <Grid item xs={12}>
                     <Button
-                      style={{ float: "right" }}
+                      style={{ float: 'right' }}
                       color="primary"
                       onClick={this.deleteDialogHandleOpen.bind(this)}
                     >
@@ -1596,14 +1791,14 @@ class Step3LifestyleProfile extends React.Component {
                 <Dialog
                   open={this.state.deleteDialogOpen}
                   onRequestClose={this.deleteDialogHandleRequestClose.bind(
-                    this
+                    this,
                   )}
                 >
                   <Typography
                     style={{
-                      flex: "0 0 auto",
-                      margin: "0",
-                      padding: "24px 24px 20px 24px"
+                      flex: '0 0 auto',
+                      margin: '0',
+                      padding: '24px 24px 20px 24px',
                     }}
                     className="title font-medium"
                     type="title"
@@ -1621,7 +1816,7 @@ class Step3LifestyleProfile extends React.Component {
                         name="restritionOrPref"
                         value={this.state.addRestrictionType}
                         onChange={this.handleChangeRadioRestriction.bind(this)}
-                        style={{ flexDirection: "row" }}
+                        style={{ flexDirection: 'row' }}
                       >
                         <FormControlLabel
                           value="Restriction"
@@ -1643,61 +1838,61 @@ class Step3LifestyleProfile extends React.Component {
                       theme={{
                         container: {
                           flexGrow: 1,
-                          position: "relative",
-                          marginBottom: "2em"
+                          position: 'relative',
+                          marginBottom: '2em',
                         },
                         suggestionsContainerOpen: {
-                          position: "absolute",
+                          position: 'absolute',
                           left: 0,
-                          right: 0
+                          right: 0,
                         },
                         suggestion: {
-                          display: "block"
+                          display: 'block',
                         },
                         suggestionsList: {
                           margin: 0,
                           padding: 0,
-                          listStyleType: "none"
-                        }
+                          listStyleType: 'none',
+                        },
                       }}
                       renderInputComponent={this.renderInput.bind(this)}
                       suggestions={this.state.suggestions}
                       onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                        this
+                        this,
                       )}
                       onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                        this
+                        this,
                       )}
                       onSuggestionSelected={this.onSuggestionSelected.bind(
-                        this
+                        this,
                       )}
                       getSuggestionValue={this.getSuggestionValue.bind(this)}
                       renderSuggestion={this.renderSuggestion.bind(this)}
                       renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                        this
+                        this,
                       )}
                       fullWidth
                       focusInputOnSuggestionClick={false}
                       inputProps={{
-                        placeholder: "Search",
+                        placeholder: 'Search',
                         value: this.state.value,
                         onChange: this.onChange.bind(this),
-                        className: "autoinput"
+                        className: 'autoinput',
                       }}
                     />
                   </DialogContent>
                 </Dialog>
 
                 <Grid container>
-                  <Grid item xs={12} style={{ marginTop: "25px" }}>
+                  <Grid item xs={12} style={{ marginTop: '25px' }}>
                     <Typography type="subheading">Preferences</Typography>
                   </Grid>
-                  <Grid item xs={12} style={{ marginTop: "25px" }}>
+                  <Grid item xs={12} style={{ marginTop: '25px' }}>
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        flexWrap: "wrap"
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
                       }}
                     >
                       {this.state.subIngredients.length ? (
@@ -1705,21 +1900,21 @@ class Step3LifestyleProfile extends React.Component {
                           <Chip
                             avatar={
                               <Avatar>
-                                {" "}
+                                {' '}
                                 {this.getSubIngredientAvatar(
-                                  subIngredient
-                                )}{" "}
+                                  subIngredient,
+                                )}{' '}
                               </Avatar>
                             }
                             style={{
-                              marginRight: "8px",
-                              marginBottom: "8px"
+                              marginRight: '8px',
+                              marginBottom: '8px',
                             }}
                             label={this.getSubIngredientTitle(subIngredient)}
                             key={i}
                             onRequestDelete={this.handleSubIngredientChipDelete.bind(
                               this,
-                              subIngredient
+                              subIngredient,
                             )}
                           />
                         ))
@@ -1728,15 +1923,15 @@ class Step3LifestyleProfile extends React.Component {
                       )}
                     </div>
                   </Grid>
-                  <Grid item xs={12} style={{ marginTop: "25px" }}>
+                  <Grid item xs={12} style={{ marginTop: '25px' }}>
                     <Typography type="subheading">Restrictions</Typography>
                   </Grid>
-                  <Grid item xs={12} style={{ marginTop: "25px" }}>
+                  <Grid item xs={12} style={{ marginTop: '25px' }}>
                     <div
                       style={{
-                        display: "flex",
-                        alignItems: "center",
-                        flexWrap: "wrap"
+                        display: 'flex',
+                        alignItems: 'center',
+                        flexWrap: 'wrap',
                       }}
                     >
                       {this.state.specificRestrictions.length ? (
@@ -1745,24 +1940,24 @@ class Step3LifestyleProfile extends React.Component {
                             <Chip
                               avatar={
                                 <Avatar>
-                                  {" "}
+                                  {' '}
                                   {this.getSubIngredientAvatar(
-                                    subIngredient
-                                  )}{" "}
+                                    subIngredient,
+                                  )}{' '}
                                 </Avatar>
                               }
                               style={{
-                                marginRight: "8px",
-                                marginBottom: "8px"
+                                marginRight: '8px',
+                                marginBottom: '8px',
                               }}
                               label={this.getSubIngredientTitle(subIngredient)}
                               key={i}
                               onRequestDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
                                 this,
-                                subIngredient
+                                subIngredient,
                               )}
                             />
-                          )
+                          ),
                         )
                       ) : (
                         <Chip className="chip--bordered" label="Ingredient" />
@@ -1771,7 +1966,7 @@ class Step3LifestyleProfile extends React.Component {
                   </Grid>
                 </Grid>
 
-                <Grid container style={{ marginTop: "50px" }}>
+                <Grid container style={{ marginTop: '50px' }}>
                   <Grid item xs={12}>
                     <Typography className="font-uppercase" type="subheading">
                       Schedule
@@ -1785,26 +1980,26 @@ class Step3LifestyleProfile extends React.Component {
                         name="scheduleType"
                         value={this.state.scheduleType}
                         onChange={this.handleChangeRadioscheduleType.bind(this)}
-                        style={{ flexDirection: "row" }}
+                        style={{ flexDirection: 'row' }}
                       >
                         <FormControlLabel
-                          value={"weekdays"}
+                          value={'weekdays'}
                           control={<Radio />}
-                          label={"Weekdays"}
+                          label={'Weekdays'}
                           selected
                         />
 
                         <FormControlLabel
-                          value={"weekends"}
+                          value={'weekends'}
                           control={<Radio />}
-                          label={"Weekends"}
+                          label={'Weekends'}
                           selected
                         />
 
                         <FormControlLabel
-                          value={"custom"}
+                          value={'custom'}
                           control={<Radio />}
-                          label={"Custom"}
+                          label={'Custom'}
                           selected
                         />
                       </RadioGroup>
@@ -1812,13 +2007,13 @@ class Step3LifestyleProfile extends React.Component {
                   </Grid>
                 </Grid>
 
-                <Grid container style={{ marginTop: "20px" }}>
+                <Grid container style={{ marginTop: '20px' }}>
                   <Table className="table-lifestyles">
                     <TableHead>
                       <TableRow>
                         <TableCell />
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <Typography
                             type="subheading"
                             className="font-medium font-uppercase"
@@ -1827,7 +2022,7 @@ class Step3LifestyleProfile extends React.Component {
                           </Typography>
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <Typography
                             type="subheading"
                             className="font-medium font-uppercase"
@@ -1836,7 +2031,7 @@ class Step3LifestyleProfile extends React.Component {
                           </Typography>
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <Typography
                             type="subheading"
                             className="font-medium font-uppercase"
@@ -1849,110 +2044,110 @@ class Step3LifestyleProfile extends React.Component {
                     <TableBody>
                       {this.state.schedule.map((e, i) => {
                         const days = [
-                          "Monday",
-                          "Tuesday",
-                          "Wednesday",
-                          "Thursday",
-                          "Friday",
-                          "Saturday",
-                          "Sunday"
+                          'Monday',
+                          'Tuesday',
+                          'Wednesday',
+                          'Thursday',
+                          'Friday',
+                          'Saturday',
+                          'Sunday',
                         ];
                         return (
                           <TableRow key={i}>
                             <TableCell>
                               <Typography
                                 type="subheading"
-                                style={{ marginTop: "10px" }}
+                                style={{ marginTop: '10px' }}
                               >
                                 {days[i]}
                               </Typography>
                             </TableCell>
 
-                            <TableCell style={{ textAlign: "center" }}>
+                            <TableCell style={{ textAlign: 'center' }}>
                               <TextField
                                 fullWidth
                                 margin="normal"
                                 style={{
-                                  fontSize: "1rem",
-                                  maxWidth: "100px",
-                                  minWidth: "100px"
+                                  fontSize: '1rem',
+                                  maxWidth: '100px',
+                                  minWidth: '100px',
                                 }}
                                 value={this.state.schedule[i].breakfast}
-                                onChange={event => {
+                                onChange={(event) => {
                                   const currentSchedule = this.state.schedule.slice();
 
                                   currentSchedule[i].breakfast =
                                     event.target.value;
 
                                   this.setState({
-                                    schedule: currentSchedule
+                                    schedule: currentSchedule,
                                   });
 
                                   this.handleSubscriptionScheduleChange();
                                 }}
                                 inputProps={{
-                                  type: "number",
-                                  min: "0",
-                                  max: "3"
+                                  type: 'number',
+                                  min: '0',
+                                  max: '3',
                                 }}
                                 name={`breakfast_${i}`}
                               />
                             </TableCell>
 
-                            <TableCell style={{ textAlign: "center" }}>
+                            <TableCell style={{ textAlign: 'center' }}>
                               <TextField
                                 fullWidth
                                 margin="normal"
                                 style={{
-                                  fontSize: "1rem",
-                                  maxWidth: "100px",
-                                  minWidth: "100px"
+                                  fontSize: '1rem',
+                                  maxWidth: '100px',
+                                  minWidth: '100px',
                                 }}
-                                onChange={event => {
+                                onChange={(event) => {
                                   const currentSchedule = this.state.schedule.slice();
 
                                   currentSchedule[i].lunch = event.target.value;
 
                                   this.setState({
-                                    schedule: currentSchedule
+                                    schedule: currentSchedule,
                                   });
                                   this.handleSubscriptionScheduleChange();
                                 }}
                                 value={this.state.schedule[i].lunch}
                                 inputProps={{
-                                  type: "number",
-                                  min: "0",
-                                  max: "3"
+                                  type: 'number',
+                                  min: '0',
+                                  max: '3',
                                 }}
                                 name={`lunch_${i}`}
                               />
                             </TableCell>
 
-                            <TableCell style={{ textAlign: "center" }}>
+                            <TableCell style={{ textAlign: 'center' }}>
                               <TextField
                                 fullWidth
                                 margin="normal"
                                 style={{
-                                  fontSize: "1rem",
-                                  maxWidth: "100px",
-                                  minWidth: "100px"
+                                  fontSize: '1rem',
+                                  maxWidth: '100px',
+                                  minWidth: '100px',
                                 }}
-                                onChange={event => {
+                                onChange={(event) => {
                                   const currentSchedule = this.state.schedule.slice();
 
                                   currentSchedule[i].dinner =
                                     event.target.value;
 
                                   this.setState({
-                                    schedule: currentSchedule
+                                    schedule: currentSchedule,
                                   });
                                   this.handleSubscriptionScheduleChange();
                                 }}
                                 value={this.state.schedule[i].dinner}
                                 inputProps={{
-                                  type: "number",
-                                  min: "0",
-                                  max: "3"
+                                  type: 'number',
+                                  min: '0',
+                                  max: '3',
                                 }}
                                 name={`dinner_${i}`}
                               />
@@ -1968,12 +2163,12 @@ class Step3LifestyleProfile extends React.Component {
               {this.state.secondaryProfilesData.map((e, profileIndex) => (
                 <div key={profileIndex}>
                   <ListItem
-                    style={{ marginTop: "15px", marginBottom: "15px" }}
+                    style={{ marginTop: '15px', marginBottom: '15px' }}
                     button
                     onClick={this.handleProfileOpen.bind(
                       this,
                       false,
-                      profileIndex
+                      profileIndex,
                     )}
                   >
                     <ListItemText
@@ -1981,9 +2176,9 @@ class Step3LifestyleProfile extends React.Component {
                         this.state.secondaryProfilesData[profileIndex]
                           .first_name
                           ? `${
-                              this.state.secondaryProfilesData[profileIndex]
-                                .first_name
-                            }'s Profile`
+                            this.state.secondaryProfilesData[profileIndex]
+                              .first_name
+                          }'s Profile`
                           : `Profile ${profileIndex + 2}`
                       }
                     />
@@ -1998,7 +2193,7 @@ class Step3LifestyleProfile extends React.Component {
                     transitionDuration="auto"
                     component="div"
                   >
-                    <div style={{ paddingLeft: "16px", paddingRight: "16px" }}>
+                    <div style={{ paddingLeft: '16px', paddingRight: '16px' }}>
                       <Grid container>
                         <Grid item xs={12} sm={6}>
                           <TextField
@@ -2009,7 +2204,7 @@ class Step3LifestyleProfile extends React.Component {
                             fullWidth
                             defaultValue={this.props.customerInfo.firstName}
                             inputProps={{}}
-                            onChange={event => {
+                            onChange={(event) => {
                               this.state.secondaryProfilesData[
                                 profileIndex
                               ].first_name =
@@ -2043,9 +2238,9 @@ class Step3LifestyleProfile extends React.Component {
                               }
                               onChange={this.handleChangeRadioLifestyleSecondary.bind(
                                 this,
-                                profileIndex
+                                profileIndex,
                               )}
-                              style={{ flexDirection: "row" }}
+                              style={{ flexDirection: 'row' }}
                             >
                               {this.props.lifestyles.map(e => (
                                 <FormControlLabel
@@ -2073,9 +2268,9 @@ class Step3LifestyleProfile extends React.Component {
                               }
                               onChange={this.handleChangeRadioExtraSecondary.bind(
                                 this,
-                                profileIndex
+                                profileIndex,
                               )}
-                              style={{ flexDirection: "row" }}
+                              style={{ flexDirection: 'row' }}
                             >
                               <FormControlLabel
                                 value="none"
@@ -2092,7 +2287,7 @@ class Step3LifestyleProfile extends React.Component {
                                           profileIndex
                                         ].lifestyle &&
                                       !element.extraAthletic &&
-                                      !element.extraBodybuilder
+                                      !element.extraBodybuilder,
                                   )
                                 }
                               />
@@ -2108,7 +2303,7 @@ class Step3LifestyleProfile extends React.Component {
                                       element.title ==
                                         this.state.secondaryProfilesData[
                                           profileIndex
-                                        ].lifestyle && !element.extraAthletic
+                                        ].lifestyle && !element.extraAthletic,
                                   )
                                 }
                               />
@@ -2124,7 +2319,7 @@ class Step3LifestyleProfile extends React.Component {
                                       element.title ==
                                         this.state.secondaryProfilesData[
                                           profileIndex
-                                        ].lifestyle && !element.extraBodybuilder
+                                        ].lifestyle && !element.extraBodybuilder,
                                   )
                                 }
                               />
@@ -2146,9 +2341,9 @@ class Step3LifestyleProfile extends React.Component {
                               }
                               onChange={this.handleChangeRadioDiscountSecondary.bind(
                                 this,
-                                profileIndex
+                                profileIndex,
                               )}
-                              style={{ flexDirection: "row" }}
+                              style={{ flexDirection: 'row' }}
                             >
                               <FormControlLabel
                                 value="none"
@@ -2165,7 +2360,7 @@ class Step3LifestyleProfile extends React.Component {
                                           profileIndex
                                         ].lifestyle &&
                                       !element.discountStudent &&
-                                      !element.discountSenior
+                                      !element.discountSenior,
                                   )
                                 }
                               />
@@ -2181,7 +2376,7 @@ class Step3LifestyleProfile extends React.Component {
                                       element.title ==
                                         this.state.secondaryProfilesData[
                                           profileIndex
-                                        ].lifestyle && !element.discountStudent
+                                        ].lifestyle && !element.discountStudent,
                                   )
                                 }
                               />
@@ -2197,7 +2392,7 @@ class Step3LifestyleProfile extends React.Component {
                                       element.title ==
                                         this.state.secondaryProfilesData[
                                           profileIndex
-                                        ].lifestyle && !element.discountSenior
+                                        ].lifestyle && !element.discountSenior,
                                   )
                                 }
                               />
@@ -2207,7 +2402,7 @@ class Step3LifestyleProfile extends React.Component {
                       </Grid>
 
                       <Grid container>
-                        <Grid item xs={12} style={{ marginTop: "25px" }}>
+                        <Grid item xs={12} style={{ marginTop: '25px' }}>
                           <Typography type="subheading">
                             Restrictions
                           </Typography>
@@ -2217,22 +2412,22 @@ class Step3LifestyleProfile extends React.Component {
                             <FormLabel component="legend">Allergies</FormLabel>
                             <FormGroup>
                               {this.props.restrictions
-                                .filter(e => e.restrictionType === "allergy")
+                                .filter(e => e.restrictionType === 'allergy')
                                 .map((e, i) => {
                                   const isSelected = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .restrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].restrictions.indexOf(e._id) != -1
+                                      profileIndex
+                                    ].restrictions.indexOf(e._id) != -1
                                     : false;
 
                                   const isAlreadyChecked = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .lifestyleRestrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].lifestyleRestrictions.indexOf(e._id) !=
+                                      profileIndex
+                                    ].lifestyleRestrictions.indexOf(e._id) !=
                                       -1
                                     : false;
                                   return (
@@ -2247,7 +2442,7 @@ class Step3LifestyleProfile extends React.Component {
                                           onChange={this.handleChangeSecondary.bind(
                                             this,
                                             profileIndex,
-                                            e._id
+                                            e._id,
                                           )}
                                           value={e.title.toLowerCase()}
                                         />
@@ -2264,21 +2459,21 @@ class Step3LifestyleProfile extends React.Component {
                             <FormLabel component="legend">Dietary</FormLabel>
                             <FormGroup>
                               {this.props.restrictions
-                                .filter(e => e.restrictionType === "dietary")
+                                .filter(e => e.restrictionType === 'dietary')
                                 .map((e, i) => {
                                   const isSelected = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .restrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].restrictions.indexOf(e._id) != -1
+                                      profileIndex
+                                    ].restrictions.indexOf(e._id) != -1
                                     : false;
                                   const isAlreadyChecked = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .lifestyleRestrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].lifestyleRestrictions.indexOf(e._id) !=
+                                      profileIndex
+                                    ].lifestyleRestrictions.indexOf(e._id) !=
                                       -1
                                     : false;
 
@@ -2294,7 +2489,7 @@ class Step3LifestyleProfile extends React.Component {
                                           onChange={this.handleChangeSecondary.bind(
                                             this,
                                             profileIndex,
-                                            e._id
+                                            e._id,
                                           )}
                                           value={e.title.toLowerCase()}
                                         />
@@ -2311,21 +2506,21 @@ class Step3LifestyleProfile extends React.Component {
                             <FormLabel component="legend">Religious</FormLabel>
                             <FormGroup>
                               {this.props.restrictions
-                                .filter(e => e.restrictionType === "religious")
+                                .filter(e => e.restrictionType === 'religious')
                                 .map((e, i) => {
                                   const isSelected = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .restrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].restrictions.indexOf(e._id) != -1
+                                      profileIndex
+                                    ].restrictions.indexOf(e._id) != -1
                                     : false;
                                   const isAlreadyChecked = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .lifestyleRestrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].lifestyleRestrictions.indexOf(e._id) !=
+                                      profileIndex
+                                    ].lifestyleRestrictions.indexOf(e._id) !=
                                       -1
                                     : false;
                                   return (
@@ -2340,7 +2535,7 @@ class Step3LifestyleProfile extends React.Component {
                                           onChange={this.handleChangeSecondary.bind(
                                             this,
                                             profileIndex,
-                                            e._id
+                                            e._id,
                                           )}
                                           value={e.title.toLowerCase()}
                                         />
@@ -2356,7 +2551,7 @@ class Step3LifestyleProfile extends React.Component {
                       <Grid container>
                         <Grid item xs={12}>
                           <Button
-                            style={{ float: "right" }}
+                            style={{ float: 'right' }}
                             color="primary"
                             onClick={this.deleteDialogHandleOpen.bind(this)}
                           >
@@ -2367,14 +2562,14 @@ class Step3LifestyleProfile extends React.Component {
                       <Dialog
                         open={this.state.deleteDialogOpen}
                         onRequestClose={this.deleteDialogHandleRequestClose.bind(
-                          this
+                          this,
                         )}
                       >
                         <Typography
                           style={{
-                            flex: "0 0 auto",
-                            margin: "0",
-                            padding: "24px 24px 20px 24px"
+                            flex: '0 0 auto',
+                            margin: '0',
+                            padding: '24px 24px 20px 24px',
                           }}
                           className="title font-medium"
                           type="title"
@@ -2392,9 +2587,9 @@ class Step3LifestyleProfile extends React.Component {
                               name="restritionOrPref"
                               value={this.state.addRestrictionType}
                               onChange={this.handleChangeRadioRestriction.bind(
-                                this
+                                this,
                               )}
-                              style={{ flexDirection: "row" }}
+                              style={{ flexDirection: 'row' }}
                             >
                               <FormControlLabel
                                 value="Restriction"
@@ -2416,154 +2611,154 @@ class Step3LifestyleProfile extends React.Component {
                             theme={{
                               container: {
                                 flexGrow: 1,
-                                position: "relative",
-                                marginBottom: "2em"
+                                position: 'relative',
+                                marginBottom: '2em',
                               },
                               suggestionsContainerOpen: {
-                                position: "absolute",
+                                position: 'absolute',
                                 left: 0,
-                                right: 0
+                                right: 0,
                               },
                               suggestion: {
-                                display: "block"
+                                display: 'block',
                               },
                               suggestionsList: {
                                 margin: 0,
                                 padding: 0,
-                                listStyleType: "none"
-                              }
+                                listStyleType: 'none',
+                              },
                             }}
                             renderInputComponent={this.renderInput.bind(this)}
                             suggestions={this.state.suggestions}
                             onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                              this
+                              this,
                             )}
                             onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                              this
+                              this,
                             )}
                             onSuggestionSelected={this.onSuggestionSelectedSecondary.bind(
                               this,
-                              profileIndex
+                              profileIndex,
                             )}
                             getSuggestionValue={this.getSuggestionValue.bind(
-                              this
+                              this,
                             )}
                             renderSuggestion={this.renderSuggestion.bind(this)}
                             renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                              this
+                              this,
                             )}
                             fullWidth
                             focusInputOnSuggestionClick={false}
                             inputProps={{
-                              placeholder: "Search",
+                              placeholder: 'Search',
                               value: this.state.value,
                               onChange: this.onChange.bind(this),
-                              className: "autoinput"
+                              className: 'autoinput',
                             }}
                           />
                         </DialogContent>
                       </Dialog>
 
                       <Grid container>
-                        <Grid item xs={12} style={{ marginTop: "25px" }}>
+                        <Grid item xs={12} style={{ marginTop: '25px' }}>
                           <Typography type="subheading">Preferences</Typography>
                         </Grid>
-                        <Grid item xs={12} style={{ marginTop: "25px" }}>
+                        <Grid item xs={12} style={{ marginTop: '25px' }}>
                           <div
                             style={{
-                              display: "flex",
-                              alignItems: "center",
-                              flexWrap: "wrap"
+                              display: 'flex',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
                             }}
                           >
                             {this.state.secondaryProfilesData[profileIndex]
                               .subIngredients.length ? (
-                              this.state.secondaryProfilesData[
-                                profileIndex
-                              ].subIngredients.map((subIngredient, i) => (
+                                this.state.secondaryProfilesData[
+                                  profileIndex
+                                ].subIngredients.map((subIngredient, i) => (
+                                  <Chip
+                                    avatar={
+                                      <Avatar>
+                                        {' '}
+                                        {this.getSubIngredientAvatar(
+                                          subIngredient,
+                                        )}{' '}
+                                      </Avatar>
+                                    }
+                                    style={{
+                                      marginRight: '8px',
+                                      marginBottom: '8px',
+                                    }}
+                                    label={this.getSubIngredientTitle(
+                                      subIngredient,
+                                    )}
+                                    key={i}
+                                    onRequestDelete={this.handleSubIngredientChipDelete.bind(
+                                      this,
+                                      subIngredient,
+                                    )}
+                                  />
+                                ))
+                              ) : (
                                 <Chip
-                                  avatar={
-                                    <Avatar>
-                                      {" "}
-                                      {this.getSubIngredientAvatar(
-                                        subIngredient
-                                      )}{" "}
-                                    </Avatar>
-                                  }
-                                  style={{
-                                    marginRight: "8px",
-                                    marginBottom: "8px"
-                                  }}
-                                  label={this.getSubIngredientTitle(
-                                    subIngredient
-                                  )}
-                                  key={i}
-                                  onRequestDelete={this.handleSubIngredientChipDelete.bind(
-                                    this,
-                                    subIngredient
-                                  )}
+                                  className="chip--bordered"
+                                  label="Ingredient"
                                 />
-                              ))
-                            ) : (
-                              <Chip
-                                className="chip--bordered"
-                                label="Ingredient"
-                              />
-                            )}
+                              )}
                           </div>
                         </Grid>
-                        <Grid item xs={12} style={{ marginTop: "25px" }}>
+                        <Grid item xs={12} style={{ marginTop: '25px' }}>
                           <Typography type="subheading">
                             Restrictions
                           </Typography>
                         </Grid>
-                        <Grid item xs={12} style={{ marginTop: "25px" }}>
+                        <Grid item xs={12} style={{ marginTop: '25px' }}>
                           <div
                             style={{
-                              display: "flex",
-                              alignItems: "center",
-                              flexWrap: "wrap"
+                              display: 'flex',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
                             }}
                           >
                             {this.state.secondaryProfilesData[profileIndex]
                               .specificRestrictions.length ? (
-                              this.state.secondaryProfilesData[
-                                profileIndex
-                              ].specificRestrictions.map((subIngredient, i) => (
+                                this.state.secondaryProfilesData[
+                                  profileIndex
+                                ].specificRestrictions.map((subIngredient, i) => (
+                                  <Chip
+                                    avatar={
+                                      <Avatar>
+                                        {' '}
+                                        {this.getSubIngredientAvatar(
+                                          subIngredient,
+                                        )}{' '}
+                                      </Avatar>
+                                    }
+                                    style={{
+                                      marginRight: '8px',
+                                      marginBottom: '8px',
+                                    }}
+                                    label={this.getSubIngredientTitle(
+                                      subIngredient,
+                                    )}
+                                    key={i}
+                                    onRequestDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                                      this,
+                                      subIngredient,
+                                    )}
+                                  />
+                                ))
+                              ) : (
                                 <Chip
-                                  avatar={
-                                    <Avatar>
-                                      {" "}
-                                      {this.getSubIngredientAvatar(
-                                        subIngredient
-                                      )}{" "}
-                                    </Avatar>
-                                  }
-                                  style={{
-                                    marginRight: "8px",
-                                    marginBottom: "8px"
-                                  }}
-                                  label={this.getSubIngredientTitle(
-                                    subIngredient
-                                  )}
-                                  key={i}
-                                  onRequestDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
-                                    this,
-                                    subIngredient
-                                  )}
+                                  className="chip--bordered"
+                                  label="Ingredient"
                                 />
-                              ))
-                            ) : (
-                              <Chip
-                                className="chip--bordered"
-                                label="Ingredient"
-                              />
-                            )}
+                              )}
                           </div>
                         </Grid>
                       </Grid>
 
-                      <Grid container style={{ marginTop: "50px" }}>
+                      <Grid container style={{ marginTop: '50px' }}>
                         <Grid item xs={12}>
                           <Typography
                             className="font-uppercase"
@@ -2584,28 +2779,28 @@ class Step3LifestyleProfile extends React.Component {
                               }
                               onChange={this.handleChangeRadioscheduleTypeSecondary.bind(
                                 this,
-                                profileIndex
+                                profileIndex,
                               )}
-                              style={{ flexDirection: "row" }}
+                              style={{ flexDirection: 'row' }}
                             >
                               <FormControlLabel
-                                value={"weekdays"}
+                                value={'weekdays'}
                                 control={<Radio />}
-                                label={"Weekdays"}
+                                label={'Weekdays'}
                                 selected
                               />
 
                               <FormControlLabel
-                                value={"weekends"}
+                                value={'weekends'}
                                 control={<Radio />}
-                                label={"Weekends"}
+                                label={'Weekends'}
                                 selected
                               />
 
                               <FormControlLabel
-                                value={"custom"}
+                                value={'custom'}
                                 control={<Radio />}
-                                label={"Custom"}
+                                label={'Custom'}
                                 selected
                               />
                             </RadioGroup>
@@ -2613,13 +2808,13 @@ class Step3LifestyleProfile extends React.Component {
                         </Grid>
                       </Grid>
 
-                      <Grid container style={{ marginTop: "20px" }}>
+                      <Grid container style={{ marginTop: '20px' }}>
                         <Table className="table-lifestyles">
                           <TableHead>
                             <TableRow>
                               <TableCell />
 
-                              <TableCell style={{ textAlign: "center" }}>
+                              <TableCell style={{ textAlign: 'center' }}>
                                 <Typography
                                   type="subheading"
                                   className="font-medium font-uppercase"
@@ -2628,7 +2823,7 @@ class Step3LifestyleProfile extends React.Component {
                                 </Typography>
                               </TableCell>
 
-                              <TableCell style={{ textAlign: "center" }}>
+                              <TableCell style={{ textAlign: 'center' }}>
                                 <Typography
                                   type="subheading"
                                   className="font-medium font-uppercase"
@@ -2637,7 +2832,7 @@ class Step3LifestyleProfile extends React.Component {
                                 </Typography>
                               </TableCell>
 
-                              <TableCell style={{ textAlign: "center" }}>
+                              <TableCell style={{ textAlign: 'center' }}>
                                 <Typography
                                   type="subheading"
                                   className="font-medium font-uppercase"
@@ -2650,40 +2845,40 @@ class Step3LifestyleProfile extends React.Component {
                           <TableBody>
                             {this.state.schedule.map((e, i) => {
                               const days = [
-                                "Monday",
-                                "Tuesday",
-                                "Wednesday",
-                                "Thursday",
-                                "Friday",
-                                "Saturday",
-                                "Sunday"
+                                'Monday',
+                                'Tuesday',
+                                'Wednesday',
+                                'Thursday',
+                                'Friday',
+                                'Saturday',
+                                'Sunday',
                               ];
                               return (
                                 <TableRow key={i}>
                                   <TableCell>
                                     <Typography
                                       type="subheading"
-                                      style={{ marginTop: "10px" }}
+                                      style={{ marginTop: '10px' }}
                                     >
                                       {days[i]}
                                     </Typography>
                                   </TableCell>
 
-                                  <TableCell style={{ textAlign: "center" }}>
+                                  <TableCell style={{ textAlign: 'center' }}>
                                     <TextField
                                       fullWidth
                                       margin="normal"
                                       style={{
-                                        fontSize: "1rem",
-                                        maxWidth: "100px",
-                                        minWidth: "100px"
+                                        fontSize: '1rem',
+                                        maxWidth: '100px',
+                                        minWidth: '100px',
                                       }}
                                       value={
                                         this.state.secondaryProfilesData[
                                           profileIndex
                                         ].schedule[i].breakfast
                                       }
-                                      onChange={event => {
+                                      onChange={(event) => {
                                         this.state.secondaryProfilesData[
                                           profileIndex
                                         ].schedule[i].breakfast =
@@ -2692,24 +2887,24 @@ class Step3LifestyleProfile extends React.Component {
                                         this.handleSubscriptionScheduleChange();
                                       }}
                                       inputProps={{
-                                        type: "number",
-                                        min: "0",
-                                        max: "3"
+                                        type: 'number',
+                                        min: '0',
+                                        max: '3',
                                       }}
                                       name={`${profileIndex}_breakfast_${i}`}
                                     />
                                   </TableCell>
 
-                                  <TableCell style={{ textAlign: "center" }}>
+                                  <TableCell style={{ textAlign: 'center' }}>
                                     <TextField
                                       fullWidth
                                       margin="normal"
                                       style={{
-                                        fontSize: "1rem",
-                                        maxWidth: "100px",
-                                        minWidth: "100px"
+                                        fontSize: '1rem',
+                                        maxWidth: '100px',
+                                        minWidth: '100px',
                                       }}
-                                      onChange={event => {
+                                      onChange={(event) => {
                                         this.state.secondaryProfilesData[
                                           profileIndex
                                         ].schedule[i].lunch =
@@ -2723,24 +2918,24 @@ class Step3LifestyleProfile extends React.Component {
                                         ].schedule[i].lunch
                                       }
                                       inputProps={{
-                                        type: "number",
-                                        min: "0",
-                                        max: "3"
+                                        type: 'number',
+                                        min: '0',
+                                        max: '3',
                                       }}
                                       name={`${profileIndex}_lunch_${i}`}
                                     />
                                   </TableCell>
 
-                                  <TableCell style={{ textAlign: "center" }}>
+                                  <TableCell style={{ textAlign: 'center' }}>
                                     <TextField
                                       fullWidth
                                       margin="normal"
                                       style={{
-                                        fontSize: "1rem",
-                                        maxWidth: "100px",
-                                        minWidth: "100px"
+                                        fontSize: '1rem',
+                                        maxWidth: '100px',
+                                        minWidth: '100px',
                                       }}
-                                      onChange={event => {
+                                      onChange={(event) => {
                                         this.state.secondaryProfilesData[
                                           profileIndex
                                         ].schedule[i].dinner =
@@ -2754,9 +2949,9 @@ class Step3LifestyleProfile extends React.Component {
                                         ].schedule[i].dinner
                                       }
                                       inputProps={{
-                                        type: "number",
-                                        min: "0",
-                                        max: "3"
+                                        type: 'number',
+                                        min: '0',
+                                        max: '3',
                                       }}
                                       name={`${profileIndex}_dinner_${i}`}
                                     />
@@ -2771,7 +2966,7 @@ class Step3LifestyleProfile extends React.Component {
                       <Button
                         raised
                         onClick={this.removeProfile.bind(this, profileIndex)}
-                        style={{ float: "right", marginTop: "25px" }}
+                        style={{ float: 'right', marginTop: '25px' }}
                       >
                         Remove profile
                       </Button>
@@ -2782,7 +2977,7 @@ class Step3LifestyleProfile extends React.Component {
               <Button
                 color="danger"
                 onClick={this.increaseProfileCount.bind(this)}
-                style={{ marginTop: "50px", marginBottom: "50px" }}
+                style={{ marginTop: '50px', marginBottom: '50px' }}
               >
                 Add a profile
               </Button>
@@ -2802,23 +2997,23 @@ class Step3LifestyleProfile extends React.Component {
                     fullWidth
                     value={this.state.subscriptionStartDate}
                     SelectProps={{ native: false }}
-                    onChange={event => {
+                    onChange={(event) => {
                       this.setState({
-                        subscriptionStartDate: event.target.value
+                        subscriptionStartDate: event.target.value,
                       });
                     }}
                   >
                     {this.renderStartDays().map((e, i) => (
                       <MenuItem
                         key={i}
-                        value={moment(e).format("dddd, MMMM Do YYYY")}
+                        value={moment(e).format('dddd, MMMM Do YYYY')}
                       >
-                        {moment(e).format("dddd, MMMM Do YYYY")}
+                        {moment(e).format('dddd, MMMM Do YYYY')}
                       </MenuItem>
                     ))}
                   </TextField>
                 </Grid>
-                <Grid item xs={12} style={{ marginTop: "25px" }}>
+                <Grid item xs={12} style={{ marginTop: '25px' }}>
                   <Typography type="subheading" className="font-uppercase">
                     Complete Schedule
                   </Typography>
@@ -2829,7 +3024,7 @@ class Step3LifestyleProfile extends React.Component {
                       <TableRow>
                         <TableCell />
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <Typography
                             type="subheading"
                             className="font-medium font-uppercase"
@@ -2838,7 +3033,7 @@ class Step3LifestyleProfile extends React.Component {
                           </Typography>
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <Typography
                             type="subheading"
                             className="font-medium font-uppercase"
@@ -2847,7 +3042,7 @@ class Step3LifestyleProfile extends React.Component {
                           </Typography>
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <Typography
                             type="subheading"
                             className="font-medium font-uppercase"
@@ -2860,13 +3055,13 @@ class Step3LifestyleProfile extends React.Component {
                     <TableBody>
                       {this.state.schedule.map((e, i) => {
                         const days = [
-                          "Monday",
-                          "Tuesday",
-                          "Wednesday",
-                          "Thursday",
-                          "Friday",
-                          "Saturday",
-                          "Sunday"
+                          'Monday',
+                          'Tuesday',
+                          'Wednesday',
+                          'Thursday',
+                          'Friday',
+                          'Saturday',
+                          'Sunday',
                         ];
 
                         return (
@@ -2874,20 +3069,20 @@ class Step3LifestyleProfile extends React.Component {
                             <TableCell>
                               <Typography
                                 type="subheading"
-                                style={{ marginTop: "10px" }}
+                                style={{ marginTop: '10px' }}
                               >
                                 {days[i]}
                               </Typography>
                             </TableCell>
 
-                            <TableCell style={{ textAlign: "center" }}>
+                            <TableCell style={{ textAlign: 'center' }}>
                               <TextField
                                 fullWidth
                                 margin="normal"
                                 style={{
-                                  fontSize: "1rem",
-                                  maxWidth: "100px",
-                                  minWidth: "100px"
+                                  fontSize: '1rem',
+                                  maxWidth: '100px',
+                                  minWidth: '100px',
                                 }}
                                 disabled
                                 value={
@@ -2897,14 +3092,14 @@ class Step3LifestyleProfile extends React.Component {
                               />
                             </TableCell>
 
-                            <TableCell style={{ textAlign: "center" }}>
+                            <TableCell style={{ textAlign: 'center' }}>
                               <TextField
                                 fullWidth
                                 margin="normal"
                                 style={{
-                                  fontSize: "1rem",
-                                  maxWidth: "100px",
-                                  minWidth: "100px"
+                                  fontSize: '1rem',
+                                  maxWidth: '100px',
+                                  minWidth: '100px',
                                 }}
                                 disabled
                                 value={this.state.subscriptionSchedule[i].lunch}
@@ -2912,14 +3107,14 @@ class Step3LifestyleProfile extends React.Component {
                               />
                             </TableCell>
 
-                            <TableCell style={{ textAlign: "center" }}>
+                            <TableCell style={{ textAlign: 'center' }}>
                               <TextField
                                 fullWidth
                                 margin="normal"
                                 style={{
-                                  fontSize: "1rem",
-                                  maxWidth: "100px",
-                                  minWidth: "100px"
+                                  fontSize: '1rem',
+                                  maxWidth: '100px',
+                                  minWidth: '100px',
                                 }}
                                 disabled
                                 value={
@@ -2936,7 +3131,7 @@ class Step3LifestyleProfile extends React.Component {
                 </Grid>
               </Grid>
 
-              <Grid container style={{ marginTop: "25px" }}>
+              <Grid container style={{ marginTop: '25px' }}>
                 <Grid item xs={12}>
                   <Typography
                     type="subheading"
@@ -2946,7 +3141,9 @@ class Step3LifestyleProfile extends React.Component {
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  {this.state.subscriptionSchedule.map((e, i) => this.renderOptions(e, i))}
+                  {this.state.subscriptionSchedule.map((e, i) =>
+                    this.renderOptions(e, i),
+                  )}
                 </Grid>
               </Grid>
             </Paper>
@@ -2955,9 +3152,9 @@ class Step3LifestyleProfile extends React.Component {
 
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end"
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
           }}
         >
           <Button
@@ -2985,7 +3182,7 @@ Step3LifestyleProfile.defaultProps = {
   popTheSnackbar: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
   handleNext: PropTypes.func.isRequired,
-  handleBack: PropTypes.func.isRequired
+  handleBack: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(Step3LifestyleProfile);

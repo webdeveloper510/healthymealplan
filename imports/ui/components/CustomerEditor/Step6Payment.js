@@ -31,6 +31,7 @@ import green from "material-ui/colors/green";
 
 import $ from "jquery";
 import validate from "../../../modules/validate";
+import { console } from "meteor/tools";
 
 const styles = theme => ({
   root: {
@@ -114,29 +115,65 @@ class Step6Payment extends React.Component {
       submitLoading: true
     });
 
-    var authData = {};
-    authData.clientKey =
-      "73C59E6vwX3c5DzP8Z5M3dCbr5LrRpQV2wm93297ff4HcbPH562PtN2Aw6tkDAat";
-    authData.apiLoginID = "47cmd9F3DJ";
+    let authData = {};
+    authData.clientKey = Meteor.settings.public.clientKey;
+    authData.apiLoginID = Meteor.settings.public.apiLoginKey;
 
     const expiration = document
       .getElementById("expiry")
       .value.trim()
       .split("/");
 
-    var cardData = {};
-    cardData.cardNumber = document.getElementById("cardNumber").value.trim();
-    cardData.month = parseInt(expiration[0], 10);
-    cardData.year = parseInt(expiration[1], 10);
+    let cardData = {};
+    cardData.cardNumber = document
+      .getElementById("cardNumber")
+      .value.trim()
+      .split(" ")
+      .join("");
+    cardData.month = expiration[0].trim();
+    cardData.year = expiration[1].trim();
     cardData.cardCode = document.getElementById("cvc").value.trim();
 
-    Accept.dispatchData({ authData, cardData }, response => {
+    console.log(cardData);
+    let secureData = {};
+    secureData.authData = authData;
+    secureData.cardData = cardData;
+
+    Accept.dispatchData(secureData, response => {
       console.log(response);
 
-      this.setState({
-        submitSuccess: false,
-        submitLoading: false
-      });
+      if (response.messages.resultCode === "Ok" && response.opaqueData) {
+        Meteor.call("customers.step5", response.opaqueData, (err, res) => {
+          if (err) {
+            console.log(err);
+
+            this.setState({
+              submitSuccess: false,
+              submitLoading: false
+            });
+
+            this.props.popTheSnackbar({
+              message: "There was an error saving customer data"
+            });
+          }
+
+          console.log(res);
+
+          this.setState({
+            submitSuccess: true,
+            submitLoading: false
+          });
+        });
+      } else {
+        this.setState({
+          submitSuccess: false,
+          submitLoading: false
+        });
+
+        this.props.popTheSnackbar({
+          message: response.messages.message[0].text
+        });
+      }
     });
 
     // Meteor.call(
@@ -305,7 +342,6 @@ class Step6Payment extends React.Component {
                             id: "nameOnCard"
                           }}
                           fullWidth
-                          id="nameOnCard"
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -316,7 +352,6 @@ class Step6Payment extends React.Component {
                             id: "cardNumber"
                           }}
                           fullWidth
-                          id="cardNumber"
                         />
                       </Grid>
                     </Grid>
@@ -326,7 +361,6 @@ class Step6Payment extends React.Component {
                           placeholder="Expiration"
                           inputProps={{ name: "expiry", id: "expiry" }}
                           fullWidth
-                          id="expiry"
                         />
                       </Grid>
                       <Grid item xs={4}>
@@ -334,7 +368,6 @@ class Step6Payment extends React.Component {
                           placeholder="CVC"
                           inputProps={{ name: "cvc", id: "cvc" }}
                           fullWidth
-                          id="cvc"
                         />
                       </Grid>
                       <Grid item xs={4}>
@@ -345,7 +378,6 @@ class Step6Payment extends React.Component {
                             id: "postalCode"
                           }}
                           fullWidth
-                          id="postalCode"
                         />
                       </Grid>
                     </Grid>

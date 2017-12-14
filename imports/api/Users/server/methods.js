@@ -5,6 +5,7 @@ import { Roles } from "meteor/alanning:roles";
 import { Accounts } from "meteor/accounts-base";
 import editProfile from "./edit-profile";
 import rateLimit from "../../../modules/rate-limit";
+import createProfileAndSubscription from "../../../modules/server/authorize/createProfileAndSubscription";
 
 Meteor.methods({
   "users.sendVerificationEmail": function usersSendVerificationEmail() {
@@ -124,6 +125,28 @@ Meteor.methods({
     } catch (exception) {
       throw new Meteor.Error("500", exception);
     }
+  },
+
+  "customers.step5": function customerStep3(opaqueData) {
+    check(opaqueData, {
+      dataDescriptor: String,
+      dataValue: String
+    });
+
+    var syncCreateProfileSubscription = Meteor.wrapAsync(
+      createProfileAndSubscription
+    );
+
+    try {
+      var createProfileResult = syncCreateProfileSubscription(
+        opaqueData.dataDescriptor,
+        opaqueData.dataValue
+      );
+    } catch (error) {
+      throw new Meteor.Error(500, error);
+    }
+
+    return createProfileResult;
   }
 });
 
@@ -132,7 +155,8 @@ rateLimit({
     "users.sendVerificationEmail",
     "users.editProfile",
     "users.addNewStaff",
-    "customers.step1"
+    "customers.step1",
+    "customers.step5"
   ],
   limit: 5,
   timeRange: 1000
