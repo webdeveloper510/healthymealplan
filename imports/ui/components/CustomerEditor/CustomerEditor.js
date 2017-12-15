@@ -7,12 +7,11 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import { Meteor } from 'meteor/meteor';
 
 import Autosuggest from 'react-autosuggest';
 
 import _ from 'lodash';
-
-import { Meteor } from 'meteor/meteor';
 
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
@@ -45,7 +44,7 @@ import Step1Eligibility from './Step1Eligibility';
 import Step2Contact from './Step2Contact';
 import Step3LifestyleProfile from './Step3LifestyleProfile';
 import Step4Delivery from './Step4Delivery';
-import Step5Review from './Step5Review';
+// import Step5Review from './Step5Review';
 import Step6Payment from './Step6Payment';
 
 import $ from 'jquery';
@@ -273,7 +272,7 @@ class CustomerEditor extends React.Component {
 
   getStepContent(step) {
     switch (step) {
-      case 7:
+      case 1:
         return (
           <Step1Eligibility
             handleNext={this.handleNext.bind(this)}
@@ -282,7 +281,7 @@ class CustomerEditor extends React.Component {
             popTheSnackbar={this.props.popTheSnackbar.bind(this)}
           />
         );
-      case 1:
+      case 2:
         return (
           <Step2Contact
             handleNext={this.handleNext.bind(this)}
@@ -292,7 +291,7 @@ class CustomerEditor extends React.Component {
             popTheSnackbar={this.props.popTheSnackbar.bind(this)}
           />
         );
-      case 6:
+      case 3:
         return (
           <Step3LifestyleProfile
             handleNext={this.handleNext.bind(this)}
@@ -306,7 +305,7 @@ class CustomerEditor extends React.Component {
             addSecondaryProfile={this.increaseProfileCount.bind(this)}
           />
         );
-      case 0:
+      case 4:
         return (
           <Step4Delivery
             handleNext={this.handleNext.bind(this)}
@@ -317,7 +316,7 @@ class CustomerEditor extends React.Component {
             addSecondaryProfile={this.increaseProfileCount.bind(this)}
           />
         );
-      case 7:
+      case 0:
         return (
           <Step6Payment
             handleNext={this.handleNext.bind(this)}
@@ -418,63 +417,6 @@ class CustomerEditor extends React.Component {
         </Stepper>
 
         {this.getStepContent(activeStep)}
-
-        {/* <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end"
-          }}
-        >
-          <Button
-            disabled={activeStep === 0}
-            onClick={this.handleBack.bind(this)}
-            className={this.props.classes.button}
-          >
-            Back
-          </Button>
-
-          <Button
-            raised
-            color="primary"
-            onClick={this.handleNext.bind(this)}
-            className={this.props.classes.button}
-          >
-            {activeStep === steps.length - 1 ? "Finish" : "Next"}
-          </Button>
-        </div> */}
-
-        {/* <Grid container justify="center" style={{ marginBottom: '50px' }}>
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid item xs={4}>
- {
-                  this.props.newCategory ? '' : (
-                    <Button
-                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
-                      raised
-                      onClick={category && category._id ? this.handleRemove.bind(this) : () => this.props.history.push('/customers')}
-                    >
-                    Delete
-                    </Button>
-                  )
-                }
-              </Grid>
-
-              <Grid item xs={8}>
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                  <Button style={{ marginRight: '10px' }} onClick={() => history.push('/customers')}>Cancel</Button>
-                  <Button disabled={!this.state.hasFormChanged} type="submit" className="btn btn-primary" raised color="contrast">
-                   Save
-                  </Button>
-                </div>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid> */}
-
-        {/* {this.renderDeleteDialog()} */}
       </div>
     );
   }

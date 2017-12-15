@@ -48,11 +48,6 @@ import Index from "../../pages/Index/Index";
 
 // import AddAccount from '../../pages/Accounts/AddAccount';
 
-// import Documents from '../../pages/Documents/Documents';
-// import NewDocument from '../../pages/NewDocument/NewDocument';
-// import ViewDocument from '../../pages/ViewDocument/ViewDocument';
-// import EditDocument from '../../pages/EditDocument/EditDocument';
-
 import Categories from "../../pages/Categories/Categories";
 import NewCategory from "../../pages/NewCategory/NewCategory";
 import EditCategory from "../../pages/EditCategory/EditCategory";
