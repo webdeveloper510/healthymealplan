@@ -71,8 +71,7 @@ class Step6Payment extends React.Component {
     this.state = {
       submitLoading: false,
       submitSuccess: false,
-      paymentMethod: '',
-      paymentFrequency: 'weekly',
+      paymentMethod: 'card',
       dormName: 'Algonquin College',
       dormResidence: 'Algonquin College',
     };
@@ -145,6 +144,7 @@ class Step6Payment extends React.Component {
         Meteor.call('customers.step5', response.opaqueData, (err, res) => {
           if (err) {
             console.log(err);
+            console.log(err.reason);
 
             this.setState({
               submitSuccess: false,
@@ -179,12 +179,6 @@ class Step6Payment extends React.Component {
   handleChangeRadioPaymentMethod(event, value) {
     this.setState({
       paymentMethod: value,
-    });
-  }
-
-  handleChangeRadiopaymentFrequency(event, value) {
-    this.setState({
-      paymentFrequency: value,
     });
   }
 
@@ -244,43 +238,6 @@ class Step6Payment extends React.Component {
                             control={<Radio />}
                             label="Cash"
                           />
-                        </RadioGroup>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
-
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <Typography type="subheading" className="font-uppercase">
-                        Frequency
-                      </Typography>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <FormControl component="fieldset">
-                        {/* <FormLabel component="legend">Type</FormLabel> */}
-                        <RadioGroup
-                          aria-label="payment-method"
-                          name="frequency"
-                          value={this.state.paymentFrequency}
-                          onChange={this.handleChangeRadiopaymentFrequency.bind(
-                            this,
-                          )}
-                          style={{ flexDirection: 'row' }}
-                        >
-                          <Grid item sm={6}>
-                            <FormControlLabel
-                              value="monthly"
-                              control={<Radio />}
-                              label="Monthly"
-                            />
-                          </Grid>
-                          <Grid item sm={6}>
-                            <FormControlLabel
-                              value="weekly"
-                              control={<Radio />}
-                              label="Weekly"
-                            />
-                          </Grid>
                         </RadioGroup>
                       </FormControl>
                     </Grid>

@@ -14,6 +14,8 @@ import Typography from 'material-ui/Typography';
 import Radio, { RadioGroup } from 'material-ui/Radio';
 import Checkbox from 'material-ui/Checkbox';
 
+import Stepper, { Step, StepLabel } from 'material-ui/Stepper';
+
 import Divider from 'material-ui/Divider';
 
 import moment from 'moment';
@@ -137,15 +139,7 @@ class Step3LifestyleProfile extends React.Component {
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
       ],
-      pairings: {
-        monday: [],
-        tuesday: [],
-        wednesday: [],
-        thursday: [],
-        friday: [],
-        saturday: [],
-        sunday: [],
-      },
+      activeDeliveryScheduleStep: 0,
       subscriptionStartDate: moment(this.renderStartDays()[0]).format(
         'dddd, MMMM Do YYYY',
       ),
@@ -561,7 +555,7 @@ class Step3LifestyleProfile extends React.Component {
     this.forceUpdate();
   }
 
-  changeRadioDeliveryType(index, element, event, value) {
+  changeRadioDeliveryType(index, event, value) {
     // console.log(index)
     // console.log(element)
     // console.log(value);
@@ -620,569 +614,4457 @@ class Step3LifestyleProfile extends React.Component {
     // console.log(pairings);
   }
 
-  renderOptions(element, index) {
-    const currentMealSum = element.breakfast + element.lunch + element.dinner;
-    const previousIndex = index - 1;
-    const daysMealSum = [];
+  // getStepContent(step) {
 
-    this.state.subscriptionSchedule.forEach((e, i) => {
-      daysMealSum.push(e.breakfast + e.lunch + e.dinner);
+  //   switch (step) {
+  //     case 0:
+  //      return this.renderOptionsForTheDay(step);
+  //     case 1:
+  //      return this.renderOptionsForTheDay(step);
+  //     case 2:
+  //      return this.renderOptionsForTheDay(step);
+  //     case 3:
+  //      return this.renderOptionsForTheDay(step);
+  //     case 4:
+  //      return this.renderOptionsForTheDay(step);
+  //     case 5:
+  //      return this.renderOptionsForTheDay(step);
+  //     case 6:
+  //      return this.renderOptionsForTheDay(step);
+  //     default:
+  //      return "Unknown step";
+  //   }
+
+  // }
+
+  handleNextDeliverySchedule() {
+    const { activeDeliveryScheduleStep } = this.state;
+
+    this.setState({
+      activeDeliveryScheduleStep: activeDeliveryScheduleStep + 1,
     });
+  }
+
+  handleBackDeliverySchedule() {
+    const { activeDeliveryScheduleStep } = this.state;
+
+    this.setState({
+      activeDeliveryScheduleStep: activeDeliveryScheduleStep - 1,
+    });
+  }
+
+  getSteps() {
+    return [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday/Sunday',
+    ];
+  }
+
+  renderOptionsForTheDay(step) {
+    const previousIndex = step == 0 ? null : step - 1;
+
+    const dayBeforeYestMealSum = step >= 2 ?
+      parseInt(this.state.subscriptionSchedule[previousIndex - 1].breakfast, 10) +
+    parseInt(this.state.subscriptionSchedule[previousIndex - 1].lunch, 10) +
+    parseInt(this.state.subscriptionSchedule[previousIndex - 1].dinner, 10) : null;
+
+    const previousDaysMealSum = step == 0 ? null :
+      parseInt(this.state.subscriptionSchedule[previousIndex].breakfast, 10) +
+    parseInt(this.state.subscriptionSchedule[previousIndex].lunch, 10) +
+    parseInt(this.state.subscriptionSchedule[previousIndex].dinner, 10);
+
+    const daysMealSum =
+      parseInt(this.state.subscriptionSchedule[step].breakfast, 10) +
+      parseInt(this.state.subscriptionSchedule[step].lunch, 10) +
+      parseInt(this.state.subscriptionSchedule[step].dinner, 10);
+
+    const nextDaysSum =
+      parseInt(this.state.subscriptionSchedule[step + 1].breakfast, 10) +
+      parseInt(this.state.subscriptionSchedule[step + 1].lunch, 10) +
+      parseInt(this.state.subscriptionSchedule[step + 1].dinner, 10);
 
     let radioGroup = (
       <RadioGroup
-        aria-label={`delivery_${index}`}
-        name={`delivery_${index}`}
+        aria-label={`delivery_${step}`}
+        name={`delivery_${step}`}
         style={{ flexDirection: 'row' }}
-        value={this.state.deliveryType[index]}
-        onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+        value={this.state.deliveryType[step]}
+        onChange={this.changeRadioDeliveryType.bind(this, step)}
         disabled
       >
-        <Typography type="body2">N/a</Typography>
+        <Typography type="body2">No meals on this day</Typography>
       </RadioGroup>
     );
 
-    if (index == 0 && currentMealSum == 1) {
-      console.log(moment(this.renderStartDays()[0])
-        .add(index, 'd')
-        .format('ddd'));
+    if (this.state.activeDeliveryScheduleStep == 0) {
 
-      radioGroup = (
-        <RadioGroup
-          aria-label={`delivery_${index}`}
-          name={`delivery_${index}`}
-          style={{ flexDirection: 'row' }}
-          onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-          value={this.state.deliveryType[index]}
-        >
-          <FormControlLabel
-            value="nightBeforePaired"
-            control={<Radio />}
-            label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, 'd')
-              .subtract(1, 'd')
-              .format('ddd')} ${moment(this.renderStartDays()[0])
-              .add(index, 'd')
-              .subtract(1, 'd')
-              .format('D')} - Free (Pair Tuesday or Tuesday & Wednesday)`}
-          />
 
-          <FormControlLabel
-            value="nightBefore"
-            control={<Radio />}
-            label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, 'd')
-              .subtract(1, 'd')
-              .format('ddd')} ${moment(this.renderStartDays()[0])
-              .add(index, 'd')
-              .subtract(1, 'd')
-              .format('D')} - $2.50`}
-          />
+      if (daysMealSum == 0) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'row' }}
+            value={this.state.deliveryType[step]}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            disabled
+          >
+            <Typography type="body2">N/a</Typography>
+          </RadioGroup>
+        );
+      }
 
-          <FormControlLabel
-            value={'dayOf'}
-            control={<Radio />}
-            label={`Delivered ${moment(this.renderStartDays()[0])
-              .add(index, 'd')
-              .format('ddd')} ${moment(this.renderStartDays()[0])
-              .add(index, 'd')
+      if (daysMealSum == 1) {
+
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - $2.50`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+      }
+
+      if (daysMealSum > 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+      }
+
+
+    }
+
+    if (this.state.activeDeliveryScheduleStep == 1) {
+
+
+      if (daysMealSum == 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - $2.50`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+
+        if (previousDaysMealSum > 0 && this.state.deliveryType[0] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[0] == 'dayOf') { // daysMealSum == 1
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`Day of 2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0) { // daysMealSum == 1
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="sundayNight"
+                control={<Radio />}
+                label={`Sunday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfMonday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+      }// daysMealSum == 1
+
+      if (daysMealSum > 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+
+        if (previousDaysMealSum > 0 && this.state.deliveryType[0] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[0] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`Day of 2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0) {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="sundayNight"
+                control={<Radio />}
+                label={`Sunday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfMonday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }// previousDaysMealSum == 0
+      }// daysMealSum > 1
+    }// tuesday
+
+    if (this.state.activeDeliveryScheduleStep == 2) {
+
+      if (daysMealSum == 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - $2.50`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+
+        if (previousDaysMealSum > 0 && this.state.deliveryType[1] == 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[1] == 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="sundayNight"
+                control={<Radio />}
+                label={`Sunday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfMonday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeMonday"
+                control={<Radio />}
+                label={`Monday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfTuesday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'sundayNight') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[0] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[0] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+
+      }// daysMealSum == 1
+
+      if (daysMealSum > 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+        console.log(dayBeforeYestMealSum);
+        if (previousDaysMealSum > 0 && this.state.deliveryType[1] == 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[1] == 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="sundayNight"
+                control={<Radio />}
+                label={`Sunday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfMonday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeMonday"
+                control={<Radio />}
+                label={`Monday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfTuesday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum === 0 && this.state.deliveryType[1] == 'sundayNight') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum === 0 && this.state.deliveryType[1] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum === 0 && this.state.deliveryType[1] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum === 0 && this.state.deliveryType[1] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - Free`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[0] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[0] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+      }// daysMealSum > 1
+
+    }
+
+    if (this.state.activeDeliveryScheduleStep == 3) {
+
+
+      if (daysMealSum == 0) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'row' }}
+            value={this.state.deliveryType[step]}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            disabled
+          >
+            <Typography type="body2">N/a</Typography>
+          </RadioGroup>
+        );
+      }
+
+      if (daysMealSum == 1) {
+
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - $2.50`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+        //
+        if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOf') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOfMonday') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOfTuesday') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'nightBefore') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'nightBeforeMonday') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'dayOfMonday' && this.state.deliveryType[2] == "dayOfPaired") {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'dayOfPaired') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'nightBeforePaired') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="mondayNight"
+                control={<Radio />}
+                label={`Monday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfTuesday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeTuesday"
+                control={<Radio />}
+                label={`Tuesday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfWednesday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } 
+
+
+      }// daysMealSum == 1
+
+
+      if (daysMealSum > 1) {
+
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+        if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOf') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOfMonday') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOfTuesday') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'nightBefore') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'nightBeforeMonday') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'dayOfMonday' && this.state.deliveryType[2] == "dayOfPaired") {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'dayOfPaired') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'nightBeforePaired') {
+
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'sundayNight' && this.state.deliveryType[2] == "nightBeforePaired") {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+  
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="mondayNight"
+                control={<Radio />}
+                label={`Monday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfTuesday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeTuesday"
+                control={<Radio />}
+                label={`Tuesday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfWednesday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[1] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
+        } 
+
+      }// daysMealSum > 1
+    }// thursday
+
+    if (this.state.activeDeliveryScheduleStep == 4) {
+
+
+      if (daysMealSum == 0) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'row' }}
+            value={this.state.deliveryType[step]}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            disabled
+          >
+            <Typography type="body2">N/a</Typography>
+          </RadioGroup>
+        );
+      }
+
+      if (daysMealSum == 1) {
+
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - $2.50`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+
+        if (this.state.deliveryType[3] === 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing  ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'dayOfWednesday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'nightBeforeTuesday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[2] === 'nightBefore' && this.state.deliveryType[3] === "nightBeforePaired") {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing  ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[2] === 'dayOf' && this.state.deliveryType[3] === "dayOfPaired") {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day-of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="tuesdayNight"
+                control={<Radio />}
+                label={`Tuesday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfWednesday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeWednesday"
+                control={<Radio />}
+                label={`Wednesday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfThursday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        
+        } else if(previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == "dayOf"){
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day-of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if(previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == "nightBefore"){
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+
+      }
+
+
+      if (daysMealSum > 1) {
+
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .add(step, 'd')
+                .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+        if (this.state.deliveryType[3] === 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing  ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'dayOfWednesday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'nightBeforeTuesday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[2] === 'nightBefore' && this.state.deliveryType[3] === "nightBeforePaired") {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing  ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[2] === 'dayOf' && this.state.deliveryType[3] === "dayOfPaired") {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day-of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="tuesdayNight"
+                control={<Radio />}
+                label={`Tuesday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfWednesday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeWednesday"
+                control={<Radio />}
+                label={`Wednesday evening ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfThursday'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        
+        } else if(previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == "dayOf"){
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day-of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if(previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == "nightBefore"){
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } 
+      }
+    }// friday
+
+    if (this.state.activeDeliveryScheduleStep == 5) {
+      // saturday & sunday
+
+      const totalMealSum = daysMealSum + nextDaysSum;
+
+      if (totalMealSum > 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value={'nightBefore'}
+              control={<Radio />}
+              label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+              
+              ${moment(this.renderStartDays()[0])
+            .add(step, 'd').subtract(2, 'd')
+            .format('DD')} evening - Free`}
+            />
+
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+              
+              ${moment(this.renderStartDays()[0])
+            .add(step, 'd').subtract(1, 'd')
+            .format('DD')} - $2.50`}
+            />
+
+
+          </RadioGroup>
+        );
+
+        if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value={'nightBefore'}
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+              
+                ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(1, 'd')
               .format('DD')} - $2.50`}
-          />
-        </RadioGroup>
-      );
-    }
+              />
 
 
-    if (currentMealSum > 1) {
-      if (index == 0) {
-        console.log(moment(this.renderStartDays()[0])
-          .add(index, 'd')
-          .format('ddd'));
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'dayOfThursday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value={'nightBefore'}
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                
+                  ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $2.50`}
+              />
+
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value={'nightBefore'}
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                  ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $2.50`}
+              />
+
+            </RadioGroup>
+          );
+        } else if ( this.state.deliveryType[4] == 'dayOfPaired' && this.state.deliveryType[3] == 'dayOf'){
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value={'dayOfThursday'}
+                control={<Radio />}
+                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                
+                  ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - $2.50`}
+              />
+
+            </RadioGroup>
+          );
+
+        }
+
+
+      }// totalMealSum > 1
+
+      if (totalMealSum == 1) {
         radioGroup = (
           <RadioGroup
-            aria-label={`delivery_${index}`}
-            name={`delivery_${index}`}
-            style={{ flexDirection: 'row' }}
-            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-            value={this.state.deliveryType[index]}
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
           >
+
             <FormControlLabel
-              value="nightBefore"
+              value={'nightBefore'}
               control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-                .add(index, 'd')
-                .subtract(1, 'd')
-                .format('ddd')} ${moment(this.renderStartDays()[0])
-                .add(index, 'd')
-                .subtract(1, 'd')
-                .format('D')} - Free`}
+              label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                  
+                ${moment(this.renderStartDays()[0])
+            .add(step, 'd').subtract(2, 'd')
+            .format('DD')} evening - $2.50`}
             />
+
 
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-                .add(index, 'd')
-                .format('ddd')} ${moment(this.renderStartDays()[0])
-                .add(index, 'd')
-                .format('DD')} - $2.50`}
+              label={`Day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                  ${moment(this.renderStartDays()[0])
+            .add(step, 'd').subtract(1, 'd')
+            .format('DD')} - $2.50`}
             />
+
+
           </RadioGroup>
         );
-      }
 
-      if (index >= 1 && index <= 4) {
-        if (
-          this.state.deliveryType[previousIndex] == '' ||
-          this.state.deliveryType[previousIndex] == 'dayOf'
-        ) {
-          console.log(moment(this.renderStartDays()[0])
-            .add(index, 'd')
-            .format('ddd'));
+        if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'nightBefore') {
           radioGroup = (
             <RadioGroup
-              aria-label={`delivery_${index}`}
-              name={`delivery_${index}`}
-              style={{ flexDirection: 'row' }}
-              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-              value={this.state.deliveryType[index]}
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
             >
+
               <FormControlLabel
-                value="nightBefore"
+                value={'nightBefore'}
                 control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
+                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                
+                  ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - Free`}
               />
 
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('DD')} - $2.50`}
+                label={`Day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $2.50`}
               />
+
             </RadioGroup>
           );
-        }
-
-        if (this.state.deliveryType[previousIndex] == 'nightBefore') {
-          console.log(moment(this.renderStartDays()[0])
-            .add(index, 'd')
-            .format('ddd'));
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'dayOfThursday') {
           radioGroup = (
             <RadioGroup
-              aria-label={`delivery_${index}`}
-              name={`delivery_${index}`}
-              style={{ flexDirection: 'row' }}
-              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-              value={this.state.deliveryType[index]}
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
             >
-              <FormControlLabel
-                value="pairing"
-                control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(previousIndex - 1, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(previousIndex - 1, 'd')
-                  .format('D')} - Free`}
-              />
 
               <FormControlLabel
-                value="nightBefore"
+                value={'nightBefore'}
                 control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
+                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                
+                  ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - $2.50`}
               />
 
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('DD')} - $2.50`}
+                label={`Day of  ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $2.50`}
               />
+
+
             </RadioGroup>
           );
-        }
-
-        if (
-          this.state.deliveryType[previousIndex] == 'pairing' &&
-          this.state.deliveryType[index - 2] == 'pairing'
-        ) {
-          console.log(moment(this.renderStartDays()[0])
-            .add(index, 'd')
-            .format('ddd'));
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'dayOf') {
           radioGroup = (
             <RadioGroup
-              aria-label={`delivery_${index}`}
-              name={`delivery_${index}`}
-              style={{ flexDirection: 'row' }}
-              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-              value={this.state.deliveryType[index]}
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
             >
-              <FormControlLabel
-                value="nightBefore"
-                control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
-              />
 
               <FormControlLabel
-                value={'dayOf'}
+                value={'nightBefore'}
                 control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('DD')} - $2.50`}
+                label={`3-day pairing day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                  ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $2.50`}
               />
+
             </RadioGroup>
           );
-        } // last else if
-
-        // if (
-        //   (this.state.deliveryType[previousIndex] == "nightBefore" &&
-        //     this.state.deliveryType[index - 2] == "pairing") ||
-        //   (this.state.deliveryType[previousIndex] == "nightBefore" &&
-        //     this.state.deliveryType[index - 2] == "")
-        // ) {
-        //       console.log(moment(this.renderStartDays()[0])
-        //           .add(index, "d")
-        //           .format("ddd"))
-        //   radioGroup = (
-        //     <RadioGroup
-        //       aria-label={`delivery_${index}`}
-        //       name={`delivery_${index}`}
-        //       style={{ flexDirection: "row" }}
-        //       onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-        //       value={this.state.deliveryType[index]}
-        //     >
-        //       <FormControlLabel
-        //         value="pairing"
-        //         control={<Radio />}
-        //         label={`Delivered ${moment(this.renderStartDays()[0])
-        //           .add(index, "d")
-        //           .subtract(index - 2, "d")
-        //           .format("ddd")} ${moment(this.renderStartDays()[0])
-        //           .add(index, "d")
-        //           .subtract(index - 2, "d")
-        //           .format("D")} - Free`}
-        //       />
-
-        //       <FormControlLabel
-        //         value="nightBefore"
-        //         control={<Radio />}
-        //         label={`Delivered ${moment(this.renderStartDays()[0])
-        //           .add(index, "d")
-        //           .subtract(1, "d")
-        //           .format("ddd")} ${moment(this.renderStartDays()[0])
-        //           .add(index, "d")
-        //           .subtract(1, "d")
-        //           .format("D")} - Free`}
-        //       />
-
-        //       <FormControlLabel
-        //         value={"dayOf"}
-        //         control={<Radio />}
-        //         label={`Delivered ${moment(this.renderStartDays()[0])
-        //           .add(index, "d")
-        //           .format("ddd")} ${moment(this.renderStartDays()[0])
-        //           .add(index, "d")
-        //           .format("DD")} - $2.50`}
-        //       />
-        //     </RadioGroup>
-        //   );
-        // }
-
-        if (
-          this.state.deliveryType[previousIndex] == 'nightBefore' &&
-          this.state.deliveryType[index - 2] == 'pairing' &&
-          this.state.deliveryType[index - 3] == 'pairing'
-        ) {
-          console.log(moment(this.renderStartDays()[0])
-            .add(index, 'd')
-            .format('ddd'));
+        } else if ( this.state.deliveryType[4] == 'dayOfPaired' && this.state.deliveryType[3] == 'dayOf'){
           radioGroup = (
             <RadioGroup
-              aria-label={`delivery_${index}`}
-              name={`delivery_${index}`}
-              style={{ flexDirection: 'row' }}
-              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-              value={this.state.deliveryType[index]}
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
             >
-              <FormControlLabel
-                value="nightBefore"
-                control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
-              />
 
               <FormControlLabel
-                value={'dayOf'}
+                value={'dayOfThursday'}
                 control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('DD')} - $2.50`}
-              />
-            </RadioGroup>
-          );
-        }
-
-        if (
-          this.state.deliveryType[index - 1] == 'pairing' &&
-          this.state.deliveryType[index - 2] == 'nightBefore' &&
-          this.state.deliveryType[index - 3] == 'pairing' &&
-          this.state.deliveryType[index - 4] == 'nightBefore'
-        ) {
-          console.log(moment(this.renderStartDays()[0])
-            .add(index, 'd')
-            .format('ddd'));
-          radioGroup = (
-            <RadioGroup
-              aria-label={`delivery_${index}`}
-              name={`delivery_${index}`}
-              style={{ flexDirection: 'row' }}
-              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-              value={this.state.deliveryType[index]}
-            >
-              <FormControlLabel
-                value="nightBefore"
-                control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
-              />
-
-              <FormControlLabel
-                value={'dayOf'}
-                control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('DD')} - $2.50`}
-              />
-            </RadioGroup>
-          );
-        }
-
-        if (this.state.deliveryType[previousIndex] == 'nightBeforePaired') {
-          console.log(moment(this.renderStartDays()[0])
-            .add(index, 'd')
-            .format('ddd'));
-          radioGroup = (
-            <RadioGroup
-              aria-label={`delivery_${index}`}
-              name={`delivery_${index}`}
-              style={{ flexDirection: 'row' }}
-              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-              value={this.state.deliveryType[index]}
-            >
-              <FormControlLabel
-                value="pairing"
-                control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(previousIndex - 1, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(previousIndex - 1, 'd')
-                  .format('D')} - Free`}
+                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                
+                  ${moment(this.renderStartDays()[0])
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - $2.50`}
               />
 
             </RadioGroup>
           );
+
         }
 
 
-        if (
-          this.state.deliveryType[index - 2] != 'pairing' &&
-          this.state.deliveryType[previousIndex] == 'pairing'
-        ) {
-          console.log(moment(this.renderStartDays()[0])
-            .add(index, 'd')
-            .format('ddd'));
-          radioGroup = (
-            <RadioGroup
-              aria-label={`delivery_${index}`}
-              name={`delivery_${index}`}
-              style={{ flexDirection: 'row' }}
-              onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-              value={this.state.deliveryType[index]}
-            >
-              <FormControlLabel
-                value="pairing"
-                control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(index + previousIndex, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(index + previousIndex, 'd')
-                  .format('D')} - Free`}
-              />
+      }// totalMealSum == 1
 
-              <FormControlLabel
-                value="nightBefore"
-                control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
-              />
+    }// saturday/sunday
 
-              <FormControlLabel
-                value={'dayOf'}
-                control={<Radio />}
-                label={`Delivered ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('ddd')} ${moment(this.renderStartDays()[0])
-                  .add(index, 'd')
-                  .format('DD')} - $2.50`}
-              />
-            </RadioGroup>
-          );
-        }
-      } // index >= 1 && index <= 4
-    } // more than 1 meal in this day currentMealSum
-    else if (currentMealSum == 1) {
-      console.log(moment(this.renderStartDays()[0])
-        .add(index, 'd')
-        .format('ddd'));
-      // if(this.state.deliveryType[previousIndex] == 'nightBeforePaired'){
 
-      //   radioGroup = (
-      //     <RadioGroup
-      //       aria-label={`delivery_${index}`}
-      //       name={`delivery_${index}`}
-      //       style={{ flexDirection: "row" }}
-      //       onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-      //       value={this.state.deliveryType[index]}
-      //     >
-      //       <FormControlLabel
-      //         value="pairing"
-      //         control={<Radio />}
-      //         label={`Delivered ${moment(this.renderStartDays()[0])
-      //           .add(previousIndex - 1, "d")
-      //           .format("ddd")} ${moment(this.renderStartDays()[0])
-      //           .add(previousIndex - 1, "d")
-      //           .format("D")} - Free`}
-      //       />
-
-      //     </RadioGroup>
-      //   );
-
-      // }
-
-      if (this.state.deliveryType[previousIndex] == 'nightBefore') {
-        console.log(moment(this.renderStartDays()[0])
-          .add(index, 'd')
-          .format('ddd'));
-        radioGroup = (
-          <RadioGroup
-            aria-label={`delivery_${index}`}
-            name={`delivery_${index}`}
-            style={{ flexDirection: 'row' }}
-            onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-            value={this.state.deliveryType[index]}
-          >
-            <FormControlLabel
-              value="pairing"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-                .add(previousIndex - 1, 'd')
-                .format('ddd')} ${moment(this.renderStartDays()[0])
-                .add(previousIndex - 1, 'd')
-                .format('D')} - Free`}
-            />
-
-            <FormControlLabel
-              value="nightBefore"
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-                .add(index, 'd')
-                .subtract(1, 'd')
-                .format('ddd')} ${moment(this.renderStartDays()[0])
-                .add(index, 'd')
-                .subtract(1, 'd')
-                .format('D')} - Free`}
-            />
-
-            <FormControlLabel
-              value={'dayOf'}
-              control={<Radio />}
-              label={`Delivered ${moment(this.renderStartDays()[0])
-                .add(index, 'd')
-                .format('ddd')} ${moment(this.renderStartDays()[0])
-                .add(index, 'd')
-                .format('DD')} - $2.50`}
-            />
-          </RadioGroup>
-        );
-      }
-    }
-
-    return (
-      <div>
-        <Typography type="subheading" className="font-uppercase font-medium">
-          {moment(this.renderStartDays()[0])
-            .add(index, 'd')
-            .format('ddd')}
-        </Typography>
-
-        <Typography type="subheading" className="font-uppercase font-medium">
-          {moment(this.renderStartDays()[0])
-            .add(index, 'd')
-            .format('DD')}
-        </Typography>
-
-        <FormControl component="fieldset" disabled={currentMealSum == 0}>
-          {currentMealSum == 0 ? (
-            <Typography type="subheading" className="font-medium">
-              N/A
-            </Typography>
-          ) : (
-            ''
-          )}
-
-          {currentMealSum >= 1 ? radioGroup : ''}
-        </FormControl>
-
-        <Divider style={{ marginBottom: '25px' }} />
-      </div>
-    );
+    return radioGroup;
   }
+
+  // renderOptions(element, index) {
+  //   const currentMealSum = element.breakfast + element.lunch + element.dinner;
+  //   const previousIndex = index - 1;
+  //   const daysMealSum = [];
+
+  //   this.state.subscriptionSchedule.forEach((e, i) => {
+  //     daysMealSum.push(e.breakfast + e.lunch + e.dinner);
+  //   });
+
+  //   let radioGroup = (
+  //     <RadioGroup
+  //       aria-label={`delivery_${index}`}
+  //       name={`delivery_${index}`}
+  //       style={{ flexDirection: 'row' }}
+  //       value={this.state.deliveryType[index]}
+  //       onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //       disabled
+  //     >
+  //       <Typography type="body2">N/a</Typography>
+  //     </RadioGroup>
+  //   );
+
+  //   if (index == 0 && currentMealSum == 1) {
+  //     console.log(moment(this.renderStartDays()[0])
+  //       .add(index, 'd')
+  //       .format('ddd'));
+
+  //     radioGroup = (
+  //       <RadioGroup
+  //         aria-label={`delivery_${index}`}
+  //         name={`delivery_${index}`}
+  //         style={{ flexDirection: 'row' }}
+  //         onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //         value={this.state.deliveryType[index]}
+  //       >
+  //         <FormControlLabel
+  //           value="nightBeforePaired"
+  //           control={<Radio />}
+  //           label={`Delivered ${moment(this.renderStartDays()[0])
+  //             .add(index, 'd')
+  //             .subtract(1, 'd')
+  //             .format('ddd')} ${moment(this.renderStartDays()[0])
+  //             .add(index, 'd')
+  //             .subtract(1, 'd')
+  //             .format('D')} - Free (Pair Tuesday or Tuesday & Wednesday)`}
+  //         />
+
+  //         <FormControlLabel
+  //           value="nightBefore"
+  //           control={<Radio />}
+  //           label={`Delivered ${moment(this.renderStartDays()[0])
+  //             .add(index, 'd')
+  //             .subtract(1, 'd')
+  //             .format('ddd')} ${moment(this.renderStartDays()[0])
+  //             .add(index, 'd')
+  //             .subtract(1, 'd')
+  //             .format('D')} - $2.50`}
+  //         />
+
+  //         <FormControlLabel
+  //           value={'dayOf'}
+  //           control={<Radio />}
+  //           label={`Delivered ${moment(this.renderStartDays()[0])
+  //             .add(index, 'd')
+  //             .format('ddd')} ${moment(this.renderStartDays()[0])
+  //             .add(index, 'd')
+  //             .format('DD')} - $2.50`}
+  //         />
+  //       </RadioGroup>
+  //     );
+  //   }
+
+  //   if (currentMealSum > 1) {
+  //     if (index == 0) {
+  //       console.log(moment(this.renderStartDays()[0])
+  //         .add(index, 'd')
+  //         .format('ddd'));
+  //       radioGroup = (
+  //         <RadioGroup
+  //           aria-label={`delivery_${index}`}
+  //           name={`delivery_${index}`}
+  //           style={{ flexDirection: 'row' }}
+  //           onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //           value={this.state.deliveryType[index]}
+  //         >
+  //           <FormControlLabel
+  //             value="nightBefore"
+  //             control={<Radio />}
+  //             label={`Delivered ${moment(this.renderStartDays()[0])
+  //               .add(index, 'd')
+  //               .subtract(1, 'd')
+  //               .format('ddd')} ${moment(this.renderStartDays()[0])
+  //               .add(index, 'd')
+  //               .subtract(1, 'd')
+  //               .format('D')} - Free`}
+  //           />
+
+  //           <FormControlLabel
+  //             value={'dayOf'}
+  //             control={<Radio />}
+  //             label={`Delivered ${moment(this.renderStartDays()[0])
+  //               .add(index, 'd')
+  //               .format('ddd')} ${moment(this.renderStartDays()[0])
+  //               .add(index, 'd')
+  //               .format('DD')} - $2.50`}
+  //           />
+  //         </RadioGroup>
+  //       );
+  //     }
+
+  //     if (index >= 1 && index <= 4) {
+  //       if (
+  //         this.state.deliveryType[previousIndex] == '' ||
+  //         this.state.deliveryType[previousIndex] == 'dayOf'
+  //       ) {
+  //         console.log(moment(this.renderStartDays()[0])
+  //           .add(index, 'd')
+  //           .format('ddd'));
+  //         radioGroup = (
+  //           <RadioGroup
+  //             aria-label={`delivery_${index}`}
+  //             name={`delivery_${index}`}
+  //             style={{ flexDirection: 'row' }}
+  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //             value={this.state.deliveryType[index]}
+  //           >
+  //             <FormControlLabel
+  //               value="nightBefore"
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('D')} - Free`}
+  //             />
+
+  //             <FormControlLabel
+  //               value={'dayOf'}
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('DD')} - $2.50`}
+  //             />
+  //           </RadioGroup>
+  //         );
+  //       }
+
+  //       if (this.state.deliveryType[previousIndex] == 'nightBefore') {
+  //         console.log(moment(this.renderStartDays()[0])
+  //           .add(index, 'd')
+  //           .format('ddd'));
+  //         radioGroup = (
+  //           <RadioGroup
+  //             aria-label={`delivery_${index}`}
+  //             name={`delivery_${index}`}
+  //             style={{ flexDirection: 'row' }}
+  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //             value={this.state.deliveryType[index]}
+  //           >
+  //             <FormControlLabel
+  //               value="pairing"
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(previousIndex - 1, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(previousIndex - 1, 'd')
+  //                 .format('D')} - Free`}
+  //             />
+
+  //             <FormControlLabel
+  //               value="nightBefore"
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('D')} - Free`}
+  //             />
+
+  //             <FormControlLabel
+  //               value={'dayOf'}
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('DD')} - $2.50`}
+  //             />
+  //           </RadioGroup>
+  //         );
+  //       }
+
+  //       if (
+  //         this.state.deliveryType[previousIndex] == 'pairing' &&
+  //         this.state.deliveryType[index - 2] == 'pairing'
+  //       ) {
+  //         console.log(moment(this.renderStartDays()[0])
+  //           .add(index, 'd')
+  //           .format('ddd'));
+  //         radioGroup = (
+  //           <RadioGroup
+  //             aria-label={`delivery_${index}`}
+  //             name={`delivery_${index}`}
+  //             style={{ flexDirection: 'row' }}
+  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //             value={this.state.deliveryType[index]}
+  //           >
+  //             <FormControlLabel
+  //               value="nightBefore"
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('D')} - Free`}
+  //             />
+
+  //             <FormControlLabel
+  //               value={'dayOf'}
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('DD')} - $2.50`}
+  //             />
+  //           </RadioGroup>
+  //         );
+
+  //       if (
+  //         this.state.deliveryType[previousIndex] == 'nightBefore' &&
+  //         this.state.deliveryType[index - 2] == 'pairing' &&
+  //         this.state.deliveryType[index - 3] == 'pairing'
+  //       ) {
+  //         console.log(moment(this.renderStartDays()[0])
+  //           .add(index, 'd')
+  //           .format('ddd'));
+  //         radioGroup = (
+  //           <RadioGroup
+  //             aria-label={`delivery_${index}`}
+  //             name={`delivery_${index}`}
+  //             style={{ flexDirection: 'row' }}
+  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //             value={this.state.deliveryType[index]}
+  //           >
+  //             <FormControlLabel
+  //               value="nightBefore"
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('D')} - Free`}
+  //             />
+
+  //             <FormControlLabel
+  //               value={'dayOf'}
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('DD')} - $2.50`}
+  //             />
+  //           </RadioGroup>
+  //         );
+  //       }
+
+  //       if (
+  //         this.state.deliveryType[index - 1] == 'pairing' &&
+  //         this.state.deliveryType[index - 2] == 'nightBefore' &&
+  //         this.state.deliveryType[index - 3] == 'pairing' &&
+  //         this.state.deliveryType[index - 4] == 'nightBefore'
+  //       ) {
+  //         console.log(moment(this.renderStartDays()[0])
+  //           .add(index, 'd')
+  //           .format('ddd'));
+  //         radioGroup = (
+  //           <RadioGroup
+  //             aria-label={`delivery_${index}`}
+  //             name={`delivery_${index}`}
+  //             style={{ flexDirection: 'row' }}
+  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //             value={this.state.deliveryType[index]}
+  //           >
+  //             <FormControlLabel
+  //               value="nightBefore"
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('D')} - Free`}
+  //             />
+
+  //             <FormControlLabel
+  //               value={'dayOf'}
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('DD')} - $2.50`}
+  //             />
+  //           </RadioGroup>
+  //         );
+  //       }
+
+  //       if (this.state.deliveryType[previousIndex] == 'nightBeforePaired') {
+  //         console.log(moment(this.renderStartDays()[0])
+  //           .add(index, 'd')
+  //           .format('ddd'));
+  //         radioGroup = (
+  //           <RadioGroup
+  //             aria-label={`delivery_${index}`}
+  //             name={`delivery_${index}`}
+  //             style={{ flexDirection: 'row' }}
+  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //             value={this.state.deliveryType[index]}
+  //           >
+  //             <FormControlLabel
+  //               value="pairing"
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(previousIndex - 1, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(previousIndex - 1, 'd')
+  //                 .format('D')} - Free`}
+  //             />
+
+  //           </RadioGroup>
+  //         );
+  //       }
+
+  //       if (
+  //         this.state.deliveryType[index - 2] != 'pairing' &&
+  //         this.state.deliveryType[previousIndex] == 'pairing'
+  //       ) {
+  //         console.log(moment(this.renderStartDays()[0])
+  //           .add(index, 'd')
+  //           .format('ddd'));
+  //         radioGroup = (
+  //           <RadioGroup
+  //             aria-label={`delivery_${index}`}
+  //             name={`delivery_${index}`}
+  //             style={{ flexDirection: 'row' }}
+  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //             value={this.state.deliveryType[index]}
+  //           >
+  //             <FormControlLabel
+  //               value="pairing"
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(index + previousIndex, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(index + previousIndex, 'd')
+  //                 .format('D')} - Free`}
+  //             />
+
+  //             <FormControlLabel
+  //               value="nightBefore"
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .subtract(1, 'd')
+  //                 .format('D')} - Free`}
+  //             />
+
+  //             <FormControlLabel
+  //               value={'dayOf'}
+  //               control={<Radio />}
+  //               label={`Delivered ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
+  //                 .add(index, 'd')
+  //                 .format('DD')} - $2.50`}
+  //             />
+  //           </RadioGroup>
+  //         );
+  //       }
+  //     } // index >= 1 && index <= 4
+  //   } // more than 1 meal in this day currentMealSum
+  //   else if (currentMealSum == 1) {
+  //     console.log(moment(this.renderStartDays()[0])
+  //       .add(index, 'd')
+  //       .format('ddd'));
+
+  //     if (this.state.deliveryType[previousIndex] == 'nightBefore') {
+  //       console.log(moment(this.renderStartDays()[0])
+  //         .add(index, 'd')
+  //         .format('ddd'));
+  //       radioGroup = (
+  //         <RadioGroup
+  //           aria-label={`delivery_${index}`}
+  //           name={`delivery_${index}`}
+  //           style={{ flexDirection: 'row' }}
+  //           onChange={this.changeRadioDeliveryType.bind(this, index, element)}
+  //           value={this.state.deliveryType[index]}
+  //         >
+  //           <FormControlLabel
+  //             value="pairing"
+  //             control={<Radio />}
+  //             label={`Delivered ${moment(this.renderStartDays()[0])
+  //               .add(previousIndex - 1, 'd')
+  //               .format('ddd')} ${moment(this.renderStartDays()[0])
+  //               .add(previousIndex - 1, 'd')
+  //               .format('D')} - Free`}
+  //           />
+
+  //           <FormControlLabel
+  //             value="nightBefore"
+  //             control={<Radio />}
+  //             label={`Delivered ${moment(this.renderStartDays()[0])
+  //               .add(index, 'd')
+  //               .subtract(1, 'd')
+  //               .format('ddd')} ${moment(this.renderStartDays()[0])
+  //               .add(index, 'd')
+  //               .subtract(1, 'd')
+  //               .format('D')} - Free`}
+  //           />
+
+  //           <FormControlLabel
+  //             value={'dayOf'}
+  //             control={<Radio />}
+  //             label={`Delivered ${moment(this.renderStartDays()[0])
+  //               .add(index, 'd')
+  //               .format('ddd')} ${moment(this.renderStartDays()[0])
+  //               .add(index, 'd')
+  //               .format('DD')} - $2.50`}
+  //           />
+  //         </RadioGroup>
+  //       );
+  //     }
+  //   }
+
+  //   return (
+  //     <div>
+  //       <Typography type="subheading" className="font-uppercase font-medium">
+  //         {moment(this.renderStartDays()[0])
+  //           .add(index, 'd')
+  //           .format('ddd')}
+  //       </Typography>
+
+  //       <Typography type="subheading" className="font-uppercase font-medium">
+  //         {moment(this.renderStartDays()[0])
+  //           .add(index, 'd')
+  //           .format('DD')}
+  //       </Typography>
+
+  //       <FormControl component="fieldset" disabled={currentMealSum == 0}>
+  //         {currentMealSum == 0 ? (
+  //           <Typography type="subheading" className="font-medium">
+  //             N/A
+  //           </Typography>
+  //         ) : (
+  //           ''
+  //         )}
+
+  //         {currentMealSum >= 1 ? radioGroup : ''}
+  //       </FormControl>
+
+  //       <Divider style={{ marginBottom: '25px' }} />
+  //     </div>
+  //   );
+  // }
 
   handleChangeRadioLifestyleSecondary(i, event, value) {
     this.state.secondaryProfilesData[i].lifestyle = value;
@@ -1492,7 +5374,8 @@ class Step3LifestyleProfile extends React.Component {
       [this.props.classes.buttonSuccess]: this.state.submitSuccess,
     });
 
-    this.checkPairings();
+    const steps = this.getSteps();
+    const { activeDeliveryScheduleStep } = this.state;
 
     return (
       <form
@@ -3141,9 +7024,72 @@ class Step3LifestyleProfile extends React.Component {
                   </Typography>
                 </Grid>
                 <Grid item xs={12}>
-                  {this.state.subscriptionSchedule.map((e, i) =>
-                    this.renderOptions(e, i),
+                  {this.state.subscriptionSchedule.map(
+                    (e, i) => '',
+                    // this.renderOptions(e, i),
                   )}
+
+                  <Stepper
+                    activeStep={activeDeliveryScheduleStep}
+                    style={{ background: 'none !important' }}
+                  >
+                    {steps.map((label, index) => {
+                      const props = {};
+                      const stepLabel = `${label} ${moment(
+                        this.renderStartDays()[0],
+                      )
+                        .add(index, 'd')
+                        .format('DD')}`;
+
+                      if (index == 5) {
+                        stepLabel = `${label.split('/')[0]} ${moment(
+                          this.renderStartDays()[0],
+                        )
+                          .add(index, 'd')
+                          .format('DD')} & ${label.split('/')[1]} ${moment(
+                          this.renderStartDays()[0],
+                        )
+                          .add(index + 1, 'd')
+                          .format('DD')}`;
+                      }
+
+                      return (
+                        <Step key={index} {...props}>
+                          <StepLabel>{stepLabel}</StepLabel>
+                        </Step>
+                      );
+                    })}
+                  </Stepper>
+
+                  {this.state.subscriptionSchedule.map((label, index) => {
+                    if (index >= 1) {
+                      return;
+                    }
+
+                    return this.renderOptionsForTheDay(
+                      activeDeliveryScheduleStep,
+                    );
+                  })}
+
+                  {activeDeliveryScheduleStep >= 1 ? (
+                    <Button
+                      onClick={this.handleBackDeliverySchedule.bind(this)}
+                    >
+                      Back
+                    </Button>
+                  ) : (
+                    ''
+                  )}
+
+                  {activeDeliveryScheduleStep < 5 ? (
+                    <Button onClick={this.handleNextDeliverySchedule.bind(this)}>
+                      Next
+                    </Button>
+                    
+                  ) : (
+                    ''
+                  )}
+                 
                 </Grid>
               </Grid>
             </Paper>

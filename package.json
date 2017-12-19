@@ -2,7 +2,7 @@
   "name": "healthy-meal-plan",
   "private": true,
   "scripts": {
-    "start": "meteor --settings settings-development.json",
+    "start": "meteor run --settings settings-development.json",
     "test": "jest"
   },
   "dependencies": {
@@ -57,7 +57,10 @@
     "jest": "^20.0.4"
   },
   "babel": {
-    "presets": ["env", "react"]
+    "presets": [
+      "env",
+      "react"
+    ]
   },
   "eslintConfig": {
     "parserOptions": {
@@ -65,7 +68,10 @@
         "jsx": true
       }
     },
-    "plugins": ["meteor", "react"],
+    "plugins": [
+      "meteor",
+      "react"
+    ],
     "extends": [
       "airbnb",
       "plugin:meteor/recommended",
