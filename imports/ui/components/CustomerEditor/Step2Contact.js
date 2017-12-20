@@ -64,9 +64,7 @@ class Step2Contact extends React.Component {
     this.state = {
       submitLoading: false,
       submitSuccess: false,
-      adultOrChildValue: this.props.customerInfo.adultOrChild
-        ? this.props.customerInfo.adultOrChild
-        : "adult"
+      adultOrChildValue: "adult"
     };
   }
 
@@ -218,6 +216,7 @@ class Step2Contact extends React.Component {
                         id="first_name"
                         label="First name"
                         name="first_name"
+                        fullWidth
                         defaultValue={this.props.customerInfo.firstName}
                         inputProps={{}}
                       />
@@ -228,6 +227,7 @@ class Step2Contact extends React.Component {
                         id="last_name"
                         label="Last name"
                         name="last_name"
+                        fullWidth
                         defaultValue={this.props.customerInfo.lastName}
                         inputProps={{}}
                       />
@@ -253,35 +253,6 @@ class Step2Contact extends React.Component {
                     defaultValue={this.props.customerInfo.phoneNumber}
                     inputProps={{}}
                   />
-
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <FormControl component="fieldset">
-                        {/* <FormLabel component="legend">Type</FormLabel> */}
-                        <RadioGroup
-                          aria-label="account-type"
-                          name="type"
-                          value={this.state.adultOrChildValue}
-                          onChange={this.handleChangeRadio.bind(this)}
-                          style={{ flexDirection: "row" }}
-                        >
-                          <FormControlLabel
-                            value="adult"
-                            control={<Radio />}
-                            label="Adult"
-                            selected
-                            disabled
-                          />
-                          <FormControlLabel
-                            value="child"
-                            control={<Radio />}
-                            label="Child"
-                            disabled
-                          />
-                        </RadioGroup>
-                      </FormControl>
-                    </Grid>
-                  </Grid>
                 </Paper>
               </Grid>
             </Grid>

@@ -2,13 +2,12 @@ import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
 import { Roles } from "meteor/alanning:roles";
 
-import Routes from "../Routes/Routes";
-
 import { Accounts } from "meteor/accounts-base";
 import editProfile from "./edit-profile";
 import rateLimit from "../../../modules/rate-limit";
 import createCustomerProfile from "../../../modules/server/authorize/createCustomerProfile";
 import createSubscriptionFromCustomerProfile from "../../../modules/server/authorize/createSubscriptionFromCustomerProfile";
+import Routes from "../../Routes/Routes";
 
 Meteor.methods({
   "users.sendVerificationEmail": function usersSendVerificationEmail() {
@@ -51,6 +50,12 @@ Meteor.methods({
       firstName: String
     });
 
+    const postalCodeExists = Routes.find({
+      title: data.postalCode.substr(0, 3)
+    }).fetch();
+
+    console.log(postalCodeExists);
+
     try {
       var userId = Accounts.createUser({
         email: data.email,
@@ -70,6 +75,11 @@ Meteor.methods({
       { _id: userId },
       { $set: { postalCode: data.postalCode, status: "abandoned" } }
     );
+
+    if (postalCodeExists.length == 0) {
+      console.log(postalCodeExists);
+      throw new Meteor.Error(400, "Delivery not available in that area.");
+    }
 
     return userId;
   },

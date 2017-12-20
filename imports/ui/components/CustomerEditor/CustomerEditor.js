@@ -271,7 +271,7 @@ class CustomerEditor extends React.Component {
 
   getStepContent(step) {
     switch (step) {
-      case 0:
+      case 2:
         return (
           <Step1Eligibility
             handleNext={this.handleNext.bind(this)}
@@ -290,7 +290,7 @@ class CustomerEditor extends React.Component {
             popTheSnackbar={this.props.popTheSnackbar.bind(this)}
           />
         );
-      case 2:
+      case 0:
         return (
           <Step3LifestyleProfile
             handleNext={this.handleNext.bind(this)}

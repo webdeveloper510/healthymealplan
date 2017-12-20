@@ -121,6 +121,17 @@ class Step3LifestyleProfile extends React.Component {
 
       restrictions: [],
 
+      scheduleReal: [
+        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
+        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
+        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
+        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
+        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
+        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
+        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
+      ],
+      
+
       schedule: [
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
@@ -140,14 +151,18 @@ class Step3LifestyleProfile extends React.Component {
         { breakfast: 0, lunch: 0, dinner: 0 },
       ],
       activeDeliveryScheduleStep: 0,
+      activeMealScheduleStep: 0,
       subscriptionStartDate: moment(this.renderStartDays()[0]).format(
+        'dddd, MMMM Do YYYY',
+      ),
+      subscriptionStartDateRaw: this.renderStartDays()[0],
+      subscriptionStartDateFormatted: moment(this.renderStartDays()[0]).format(
         'dddd, MMMM Do YYYY',
       ),
       deliveryType: ['', '', '', '', '', '', ''],
       nextFewMondays: null,
 
       // collapse
-      primaryCollapse: true,
       secondaryCollapses: [false, false, false, false, false, false],
       secondaryProfileCount: 0,
       secondaryProfilesData: [],
@@ -414,6 +429,45 @@ class Step3LifestyleProfile extends React.Component {
     });
   }
 
+  handleChangeRadioScheduleQuantity(index, mealType, event, value){
+    console.log(mealType)
+    console.log(event.target.value)
+
+    const scheduleRealCopy = this.state.scheduleReal.slice();
+
+    scheduleRealCopy[index][mealType].quantity = event.target.value
+
+    this.setState({
+      scheduleReal: scheduleRealCopy
+    })
+  }
+
+  handleChangeRadioSchedulePortion(index, mealType, event, value){
+    console.log(mealType)
+    console.log(event.target.value)
+
+
+    const scheduleRealCopy = this.state.scheduleReal.slice();
+
+    scheduleRealCopy[index][mealType].portions = event.target.value
+
+    this.setState({
+      scheduleReal: scheduleRealCopy
+    })
+  }
+  
+  
+  handleScheduleMealTypeCheck(index, mealType, event){
+
+    const scheduleRealCopy = this.state.scheduleReal.slice();
+
+    scheduleRealCopy[index][mealType].active = !scheduleRealCopy[index][mealType].active;
+
+    this.setState({
+      scheduleReal: scheduleRealCopy
+    })
+  }
+
   handleChangeRadioscheduleType(event, value) {
     const scheduleCopy = _.cloneDeep(this.state.schedule);
     const subscriptionScheduleCopy = _.cloneDeep(
@@ -614,29 +668,6 @@ class Step3LifestyleProfile extends React.Component {
     // console.log(pairings);
   }
 
-  // getStepContent(step) {
-
-  //   switch (step) {
-  //     case 0:
-  //      return this.renderOptionsForTheDay(step);
-  //     case 1:
-  //      return this.renderOptionsForTheDay(step);
-  //     case 2:
-  //      return this.renderOptionsForTheDay(step);
-  //     case 3:
-  //      return this.renderOptionsForTheDay(step);
-  //     case 4:
-  //      return this.renderOptionsForTheDay(step);
-  //     case 5:
-  //      return this.renderOptionsForTheDay(step);
-  //     case 6:
-  //      return this.renderOptionsForTheDay(step);
-  //     default:
-  //      return "Unknown step";
-  //   }
-
-  // }
-
   handleNextDeliverySchedule() {
     const { activeDeliveryScheduleStep } = this.state;
 
@@ -653,6 +684,22 @@ class Step3LifestyleProfile extends React.Component {
     });
   }
 
+  handleNextMealSchedule() {
+    const { activeMealScheduleStep } = this.state;
+
+    this.setState({
+      activeMealScheduleStep: activeMealScheduleStep + 1,
+    });
+  }
+
+  handleBackMealSchedule() {
+    const { activeMealScheduleStep } = this.state;
+
+    this.setState({
+      activeMealScheduleStep: activeMealScheduleStep - 1,
+    });
+  }
+
   getSteps() {
     return [
       'Monday',
@@ -663,6 +710,19 @@ class Step3LifestyleProfile extends React.Component {
       'Saturday/Sunday',
     ];
   }
+
+  getMealSteps() {
+    return [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday'
+    ];
+  }
+
 
   renderOptionsForTheDay(step) {
     const previousIndex = step == 0 ? null : step - 1;
@@ -4583,489 +4643,6 @@ class Step3LifestyleProfile extends React.Component {
     return radioGroup;
   }
 
-  // renderOptions(element, index) {
-  //   const currentMealSum = element.breakfast + element.lunch + element.dinner;
-  //   const previousIndex = index - 1;
-  //   const daysMealSum = [];
-
-  //   this.state.subscriptionSchedule.forEach((e, i) => {
-  //     daysMealSum.push(e.breakfast + e.lunch + e.dinner);
-  //   });
-
-  //   let radioGroup = (
-  //     <RadioGroup
-  //       aria-label={`delivery_${index}`}
-  //       name={`delivery_${index}`}
-  //       style={{ flexDirection: 'row' }}
-  //       value={this.state.deliveryType[index]}
-  //       onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //       disabled
-  //     >
-  //       <Typography type="body2">N/a</Typography>
-  //     </RadioGroup>
-  //   );
-
-  //   if (index == 0 && currentMealSum == 1) {
-  //     console.log(moment(this.renderStartDays()[0])
-  //       .add(index, 'd')
-  //       .format('ddd'));
-
-  //     radioGroup = (
-  //       <RadioGroup
-  //         aria-label={`delivery_${index}`}
-  //         name={`delivery_${index}`}
-  //         style={{ flexDirection: 'row' }}
-  //         onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //         value={this.state.deliveryType[index]}
-  //       >
-  //         <FormControlLabel
-  //           value="nightBeforePaired"
-  //           control={<Radio />}
-  //           label={`Delivered ${moment(this.renderStartDays()[0])
-  //             .add(index, 'd')
-  //             .subtract(1, 'd')
-  //             .format('ddd')} ${moment(this.renderStartDays()[0])
-  //             .add(index, 'd')
-  //             .subtract(1, 'd')
-  //             .format('D')} - Free (Pair Tuesday or Tuesday & Wednesday)`}
-  //         />
-
-  //         <FormControlLabel
-  //           value="nightBefore"
-  //           control={<Radio />}
-  //           label={`Delivered ${moment(this.renderStartDays()[0])
-  //             .add(index, 'd')
-  //             .subtract(1, 'd')
-  //             .format('ddd')} ${moment(this.renderStartDays()[0])
-  //             .add(index, 'd')
-  //             .subtract(1, 'd')
-  //             .format('D')} - $2.50`}
-  //         />
-
-  //         <FormControlLabel
-  //           value={'dayOf'}
-  //           control={<Radio />}
-  //           label={`Delivered ${moment(this.renderStartDays()[0])
-  //             .add(index, 'd')
-  //             .format('ddd')} ${moment(this.renderStartDays()[0])
-  //             .add(index, 'd')
-  //             .format('DD')} - $2.50`}
-  //         />
-  //       </RadioGroup>
-  //     );
-  //   }
-
-  //   if (currentMealSum > 1) {
-  //     if (index == 0) {
-  //       console.log(moment(this.renderStartDays()[0])
-  //         .add(index, 'd')
-  //         .format('ddd'));
-  //       radioGroup = (
-  //         <RadioGroup
-  //           aria-label={`delivery_${index}`}
-  //           name={`delivery_${index}`}
-  //           style={{ flexDirection: 'row' }}
-  //           onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //           value={this.state.deliveryType[index]}
-  //         >
-  //           <FormControlLabel
-  //             value="nightBefore"
-  //             control={<Radio />}
-  //             label={`Delivered ${moment(this.renderStartDays()[0])
-  //               .add(index, 'd')
-  //               .subtract(1, 'd')
-  //               .format('ddd')} ${moment(this.renderStartDays()[0])
-  //               .add(index, 'd')
-  //               .subtract(1, 'd')
-  //               .format('D')} - Free`}
-  //           />
-
-  //           <FormControlLabel
-  //             value={'dayOf'}
-  //             control={<Radio />}
-  //             label={`Delivered ${moment(this.renderStartDays()[0])
-  //               .add(index, 'd')
-  //               .format('ddd')} ${moment(this.renderStartDays()[0])
-  //               .add(index, 'd')
-  //               .format('DD')} - $2.50`}
-  //           />
-  //         </RadioGroup>
-  //       );
-  //     }
-
-  //     if (index >= 1 && index <= 4) {
-  //       if (
-  //         this.state.deliveryType[previousIndex] == '' ||
-  //         this.state.deliveryType[previousIndex] == 'dayOf'
-  //       ) {
-  //         console.log(moment(this.renderStartDays()[0])
-  //           .add(index, 'd')
-  //           .format('ddd'));
-  //         radioGroup = (
-  //           <RadioGroup
-  //             aria-label={`delivery_${index}`}
-  //             name={`delivery_${index}`}
-  //             style={{ flexDirection: 'row' }}
-  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //             value={this.state.deliveryType[index]}
-  //           >
-  //             <FormControlLabel
-  //               value="nightBefore"
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('D')} - Free`}
-  //             />
-
-  //             <FormControlLabel
-  //               value={'dayOf'}
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('DD')} - $2.50`}
-  //             />
-  //           </RadioGroup>
-  //         );
-  //       }
-
-  //       if (this.state.deliveryType[previousIndex] == 'nightBefore') {
-  //         console.log(moment(this.renderStartDays()[0])
-  //           .add(index, 'd')
-  //           .format('ddd'));
-  //         radioGroup = (
-  //           <RadioGroup
-  //             aria-label={`delivery_${index}`}
-  //             name={`delivery_${index}`}
-  //             style={{ flexDirection: 'row' }}
-  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //             value={this.state.deliveryType[index]}
-  //           >
-  //             <FormControlLabel
-  //               value="pairing"
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(previousIndex - 1, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(previousIndex - 1, 'd')
-  //                 .format('D')} - Free`}
-  //             />
-
-  //             <FormControlLabel
-  //               value="nightBefore"
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('D')} - Free`}
-  //             />
-
-  //             <FormControlLabel
-  //               value={'dayOf'}
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('DD')} - $2.50`}
-  //             />
-  //           </RadioGroup>
-  //         );
-  //       }
-
-  //       if (
-  //         this.state.deliveryType[previousIndex] == 'pairing' &&
-  //         this.state.deliveryType[index - 2] == 'pairing'
-  //       ) {
-  //         console.log(moment(this.renderStartDays()[0])
-  //           .add(index, 'd')
-  //           .format('ddd'));
-  //         radioGroup = (
-  //           <RadioGroup
-  //             aria-label={`delivery_${index}`}
-  //             name={`delivery_${index}`}
-  //             style={{ flexDirection: 'row' }}
-  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //             value={this.state.deliveryType[index]}
-  //           >
-  //             <FormControlLabel
-  //               value="nightBefore"
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('D')} - Free`}
-  //             />
-
-  //             <FormControlLabel
-  //               value={'dayOf'}
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('DD')} - $2.50`}
-  //             />
-  //           </RadioGroup>
-  //         );
-
-  //       if (
-  //         this.state.deliveryType[previousIndex] == 'nightBefore' &&
-  //         this.state.deliveryType[index - 2] == 'pairing' &&
-  //         this.state.deliveryType[index - 3] == 'pairing'
-  //       ) {
-  //         console.log(moment(this.renderStartDays()[0])
-  //           .add(index, 'd')
-  //           .format('ddd'));
-  //         radioGroup = (
-  //           <RadioGroup
-  //             aria-label={`delivery_${index}`}
-  //             name={`delivery_${index}`}
-  //             style={{ flexDirection: 'row' }}
-  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //             value={this.state.deliveryType[index]}
-  //           >
-  //             <FormControlLabel
-  //               value="nightBefore"
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('D')} - Free`}
-  //             />
-
-  //             <FormControlLabel
-  //               value={'dayOf'}
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('DD')} - $2.50`}
-  //             />
-  //           </RadioGroup>
-  //         );
-  //       }
-
-  //       if (
-  //         this.state.deliveryType[index - 1] == 'pairing' &&
-  //         this.state.deliveryType[index - 2] == 'nightBefore' &&
-  //         this.state.deliveryType[index - 3] == 'pairing' &&
-  //         this.state.deliveryType[index - 4] == 'nightBefore'
-  //       ) {
-  //         console.log(moment(this.renderStartDays()[0])
-  //           .add(index, 'd')
-  //           .format('ddd'));
-  //         radioGroup = (
-  //           <RadioGroup
-  //             aria-label={`delivery_${index}`}
-  //             name={`delivery_${index}`}
-  //             style={{ flexDirection: 'row' }}
-  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //             value={this.state.deliveryType[index]}
-  //           >
-  //             <FormControlLabel
-  //               value="nightBefore"
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('D')} - Free`}
-  //             />
-
-  //             <FormControlLabel
-  //               value={'dayOf'}
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('DD')} - $2.50`}
-  //             />
-  //           </RadioGroup>
-  //         );
-  //       }
-
-  //       if (this.state.deliveryType[previousIndex] == 'nightBeforePaired') {
-  //         console.log(moment(this.renderStartDays()[0])
-  //           .add(index, 'd')
-  //           .format('ddd'));
-  //         radioGroup = (
-  //           <RadioGroup
-  //             aria-label={`delivery_${index}`}
-  //             name={`delivery_${index}`}
-  //             style={{ flexDirection: 'row' }}
-  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //             value={this.state.deliveryType[index]}
-  //           >
-  //             <FormControlLabel
-  //               value="pairing"
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(previousIndex - 1, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(previousIndex - 1, 'd')
-  //                 .format('D')} - Free`}
-  //             />
-
-  //           </RadioGroup>
-  //         );
-  //       }
-
-  //       if (
-  //         this.state.deliveryType[index - 2] != 'pairing' &&
-  //         this.state.deliveryType[previousIndex] == 'pairing'
-  //       ) {
-  //         console.log(moment(this.renderStartDays()[0])
-  //           .add(index, 'd')
-  //           .format('ddd'));
-  //         radioGroup = (
-  //           <RadioGroup
-  //             aria-label={`delivery_${index}`}
-  //             name={`delivery_${index}`}
-  //             style={{ flexDirection: 'row' }}
-  //             onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //             value={this.state.deliveryType[index]}
-  //           >
-  //             <FormControlLabel
-  //               value="pairing"
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(index + previousIndex, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(index + previousIndex, 'd')
-  //                 .format('D')} - Free`}
-  //             />
-
-  //             <FormControlLabel
-  //               value="nightBefore"
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .subtract(1, 'd')
-  //                 .format('D')} - Free`}
-  //             />
-
-  //             <FormControlLabel
-  //               value={'dayOf'}
-  //               control={<Radio />}
-  //               label={`Delivered ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('ddd')} ${moment(this.renderStartDays()[0])
-  //                 .add(index, 'd')
-  //                 .format('DD')} - $2.50`}
-  //             />
-  //           </RadioGroup>
-  //         );
-  //       }
-  //     } // index >= 1 && index <= 4
-  //   } // more than 1 meal in this day currentMealSum
-  //   else if (currentMealSum == 1) {
-  //     console.log(moment(this.renderStartDays()[0])
-  //       .add(index, 'd')
-  //       .format('ddd'));
-
-  //     if (this.state.deliveryType[previousIndex] == 'nightBefore') {
-  //       console.log(moment(this.renderStartDays()[0])
-  //         .add(index, 'd')
-  //         .format('ddd'));
-  //       radioGroup = (
-  //         <RadioGroup
-  //           aria-label={`delivery_${index}`}
-  //           name={`delivery_${index}`}
-  //           style={{ flexDirection: 'row' }}
-  //           onChange={this.changeRadioDeliveryType.bind(this, index, element)}
-  //           value={this.state.deliveryType[index]}
-  //         >
-  //           <FormControlLabel
-  //             value="pairing"
-  //             control={<Radio />}
-  //             label={`Delivered ${moment(this.renderStartDays()[0])
-  //               .add(previousIndex - 1, 'd')
-  //               .format('ddd')} ${moment(this.renderStartDays()[0])
-  //               .add(previousIndex - 1, 'd')
-  //               .format('D')} - Free`}
-  //           />
-
-  //           <FormControlLabel
-  //             value="nightBefore"
-  //             control={<Radio />}
-  //             label={`Delivered ${moment(this.renderStartDays()[0])
-  //               .add(index, 'd')
-  //               .subtract(1, 'd')
-  //               .format('ddd')} ${moment(this.renderStartDays()[0])
-  //               .add(index, 'd')
-  //               .subtract(1, 'd')
-  //               .format('D')} - Free`}
-  //           />
-
-  //           <FormControlLabel
-  //             value={'dayOf'}
-  //             control={<Radio />}
-  //             label={`Delivered ${moment(this.renderStartDays()[0])
-  //               .add(index, 'd')
-  //               .format('ddd')} ${moment(this.renderStartDays()[0])
-  //               .add(index, 'd')
-  //               .format('DD')} - $2.50`}
-  //           />
-  //         </RadioGroup>
-  //       );
-  //     }
-  //   }
-
-  //   return (
-  //     <div>
-  //       <Typography type="subheading" className="font-uppercase font-medium">
-  //         {moment(this.renderStartDays()[0])
-  //           .add(index, 'd')
-  //           .format('ddd')}
-  //       </Typography>
-
-  //       <Typography type="subheading" className="font-uppercase font-medium">
-  //         {moment(this.renderStartDays()[0])
-  //           .add(index, 'd')
-  //           .format('DD')}
-  //       </Typography>
-
-  //       <FormControl component="fieldset" disabled={currentMealSum == 0}>
-  //         {currentMealSum == 0 ? (
-  //           <Typography type="subheading" className="font-medium">
-  //             N/A
-  //           </Typography>
-  //         ) : (
-  //           ''
-  //         )}
-
-  //         {currentMealSum >= 1 ? radioGroup : ''}
-  //       </FormControl>
-
-  //       <Divider style={{ marginBottom: '25px' }} />
-  //     </div>
-  //   );
-  // }
-
   handleChangeRadioLifestyleSecondary(i, event, value) {
     this.state.secondaryProfilesData[i].lifestyle = value;
 
@@ -5369,13 +4946,329 @@ class Step3LifestyleProfile extends React.Component {
     );
   }
 
+
+  renderMealStepsContent(index){
+
+
+    return(
+
+      <Grid container>
+
+        <Grid xs={12} sm={4}>
+        
+          <Typography type="body1" className="text-uppercase">Breakfast</Typography>
+          <FormControl component="fieldset">
+            <FormGroup>
+        
+              <FormControlLabel
+                key={index}
+                onChange={this.handleScheduleMealTypeCheck.bind(this, index, "breakfast")}
+                control={
+                  <Checkbox
+                    value={"breakfast"}
+                  />
+                }
+                label={"Breakfast"}
+              />
+          
+            </FormGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">Portion</Typography>
+          <FormControl component="fieldset">
+              <RadioGroup
+                  aria-label=""
+                  name=""
+                  disabled={!this.state.scheduleReal[index].breakfast.active}
+                  value={this.state.scheduleReal[index].breakfast.portions}
+                  onChange={this.handleChangeRadioSchedulePortion.bind(this, index, "breakfast")}
+                  style={{ flexDirection: 'row' }}
+                >
+            
+                <FormControlLabel
+                  key={index}
+                  value={"regular"}
+                  disabled={!this.state.scheduleReal[index].breakfast.active}
+
+                  control={
+                    <Radio />
+                  }
+                  label={"Regular"}
+                />
+
+                <FormControlLabel
+                  key={index}
+                  value={"athletic"}
+                  disabled={!this.state.scheduleReal[index].breakfast.active}
+
+                  control={
+                    <Radio />
+                  }
+                  label={"Athletic"}
+                />
+
+
+                <FormControlLabel
+                  key={index}
+                  value={"bodybuilder"}
+                  disabled={!this.state.scheduleReal[index].breakfast.active}
+
+                  control={
+                    <Radio />
+                  }
+                  label={"Bodybuilder"}
+                />
+                  
+              </RadioGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">Quantity</Typography>
+          <FormControl component="fieldset">
+                <RadioGroup
+                aria-label=""
+                name=""
+                disabled={!this.state.scheduleReal[index].breakfast.active}
+                value={this.state.scheduleReal[index].breakfast.quantity}
+                onChange={this.handleChangeRadioScheduleQuantity.bind(this, index, "breakfast")}
+                style={{ flexDirection: 'row' }}
+              >
+                  <FormControlLabel
+                    value={"1"}
+                    control={<Radio />}
+                    label={"1"}
+                    selected
+                    key={index}
+                    disabled={!this.state.scheduleReal[index].breakfast.active}
+
+                  />
+
+                  <FormControlLabel
+                    value={"2"}
+                    control={<Radio />}
+                    label={"2"}
+                    selected
+                    key={index}
+                    disabled={!this.state.scheduleReal[index].breakfast.active}
+
+                  />
+                
+              </RadioGroup>
+          </FormControl>
+        </Grid>
+        
+
+
+        <Grid xs={12} sm={4}>
+        
+          <Typography type="body1" className="text-uppercase">Lunch</Typography>
+          <FormControl component="fieldset">
+            <FormGroup>
+              
+              <FormControlLabel
+                key={index}
+                onChange={this.handleScheduleMealTypeCheck.bind(this, index, "lunch")}
+
+                control={
+                  <Checkbox
+                    value={"value"}
+                  />
+                }
+                label={"Lunch"}
+              />
+          
+            </FormGroup>
+          </FormControl>
+          
+          <Typography type="body1" className="text-uppercase">Portion</Typography>
+          <FormControl component="fieldset">
+            <RadioGroup
+              aria-label=""
+              name=""
+              disabled={this.state.scheduleReal[index].lunch.active}
+              value={this.state.scheduleReal[index].lunch.portions}
+              onChange={this.handleChangeRadioSchedulePortion.bind(this, index, "lunch")}
+              style={{ flexDirection: 'row' }}
+            >
+        
+            <FormControlLabel
+              key={index}
+              value={"regular"}
+              disabled={!this.state.scheduleReal[index].lunch.active}
+              control={
+                <Radio />
+              }
+              label={"Regular"}
+            />
+
+            <FormControlLabel
+              key={index}
+              value={"athletic"}
+              disabled={!this.state.scheduleReal[index].lunch.active}
+              control={
+                <Radio />
+              }
+              label={"Athletic"}
+            />
+
+
+            <FormControlLabel
+              key={index}
+              value={"bodybuilder"}
+              disabled={!this.state.scheduleReal[index].lunch.active}
+              control={
+                <Radio />
+              }
+              label={"Bodybuilder"}
+            />
+              
+          </RadioGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">Quantity</Typography>
+          <FormControl component="fieldset">
+              <RadioGroup
+              aria-label=""
+              name=""
+              disabled={!this.state.scheduleReal[index].lunch.active}
+              value={this.state.scheduleReal[index].lunch.quantity}
+              onChange={this.handleChangeRadioScheduleQuantity.bind(this, index, "lunch")}
+              style={{ flexDirection: 'row' }}
+              
+            >
+                <FormControlLabel
+                  value={"1"}
+                  control={<Radio />}
+                  label={"1"}
+                  selected
+                  key={index}
+                  disabled={!this.state.scheduleReal[index].lunch.active}
+                />
+
+                <FormControlLabel
+                  value={"2"}
+                  control={<Radio />}
+                  label={"2"}
+                  selected
+                  key={index}
+                  disabled={!this.state.scheduleReal[index].lunch.active}
+                />
+              
+            </RadioGroup>
+          </FormControl>
+
+        </Grid>
+
+
+        <Grid xs={12} sm={4}>
+        
+          <Typography type="body1" className="text-uppercase">Dinner</Typography>
+          <FormControl component="fieldset">
+            <FormGroup>
+          
+                <FormControlLabel
+                  key={index}
+                  onChange={this.handleScheduleMealTypeCheck.bind(this, index, "dinner")}
+                  control={
+                    <Checkbox
+                      value={"value"}
+                    />
+                  }
+                  label={"Dinner"}
+                />
+                
+            </FormGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">Portion</Typography>
+          <FormControl component="fieldset">
+            <RadioGroup
+              aria-label=""
+              name=""
+              value={this.state.scheduleReal[index].dinner.portions}
+              onChange={this.handleChangeRadioSchedulePortion.bind(this, index, "dinner")}
+              disabled={!this.state.scheduleReal[index].dinner.active}
+              style={{ flexDirection: 'row' }}
+            >
+        
+            <FormControlLabel
+              key={index}
+              value={"regular"}
+              disabled={!this.state.scheduleReal[index].dinner.active}
+              control={
+                <Radio />
+              }
+              label={"Regular"}
+            />
+
+            <FormControlLabel
+              key={index}
+              value={"athletic"}
+              disabled={!this.state.scheduleReal[index].dinner.active}
+              control={
+                <Radio />
+              }
+              label={"Athletic"}
+            />
+
+
+            <FormControlLabel
+              key={index}
+              value={"bodybuilder"}
+              disabled={!this.state.scheduleReal[index].dinner.active}
+              control={
+                <Radio />
+              }
+              label={"Bodybuilder"}
+            />
+              
+          </RadioGroup>
+          </FormControl>
+          <Typography type="body1" className="text-uppercase">Quantity</Typography>
+          <FormControl component="fieldset">
+            <RadioGroup
+              aria-label=""
+              name=""
+              disabled={!this.state.scheduleReal[index].dinner.active}
+              value={this.state.scheduleReal[index].dinner.quantity}
+              onChange={this.handleChangeRadioScheduleQuantity.bind(this, index, "dinner")}
+              style={{ flexDirection: 'row' }}
+            >
+                <FormControlLabel
+                  value={"1"}
+                  control={<Radio />}
+                  label={"1"}
+                  selected
+                  key={index}
+                  disabled={!this.state.scheduleReal[index].dinner.active}
+                />
+
+                <FormControlLabel
+                  value={"2"}
+                  control={<Radio />}
+                  label={"2"}
+                  selected
+                  key={index}
+                  disabled={!this.state.scheduleReal[index].dinner.active}
+                />
+              
+            </RadioGroup>
+          </FormControl>
+
+        </Grid>
+
+      </Grid>
+    )
+
+  }
+
   render() {
     const buttonClassname = classNames({
       [this.props.classes.buttonSuccess]: this.state.submitSuccess,
     });
 
     const steps = this.getSteps();
-    const { activeDeliveryScheduleStep } = this.state;
+    const mealSteps = this.getMealSteps();
+    const { activeDeliveryScheduleStep, activeMealScheduleStep } = this.state;
 
     return (
       <form
@@ -5390,23 +5283,18 @@ class Step3LifestyleProfile extends React.Component {
         >
           <Grid item xs={12}>
             <Paper elevation={2} className="paper-for-fields">
-              <ListItem
+              <Typography type="headline"
                 style={{ marginBottom: '25px' }}
-                button
-                onClick={this.handleProfileOpen.bind(this, true, false)}
               >
-                <ListItemText primary="Primary profile" />
-                {this.state.primaryCollapse ? <ExpandLess /> : <ExpandMore />}
-              </ListItem>
-              <Collapse
-                in={this.state.primaryCollapse}
-                transitionDuration="auto"
-                component="div"
-              >
+               {`${this.props.customerInfo.firstName}'s profile`}
+              </Typography>
+            
                 <Grid container>
-                  <Grid item xs={12}>
+                  <Grid item xs={12} sm={6} md={6}>
                     <FormControl component="fieldset">
-                      <FormLabel component="legend">Select lifestyle</FormLabel>
+                      <FormLabel component="legend">
+                        <Typography type="body1" className="text-uppercase font-medium">Plan</Typography>
+                      </FormLabel>
                       <RadioGroup
                         aria-label="lifestyle"
                         name="lifestyle"
@@ -5426,12 +5314,11 @@ class Step3LifestyleProfile extends React.Component {
                       </RadioGroup>
                     </FormControl>
                   </Grid>
-                </Grid>
-
+{/*                         
                 <Grid container>
                   <Grid item xs={12}>
                     <FormControl component="fieldset">
-                      <FormLabel component="legend">Extras</FormLabel>
+                      <FormLabel component="legend"><Typography type="body1" className="text-uppercase font-medium">Extras</Typography></FormLabel>
                       <RadioGroup
                         aria-label="extra"
                         name="extra"
@@ -5482,12 +5369,13 @@ class Step3LifestyleProfile extends React.Component {
                       </RadioGroup>
                     </FormControl>
                   </Grid>
-                </Grid>
+                </Grid> */}
 
-                <Grid container>
-                  <Grid item xs={12}>
+                
+
+                  <Grid item xs={12} sm={6} md={6}>
                     <FormControl component="fieldset">
-                      <FormLabel component="legend">Discounts</FormLabel>
+                      <FormLabel component="legend"><Typography type="body1" className="text-uppercase font-medium">Discount</Typography></FormLabel>
                       <RadioGroup
                         aria-label="discount"
                         name="discount"
@@ -5541,9 +5429,117 @@ class Step3LifestyleProfile extends React.Component {
                   </Grid>
                 </Grid>
 
+                <Grid container style={{ marginTop: "25px" }}>
+                  <Grid item xs={12} sm={6}>
+                  <Typography type="body1" className="text-uppercase font-medium">Subscription</Typography>
+
+                    <TextField
+                      select
+                      id="startDate"
+                      label="Select a start date"
+                      name="startDate"
+                      fullWidth
+                      value={this.state.subscriptionStartDateFormatted}
+                      SelectProps={{ native: false }}
+                      onChange={(event) => {
+                        this.setState({
+                          subscriptionStartDate: event.target.value,
+                          subscriptionStartDateRaw: event.target.value,
+                          subscriptionStartDateFormatted: moment(event.target.value).format('dddd, MMMM Do YYYY')
+                        });
+                      }}
+                    >
+                      {this.renderStartDays().map((e, i) => (
+                        <MenuItem
+                          key={i}
+                          value={e}
+                        >
+                          {moment(e).format('dddd, MMMM Do YYYY')}
+                        </MenuItem>
+                      ))}
+                    </TextField>
+                  </Grid>
+                  
+                  <Grid item sm={6} xs={12}>
+                    <Typography type="body1" className="text-uppercase font-medium">Frequency</Typography>
+                    <FormControl component="fieldset">
+                      <RadioGroup
+                        aria-label="scheduleType"
+                        name="scheduleType"
+                        value={this.state.scheduleType}
+                        onChange={this.handleChangeRadioscheduleType.bind(this)}
+                        style={{ flexDirection: 'row' }}
+                      >
+                        <FormControlLabel
+                          value={'weekdays'}
+                          control={<Radio />}
+                          label={'Weekdays'}
+                          selected
+                        />
+
+                        <FormControlLabel
+                          value={'everyday'}
+                          control={<Radio />}
+                          label={'Everyday'}
+                          selected
+                        />
+
+                        <FormControlLabel
+                          value={'custom'}
+                          control={<Radio />}
+                          label={'Custom'}
+                          selected
+                        />
+                      </RadioGroup>
+                    </FormControl>
+                  </Grid>
+
+                </Grid>
+                
+                <Stepper
+                    activeStep={activeMealScheduleStep}
+                    style={{ background: 'none !important' }}
+                  >
+                    {mealSteps.map((label, index) => {
+                      const props = {};
+                      const stepLabel = `${label} ${moment(
+                        this.renderStartDays()[0],
+                      ).add(index, 'd').format('DD')}`;
+
+                      return (
+                        <Step key={index} {...props}>
+                          <StepLabel>{stepLabel}</StepLabel>
+                        </Step>
+                      );
+                    })}
+                  </Stepper>
+                
+                {this.renderMealStepsContent(activeMealScheduleStep)}
+
+
+
+                  {activeMealScheduleStep >= 1 ? (
+                    <Button
+                      onClick={this.handleBackMealSchedule.bind(this)}
+                    >
+                      Back
+                    </Button>
+                  ) : (
+                    ''
+                  )}
+
+                  {activeMealScheduleStep < 6 ? (
+                    <Button onClick={this.handleNextMealSchedule.bind(this)}>
+                      Next
+                    </Button>
+                    
+                  ) : (
+                    ''
+                  )}
+
                 <Grid container>
                   <Grid item xs={12} style={{ marginTop: '25px' }}>
-                    <Typography type="subheading">Restrictions</Typography>
+                    <Typography type="body1" className="text-uppercase font-medium">Restrictions</Typography>
                   </Grid>
                   <Grid item xs={4}>
                     <FormControl component="fieldset">
@@ -5660,17 +5656,7 @@ class Step3LifestyleProfile extends React.Component {
                     </FormControl>
                   </Grid>
                 </Grid>
-                <Grid container>
-                  <Grid item xs={12}>
-                    <Button
-                      style={{ float: 'right' }}
-                      color="primary"
-                      onClick={this.deleteDialogHandleOpen.bind(this)}
-                    >
-                      Add a restriction
-                    </Button>
-                  </Grid>
-                </Grid>
+               
                 <Dialog
                   open={this.state.deleteDialogOpen}
                   onRequestClose={this.deleteDialogHandleRequestClose.bind(
@@ -5767,15 +5753,16 @@ class Step3LifestyleProfile extends React.Component {
                 </Dialog>
 
                 <Grid container>
-                  <Grid item xs={12} style={{ marginTop: '25px' }}>
-                    <Typography type="subheading">Preferences</Typography>
-                  </Grid>
-                  <Grid item xs={12} style={{ marginTop: '25px' }}>
+
+                  <Grid item xs={12} sm={6}>
+                    <Typography type="subheading" className="text-uppercase font-medium">Preferences</Typography>
+
                     <div
                       style={{
                         display: 'flex',
                         alignItems: 'center',
                         flexWrap: 'wrap',
+                        marginTop: "25px"
                       }}
                     >
                       {this.state.subIngredients.length ? (
@@ -5806,15 +5793,16 @@ class Step3LifestyleProfile extends React.Component {
                       )}
                     </div>
                   </Grid>
-                  <Grid item xs={12} style={{ marginTop: '25px' }}>
-                    <Typography type="subheading">Restrictions</Typography>
-                  </Grid>
-                  <Grid item xs={12} style={{ marginTop: '25px' }}>
+                
+                  <Grid item xs={12} sm={6}>
+                    <Typography type="subheading" className="text-uppercase font-medium">Restrictions</Typography>
+
                     <div
                       style={{
                         display: 'flex',
                         alignItems: 'center',
                         flexWrap: 'wrap',
+                        marginTop: "25px"
                       }}
                     >
                       {this.state.specificRestrictions.length ? (
@@ -5848,7 +5836,17 @@ class Step3LifestyleProfile extends React.Component {
                     </div>
                   </Grid>
                 </Grid>
-
+                <Grid container>
+                  <Grid item xs={12}>
+                    <Button
+                      style={{ marginTop: '25px' }}
+                      color="primary"
+                      onClick={this.deleteDialogHandleOpen.bind(this)}
+                    >
+                      Add a restriction
+                    </Button>
+                  </Grid>
+                </Grid>
                 <Grid container style={{ marginTop: '50px' }}>
                   <Grid item xs={12}>
                     <Typography className="font-uppercase" type="subheading">
@@ -6041,7 +6039,6 @@ class Step3LifestyleProfile extends React.Component {
                     </TableBody>
                   </Table>
                 </Grid>
-              </Collapse>
 
               {this.state.secondaryProfilesData.map((e, profileIndex) => (
                 <div key={profileIndex}>
@@ -6085,7 +6082,7 @@ class Step3LifestyleProfile extends React.Component {
                             label="First name"
                             name="first_name"
                             fullWidth
-                            defaultValue={this.props.customerInfo.firstName}
+                            defaultValue={this.props.customerInfo.secondaryProfiles[profileIndex] ? this.props.customerInfo.secondaryProfiles[profileIndex].firstName  : ""}
                             inputProps={{}}
                             onChange={(event) => {
                               this.state.secondaryProfilesData[
@@ -6103,14 +6100,15 @@ class Step3LifestyleProfile extends React.Component {
                             label="Last name"
                             name="last_name"
                             fullWidth
-                            defaultValue={this.props.customerInfo.lastName}
+                            defaultValue={this.props.customerInfo.secondaryProfiles[profileIndex] ? this.props.customerInfo.secondaryProfiles[profileIndex].lastName  : ""}                            
                             inputProps={{}}
                           />
                         </Grid>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sm={6}>
                           <FormControl component="fieldset">
                             <FormLabel component="legend">
-                              Select lifestyle
+                              <Typography type="body1" className="text-uppercase font-medium">Plan</Typography>
+
                             </FormLabel>
                             <RadioGroup
                               aria-label="lifestyle"
@@ -6136,9 +6134,8 @@ class Step3LifestyleProfile extends React.Component {
                             </RadioGroup>
                           </FormControl>
                         </Grid>
-                      </Grid>
 
-                      <Grid container>
+                      {/* <Grid container>
                         <Grid item xs={12}>
                           <FormControl component="fieldset">
                             <FormLabel component="legend">Extras</FormLabel>
@@ -6209,12 +6206,11 @@ class Step3LifestyleProfile extends React.Component {
                             </RadioGroup>
                           </FormControl>
                         </Grid>
-                      </Grid>
+                      </Grid> */}
 
-                      <Grid container>
-                        <Grid item xs={12}>
+                        <Grid item xs={12} sm={6}>
                           <FormControl component="fieldset">
-                            <FormLabel component="legend">Discounts</FormLabel>
+                            <FormLabel component="legend"><Typography type="body1" className="text-uppercase font-medium">Discount</Typography></FormLabel>
                             <RadioGroup
                               aria-label="discount"
                               name="discount"
@@ -6286,9 +6282,8 @@ class Step3LifestyleProfile extends React.Component {
 
                       <Grid container>
                         <Grid item xs={12} style={{ marginTop: '25px' }}>
-                          <Typography type="subheading">
-                            Restrictions
-                          </Typography>
+                          <Typography type="body1" className="text-uppercase font-medium">Restrictions</Typography>
+                        
                         </Grid>
                         <Grid item xs={4}>
                           <FormControl component="fieldset">
@@ -6431,17 +6426,7 @@ class Step3LifestyleProfile extends React.Component {
                           </FormControl>
                         </Grid>
                       </Grid>
-                      <Grid container>
-                        <Grid item xs={12}>
-                          <Button
-                            style={{ float: 'right' }}
-                            color="primary"
-                            onClick={this.deleteDialogHandleOpen.bind(this)}
-                          >
-                            Add a restriction
-                          </Button>
-                        </Grid>
-                      </Grid>
+               
                       <Dialog
                         open={this.state.deleteDialogOpen}
                         onRequestClose={this.deleteDialogHandleRequestClose.bind(
@@ -6543,17 +6528,18 @@ class Step3LifestyleProfile extends React.Component {
                       </Dialog>
 
                       <Grid container>
-                        <Grid item xs={12} style={{ marginTop: '25px' }}>
-                          <Typography type="subheading">Preferences</Typography>
-                        </Grid>
-                        <Grid item xs={12} style={{ marginTop: '25px' }}>
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              flexWrap: 'wrap',
-                            }}
-                          >
+                  
+                        <Grid item xs={12} sm={6}>
+                          <Typography type="body1" className="text-uppercase font-medium" style={{ marginTop: '25px' }}>Preferences</Typography>
+
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                flexWrap: 'wrap',
+                                marginTop: "25px"
+                              }}
+                            >
                             {this.state.secondaryProfilesData[profileIndex]
                               .subIngredients.length ? (
                                 this.state.secondaryProfilesData[
@@ -6590,19 +6576,18 @@ class Step3LifestyleProfile extends React.Component {
                               )}
                           </div>
                         </Grid>
-                        <Grid item xs={12} style={{ marginTop: '25px' }}>
-                          <Typography type="subheading">
-                            Restrictions
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} style={{ marginTop: '25px' }}>
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              flexWrap: 'wrap',
-                            }}
-                          >
+                    
+                        <Grid item xs={12} sm={6}>
+                          <Typography type="body1" className="text-uppercase font-medium">Restrictions</Typography>
+
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                flexWrap: 'wrap',
+                                marginTop: "25px"
+                              }}
+                            >
                             {this.state.secondaryProfilesData[profileIndex]
                               .specificRestrictions.length ? (
                                 this.state.secondaryProfilesData[
@@ -6641,14 +6626,21 @@ class Step3LifestyleProfile extends React.Component {
                         </Grid>
                       </Grid>
 
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <Button
+                            color="primary"
+                            onClick={this.deleteDialogHandleOpen.bind(this)}
+                          >
+                            Add a restriction
+                          </Button>
+                        </Grid>
+                      </Grid>
+
                       <Grid container style={{ marginTop: '50px' }}>
                         <Grid item xs={12}>
-                          <Typography
-                            className="font-uppercase"
-                            type="subheading"
-                          >
-                            Schedule
-                          </Typography>
+                        <Typography type="body1" className="text-uppercase font-medium">Schedule</Typography>
+
                         </Grid>
 
                         <Grid item xs={12}>
@@ -6866,40 +6858,11 @@ class Step3LifestyleProfile extends React.Component {
               </Button>
 
               <Grid container>
-                <Grid item xs={12}>
-                  <Typography type="subheading" className="font-uppercase">
-                    Subscription
-                  </Typography>
-                </Grid>
-                <Grid item xs={12}>
-                  <TextField
-                    select
-                    id="startDate"
-                    label="Select a start date"
-                    name="startDate"
-                    fullWidth
-                    value={this.state.subscriptionStartDate}
-                    SelectProps={{ native: false }}
-                    onChange={(event) => {
-                      this.setState({
-                        subscriptionStartDate: event.target.value,
-                      });
-                    }}
-                  >
-                    {this.renderStartDays().map((e, i) => (
-                      <MenuItem
-                        key={i}
-                        value={moment(e).format('dddd, MMMM Do YYYY')}
-                      >
-                        {moment(e).format('dddd, MMMM Do YYYY')}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
+                
                 <Grid item xs={12} style={{ marginTop: '25px' }}>
-                  <Typography type="subheading" className="font-uppercase">
-                    Complete Schedule
-                  </Typography>
+
+                  <Typography type="body1" className="text-uppercase font-medium">Complete Schedule</Typography>
+
                 </Grid>
                 <Grid item xs={12}>
                   <Table className="table-lifestyles">
@@ -7016,12 +6979,9 @@ class Step3LifestyleProfile extends React.Component {
 
               <Grid container style={{ marginTop: '25px' }}>
                 <Grid item xs={12}>
-                  <Typography
-                    type="subheading"
-                    className="font-medium font-uppercase"
-                  >
-                    Delivery type
-                  </Typography>
+        
+                  <Typography type="body1" className="text-uppercase font-medium">Delivery type</Typography>
+
                 </Grid>
                 <Grid item xs={12}>
                   {this.state.subscriptionSchedule.map(

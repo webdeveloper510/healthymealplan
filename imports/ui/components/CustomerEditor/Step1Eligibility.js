@@ -139,13 +139,23 @@ class Step1Eligibility extends React.Component {
 
           this.props.handleNext();
         } else {
+          console.log(err);
+
           this.setState({
             submitSuccess: false,
             submitLoading: false
           });
 
+          let userExists = "";
+
+          if (err.reason.reason == "Email already exists.") {
+            userExists = "User already exists.";
+          }
+
           this.props.popTheSnackbar({
-            message: err.reason.reason
+            message: userExists
+              ? userExists
+              : "" || (err.reason.length ? err.reason : err.reason.reason)
           });
         }
       }
