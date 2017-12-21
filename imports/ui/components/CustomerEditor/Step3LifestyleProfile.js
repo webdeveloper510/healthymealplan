@@ -122,16 +122,15 @@ class Step3LifestyleProfile extends React.Component {
       restrictions: [],
 
       scheduleReal: [
-        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
-        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
-        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
-        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
-        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
-        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
-        { breakfast: { active: false, portions: "regular", quantity: 1, }, lunch: { active: false, portions: "regular", quantity: 1, }, dinner: { active: false, portions: "regular", quantity: 1, } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
       ],
-      
-
+    
       schedule: [
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
@@ -150,14 +149,15 @@ class Step3LifestyleProfile extends React.Component {
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
       ],
+
       activeDeliveryScheduleStep: 0,
       activeMealScheduleStep: 0,
       subscriptionStartDate: moment(this.renderStartDays()[0]).format(
-        'dddd, MMMM Do YYYY',
+        'dddd MMMM Do YYYY',
       ),
       subscriptionStartDateRaw: this.renderStartDays()[0],
       subscriptionStartDateFormatted: moment(this.renderStartDays()[0]).format(
-        'dddd, MMMM Do YYYY',
+        'dddd MMMM Do YYYY',
       ),
       deliveryType: ['', '', '', '', '', '', ''],
       nextFewMondays: null,
@@ -269,7 +269,19 @@ class Step3LifestyleProfile extends React.Component {
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
       ],
+      scheduleReal: [
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+        { breakfast: { active: false, portions: "regular", quantity: "1", }, lunch: { active: false, portions: "regular", quantity: "1", }, dinner: { active: false, portions: "regular", quantity: "1", } },
+      ],
+      adultOrChild: '',
       scheduleType: '',
+      activeMealScheduleStep: 0
+
     });
 
     this.setState({
@@ -466,6 +478,72 @@ class Step3LifestyleProfile extends React.Component {
     this.setState({
       scheduleReal: scheduleRealCopy
     })
+  }
+
+
+  handleChangeRadioFrequencyType(event, value){
+    const scheduleCopy = _.cloneDeep(this.state.scheduleReal);
+    const subscriptionScheduleCopy = _.cloneDeep(
+      this.state.subscriptionSchedule,
+    );
+
+    if (value == 'weekdays') {
+      for (let i = 0; i <= 6; i += 1) {
+        if (i <= 4) {
+          scheduleCopy[i].breakfast = 1;
+          scheduleCopy[i].lunch = 1;
+          scheduleCopy[i].dinner = 1;
+
+          subscriptionScheduleCopy[i].breakfast = 1;
+          subscriptionScheduleCopy[i].lunch = 1;
+          subscriptionScheduleCopy[i].dinner = 1;
+        } else {
+          scheduleCopy[i].breakfast = 0;
+          scheduleCopy[i].lunch = 0;
+          scheduleCopy[i].dinner = 0;
+
+          subscriptionScheduleCopy[i].breakfast = 0;
+          subscriptionScheduleCopy[i].lunch = 0;
+          subscriptionScheduleCopy[i].dinner = 0;
+        }
+      }
+    }
+
+    if (value == 'weekends') {
+      for (let i = 0; i <= 6; i += 1) {
+        if (i >= 5) {
+          scheduleCopy[i].breakfast = 1;
+          scheduleCopy[i].lunch = 1;
+          scheduleCopy[i].dinner = 1;
+
+          subscriptionScheduleCopy[i].breakfast = 1;
+          subscriptionScheduleCopy[i].lunch = 1;
+          subscriptionScheduleCopy[i].dinner = 1;
+        } else {
+          scheduleCopy[i].breakfast = 0;
+          scheduleCopy[i].lunch = 0;
+          scheduleCopy[i].dinner = 0;
+
+          subscriptionScheduleCopy[i].breakfast = 0;
+          subscriptionScheduleCopy[i].lunch = 0;
+          subscriptionScheduleCopy[i].dinner = 0;
+        }
+      }
+    }
+
+    if (value == 'custom') {
+      for (let i = 0; i <= 6; i += 1) {
+        scheduleCopy[i].breakfast = 1;
+        scheduleCopy[i].lunch = 1;
+        scheduleCopy[i].dinner = 1;
+
+        subscriptionScheduleCopy[i].breakfast = 1;
+        subscriptionScheduleCopy[i].lunch = 1;
+        subscriptionScheduleCopy[i].dinner = 1;
+      }
+    }
+
+
   }
 
   handleChangeRadioscheduleType(event, value) {
@@ -4962,6 +5040,7 @@ class Step3LifestyleProfile extends React.Component {
         
               <FormControlLabel
                 key={index}
+                checked={this.state.scheduleReal[index].breakfast.active}
                 onChange={this.handleScheduleMealTypeCheck.bind(this, index, "breakfast")}
                 control={
                   <Checkbox
@@ -5066,6 +5145,8 @@ class Step3LifestyleProfile extends React.Component {
               
               <FormControlLabel
                 key={index}
+                checked={this.state.scheduleReal[index].lunch.active}
+
                 onChange={this.handleScheduleMealTypeCheck.bind(this, index, "lunch")}
 
                 control={
@@ -5167,6 +5248,7 @@ class Step3LifestyleProfile extends React.Component {
           
                 <FormControlLabel
                   key={index}
+                  checked={this.state.scheduleReal[index].dinner.active}
                   onChange={this.handleScheduleMealTypeCheck.bind(this, index, "dinner")}
                   control={
                     <Checkbox
@@ -5439,35 +5521,35 @@ class Step3LifestyleProfile extends React.Component {
                       label="Select a start date"
                       name="startDate"
                       fullWidth
-                      value={this.state.subscriptionStartDateFormatted}
+                      value={this.state.subscriptionStartDate}
                       SelectProps={{ native: false }}
                       onChange={(event) => {
-                        this.setState({
+                        this.setState({ 
                           subscriptionStartDate: event.target.value,
-                          subscriptionStartDateRaw: event.target.value,
-                          subscriptionStartDateFormatted: moment(event.target.value).format('dddd, MMMM Do YYYY')
+                          subscriptionStartDateRaw: new Date(event.currentTarget.getAttribute('data-original-date'))
                         });
                       }}
                     >
                       {this.renderStartDays().map((e, i) => (
                         <MenuItem
                           key={i}
-                          value={e}
+                          value={moment(e).format('dddd MMMM Do YYYY')}
+                          data-original-date={e}
                         >
-                          {moment(e).format('dddd, MMMM Do YYYY')}
+                          {moment(e).format('dddd MMMM Do YYYY')}
                         </MenuItem>
                       ))}
                     </TextField>
                   </Grid>
                   
-                  <Grid item sm={6} xs={12}>
+                  {/* <Grid item sm={6} xs={12}>
                     <Typography type="body1" className="text-uppercase font-medium">Frequency</Typography>
                     <FormControl component="fieldset">
                       <RadioGroup
-                        aria-label="scheduleType"
-                        name="scheduleType"
-                        value={this.state.scheduleType}
-                        onChange={this.handleChangeRadioscheduleType.bind(this)}
+                        aria-label="frequencyType"
+                        name="frequencyType"
+                        value={this.state.frequencyType}
+                        onChange={this.handleChangeRadioFrequencyType.bind(this)}
                         style={{ flexDirection: 'row' }}
                       >
                         <FormControlLabel
@@ -5492,51 +5574,52 @@ class Step3LifestyleProfile extends React.Component {
                         />
                       </RadioGroup>
                     </FormControl>
-                  </Grid>
+                  </Grid> */}
 
                 </Grid>
                 
-                <Stepper
-                    activeStep={activeMealScheduleStep}
-                    style={{ background: 'none !important' }}
-                  >
-                    {mealSteps.map((label, index) => {
-                      const props = {};
-                      const stepLabel = `${label} ${moment(
-                        this.renderStartDays()[0],
-                      ).add(index, 'd').format('DD')}`;
-
-                      return (
-                        <Step key={index} {...props}>
-                          <StepLabel>{stepLabel}</StepLabel>
-                        </Step>
-                      );
-                    })}
-                  </Stepper>
-                
-                {this.renderMealStepsContent(activeMealScheduleStep)}
-
-
-
-                  {activeMealScheduleStep >= 1 ? (
-                    <Button
-                      onClick={this.handleBackMealSchedule.bind(this)}
+                  <Stepper
+                      activeStep={activeMealScheduleStep}
+                      style={{ marginTop: "40px", marginBottom: "20px", background: 'none !important' }}
                     >
-                      Back
-                    </Button>
-                  ) : (
-                    ''
-                  )}
+                      {mealSteps.map((label, index) => {
+                        const props = {};
 
-                  {activeMealScheduleStep < 6 ? (
-                    <Button onClick={this.handleNextMealSchedule.bind(this)}>
-                      Next
-                    </Button>
-                    
-                  ) : (
-                    ''
-                  )}
+                        const momentDateObj = moment()
 
+                        const stepLabel = `${label} ${moment(this.state.subscriptionStartDateRaw).add(index, 'd').format('DD')}`;
+
+                        return (
+                          <Step key={index} {...props}>
+                            <StepLabel>{stepLabel}</StepLabel>
+                          </Step>
+                        );
+                      })}
+                  </Stepper>
+                  <div style={{ marginBottom:"30px" }}>
+                    {this.renderMealStepsContent(activeMealScheduleStep)}
+
+
+
+                    {activeMealScheduleStep >= 1 ? (
+                      <Button
+                        onClick={this.handleBackMealSchedule.bind(this)} style={{ marginTop: "20px" }}
+                      >
+                        Back
+                      </Button>
+                    ) : (
+                      ''
+                    )}
+
+                    {activeMealScheduleStep < 6 ? (
+                      <Button onClick={this.handleNextMealSchedule.bind(this)} style={{ marginTop: "20px" }}>
+                        Next
+                      </Button>
+                      
+                    ) : (
+                      ''
+                    )}
+                </div>
                 <Grid container>
                   <Grid item xs={12} style={{ marginTop: '25px' }}>
                     <Typography type="body1" className="text-uppercase font-medium">Restrictions</Typography>
@@ -6279,6 +6362,47 @@ class Step3LifestyleProfile extends React.Component {
                           </FormControl>
                         </Grid>
                       </Grid>
+
+                      <Stepper
+                        activeStep={this.state.secondaryProfilesData[profileIndex].activeMealScheduleStep}
+                        style={{ marginTop: "40px", marginBottom: "20px", background: 'none !important' }}
+                      >
+                        {mealSteps.map((label, index) => {
+                          const props = {};
+                          const stepLabel = `${label} ${moment(this.state.subscriptionStartDateRaw).add(index, 'd').format('DD')}`;
+
+                          return (
+                            <Step key={index} {...props}>
+                              <StepLabel>{stepLabel}</StepLabel>
+                            </Step>
+                          );
+                        })}
+                      </Stepper>
+
+                      <div style={{ marginBottom:"30px" }}>
+                        {this.renderMealStepsContent(this.state.secondaryProfilesData[profileIndex].activeMealScheduleStep)}
+
+
+
+                        {this.state.secondaryProfilesData[profileIndex].activeMealScheduleStep >= 1 ? (
+                          <Button
+                            onClick={this.handleBackMealSchedule.bind(this)} style={{ marginTop: "20px" }}
+                          >
+                            Back
+                          </Button>
+                        ) : (
+                          ''
+                        )}
+
+                        {this.state.secondaryProfilesData[profileIndex].activeMealScheduleStep < 6 ? (
+                          <Button onClick={this.handleNextMealSchedule.bind(this)} style={{ marginTop: "20px" }}>
+                            Next
+                          </Button>
+                          
+                        ) : (
+                          ''
+                        )}
+                      </div>
 
                       <Grid container>
                         <Grid item xs={12} style={{ marginTop: '25px' }}>

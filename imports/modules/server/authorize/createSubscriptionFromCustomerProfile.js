@@ -25,10 +25,9 @@ export default function createSubscriptionFromCustomerProfile(
   interval.setUnit(ApiContracts.ARBSubscriptionUnitEnum.DAYS);
 
   const paymentScheduleType = new ApiContracts.PaymentScheduleType();
-  paymentScheduleType.setInterval(7);
+  paymentScheduleType.setInterval(interval);
   paymentScheduleType.setStartDate(subscriptionStartDate);
   paymentScheduleType.setTotalOccurrences(9999);
-  paymentScheduleType.setTrialOccurrences(0);
 
   const customerProfileIdType = new ApiContracts.CustomerProfileIdType();
   customerProfileIdType.setCustomerProfileId(customerProfileId);
@@ -39,7 +38,6 @@ export default function createSubscriptionFromCustomerProfile(
   arbSubscription.setName('Some lifestyle - some name');
   arbSubscription.setPaymentSchedule(paymentScheduleType);
   arbSubscription.setAmount(subscriptionAmount);
-  // arbSubscription.setTrialAmount(utils.getRandomAmount());
   arbSubscription.setProfile(customerProfileIdType);
 
   const createRequest = new ApiContracts.ARBCreateSubscriptionRequest();
@@ -53,10 +51,12 @@ export default function createSubscriptionFromCustomerProfile(
   );
 
   ctrl.execute(() => {
-    let apiResponse = ctrl.getResponse();
+    const apiResponse = ctrl.getResponse();
     let err;
 
-    let response = new ApiContracts.ARBCreateSubscriptionResponse(apiResponse);
+    const response = new ApiContracts.ARBCreateSubscriptionResponse(
+      apiResponse,
+    );
 
     console.log(JSON.stringify(response, null, 2));
 

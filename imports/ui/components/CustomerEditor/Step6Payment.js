@@ -144,7 +144,6 @@ class Step6Payment extends React.Component {
         Meteor.call('customers.step5', response.opaqueData, (err, res) => {
           if (err) {
             console.log(err);
-            console.log(err.reason);
 
             this.setState({
               submitSuccess: false,
@@ -161,6 +160,12 @@ class Step6Payment extends React.Component {
           this.setState({
             submitSuccess: true,
             submitLoading: false,
+          });
+
+          this.props.popTheSnackbar({
+            message:
+              'Successfully created customer profile and subscription with subscription Id:' +
+              res.subscriptionId,
           });
         });
       } else {

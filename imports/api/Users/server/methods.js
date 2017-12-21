@@ -47,7 +47,9 @@ Meteor.methods({
     check(data, {
       email: String,
       postalCode: String,
-      firstName: String
+      firstName: String,
+      lastName: String,
+      phoneNumber: String
     });
 
     const postalCodeExists = Routes.find({
@@ -56,12 +58,15 @@ Meteor.methods({
 
     console.log(postalCodeExists);
 
+    let userId;
+
     try {
-      var userId = Accounts.createUser({
+      userId = Accounts.createUser({
         email: data.email,
         profile: {
           name: {
-            first: data.firstName
+            first: data.firstName,
+            last: data.lastName
           }
         }
       });
@@ -73,7 +78,14 @@ Meteor.methods({
 
     Meteor.users.update(
       { _id: userId },
-      { $set: { postalCode: data.postalCode, status: "abandoned" } }
+      {
+        $set: {
+          postalCode: data.postalCode,
+          status: "abandoned",
+          phone: data.phoneNumber,
+          adultOrChild: "adult"
+        }
+      }
     );
 
     if (postalCodeExists.length == 0) {
@@ -102,7 +114,7 @@ Meteor.methods({
             "profile.name.first": data.firstName,
             "profile.name.last": data.lastName,
             phone: data.phoneNumber,
-            adultOrChild: data.adultOrChild
+            adultOrChild: "adult"
           }
         }
       );
@@ -157,35 +169,31 @@ Meteor.methods({
       opaqueData.dataValue
     );
 
-    if (createCustomerProfileRes.resultCode != "Ok") {
+    if (
+      createCustomerProfileRes.resultCode &&
+      createCustomerProfileRes.resultCode != "Ok"
+    ) {
       throw new Meteor.Error(500, "There was a problem creating user profile.");
     }
 
     const createSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
       createCustomerProfileRes.customerProfileId,
-      createCustomerProfileRes.customerPaymentProfileIdList.numericString[0].join(
-        ""
-      ),
-      "2017-12-17",
-      100
+      createCustomerProfileRes.customerPaymentProfileIdList.numericString[0],
+      "2017-12-29", // calculate this from the subscriptionStartDate step data
+      100 // calculate this from user plan selection, restrictions and delivery pricing
     );
 
+    if (
+      createSubscriptionFromCustomerProfileRes.resultCode &&
+      createSubscriptionFromCustomerProfileRes.resultCode != "Ok"
+    ) {
+      throw new Meteor.Error(
+        500,
+        "There was a problem creating subscription from user profile."
+      );
+    }
+
     return createSubscriptionFromCustomerProfileRes;
-
-    // return createCustomerProfileRes;
-    // createCustomerProfile(
-    //   opaqueData.dataDescriptor,
-    //   opaqueData.dataValue,
-    //   (err, response) => {
-    //     if (err) {
-    //       future.return(err);
-    //     } else {
-    //       future.return(response);
-    //     }
-    //   },
-    // );
-
-    // return future.wait();
   }
 });
 

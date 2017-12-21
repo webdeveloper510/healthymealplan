@@ -3,6 +3,8 @@ import { Meteor } from 'meteor/meteor';
 const ApiContracts = require('authorizenet').APIContracts;
 const ApiControllers = require('authorizenet').APIControllers;
 
+import { Random } from 'meteor/random';
+
 /*
   opaque Object - comes from Accept.js authorization response
 
@@ -22,11 +24,16 @@ export default function createCustomerProfile(descriptor, value, callback) {
   const paymentType = new ApiContracts.PaymentType();
   paymentType.setOpaqueData(opaqueData);
 
+  const customerAddress = new ApiContracts.CustomerAddressType();
+  customerAddress.setFirstName(Random.id());
+  customerAddress.setLastName(Random.id());
+
   const customerPaymentProfileType = new ApiContracts.CustomerPaymentProfileType();
   customerPaymentProfileType.setCustomerType(
     ApiContracts.CustomerTypeEnum.INDIVIDUAL,
   );
   customerPaymentProfileType.setPayment(paymentType);
+  customerPaymentProfileType.setBillTo(customerAddress);
 
   const paymentProfilesList = [];
   paymentProfilesList.push(customerPaymentProfileType);
@@ -34,7 +41,7 @@ export default function createCustomerProfile(descriptor, value, callback) {
   const customerProfileType = new ApiContracts.CustomerProfileType();
   customerProfileType.setMerchantCustomerId('M');
   customerProfileType.setDescription('Profile description here');
-  customerProfileType.setEmail('786786786@gmail.com');
+  customerProfileType.setEmail(`${Random.id()}@gmail.com`);
   customerProfileType.setPaymentProfiles(paymentProfilesList);
 
   const createRequest = new ApiContracts.CreateCustomerProfileRequest();
