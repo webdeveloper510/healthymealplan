@@ -81,7 +81,7 @@ class Step4Delivery extends React.Component {
     this.state = {
       submitLoading: false,
       submitSuccess: false,
-      addressType: "hotel",
+      addressType: "apartment",
       dormName: "Algonquin College",
       dormResidence: "Algonquin College",
       activeDeliveryScheduleStep: 0,
@@ -95,6 +95,7 @@ class Step4Delivery extends React.Component {
         { breakfast: 0, lunch: 0, dinner: 0 },
         { breakfast: 0, lunch: 0, dinner: 0 },
       ],
+      completeSchedule: this.props.customerInfo.completeSchedule,
       deliveryType: ["", "", "", "", "", "", ""],
 
     };
@@ -102,6 +103,26 @@ class Step4Delivery extends React.Component {
 
   componentDidMount() {
     const component = this;
+
+    // validate(component.form, {
+    //   errorPlacement(error, element) {
+    //     error.insertAfter(
+    //       $(element)
+    //         .parent()
+    //         .parent()
+    //     );
+    //   },
+
+    //   rules: {
+    //     addressType: {
+    //       required: true
+    //     }
+    //   },
+
+    //   submitHandler() {
+    //     component.handleSubmitStep();
+    //   }
+    // });
 
     validate(component.form, {
       errorPlacement(error, element) {
@@ -112,16 +133,10 @@ class Step4Delivery extends React.Component {
         );
       },
 
-      rules: {
-        addressType: {
-          required: true
-        }
-      },
-
       submitHandler() {
         component.handleSubmitStep();
       }
-    });
+    })
   }
 
   handleSubmitStep() {
@@ -243,51 +258,29 @@ class Step4Delivery extends React.Component {
       'Saturday/Sunday',
     ];
   }
-
-  renderStartDays() {
-    const allDates = [];
-
-    // thanks stackoverflow
-    function nextDay(x) {
-      const now = new Date();
-      now.setDate(now.getDate() + (x + (7 - now.getDay())) % 7);
-      return now;
-    }
-
-    const immediateMonday = nextDay(1);
-
-    allDates.push(new Date(immediateMonday));
-
-    for (i = 1; i <= 4; i++) {
-      const nextMonday = immediateMonday.setDate(immediateMonday.getDate() + 7);
-      allDates.push(new Date(nextMonday));
-    }
-
-    return allDates;
-  }
-
+  
   renderOptionsForTheDay(step) {
     const previousIndex = step == 0 ? null : step - 1;
 
     const dayBeforeYestMealSum = step >= 2 ?
-      parseInt(this.state.subscriptionSchedule[previousIndex - 1].breakfast, 10) +
-    parseInt(this.state.subscriptionSchedule[previousIndex - 1].lunch, 10) +
-    parseInt(this.state.subscriptionSchedule[previousIndex - 1].dinner, 10) : null;
+      parseInt(this.state.completeSchedule[previousIndex - 1].breakfast, 10) +
+    parseInt(this.state.completeSchedule[previousIndex - 1].lunch, 10) +
+    parseInt(this.state.completeSchedule[previousIndex - 1].dinner, 10) : null;
 
     const previousDaysMealSum = step == 0 ? null :
-      parseInt(this.state.subscriptionSchedule[previousIndex].breakfast, 10) +
-    parseInt(this.state.subscriptionSchedule[previousIndex].lunch, 10) +
-    parseInt(this.state.subscriptionSchedule[previousIndex].dinner, 10);
+      parseInt(this.state.completeSchedule[previousIndex].breakfast, 10) +
+    parseInt(this.state.completeSchedule[previousIndex].lunch, 10) +
+    parseInt(this.state.completeSchedule[previousIndex].dinner, 10);
 
     const daysMealSum =
-      parseInt(this.state.subscriptionSchedule[step].breakfast, 10) +
-      parseInt(this.state.subscriptionSchedule[step].lunch, 10) +
-      parseInt(this.state.subscriptionSchedule[step].dinner, 10);
+      parseInt(this.state.completeSchedule[step].breakfast, 10) +
+      parseInt(this.state.completeSchedule[step].lunch, 10) +
+      parseInt(this.state.completeSchedule[step].dinner, 10);
 
     const nextDaysSum =
-      parseInt(this.state.subscriptionSchedule[step + 1].breakfast, 10) +
-      parseInt(this.state.subscriptionSchedule[step + 1].lunch, 10) +
-      parseInt(this.state.subscriptionSchedule[step + 1].dinner, 10);
+      parseInt(this.state.completeSchedule[step + 1].breakfast, 10) +
+      parseInt(this.state.completeSchedule[step + 1].lunch, 10) +
+      parseInt(this.state.completeSchedule[step + 1].dinner, 10);
 
     let radioGroup = (
       <RadioGroup
@@ -334,10 +327,10 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value="nightBefore"
               control={<Radio />}
-              label={`Night before ${moment(this.renderStartDays()[0])
+              label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('D')} - $2.50`}
@@ -346,9 +339,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0])
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('DD')} - $2.50`}
             />
@@ -368,10 +361,10 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value="nightBefore"
               control={<Radio />}
-              label={`Night before ${moment(this.renderStartDays()[0])
+              label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('D')} - Free`}
@@ -380,9 +373,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0])
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('DD')} - $2.50`}
             />
@@ -408,10 +401,10 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value="nightBefore"
               control={<Radio />}
-              label={`Night before ${moment(this.renderStartDays()[0])
+              label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('D')} - $2.50`}
@@ -420,9 +413,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0])
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('DD')} - $2.50`}
             />
@@ -441,7 +434,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} evening - Free`}
@@ -450,10 +443,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -462,9 +455,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -482,10 +475,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`Day of 2-day pairing ${moment(this.renderStartDays()[0])
+                label={`Day of 2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -494,10 +487,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -506,9 +499,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -526,10 +519,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="sundayNight"
                 control={<Radio />}
-                label={`Sunday evening ${moment(this.renderStartDays()[0])
+                label={`Sunday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - $2.50`}
@@ -538,9 +531,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfMonday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -548,10 +541,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -560,9 +553,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -583,10 +576,10 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value="nightBefore"
               control={<Radio />}
-              label={`Night before ${moment(this.renderStartDays()[0])
+              label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('D')} - Free`}
@@ -595,9 +588,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0])
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('DD')} - $2.50`}
             />
@@ -616,7 +609,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} evening - Free`}
@@ -625,10 +618,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -637,9 +630,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -657,10 +650,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`Day of 2-day pairing ${moment(this.renderStartDays()[0])
+                label={`Day of 2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -669,10 +662,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -681,9 +674,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -701,10 +694,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="sundayNight"
                 control={<Radio />}
-                label={`Sunday evening ${moment(this.renderStartDays()[0])
+                label={`Sunday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -713,10 +706,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -725,9 +718,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfMonday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -736,9 +729,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -762,10 +755,10 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value="nightBefore"
               control={<Radio />}
-              label={`Night before ${moment(this.renderStartDays()[0])
+              label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('D')} - $2.50`}
@@ -774,9 +767,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0])
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('DD')} - $2.50`}
             />
@@ -795,7 +788,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} evening - Free`}
@@ -804,10 +797,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -816,9 +809,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -836,7 +829,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`3-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} - Free`}
@@ -845,10 +838,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -857,9 +850,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -877,10 +870,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="sundayNight"
                 control={<Radio />}
-                label={`Sunday evening ${moment(this.renderStartDays()[0])
+                label={`Sunday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - $2.50`}
@@ -889,7 +882,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfMonday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
                   .format('dddd')} - $2.50`}
               />
@@ -897,7 +890,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforeMonday"
                 control={<Radio />}
-                label={`Monday evening ${moment(this.renderStartDays()[0])
+                label={`Monday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} - $2.50`}
@@ -906,10 +899,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -918,9 +911,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfTuesday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -929,9 +922,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -949,7 +942,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} evening - Free`}
@@ -958,10 +951,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -970,9 +963,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -990,7 +983,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} - Free`}
@@ -999,10 +992,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1011,9 +1004,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1031,7 +1024,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} evening - Free`}
@@ -1040,10 +1033,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1052,9 +1045,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1072,7 +1065,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} - Free`}
@@ -1081,10 +1074,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1093,9 +1086,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1113,7 +1106,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} evening - Free`}
@@ -1122,10 +1115,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1134,9 +1127,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1154,7 +1147,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} - Free`}
@@ -1163,10 +1156,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1175,9 +1168,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1195,7 +1188,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} - Free`}
@@ -1204,10 +1197,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1216,9 +1209,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1236,7 +1229,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} - Free`}
@@ -1245,10 +1238,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1257,9 +1250,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1277,7 +1270,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} evening - Free`}
@@ -1286,10 +1279,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1298,9 +1291,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1322,10 +1315,10 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value="nightBefore"
               control={<Radio />}
-              label={`Night before ${moment(this.renderStartDays()[0])
+              label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('D')} - Free`}
@@ -1334,9 +1327,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0])
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('DD')} - $2.50`}
             />
@@ -1355,7 +1348,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} evening - Free`}
@@ -1364,10 +1357,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1376,9 +1369,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1396,7 +1389,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`3-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} - Free`}
@@ -1405,10 +1398,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1417,9 +1410,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1437,10 +1430,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="sundayNight"
                 control={<Radio />}
-                label={`Sunday evening ${moment(this.renderStartDays()[0])
+                label={`Sunday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - Free`}
@@ -1449,7 +1442,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfMonday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
                   .format('dddd')} - $2.50`}
               />
@@ -1457,10 +1450,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforeMonday"
                 control={<Radio />}
-                label={`Monday evening ${moment(this.renderStartDays()[0])
+                label={`Monday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -1469,10 +1462,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -1481,9 +1474,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfTuesday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1492,9 +1485,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1512,7 +1505,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} evening - Free`}
@@ -1521,10 +1514,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1533,9 +1526,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1553,7 +1546,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} - Free`}
@@ -1562,10 +1555,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -1574,9 +1567,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1594,7 +1587,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} evening - Free`}
@@ -1603,10 +1596,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1615,9 +1608,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1635,7 +1628,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} - Free`}
@@ -1644,10 +1637,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -1656,9 +1649,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - Free`}
               />
@@ -1676,7 +1669,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} evening - Free`}
@@ -1685,10 +1678,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -1697,9 +1690,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1717,7 +1710,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} - Free`}
@@ -1726,10 +1719,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -1738,9 +1731,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1758,7 +1751,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} - Free`}
@@ -1767,10 +1760,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -1779,9 +1772,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1799,7 +1792,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} - Free`}
@@ -1808,10 +1801,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -1820,9 +1813,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1840,7 +1833,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} evening - Free`}
@@ -1849,10 +1842,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -1861,9 +1854,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1906,10 +1899,10 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value="nightBefore"
               control={<Radio />}
-              label={`Night before ${moment(this.renderStartDays()[0])
+              label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('D')} - $2.50`}
@@ -1918,9 +1911,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0])
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('DD')} - $2.50`}
             />
@@ -1940,10 +1933,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -1952,10 +1945,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -1964,9 +1957,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -1987,10 +1980,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - Free`}
@@ -1999,10 +1992,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -2011,9 +2004,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2034,10 +2027,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -2046,10 +2039,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -2058,9 +2051,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2081,10 +2074,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} evening - Free`}
@@ -2093,10 +2086,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -2105,9 +2098,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2127,10 +2120,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} evening - Free`}
@@ -2139,10 +2132,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -2151,9 +2144,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2172,10 +2165,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`3-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - Free`}
@@ -2184,10 +2177,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -2196,9 +2189,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2217,10 +2210,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`3-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -2229,10 +2222,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -2241,9 +2234,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2263,10 +2256,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} evening - Free`}
@@ -2275,10 +2268,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -2287,9 +2280,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2308,10 +2301,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="mondayNight"
                 control={<Radio />}
-                label={`Monday evening ${moment(this.renderStartDays()[0])
+                label={`Monday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - $2.50`}
@@ -2320,7 +2313,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfTuesday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
                   .format('dddd')} - $2.50`}
               />
@@ -2328,10 +2321,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforeTuesday"
                 control={<Radio />}
-                label={`Tuesday evening ${moment(this.renderStartDays()[0])
+                label={`Tuesday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - $2.50`}
@@ -2340,10 +2333,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -2352,9 +2345,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfWednesday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2363,9 +2356,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2391,10 +2384,10 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value="nightBefore"
               control={<Radio />}
-              label={`Night before ${moment(this.renderStartDays()[0])
+              label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('D')} - Free`}
@@ -2403,9 +2396,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0])
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('DD')} - $2.50`}
             />
@@ -2424,10 +2417,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2436,10 +2429,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2448,9 +2441,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2471,10 +2464,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - Free`}
@@ -2483,10 +2476,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2495,9 +2488,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2518,10 +2511,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -2530,10 +2523,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2542,9 +2535,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2565,10 +2558,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} evening - Free`}
@@ -2577,10 +2570,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2589,9 +2582,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2611,10 +2604,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing ${moment(this.renderStartDays()[0])
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} evening - Free`}
@@ -2623,10 +2616,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2635,9 +2628,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2656,10 +2649,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`3-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - Free`}
@@ -2668,10 +2661,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2680,9 +2673,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2701,10 +2694,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`3-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -2713,10 +2706,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2725,9 +2718,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2747,10 +2740,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} evening - Free`}
@@ -2759,10 +2752,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2771,9 +2764,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2793,10 +2786,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2805,9 +2798,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2825,10 +2818,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="mondayNight"
                 control={<Radio />}
-                label={`Monday evening ${moment(this.renderStartDays()[0])
+                label={`Monday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - Free`}
@@ -2837,7 +2830,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfTuesday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
                   .format('dddd')} - $2.50`}
               />
@@ -2845,10 +2838,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforeTuesday"
                 control={<Radio />}
-                label={`Tuesday evening ${moment(this.renderStartDays()[0])
+                label={`Tuesday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -2857,10 +2850,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2869,9 +2862,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfWednesday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2880,9 +2873,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2900,10 +2893,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - Free`}
@@ -2912,10 +2905,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -2924,9 +2917,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -2970,10 +2963,10 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value="nightBefore"
               control={<Radio />}
-              label={`Night before ${moment(this.renderStartDays()[0])
+              label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('D')} - $2.50`}
@@ -2982,9 +2975,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0])
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('DD')} - $2.50`}
             />
@@ -3003,10 +2996,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing  ${moment(this.renderStartDays()[0])
+                label={`2-day pairing  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} evening - Free`}
@@ -3014,10 +3007,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -3026,9 +3019,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3046,10 +3039,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3057,10 +3050,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -3069,9 +3062,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3089,10 +3082,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -3100,10 +3093,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -3112,9 +3105,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3132,10 +3125,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} evening - Free`}
@@ -3143,10 +3136,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -3155,9 +3148,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3175,10 +3168,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing  ${moment(this.renderStartDays()[0])
+                label={`3-day pairing  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} evening - Free`}
@@ -3186,10 +3179,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -3198,9 +3191,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3218,10 +3211,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing day-of ${moment(this.renderStartDays()[0])
+                label={`3-day pairing day-of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -3229,10 +3222,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -3241,9 +3234,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3261,10 +3254,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="tuesdayNight"
                 control={<Radio />}
-                label={`Tuesday evening ${moment(this.renderStartDays()[0])
+                label={`Tuesday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - $2.50`}
@@ -3273,7 +3266,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfWednesday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
                   .format('dddd')} - $2.50`}
               />
@@ -3281,10 +3274,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforeWednesday"
                 control={<Radio />}
-                label={`Wednesday evening ${moment(this.renderStartDays()[0])
+                label={`Wednesday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - $2.50`}
@@ -3293,10 +3286,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -3305,9 +3298,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfThursday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3316,9 +3309,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3337,10 +3330,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing day-of ${moment(this.renderStartDays()[0])
+                label={`3-day pairing day-of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -3348,10 +3341,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -3360,9 +3353,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3380,10 +3373,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} evening - Free`}
@@ -3391,10 +3384,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - $2.50`}
@@ -3403,9 +3396,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3430,10 +3423,10 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value="nightBefore"
               control={<Radio />}
-              label={`Night before ${moment(this.renderStartDays()[0])
+              label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('D')} - Free`}
@@ -3442,9 +3435,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0])
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
-                .format('dddd')} ${moment(this.renderStartDays()[0])
+                .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('DD')} - $2.50`}
             />
@@ -3462,10 +3455,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`2-day pairing  ${moment(this.renderStartDays()[0])
+                label={`2-day pairing  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} evening - Free`}
@@ -3473,10 +3466,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3485,9 +3478,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3505,10 +3498,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3516,10 +3509,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3528,9 +3521,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3548,10 +3541,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`2-day pairing day of ${moment(this.renderStartDays()[0])
+                label={`2-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -3559,10 +3552,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3571,9 +3564,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3591,10 +3584,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} evening - Free`}
@@ -3602,10 +3595,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3614,9 +3607,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3634,10 +3627,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing  ${moment(this.renderStartDays()[0])
+                label={`3-day pairing  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} evening - Free`}
@@ -3645,10 +3638,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3657,9 +3650,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3677,10 +3670,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing day-of ${moment(this.renderStartDays()[0])
+                label={`3-day pairing day-of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -3688,10 +3681,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3700,9 +3693,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3720,10 +3713,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="tuesdayNight"
                 control={<Radio />}
-                label={`Tuesday evening ${moment(this.renderStartDays()[0])
+                label={`Tuesday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} - Free`}
@@ -3732,7 +3725,7 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfWednesday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
                   .format('dddd')} - $2.50`}
               />
@@ -3740,10 +3733,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforeWednesday"
                 control={<Radio />}
-                label={`Wednesday evening ${moment(this.renderStartDays()[0])
+                label={`Wednesday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('MMM')} ${moment(this.renderStartDays()[0])
+                  .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -3752,10 +3745,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3764,9 +3757,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfThursday'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3775,9 +3768,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3796,10 +3789,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="dayOfPaired"
                 control={<Radio />}
-                label={`3-day pairing day-of ${moment(this.renderStartDays()[0])
+                label={`3-day pairing day-of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('D')} - Free`}
@@ -3807,10 +3800,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3819,9 +3812,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3839,10 +3832,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBeforePaired"
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0])
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('D')} evening - Free`}
@@ -3850,10 +3843,10 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value="nightBefore"
                 control={<Radio />}
-                label={`Night before ${moment(this.renderStartDays()[0])
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('D')} - Free`}
@@ -3862,9 +3855,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0])
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('dddd')} ${moment(this.renderStartDays()[0])
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('DD')} - $2.50`}
               />
@@ -3892,9 +3885,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'nightBefore'}
               control={<Radio />}
-              label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+              label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
               
-              ${moment(this.renderStartDays()[0])
+              ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
             .add(step, 'd').subtract(2, 'd')
             .format('DD')} evening - Free`}
             />
@@ -3903,9 +3896,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
               
-              ${moment(this.renderStartDays()[0])
+              ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
             .add(step, 'd').subtract(1, 'd')
             .format('DD')} - $2.50`}
             />
@@ -3927,9 +3920,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'nightBefore'}
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
               
-                ${moment(this.renderStartDays()[0])
+                ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(2, 'd')
               .format('DD')} evening - Free`}
               />
@@ -3937,9 +3930,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
-                ${moment(this.renderStartDays()[0])
+                ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(1, 'd')
               .format('DD')} - $2.50`}
               />
@@ -3960,9 +3953,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'nightBefore'}
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
-                  ${moment(this.renderStartDays()[0])
+                  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(2, 'd')
               .format('DD')} evening - $2.50`}
               />
@@ -3970,9 +3963,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
-                ${moment(this.renderStartDays()[0])
+                ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(1, 'd')
               .format('DD')} - $2.50`}
               />
@@ -3992,9 +3985,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'nightBefore'}
                 control={<Radio />}
-                label={`3-day pairing day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                label={`3-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
-                  ${moment(this.renderStartDays()[0])
+                  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(1, 'd')
               .format('DD')} - $2.50`}
               />
@@ -4014,9 +4007,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfThursday'}
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
-                  ${moment(this.renderStartDays()[0])
+                  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(2, 'd')
               .format('DD')} evening - $2.50`}
               />
@@ -4042,9 +4035,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'nightBefore'}
               control={<Radio />}
-              label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+              label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                   
-                ${moment(this.renderStartDays()[0])
+                ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
             .add(step, 'd').subtract(2, 'd')
             .format('DD')} evening - $2.50`}
             />
@@ -4053,9 +4046,9 @@ class Step4Delivery extends React.Component {
             <FormControlLabel
               value={'dayOf'}
               control={<Radio />}
-              label={`Day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+              label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
-                  ${moment(this.renderStartDays()[0])
+                  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
             .add(step, 'd').subtract(1, 'd')
             .format('DD')} - $2.50`}
             />
@@ -4077,9 +4070,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'nightBefore'}
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
-                  ${moment(this.renderStartDays()[0])
+                  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(2, 'd')
               .format('DD')} evening - Free`}
               />
@@ -4087,9 +4080,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
-                ${moment(this.renderStartDays()[0])
+                ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(1, 'd')
               .format('DD')} - $2.50`}
               />
@@ -4109,9 +4102,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'nightBefore'}
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
-                  ${moment(this.renderStartDays()[0])
+                  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(2, 'd')
               .format('DD')} evening - $2.50`}
               />
@@ -4119,9 +4112,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOf'}
                 control={<Radio />}
-                label={`Day of  ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                label={`Day of  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
-                ${moment(this.renderStartDays()[0])
+                ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(1, 'd')
               .format('DD')} - $2.50`}
               />
@@ -4142,9 +4135,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'nightBefore'}
                 control={<Radio />}
-                label={`3-day pairing day of ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                label={`3-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
-                  ${moment(this.renderStartDays()[0])
+                  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(1, 'd')
               .format('DD')} - $2.50`}
               />
@@ -4164,9 +4157,9 @@ class Step4Delivery extends React.Component {
               <FormControlLabel
                 value={'dayOfThursday'}
                 control={<Radio />}
-                label={`3-day pairing ${moment(this.renderStartDays()[0]).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
-                  ${moment(this.renderStartDays()[0])
+                  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
               .add(step, 'd').subtract(2, 'd')
               .format('DD')} evening - $2.50`}
               />
@@ -4207,9 +4200,7 @@ class Step4Delivery extends React.Component {
             <Paper elevation={2} className="paper-for-fields">
               <Grid container>
                 <Grid item xs={12}>
-                  <Typography type="subheading" className="font-uppercase">
-                    Address Type
-                  </Typography>
+                    <Typography type="body1" className="text-uppercase font-medium">Address Type</Typography>
                 </Grid>
                 <Grid item xs={12}>
                   <FormControl component="fieldset">
@@ -4261,6 +4252,7 @@ class Step4Delivery extends React.Component {
                       <Typography type="subheading" className="font-uppercase">
                         Apartment
                       </Typography>
+                      
                     </Grid>
                     <Grid item xs={12}>
                       <TextField
@@ -4607,11 +4599,8 @@ class Step4Delivery extends React.Component {
                 <div>
                   <Grid container>
                     <Grid item xs={12} sm={8}>
-                      {/* <TextField
 
-                          /> */}
-
-                      <Geosuggest className="geosuggest-input-material" />
+                      <Geosuggest className="geosuggest-input-material" placeholder="Street address" />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
@@ -4692,7 +4681,7 @@ class Step4Delivery extends React.Component {
                           </TableRow>
                         </TableHead>
                         <TableBody>
-                          {this.state.subscriptionSchedule.map((e, i) => {
+                          {this.state.completeSchedule.map((e, i) => {
                             const days = [
                               "Monday",
                               "Tuesday",
@@ -4725,7 +4714,7 @@ class Step4Delivery extends React.Component {
                                     }}
                                     disabled
                                     value={
-                                      this.state.subscriptionSchedule[i]
+                                      this.state.completeSchedule[i]
                                         .breakfast
                                     }
                                     name={`all_breakfast_${i}`}
@@ -4743,7 +4732,7 @@ class Step4Delivery extends React.Component {
                                     }}
                                     disabled
                                     value={
-                                      this.state.subscriptionSchedule[i].lunch
+                                      this.state.completeSchedule[i].lunch
                                     }
                                     name={`all_lunch_${i}`}
                                   />
@@ -4760,7 +4749,7 @@ class Step4Delivery extends React.Component {
                                     }}
                                     disabled
                                     value={
-                                      this.state.subscriptionSchedule[i].dinner
+                                      this.state.completeSchedule[i].dinner
                                     }
                                     name={`all_dinner_${i}`}
                                   />
@@ -4783,11 +4772,7 @@ class Step4Delivery extends React.Component {
                       </Typography>
                     </Grid>
                     <Grid item xs={12}>
-                      {this.state.subscriptionSchedule.map(
-                        (e, i) => ""
-                        // this.renderOptions(e, i),
-                      )}
-
+           
                       <Stepper
                         activeStep={activeDeliveryScheduleStep}
                         style={{ background: "none !important" }}
@@ -4795,18 +4780,18 @@ class Step4Delivery extends React.Component {
                         {steps.map((label, index) => {
                           const props = {};
                           const stepLabel = `${label} ${moment(
-                            this.renderStartDays()[0]
+                            new Date(this.props.customerInfo.subscriptionStartDateRaw)
                           )
                             .add(index, "d")
                             .format("DD")}`;
 
                           if (index == 5) {
                             stepLabel = `${label.split("/")[0]} ${moment(
-                              this.renderStartDays()[0]
+                              new Date(this.props.customerInfo.subscriptionStartDateRaw)
                             )
                               .add(index, "d")
                               .format("DD")} & ${label.split("/")[1]} ${moment(
-                              this.renderStartDays()[0]
+                              new Date(this.props.customerInfo.subscriptionStartDateRaw)
                             )
                               .add(index + 1, "d")
                               .format("DD")}`;
@@ -4820,7 +4805,7 @@ class Step4Delivery extends React.Component {
                         })}
                       </Stepper>
 
-                      {this.state.subscriptionSchedule.map((label, index) => {
+                      {this.state.completeSchedule.map((label, index) => {
                         if (index >= 1) {
                           return;
                         }

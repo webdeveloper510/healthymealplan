@@ -120,7 +120,7 @@ class Step3LifestyleProfile extends React.Component {
         : "none",
 
       restrictions: [],
-
+      completeSchedule: [],
       scheduleReal: [
         {
           breakfast: { active: false, portions: "regular", quantity: "1" },
@@ -377,11 +377,48 @@ class Step3LifestyleProfile extends React.Component {
   }
 
   handleSubmitStep() {
-    // console.log('Reached');
-    // this.setState({
-    //   submitSuccess: false,
-    //   submitLoading: true,
-    // });
+    let scheduleSummation = [
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 }
+    ];
+
+    this.state.scheduleReal.forEach((e, i) => {
+      if (e.breakfast.active) {
+        scheduleSummation[i].breakfast += parseInt(e.breakfast.quantity, 10);
+      }
+
+      if (e.lunch.active) {
+        scheduleSummation[i].lunch += parseInt(e.lunch.quantity, 10);
+      }
+
+      if (e.dinner.active) {
+        scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+      }
+    });
+
+    this.state.secondaryProfilesData.forEach((e, i) => {
+      e.scheduleReal.forEach((el, index) => {
+        if (el.breakfast.active) {
+          scheduleSummation[index].breakfast += parseInt(
+            el.breakfast.quantity,
+            10
+          );
+        }
+
+        if (el.lunch.active) {
+          scheduleSummation[index].lunch += parseInt(el.lunch.quantity, 10);
+        }
+
+        if (el.dinner.active) {
+          scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+        }
+      });
+    });
 
     this.props.saveValues({
       subIngredients: this.state.subIngredients,
@@ -395,10 +432,13 @@ class Step3LifestyleProfile extends React.Component {
       secondaryProfileCount: this.state.secondaryProfileCount,
       secondaryProfiles: this.state.secondaryProfilesData,
       subscriptionStartDate: this.state.subscriptionStartDate,
-      subscriptionStartDateRaw: this.state.subscriptionStartDateRaw
+      subscriptionStartDateRaw: this.state.subscriptionStartDateRaw,
+      completeSchedule: scheduleSummation
     });
 
-    this.props.handleNext();
+    if ($("#step3").valid()) {
+      this.props.handleNext();
+    }
   }
 
   handleChangeRadioLifestyle(event, value) {
@@ -784,7 +824,7 @@ class Step3LifestyleProfile extends React.Component {
     //   .restrictions.length
     //   ? this.state.secondaryProfilesData[i].restrictions.slice()
     //   : [];]
-    let currentRestrictionsIds = [];
+    const currentRestrictionsIds = [];
     currentRestrictionsIds.push(...getLifestyleRestrictions.restrictions);
 
     this.state.secondaryProfilesData[
@@ -1864,7 +1904,7 @@ class Step3LifestyleProfile extends React.Component {
                     </RadioGroup>
                   </FormControl>
                 </Grid>
-                {/*                         
+                {/*
                 <Grid container>
                   <Grid item xs={12}>
                     <FormControl component="fieldset">
@@ -1937,6 +1977,7 @@ class Step3LifestyleProfile extends React.Component {
                       value={this.state.discount}
                       onChange={this.handleChangeRadioDiscount.bind(this)}
                       style={{ flexDirection: "row" }}
+                      data-rule-required="true"
                     >
                       <FormControlLabel
                         value="none"
@@ -2466,6 +2507,7 @@ class Step3LifestyleProfile extends React.Component {
                                   ].firstName
                                 : ""
                             }
+                            data-rule-required="true"
                             inputProps={{}}
                             onChange={event => {
                               this.state.secondaryProfilesData[
@@ -2482,6 +2524,7 @@ class Step3LifestyleProfile extends React.Component {
                             id="last_name"
                             label="Last name"
                             name="last_name"
+                            data-rule-required="true"
                             fullWidth
                             defaultValue={
                               this.props.customerInfo.secondaryProfiles[
@@ -2517,6 +2560,7 @@ class Step3LifestyleProfile extends React.Component {
                                 profileIndex
                               )}
                               style={{ flexDirection: "row" }}
+                              data-rule-required="true"
                             >
                               {this.props.lifestyles.map(e => (
                                 <FormControlLabel
