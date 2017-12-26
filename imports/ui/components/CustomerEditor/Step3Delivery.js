@@ -74,7 +74,7 @@ const styles = theme => ({
   }
 });
 
-class Step4Delivery extends React.Component {
+class Step3Delivery extends React.Component {
   constructor(props) {
     super(props);
 
@@ -4872,11 +4872,11 @@ class Step4Delivery extends React.Component {
   }
 }
 
-Step4Delivery.defaultProps = {
+Step3Delivery.defaultProps = {
   popTheSnackbar: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
   handleNext: PropTypes.func.isRequired,
   handleBack: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(Step4Delivery);
+export default withStyles(styles)(Step3Delivery);

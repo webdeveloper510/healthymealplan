@@ -96,7 +96,7 @@ const styles = theme => ({
   }
 });
 
-class Step3LifestyleProfile extends React.Component {
+class Step2Plan extends React.Component {
   constructor(props) {
     super(props);
 
@@ -3534,11 +3534,11 @@ class Step3LifestyleProfile extends React.Component {
   }
 }
 
-Step3LifestyleProfile.defaultProps = {
+Step2Plan.defaultProps = {
   popTheSnackbar: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
   handleNext: PropTypes.func.isRequired,
   handleBack: PropTypes.func.isRequired
 };
 
-export default withStyles(styles)(Step3LifestyleProfile);
+export default withStyles(styles)(Step2Plan);
