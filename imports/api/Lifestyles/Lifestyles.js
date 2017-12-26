@@ -24,11 +24,15 @@ Lifestyles.schema = new SimpleSchema({
   },
   title: {
     type: String,
-    label: "The title of the category."
+    label: "The title of the lifestyle."
+  },
+  custom: {
+    type: Boolean,
+    label: "If it is a custom lifestyle."
   },
   restrictions: {
     type: Array,
-    label: "The types that belong to this category"
+    label: "The restrictions that belong to the lifestyle"
   },
   "restrictions.$": {
     type: String,
@@ -125,11 +129,16 @@ Lifestyles.schema = new SimpleSchema({
     label: "Percentage or Fixed amount",
     optional: true
   },
+  disableRestrictions: {
+    type: Boolean,
+    label: "Disable restrictions for the lifestyle."
+  },
 
   owner: {
     type: String,
     label: "The ID of the user this category belongs to."
   },
+
   createdAt: {
     type: String,
     label: "The date this category was created.",

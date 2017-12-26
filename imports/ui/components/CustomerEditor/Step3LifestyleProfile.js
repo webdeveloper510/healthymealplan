@@ -185,21 +185,50 @@ class Step3LifestyleProfile extends React.Component {
       },
 
       rules: {
-        first_name: {
-          required: true
-        },
-        last_name: {
-          required: true
-        },
-        email: {
-          required: true,
-          email: true
-        },
-        phoneNumber: {
-          minlength: 10,
-          maxlength: 10,
-          number: true
-        },
+        first_name: { required: true },
+        first_name1: { required: true },
+        first_name2: { required: true },
+        first_name3: { required: true },
+        first_name4: { required: true },
+        first_name5: { required: true },
+        first_name6: { required: true },
+        first_name7: { required: true },
+
+        last_name: { required: true },
+        last_name1: { required: true },
+        last_name2: { required: true },
+        last_name3: { required: true },
+        last_name4: { required: true },
+        last_name5: { required: true },
+        last_name6: { required: true },
+        last_name7: { required: true },
+
+        lifestyle: { required: true },
+        lifestyle1: { required: true },
+        lifestyle2: { required: true },
+        lifestyle3: { required: true },
+        lifestyle4: { required: true },
+        lifestyle5: { required: true },
+        lifestyle6: { required: true },
+        lifestyle7: { required: true },
+
+        discount: { required: true },
+        discount1: { required: true },
+        discount2: { required: true },
+        discount3: { required: true },
+        discount4: { required: true },
+        discount5: { required: true },
+        discount6: { required: true },
+        discount7: { required: true },
+
+        adultOrChild1: { required: true },
+        adultOrChild2: { required: true },
+        adultOrChild3: { required: true },
+        adultOrChild4: { required: true },
+        adultOrChild5: { required: true },
+        adultOrChild6: { required: true },
+        adultOrChild7: { required: true },
+
         type: {
           required: true
         }
@@ -377,7 +406,7 @@ class Step3LifestyleProfile extends React.Component {
   }
 
   handleSubmitStep() {
-    let scheduleSummation = [
+    const scheduleSummation = [
       { breakfast: 0, lunch: 0, dinner: 0 },
       { breakfast: 0, lunch: 0, dinner: 0 },
       { breakfast: 0, lunch: 0, dinner: 0 },
@@ -386,6 +415,36 @@ class Step3LifestyleProfile extends React.Component {
       { breakfast: 0, lunch: 0, dinner: 0 },
       { breakfast: 0, lunch: 0, dinner: 0 }
     ];
+
+    if (
+      this.state.scheduleReal.find(
+        el => el.breakfast.active || el.lunch.active || el.dinner.active
+      ) === undefined
+    ) {
+      this.props.popTheSnackbar({
+        message:
+          "There should be at least one meal type selected in the primary profile."
+      });
+
+      return;
+    }
+
+    if (this.state.secondaryProfileCount > 0) {
+      this.state.secondaryProfilesData.forEach((e, i) => {
+        if (
+          e.scheduleReal.find(
+            el => el.breakfast.active || el.lunch.active || el.dinner.active
+          ) === undefined
+        ) {
+          this.props.popTheSnackbar({
+            message: `There should be at least one meal type selected in the secondary profile # ${i +
+              1}`
+          });
+
+          return;
+        }
+      });
+    }
 
     this.state.scheduleReal.forEach((e, i) => {
       if (e.breakfast.active) {
@@ -441,6 +500,7 @@ class Step3LifestyleProfile extends React.Component {
     }
   }
 
+  //remove lifestyles that may have been already checked but get disabled when you select a lifestyle.
   handleChangeRadioLifestyle(event, value) {
     const getLifestyleRestrictions = this.props.lifestyles.find(
       el => el.title === value
@@ -1114,6 +1174,26 @@ class Step3LifestyleProfile extends React.Component {
         }}
       />
     );
+  }
+
+  renderDiscountValue(discountType) {
+    const lifestyle = this.props.lifestyles.find(
+      e => e.title == this.state.lifestyle
+    );
+
+    if (discountType == "student") {
+      if (lifestyle.discountStudent) {
+        return lifestyle.discountStudent;
+      }
+    }
+
+    if (discountType == "senior") {
+      if (lifestyle.discountSenior) {
+        return lifestyle.discountSenior;
+      }
+    }
+
+    return "";
   }
 
   renderMealStepsContent(index) {
@@ -1977,7 +2057,6 @@ class Step3LifestyleProfile extends React.Component {
                       value={this.state.discount}
                       onChange={this.handleChangeRadioDiscount.bind(this)}
                       style={{ flexDirection: "row" }}
-                      data-rule-required="true"
                     >
                       <FormControlLabel
                         value="none"
@@ -1997,7 +2076,7 @@ class Step3LifestyleProfile extends React.Component {
                       <FormControlLabel
                         value="student"
                         control={<Radio />}
-                        label="Student"
+                        label={`Student`}
                         disabled={
                           this.state.lifestyle &&
                           this.props.lifestyles.find(
@@ -2007,10 +2086,11 @@ class Step3LifestyleProfile extends React.Component {
                           )
                         }
                       />
+                      {this.renderDiscountValue.bind(this, "student")}
                       <FormControlLabel
                         value="senior"
                         control={<Radio />}
-                        label="Senior"
+                        label={`Senior`}
                         disabled={
                           this.state.lifestyle &&
                           this.props.lifestyles.find(
@@ -2020,6 +2100,7 @@ class Step3LifestyleProfile extends React.Component {
                           )
                         }
                       />
+                      {this.renderDiscountValue.bind(this, "senior")}
                     </RadioGroup>
                   </FormControl>
                 </Grid>
@@ -2496,7 +2577,7 @@ class Step3LifestyleProfile extends React.Component {
                             margin="normal"
                             id="first_name"
                             label="First name"
-                            name="first_name"
+                            name={`first_name${profileIndex + 1}`}
                             fullWidth
                             defaultValue={
                               this.props.customerInfo.secondaryProfiles[
@@ -2523,7 +2604,7 @@ class Step3LifestyleProfile extends React.Component {
                             margin="normal"
                             id="last_name"
                             label="Last name"
-                            name="last_name"
+                            name={`last_name${profileIndex + 1}`}
                             data-rule-required="true"
                             fullWidth
                             defaultValue={
@@ -2550,7 +2631,7 @@ class Step3LifestyleProfile extends React.Component {
                             </FormLabel>
                             <RadioGroup
                               aria-label="lifestyle"
-                              name="lifestyle"
+                              name={`lifestyle${profileIndex + 1}`}
                               value={
                                 this.state.secondaryProfilesData[profileIndex]
                                   .lifestyle
@@ -2739,7 +2820,7 @@ class Step3LifestyleProfile extends React.Component {
                             </FormLabel>
                             <RadioGroup
                               aria-label="adultOrChild"
-                              name="adultOrChild"
+                              name={`adultOrChild${profileIndex + 1}`}
                               value={
                                 this.state.secondaryProfilesData[profileIndex]
                                   .adultOrChild
@@ -2752,16 +2833,14 @@ class Step3LifestyleProfile extends React.Component {
                             >
                               <FormControlLabel
                                 value={"adult"}
-                                control={<Radio />}
+                                control={<Radio selected />}
                                 label={"Adult"}
-                                selected
                               />
 
                               <FormControlLabel
                                 value={"child"}
                                 control={<Radio />}
                                 label={"Child"}
-                                selected
                               />
                             </RadioGroup>
                           </FormControl>

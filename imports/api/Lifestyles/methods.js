@@ -9,6 +9,8 @@ Meteor.methods({
   "lifestyles.insert": function lifestylesInsert(lifestyle) {
     check(lifestyle, {
       title: String,
+      custom: Boolean,
+      disableRestrictions: Boolean,
       restrictions: Array,
       prices: Object,
       discountAthletic: Match.Maybe(Number),
@@ -57,6 +59,8 @@ Meteor.methods({
     check(lifestyle, {
       _id: String,
       title: String,
+      custom: Boolean,
+      disableRestrictions: Boolean,
       restrictions: Array,
       prices: Object,
       discountAthletic: Match.Maybe(Number),

@@ -17,13 +17,14 @@ import { Meteor } from "meteor/meteor";
 import Button from "material-ui/Button";
 import { MenuItem } from "material-ui/Menu";
 import TextField from "material-ui/TextField";
-// import Select from 'material-ui/Select';
 import Input, { InputLabel, InputAdornment } from "material-ui/Input";
 import {
   FormControl,
   FormHelperText,
   FormControlLabel
 } from "material-ui/Form";
+
+import Checkbox from "material-ui/Checkbox";
 import Radio, { RadioGroup } from "material-ui/Radio";
 
 import Dialog, {
@@ -123,6 +124,15 @@ class LifestyleEditor extends React.Component {
           : [],
       deleteDialogOpen: false,
       hasFormChanged: false,
+
+      custom:
+        this.props.lifestyle && !this.props.newLifestyle
+          ? this.props.lifestyle.custom
+          : false,
+      disableRestrictions:
+        this.props.lifestyle && !this.props.newLifestyle
+          ? this.props.lifestyle.disableRestrictions
+          : false,
 
       // discountOrExtraSelectedAthletic: false,
       discountOrExtraSelectedAthletic: !!(
@@ -511,7 +521,9 @@ class LifestyleEditor extends React.Component {
         breakfast: [],
         lunch: [],
         dinner: []
-      }
+      },
+      custom: this.state.custom,
+      disableRestrictions: this.state.disableRestrictions
     };
 
     if (this.state.discountOrExtraSelectedAthletic) {
@@ -525,7 +537,6 @@ class LifestyleEditor extends React.Component {
       lifestyle.discountOrExtraTypeAthletic = this.state.discountTypeAthletic;
     }
 
-
     if (this.state.discountOrExtraSelectedBodybuilder) {
       const discountOrExtraBodybuilder = `${
         this.state.valueDiscountOrExtraBodybuilder
@@ -536,7 +547,6 @@ class LifestyleEditor extends React.Component {
       );
       lifestyle.discountOrExtraTypeBodybuilder = this.state.discountTypeBodybuilder;
     }
-
 
     if (this.state.discountOrExtraSelectedStudent) {
       const discountOrExtraStudent = `${
@@ -908,6 +918,21 @@ class LifestyleEditor extends React.Component {
                     inputProps={{}}
                     onChange={this.titleFieldChanged.bind(this)}
                   />
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={this.state.custom}
+                        onChange={(event, checked) => {
+                          this.setState({
+                            custom: checked,
+                            hasFormChanged: true
+                          });
+                        }}
+                        value="checked"
+                      />
+                    }
+                    label="Custom"
+                  />
                 </Paper>
               </Grid>
             </Grid>
@@ -929,53 +954,75 @@ class LifestyleEditor extends React.Component {
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
-                  <Search className="autoinput-icon" />
-                  <Autosuggest
-                    id="1"
-                    className="autosuggest"
-                    theme={{
-                      container: {
-                        flexGrow: 1,
-                        position: "relative"
-                      },
-                      suggestionsContainerOpen: {
-                        position: "absolute",
-                        left: 0,
-                        right: 0
-                      },
-                      suggestion: {
-                        display: "block"
-                      },
-                      suggestionsList: {
-                        margin: 0,
-                        padding: 0,
-                        listStyleType: "none"
-                      }
-                    }}
-                    renderInputComponent={this.renderInputTypes.bind(this)}
-                    suggestions={this.state.suggestionsTypes}
-                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(
-                      this
-                    )}
-                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(
-                      this
-                    )}
-                    onSuggestionSelected={this.onSuggestionSelectedTypes.bind(
-                      this
-                    )}
-                    getSuggestionValue={this.getSuggestionValueTypes.bind(this)}
-                    renderSuggestion={this.renderSuggestionTypes.bind(this)}
-                    renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(
-                      this
-                    )}
-                    focusInputOnSuggestionClick={false}
-                    inputProps={{
-                      placeholder: "Search",
-                      value: this.state.valueTypes,
-                      onChange: this.onChangeTypes.bind(this),
-                      className: "auto type-autocomplete"
-                    }}
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={this.state.disableRestrictions}
+                        onChange={(event, checked) => {
+                          this.setState({
+                            disableRestrictions: checked,
+                            hasFormChanged: true
+                          });
+                        }}
+                      />
+                    }
+                    label="Disable restrictions"
                   />
+
+                  <Grid item xs={12} style={{ position: "relative" }}>
+                    <Search
+                      className="autoinput-icon"
+                      style={{ right: "0 !important" }}
+                    />
+                    <Autosuggest
+                      id="1"
+                      className="autosuggest"
+                      theme={{
+                        container: {
+                          flexGrow: 1,
+                          position: "relative"
+                        },
+                        suggestionsContainerOpen: {
+                          position: "absolute",
+                          left: 0,
+                          right: 0
+                        },
+                        suggestion: {
+                          display: "block"
+                        },
+                        suggestionsList: {
+                          margin: 0,
+                          padding: 0,
+                          listStyleType: "none"
+                        }
+                      }}
+                      renderInputComponent={this.renderInputTypes.bind(this)}
+                      suggestions={this.state.suggestionsTypes}
+                      onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(
+                        this
+                      )}
+                      onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(
+                        this
+                      )}
+                      onSuggestionSelected={this.onSuggestionSelectedTypes.bind(
+                        this
+                      )}
+                      getSuggestionValue={this.getSuggestionValueTypes.bind(
+                        this
+                      )}
+                      renderSuggestion={this.renderSuggestionTypes.bind(this)}
+                      renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(
+                        this
+                      )}
+                      focusInputOnSuggestionClick={false}
+                      inputProps={{
+                        placeholder: "Search",
+                        value: this.state.valueTypes,
+                        onChange: this.onChangeTypes.bind(this),
+                        className: "auto type-autocomplete"
+                      }}
+                    />
+                  </Grid>
 
                   <div
                     style={{
