@@ -266,7 +266,7 @@ class Step2Plan extends React.Component {
 
   increaseProfileCount() {
     if (this.state.secondaryProfileCount === 7) {
-      this.popTheSnackbar({
+      this.props.popTheSnackbar({
         message: "Cannot add more than 7 profiles"
       });
 
@@ -430,20 +430,25 @@ class Step2Plan extends React.Component {
     }
 
     if (this.state.secondaryProfileCount > 0) {
-      this.state.secondaryProfilesData.forEach((e, i) => {
+      for (
+        let index = 0;
+        index < this.state.secondaryProfilesData.length;
+        index++
+      ) {
+        const element = this.state.secondaryProfilesData[index];
         if (
-          e.scheduleReal.find(
+          element.scheduleReal.find(
             el => el.breakfast.active || el.lunch.active || el.dinner.active
           ) === undefined
         ) {
-          this.props.popTheSnackbar({
-            message: `There should be at least one meal type selected in the secondary profile # ${i +
-              1}`
+          this.popTheSnackbar({
+            message: `There should be at least one meal type selected in one of the secondary profile ${index +
+              1}.`
           });
 
           return;
         }
-      });
+      }
     }
 
     this.state.scheduleReal.forEach((e, i) => {

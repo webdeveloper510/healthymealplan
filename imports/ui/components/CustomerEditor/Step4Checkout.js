@@ -106,7 +106,7 @@ class Step4Checkout extends React.Component {
     Payment.formatCardCVC(document.querySelector("#cvc"));
 
     /*
-    * The best way to refactor the below bill calculator is to separate it 
+    * The best way to refactor the below bill calculator is to separate it
     * into a billing module which can be imported here instead.
     */
 
@@ -133,6 +133,8 @@ class Step4Checkout extends React.Component {
         athleticQty: 0,
         bodybuilderQty: 0
       },
+      discount: this.props.customerInfo.discount,
+      discountActual: 0,
       restrictions: this.props.customerInfo.restrictions,
       restrictionsActual: [],
       restrictionsSurcharges: [],
@@ -149,7 +151,7 @@ class Step4Checkout extends React.Component {
       elem => elem.title === this.props.customerInfo.lifestyle
     );
 
-    //calculating basePrices for Breakfast, lunch and dinner
+    // calculating basePrices for Breakfast, lunch and dinner
     const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
 
     primaryCustomer.breakfastPrice =
@@ -161,7 +163,7 @@ class Step4Checkout extends React.Component {
     primaryCustomer.dinnerPrice =
       primaryCustomer.lifestyle.prices.dinner[numberOfProfiles];
 
-    //calculating total quantities and extra quantities and regular quantites
+    // calculating total quantities and extra quantities and regular quantites
     this.props.customerInfo.scheduleReal.forEach((e, i) => {
       if (e.breakfast.active) {
         primaryCustomer.breakfast.totalQty =
@@ -219,7 +221,55 @@ class Step4Checkout extends React.Component {
       }
     });
 
-    //calculating restrictions and specificRestrictions surcharges
+    // total base price based on per meal type base price, (before restrictions and extras and discounts)
+    primaryCustomer.baseMealPriceTotal =
+      primaryCustomer.breakfast.totalQty * primaryCustomer.breakfastPrice +
+      primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
+      primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
+
+    // discounted basePrice -- this is the actual base price to add up in the total
+
+    if (primaryCustomer.discount == "senior") {
+      let discountAmount = 0;
+
+      if (primaryCustomer.lifestyle.discountOrExtraTypeSenior == "Percentage") {
+        discountAmount =
+          primaryCustomer.lifestyle.discountSenior /
+          100 *
+          primaryCustomer.baseMealPriceTotal;
+      }
+
+      if (
+        primaryCustomer.lifestyle.discountOrExtraTypeSenior == "Fixed amount"
+      ) {
+        discountAmount = primaryCustomer.lifestyle.discountSenior;
+      }
+
+      primaryCustomer.discountActual = discountAmount;
+    }
+
+    if (primaryCustomer.discount == "student") {
+      let discountAmount = 0;
+
+      if (
+        primaryCustomer.lifestyle.discountOrExtraTypeStudent == "Percentage"
+      ) {
+        discountAmount =
+          primaryCustomer.lifestyle.discountStudent /
+          100 *
+          primaryCustomer.baseMealPriceTotal;
+      }
+
+      if (
+        primaryCustomer.lifestyle.discountOrExtraTypeStudent == "Fixed amount"
+      ) {
+        discountAmount = primaryCustomer.lifestyle.discountStudent;
+      }
+
+      primaryCustomer.discountActual = discountAmount;
+    }
+
+    // calculating restrictions and specificRestrictions surcharges
     if (primaryCustomer.restrictions.length > 0) {
       primaryCustomer.restrictions.forEach((e, i) => {
         primaryCustomer.restrictionsActual.push(
@@ -260,7 +310,7 @@ class Step4Checkout extends React.Component {
       });
     }
 
-    //calculating athletic surcharge for all meals
+    // calculating athletic surcharge for all meals
     if (
       primaryCustomer.breakfast.athleticQty > 0 ||
       primaryCustomer.lunch.athleticQty > 0 ||
@@ -340,8 +390,7 @@ class Step4Checkout extends React.Component {
       primaryCustomer.totalAthleticSurcharge = totalAthleticSurcharge;
     }
 
-    //calculating bodybuilder surcharge for all meals
-
+    // calculating bodybuilder surcharge for all meals
     if (
       primaryCustomer.breakfast.bodybuilderQty > 0 ||
       primaryCustomer.lunch.bodybuilderQty > 0 ||
@@ -399,7 +448,7 @@ class Step4Checkout extends React.Component {
 
     console.log(primaryCustomer);
 
-    //all of the above for all the secondary profiles
+    // all of the above for all the secondary profiles
     if (this.props.customerInfo.secondaryProfileCount > 0) {
       this.props.customerInfo.secondaryProfiles.forEach((el, index) => {
         const currentCustomer = {
@@ -824,6 +873,45 @@ class Step4Checkout extends React.Component {
                       </Grid>
 
                       {this.state.primaryProfileBilling &&
+                      this.state.primaryProfileBilling.discountActual ? (
+                        <Grid container>
+                          <Grid item xs={12}>
+                            <Typography
+                              type="body2"
+                              className="font-medium font-uppercase"
+                              style={{ marginTop: ".75em" }}
+                            >
+                              Discount
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <Typography type="subheading">
+                              {this.state.primaryProfileBilling.discount
+                                .charAt(0)
+                                .toUpperCase() +
+                                this.state.primaryProfileBilling.discount.substr(
+                                  1,
+                                  this.state.primaryProfileBilling.discount
+                                    .length
+                                )}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12} sm={6}>
+                            <Typography
+                              type="subheading"
+                              style={{ textAlign: "right" }}
+                            >
+                              -${
+                                this.state.primaryProfileBilling.discountActual
+                              }{" "}
+                            </Typography>
+                          </Grid>
+                        </Grid>
+                      ) : (
+                        ""
+                      )}
+
+                      {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.totalAthleticSurcharge >
                         0 ? (
                         <Grid container>
@@ -907,35 +995,33 @@ class Step4Checkout extends React.Component {
                       this.state.primaryProfileBilling.restrictionsActual
                         .length > 0
                         ? this.state.primaryProfileBilling.restrictionsActual.map(
-                            (e, i) => {
-                              return (
-                                <Grid container key={i}>
-                                  <Grid item xs={12} sm={6}>
-                                    <Typography type="subheading">
-                                      {e.title} ({e.discountOrExtraType ==
-                                      "Fixed amount"
-                                        ? "$"
-                                        : ""}
-                                      {e.extra}
-                                      {e.discountOrExtraType == "Percentage"
-                                        ? "%"
-                                        : ""})
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12} sm={6}>
-                                    <Typography
-                                      type="subheading"
-                                      style={{ textAlign: "right" }}
-                                    >
-                                      ${
-                                        this.state.primaryProfileBilling
-                                          .restrictionsSurcharges[i]
-                                      }
-                                    </Typography>
-                                  </Grid>
+                            (e, i) => (
+                              <Grid container key={i}>
+                                <Grid item xs={12} sm={6}>
+                                  <Typography type="subheading">
+                                    {e.title} ({e.discountOrExtraType ==
+                                    "Fixed amount"
+                                      ? "$"
+                                      : ""}
+                                    {e.extra}
+                                    {e.discountOrExtraType == "Percentage"
+                                      ? "%"
+                                      : ""})
+                                  </Typography>
                                 </Grid>
-                              );
-                            }
+                                <Grid item xs={12} sm={6}>
+                                  <Typography
+                                    type="subheading"
+                                    style={{ textAlign: "right" }}
+                                  >
+                                    ${
+                                      this.state.primaryProfileBilling
+                                        .restrictionsSurcharges[i]
+                                    }
+                                  </Typography>
+                                </Grid>
+                              </Grid>
+                            )
                           )
                         : ""}
 

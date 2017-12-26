@@ -83,8 +83,11 @@ class Step3Delivery extends React.Component {
       submitSuccess: false,
       addressType: "apartment",
       dormName: "Algonquin College",
-      dormResidence: "Algonquin College",
+      dormResidence: "Student Residence",
       activeDeliveryScheduleStep: 0,
+      streetAddress: '',
+      coolerBag: false,
+
  
       subscriptionSchedule: [
         { breakfast: 0, lunch: 0, dinner: 0 },
@@ -104,25 +107,25 @@ class Step3Delivery extends React.Component {
   componentDidMount() {
     const component = this;
 
-    // validate(component.form, {
-    //   errorPlacement(error, element) {
-    //     error.insertAfter(
-    //       $(element)
-    //         .parent()
-    //         .parent()
-    //     );
-    //   },
+    validate(component.form, {
+      errorPlacement(error, element) {
+        error.insertAfter(
+          $(element)
+            .parent()
+            .parent()
+        );
+      },
 
-    //   rules: {
-    //     addressType: {
-    //       required: true
-    //     }
-    //   },
+      rules: {
+        addressType: {
+          required: true
+        }
+      },
 
-    //   submitHandler() {
-    //     component.handleSubmitStep();
-    //   }
-    // });
+      submitHandler() {
+        component.handleSubmitStep();
+      }
+    });
 
     validate(component.form, {
       errorPlacement(error, element) {
@@ -140,45 +143,18 @@ class Step3Delivery extends React.Component {
   }
 
   handleSubmitStep() {
-    console.log("Reached");
 
     this.setState({
-      submitSuccess: false,
-      submitLoading: true
+      submitSuccess: true,
+      submitLoading: false
     });
 
-    Meteor.call(
-      "customers.step2",
-      {
-        id: this.props.customerInfo.id,
-        addressType: this.state.addressType
-      },
-      (err, returnVal) => {
-        if (err) {
-          console.log(err);
 
-          // this.props.popTheSnackbar({
-          //   message: err.reason,
-          // });
+    this.props.saveValues({
 
-          this.setState({
-            submitSuccess: false,
-            submitLoading: false
-          });
-        } else {
-          this.setState({
-            submitSuccess: true,
-            submitLoading: false
-          });
 
-          console.log("Reached no error");
+    });
 
-          this.props.saveValues({});
-
-          this.props.handleNext();
-        }
-      }
-    );
   }
 
   handleChangeRadioAddressType(event, value) {
@@ -188,33 +164,31 @@ class Step3Delivery extends React.Component {
   }
 
   changeDormName(event, value) {
-    let changedResidence = "";
+    // console.log(event.target.value);
 
-    switch (event.target.value) {
-      case "Algonquin College":
-        changedResidence = "Student Residence";
+    if(event.target.value == "Algonquin College") {
+      var changedResidence = "Student Residence";
+    }
 
-      case "Carleton University":
-        changedResidence = "Dundas House";
-
-      case "University of Ottawa":
-        changedResidence = "90 U Residence";
-
-      default:
-        changedResidence = "Student Residence";
+    if(event.target.value == "Carleton University") {
+      var changedResidence = "Dundas House";
+    }
+        
+    if(event.target.value == "University of Ottawa") {
+      var changedResidence = "90 U Residence";
     }
 
     this.setState({
       dormName: event.target.value,
-      dormResidence: changedResidence
+      dormResidence: changedResidence 
     });
   }
 
   changeDormResidence(event, value) {
-    console.log(event.target.value);
+    // console.log(event.target.value);
 
     this.setState({
-      dormResidence: event.currentTarget.value
+      dormResidence: event.target.value
     });
   }
 
@@ -4177,6 +4151,15 @@ class Step3Delivery extends React.Component {
     return radioGroup;
   }
 
+
+  setCoolerbagCheckbox(event, checked){
+
+    this.setState({
+      coolerBag: checked
+    })
+
+  }
+
   render() {
     const buttonClassname = classNames({
       [this.props.classes.buttonSuccess]: this.state.submitSuccess
@@ -4400,17 +4383,17 @@ class Step3Delivery extends React.Component {
                           select
                           value={
                             this.state.dormResidence
-                              ? this.state.dormResidence
-                              : "Student Residence"
+                              // ? this.state.dormResidence
+                              // : "Student Residence"
                           }
                           fullWidth
                           onChange={this.changeDormResidence.bind(this)}
                         >
-                          <div>
-                            <MenuItem key={1} value="Student Residence">
-                              Student Residence
-                            </MenuItem>
-                          </div>
+                          
+                          <MenuItem key={1} value="Student Residence">
+                            Student Residence
+                          </MenuItem>
+                          
                         </TextField>
                       ) : (
                         ""
@@ -4425,8 +4408,8 @@ class Step3Delivery extends React.Component {
                           select
                           value={
                             this.state.dormResidence
-                              ? this.state.dormResidence
-                              : "Dundas House"
+                              // ? this.state.dormResidence
+                              // : "Dundas House"
                           }
                           fullWidth
                           onChange={this.changeDormResidence.bind(this)}
@@ -4470,8 +4453,8 @@ class Step3Delivery extends React.Component {
                           select
                           value={
                             this.state.dormResidence
-                              ? this.state.dormResidence
-                              : "90 U Residence"
+                              // ? this.state.dormResidence
+                              // : "90 U Residence"
                           }
                           fullWidth
                           onChange={this.changeDormResidence.bind(this)}
@@ -4558,9 +4541,9 @@ class Step3Delivery extends React.Component {
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <FormGroup>
+                    <FormGroup value={this.state.coolerBag}>
                       <FormControlLabel
-                        control={<Checkbox value="leaveAtFrontDesk" />}
+                        control={<Checkbox />}
                         label="Leave at front desk"
                       />
                     </FormGroup>
@@ -4600,7 +4583,11 @@ class Step3Delivery extends React.Component {
                   <Grid container>
                     <Grid item xs={12} sm={8}>
 
-                      <Geosuggest className="geosuggest-input-material" placeholder="Street address" />
+                      <Geosuggest className="geosuggest-input-material" 
+                      placeholder="Street address" 
+                      onChange={(value) => { this.setState({ streetAddress: value })}} 
+                      onSuggestSelect={(suggest) => { this.setState({ streetAddress: suggest.label })}}
+                      />
                     </Grid>
                     <Grid item xs={12} sm={4}>
                       <TextField
@@ -4621,6 +4608,7 @@ class Step3Delivery extends React.Component {
                         name="notes"
                         fullWidth
                         multiline
+                        onChange={(event) => { this.setState({notes: event.target.value}) }}
                         defaultValue={this.props.customerInfo.address.notes}
                       />
                     </Grid>
@@ -4628,9 +4616,11 @@ class Step3Delivery extends React.Component {
 
                   <Grid container>
                     <Grid item xs={12}>
-                      <FormGroup>
+                      <FormGroup> 
                         <FormControlLabel
-                          control={<Checkbox value="leaveAtFrontDesk" />}
+                          control={<Checkbox checked={this.state.coolerBag}
+                          onChange={this.setCoolerbagCheckbox.bind(this)}
+                        />}
                           label="Cooler bag (One time fee - $20)"
                         />
                       </FormGroup>
