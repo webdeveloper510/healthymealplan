@@ -82,11 +82,28 @@ class Step3Delivery extends React.Component {
       submitLoading: false,
       submitSuccess: false,
       addressType: "apartment",
+
+      apartmentName: '',
+      unit: '',
+      buzzer: '',
+
+      businessName: '',
+
+      roomNumber:'',
+
+      hotelName: '',
+      hotelFrontDesk: false,
+
       dormName: "Algonquin College",
       dormResidence: "Student Residence",
-      activeDeliveryScheduleStep: 0,
+      
       streetAddress: '',
+      postalCode: this.props.customerInfo.postalCode,
+      notes: '',  
+
+
       coolerBag: false,
+      activeDeliveryScheduleStep: 0,
 
  
       subscriptionSchedule: [
@@ -119,6 +136,18 @@ class Step3Delivery extends React.Component {
       rules: {
         addressType: {
           required: true
+        },
+        apartmentUnit: {
+          required: true,
+        },
+        business_name: {
+          required: true,
+        },
+        hotelName: {
+          required: true
+        },
+        streetAddress: {
+          required: true
         }
       },
 
@@ -149,12 +178,52 @@ class Step3Delivery extends React.Component {
       submitLoading: false
     });
 
+    let address = {
+      type: this.state.addressType,
+      streetAddress: this.state.streetAddress,
+      postalCode: this.state.postalCode,
+      notes: this.state.notes,
+    };
+
+    if(this.state.addressType == 'apartment'){
+
+      address.apartmentName = this.state.apartmentName;
+      address.unit = this.state.unit;
+      address.buzzer = this.state.buzzer;
+      
+    }else if(this.state.addressType == 'hotel'){
+      
+      address.hotelName = this.state.hotelName;
+      address.roomNumber = this.state.roomNumber;
+      address.leaveAtFrontDesk = this.state.leaveAtFrontDesk;
+
+    }else if(this.state.addressType == 'house'){
+
+      address.unit = this.state.unit;
+
+    }else if(this.state.addressType == 'business'){
+
+      address.apartmentName = this.state.businessName;
+      address.unit = this.state.unit;
+      address.buzzer = this.state.buzzer; 
+
+    }else if(this.state.addressType == 'dormitory'){
+
+      address.dormName = this.state.dormName;
+      address.dormResidence = this.state.dormResidence;
+      address.roomNumber = this.state.roomNumber;
+      address.buzzer = this.state.buzzer;
+      
+    }
+
 
     this.props.saveValues({
-
-
+      address: address,
+      coolerBag: this.state.coolerBag,
+      deliveryType: this.state.deliveryType,
     });
 
+    this.props.handleNext();
   }
 
   handleChangeRadioAddressType(event, value) {
@@ -238,13 +307,13 @@ class Step3Delivery extends React.Component {
 
     const dayBeforeYestMealSum = step >= 2 ?
       parseInt(this.state.completeSchedule[previousIndex - 1].breakfast, 10) +
-    parseInt(this.state.completeSchedule[previousIndex - 1].lunch, 10) +
-    parseInt(this.state.completeSchedule[previousIndex - 1].dinner, 10) : null;
+      parseInt(this.state.completeSchedule[previousIndex - 1].lunch, 10) +
+      parseInt(this.state.completeSchedule[previousIndex - 1].dinner, 10) : null;
 
     const previousDaysMealSum = step == 0 ? null :
       parseInt(this.state.completeSchedule[previousIndex].breakfast, 10) +
-    parseInt(this.state.completeSchedule[previousIndex].lunch, 10) +
-    parseInt(this.state.completeSchedule[previousIndex].dinner, 10);
+      parseInt(this.state.completeSchedule[previousIndex].lunch, 10) +
+      parseInt(this.state.completeSchedule[previousIndex].dinner, 10);
 
     const daysMealSum =
       parseInt(this.state.completeSchedule[step].breakfast, 10) +
@@ -1378,7 +1447,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -1549,7 +1618,7 @@ class Step3Delivery extends React.Component {
               />
             </RadioGroup>
           );
-        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum === 0 && this.state.deliveryType[1] == 'nightBefore') {
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum === 0 && this.state.deliveryType[1] == 'nightBefore') { //check this once
           radioGroup = (
             <RadioGroup
               aria-label={`delivery_${step}`}
@@ -1839,7 +1908,7 @@ class Step3Delivery extends React.Component {
         }
       }// daysMealSum > 1
 
-    }
+    }// wednesday
 
     if (this.state.activeDeliveryScheduleStep == 3) {
 
@@ -2217,7 +2286,7 @@ class Step3Delivery extends React.Component {
             </RadioGroup>
           );
 
-        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'nightBeforePaired') {
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'nightBeforePaired' && this.state.deliveryType[1] != 'nightBeforePaired') { 
 
           radioGroup = (
             <RadioGroup
@@ -2236,7 +2305,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('D')} evening - Free`}
+                  .format('D')} evening - Free is it showing this`}
               />
 
               <FormControlLabel
@@ -2338,9 +2407,39 @@ class Step3Delivery extends React.Component {
               />
             </RadioGroup>
           );
-        } 
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'nightBeforePaired' && this.state.deliveryType[1] == 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
 
-
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
       }// daysMealSum == 1
 
 
@@ -3857,7 +3956,7 @@ class Step3Delivery extends React.Component {
           >
 
             <FormControlLabel
-              value={'nightBefore'}
+              value={'nightBeforeThursday'}
               control={<Radio />}
               label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
               
@@ -3892,7 +3991,7 @@ class Step3Delivery extends React.Component {
             >
 
               <FormControlLabel
-                value={'nightBefore'}
+                value={'nightBeforeThursday'}
                 control={<Radio />}
                 label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
               
@@ -3902,7 +4001,7 @@ class Step3Delivery extends React.Component {
               />
 
               <FormControlLabel
-                value={'dayOf'}
+                value={'dayOfFriday'}
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
@@ -3925,7 +4024,7 @@ class Step3Delivery extends React.Component {
             >
 
               <FormControlLabel
-                value={'nightBefore'}
+                value={'nightBeforeThursday'}
                 control={<Radio />}
                 label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
@@ -3935,7 +4034,7 @@ class Step3Delivery extends React.Component {
               />
 
               <FormControlLabel
-                value={'dayOf'}
+                value={'dayOfFriday'}
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
@@ -3955,9 +4054,9 @@ class Step3Delivery extends React.Component {
               onChange={this.changeRadioDeliveryType.bind(this, step)}
               value={this.state.deliveryType[step]}
             >
-
+              {/*  changed this from nightBefore to dayOfFriday */}
               <FormControlLabel
-                value={'nightBefore'}
+                value={'dayOfFriday'}
                 control={<Radio />}
                 label={`3-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
@@ -3978,8 +4077,19 @@ class Step3Delivery extends React.Component {
               value={this.state.deliveryType[step]}
             >
 
+            
               <FormControlLabel
-                value={'dayOfThursday'}
+                value={'dayOfFriday'}
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                .add(step, 'd').subtract(1, 'd')
+                .format('DD')} day of - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'nightBeforeThursday'}
                 control={<Radio />}
                 label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
@@ -4007,7 +4117,7 @@ class Step3Delivery extends React.Component {
           >
 
             <FormControlLabel
-              value={'nightBefore'}
+              value={'nightBeforeThursday'}
               control={<Radio />}
               label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                   
@@ -4042,7 +4152,7 @@ class Step3Delivery extends React.Component {
             >
 
               <FormControlLabel
-                value={'nightBefore'}
+                value={'nightBeforeThursday'}
                 control={<Radio />}
                 label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
@@ -4052,7 +4162,7 @@ class Step3Delivery extends React.Component {
               />
 
               <FormControlLabel
-                value={'dayOf'}
+                value={'dayOfFriday'}
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
@@ -4074,7 +4184,7 @@ class Step3Delivery extends React.Component {
             >
 
               <FormControlLabel
-                value={'nightBefore'}
+                value={'nightBeforeThursday'}
                 control={<Radio />}
                 label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
@@ -4084,7 +4194,7 @@ class Step3Delivery extends React.Component {
               />
 
               <FormControlLabel
-                value={'dayOf'}
+                value={'dayOfFriday'}
                 control={<Radio />}
                 label={`Day of  ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
@@ -4107,7 +4217,7 @@ class Step3Delivery extends React.Component {
             >
 
               <FormControlLabel
-                value={'nightBefore'}
+                value={'dayOfFriday'}
                 control={<Radio />}
                 label={`3-day pairing day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
@@ -4128,8 +4238,19 @@ class Step3Delivery extends React.Component {
               value={this.state.deliveryType[step]}
             >
 
+
+            <FormControlLabel
+                value={'dayOfFriday'}
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                .add(step, 'd').subtract(1, 'd')
+                .format('DD')} day of - $2.50`}
+                />
+
               <FormControlLabel
-                value={'dayOfThursday'}
+                value={'nightBeforeThursday'}
                 control={<Radio />}
                 label={`3-day pairing ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
@@ -4159,6 +4280,16 @@ class Step3Delivery extends React.Component {
     })
 
   }
+
+  setHotelFrontDeskCheckbox(event, checked){
+
+    this.setState({
+      hotelFrontDesk: checked
+    })
+
+  }
+  
+
 
   render() {
     const buttonClassname = classNames({
@@ -4190,7 +4321,7 @@ class Step3Delivery extends React.Component {
                     {/* <FormLabel component="legend">Type</FormLabel> */}
                     <RadioGroup
                       aria-label="account-type"
-                      name="type"
+                      name="addressType"
                       value={this.state.addressType}
                       onChange={this.handleChangeRadioAddressType.bind(this)}
                       style={{ flexDirection: "row" }}
@@ -4244,6 +4375,8 @@ class Step3Delivery extends React.Component {
                         label="Apartment name"
                         name="apartment_name"
                         fullWidth
+                        value={this.state.apartmentName}
+                        onChange={(event) => { this.setState({apartmentName: event.target.value}) }}
                         defaultValue={
                           this.props.customerInfo.address.apartmentName
                         }
@@ -4257,8 +4390,10 @@ class Step3Delivery extends React.Component {
                         margin="normal"
                         id="unit"
                         label="Unit"
-                        name="unit"
+                        name="apartmentUnit"
                         fullWidth
+                        onChange={(event) => { this.setState({unit: event.target.value}) }}
+
                         defaultValue={this.props.customerInfo.address.unit}
                         inputProps={{}}
                       />
@@ -4270,6 +4405,8 @@ class Step3Delivery extends React.Component {
                         label="Buzzer"
                         name="buzzer"
                         fullWidth
+                        onChange={(event) => { this.setState({buzzer: event.target.value}) }}
+
                         defaultValue={this.props.customerInfo.address.buzzer}
                         inputProps={{}}
                       />
@@ -4295,6 +4432,8 @@ class Step3Delivery extends React.Component {
                         label="Business name"
                         name="business_name"
                         fullWidth
+                        onChange={(event) => { this.setState({ businessName: event.target.value}) }}
+
                         defaultValue={
                           this.props.customerInfo.address.businessName
                         }
@@ -4310,6 +4449,8 @@ class Step3Delivery extends React.Component {
                         label="Unit"
                         name="businessUnit"
                         fullWidth
+                        onChange={(event) => { this.setState({unit: event.target.value}) }}
+
                         defaultValue={
                           this.props.customerInfo.address.businessUnit
                         }
@@ -4323,6 +4464,8 @@ class Step3Delivery extends React.Component {
                         label="Buzzer"
                         name="businessBuzzer"
                         fullWidth
+                        onChange={(event) => { this.setState({buzzer: event.target.value}) }}
+
                         defaultValue={
                           this.props.customerInfo.address.businessBuzzer
                         }
@@ -4488,6 +4631,8 @@ class Step3Delivery extends React.Component {
                         label="Room number"
                         name="roomNumber"
                         fullWidth
+                        onChange={(event) => { this.setState({roomNumber: event.target.value}) }}
+
                         defaultValue={
                           this.props.customerInfo.address.roomNumber
                         }
@@ -4501,6 +4646,8 @@ class Step3Delivery extends React.Component {
                         label="Buzzer"
                         name="buzzer"
                         fullWidth
+                        onChange={(event) => { this.setState({ buzzer: event.target.value}) }}
+
                         defaultValue={this.props.customerInfo.address.buzzer}
                         inputProps={{}}
                       />
@@ -4525,6 +4672,8 @@ class Step3Delivery extends React.Component {
                       label="Hotel name"
                       name="hotelName"
                       fullWidth
+                      onChange={(event) => { this.setState({hotelNumber: event.target.value}) }}
+
                       defaultValue={this.props.customerInfo.address.hotelNumber}
                       inputProps={{}}
                     />
@@ -4536,15 +4685,20 @@ class Step3Delivery extends React.Component {
                       label="Room number"
                       name="roomNumber"
                       fullWidth
+                      onChange={(event) => { this.setState({roomNumber: event.target.value}) }}
+
                       defaultValue={this.props.customerInfo.address.roomNumber}
                       inputProps={{}}
                     />
                   </Grid>
                   <Grid item xs={12}>
-                    <FormGroup value={this.state.coolerBag}>
+                    <FormGroup>
                       <FormControlLabel
-                        control={<Checkbox />}
+                        control={<Checkbox checked={this.state.hotelFrontDesk}
+                        />}
+                        disabled={this.state.roomNumber.length > 0}
                         label="Leave at front desk"
+                        onChange={this.setHotelFrontDeskCheckbox.bind(this)}
                       />
                     </FormGroup>
                   </Grid>
@@ -4568,6 +4722,8 @@ class Step3Delivery extends React.Component {
                         label="Unit"
                         name="unitHouse"
                         fullWidth
+                        onChange={(event) => { this.setState({unit: event.target.value}) }}
+
                         defaultValue={this.props.customerInfo.address.unitHouse}
                         inputProps={{}}
                       />
@@ -4584,9 +4740,10 @@ class Step3Delivery extends React.Component {
                     <Grid item xs={12} sm={8}>
 
                       <Geosuggest className="geosuggest-input-material" 
-                      placeholder="Street address" 
-                      onChange={(value) => { this.setState({ streetAddress: value })}} 
-                      onSuggestSelect={(suggest) => { this.setState({ streetAddress: suggest.label })}}
+                        placeholder="Street address" 
+                        onChange={(value) => { this.setState({ streetAddress: value })}} 
+                        onSuggestSelect={(suggest) => { this.setState({ streetAddress: suggest.label })}}
+                        name="streetAddress"
                       />
                     </Grid>
                     <Grid item xs={12} sm={4}>
@@ -4596,6 +4753,8 @@ class Step3Delivery extends React.Component {
                         name="postalCode"
                         defaultValue={this.props.customerInfo.postalCode}
                         fullWidth
+                        readonly
+                        disabled
                       />
                     </Grid>
                   </Grid>
@@ -4606,6 +4765,7 @@ class Step3Delivery extends React.Component {
                         label="Notes"
                         id="notes"
                         name="notes"
+                        value={this.state.notes}
                         fullWidth
                         multiline
                         onChange={(event) => { this.setState({notes: event.target.value}) }}
@@ -4841,6 +5001,9 @@ class Step3Delivery extends React.Component {
             justifyContent: "flex-end"
           }}
         >
+           <Button color="primary" onClick={this.props.handleBack}>
+            Back
+          </Button>
           <Button
             disabled={this.state.submitLoading}
             raised

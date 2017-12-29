@@ -133,6 +133,8 @@ class Step4Checkout extends React.Component {
         athleticQty: 0,
         bodybuilderQty: 0
       },
+      coolerBag: this.props.customerInfo.coolerBag ? 20 : 0,
+      deliveryCost: 0,
       discount: this.props.customerInfo.discount,
       discountActual: 0,
       restrictions: this.props.customerInfo.restrictions,
@@ -474,17 +476,29 @@ class Step4Checkout extends React.Component {
             athleticQty: 0,
             bodybuilderQty: 0
           },
-          restrictions: [],
-          specificRestrictions: [],
+          deliveryCost: 0,
+          discount: this.props.customerInfo.secondaryProfiles[index].discount,
+          discountActual: 0,
+          restrictions: this.props.customerInfo.secondaryProfiles[index]
+            .restrictions,
+          restrictionsActual: [],
+          restrictionsSurcharges: [],
+          specificRestrictions: this.props.customerInfo.secondaryProfiles[index]
+            .specificRestrictions,
+          specificRestrictionsActual: [],
+          specificRestrictionsSurcharges: [],
+          preferences: this.props.customerInfo.secondaryProfiles[index]
+            .preferences,
           total: 0
         };
 
+        //the lifestyle for the current secondarycustomer
         currentCustomer.lifestyle = this.props.lifestyles.find(
           elem => elem.title === el.lifestyle
         );
 
-        const numberOfProfiles = this.props.customerInfo.secondaryProfiles
-          .length;
+        // calculating basePrices for Breakfast, lunch and dinner
+        const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
 
         currentCustomer.breakfastPrice =
           currentCustomer.lifestyle.prices.breakfast[numberOfProfiles];
@@ -564,9 +578,320 @@ class Step4Checkout extends React.Component {
           }
         });
 
+        // total base price based on per meal type base price, (before restrictions and extras and discounts)
+        currentCustomer.baseMealPriceTotal =
+          currentCustomer.breakfast.totalQty * currentCustomer.breakfastPrice +
+          currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
+          currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
+
+        // discounted basePrice -- this is the actual base price to add up in the total
+        if (currentCustomer.discount == "senior") {
+          let discountAmount = 0;
+
+          if (
+            currentCustomer.lifestyle.discountOrExtraTypeSenior == "Percentage"
+          ) {
+            discountAmount =
+              currentCustomer.lifestyle.discountSenior /
+              100 *
+              currentCustomer.baseMealPriceTotal;
+          }
+
+          if (
+            currentCustomer.lifestyle.discountOrExtraTypeSenior ==
+            "Fixed amount"
+          ) {
+            discountAmount = currentCustomer.lifestyle.discountSenior;
+          }
+
+          currentCustomer.discountActual = discountAmount;
+        }
+
+        if (currentCustomer.discount == "student") {
+          let discountAmount = 0;
+
+          if (
+            currentCustomer.lifestyle.discountOrExtraTypeStudent == "Percentage"
+          ) {
+            discountAmount =
+              currentCustomer.lifestyle.discountStudent /
+              100 *
+              currentCustomer.baseMealPriceTotal;
+          }
+
+          if (
+            currentCustomer.lifestyle.discountOrExtraTypeStudent ==
+            "Fixed amount"
+          ) {
+            discountAmount = currentCustomer.lifestyle.discountStudent;
+          }
+
+          currentCustomer.discountActual = discountAmount;
+        }
+
+        // calculating restrictions and specificRestrictions surcharges
+        if (currentCustomer.restrictions.length > 0) {
+          currentCustomer.restrictions.forEach((e, i) => {
+            currentCustomer.restrictionsActual.push(
+              this.props.restrictions.find(elem => elem._id === e)
+            );
+          });
+
+          currentCustomer.restrictionsActual.forEach((e, i) => {
+            let totalRestrictionsSurcharge = 0;
+            console.log(e);
+
+            const totalBaseMealsCharge =
+              currentCustomer.breakfast.totalQty *
+                currentCustomer.breakfastPrice +
+              currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
+              currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
+
+            if (e.discountOrExtraType == "Percentage") {
+              totalRestrictionsSurcharge = e.extra / 100 * totalBaseMealsCharge;
+            }
+
+            if (e.discountOrExtraType == "Fixed amount") {
+              totalRestrictionsSurcharge =
+                (currentCustomer.breakfast.totalQty +
+                  currentCustomer.lunch.totalQty +
+                  currentCustomer.dinner.totalQty) *
+                e.extra;
+            }
+
+            console.log(totalRestrictionsSurcharge);
+
+            currentCustomer.restrictionsSurcharges.push(
+              totalRestrictionsSurcharge
+            );
+          });
+        }
+
+        console.log(currentCustomer.restrictionsSurcharges);
+
+        if (currentCustomer.specificRestrictions.length > 0) {
+          currentCustomer.specificRestrictions.forEach((e, i) => {
+            currentCustomer.specificRestrictionsActual.push(
+              this.props.ingredients.find(elem => elem._id === e)
+            );
+          });
+        }
+
+        // calculating athletic surcharge for all meals
+        if (
+          currentCustomer.breakfast.athleticQty > 0 ||
+          currentCustomer.lunch.athleticQty > 0 ||
+          currentCustomer.dinner.athleticQty > 0
+        ) {
+          const totalAthleticSurcharge = 0;
+
+          if (currentCustomer.breakfast.athleticQty > 0) {
+            if (
+              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+              "Percentage"
+            ) {
+              const extraAthleticPerBreakfast =
+                currentCustomer.lifestyle.extraAthletic /
+                100 *
+                currentCustomer.breakfastPrice;
+
+              totalAthleticSurcharge +=
+                currentCustomer.breakfast.athleticQty *
+                extraAthleticPerBreakfast;
+            }
+
+            if (
+              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+              "Fixed amount"
+            ) {
+              totalAthleticSurcharge +=
+                currentCustomer.breakfast.athleticQty *
+                currentCustomer.lifestyle.extraAthletic;
+            }
+          }
+
+          if (currentCustomer.lunch.athleticQty > 0) {
+            if (
+              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+              "Percentage"
+            ) {
+              const extraAthleticPerLunch =
+                currentCustomer.lifestyle.extraAthletic /
+                100 *
+                currentCustomer.lunchPrice;
+
+              totalAthleticSurcharge +=
+                currentCustomer.lunch.athleticQty * extraAthleticPerLunch;
+            }
+
+            if (
+              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+              "Fixed amount"
+            ) {
+              totalAthleticSurcharge +=
+                currentCustomer.lunch.athleticQty *
+                currentCustomer.lifestyle.extraAthletic;
+            }
+          }
+
+          if (currentCustomer.dinner.athleticQty > 0) {
+            if (
+              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+              "Percentage"
+            ) {
+              const extraAthleticPerDinner =
+                currentCustomer.lifestyle.extraAthletic /
+                100 *
+                currentCustomer.dinnerPrice;
+
+              totalAthleticSurcharge +=
+                currentCustomer.dinner.athleticQty * extraAthleticPerDinner;
+            }
+
+            if (
+              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+              "Fixed amount"
+            ) {
+              totalAthleticSurcharge +=
+                currentCustomer.breakfast.athleticQty *
+                currentCustomer.lifestyle.extraAthletic;
+            }
+          }
+
+          currentCustomer.totalAthleticSurcharge = totalAthleticSurcharge;
+        }
+
+        // calculating bodybuilder surcharge for all meals
+        if (
+          currentCustomer.breakfast.bodybuilderQty > 0 ||
+          currentCustomer.lunch.bodybuilderQty > 0 ||
+          currentCustomer.dinner.bodybuilderQty > 0
+        ) {
+          const totalBodybuilderSurcharge = 0;
+
+          if (currentCustomer.breakfast.bodybuilderQty > 0) {
+            if (
+              currentCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
+              "Percentage"
+            ) {
+              const extraBodybuilderPerBreakfast =
+                currentCustomer.lifestyle.extraBodybuilder /
+                100 *
+                currentCustomer.breakfastPrice;
+
+              totalBodybuilderSurcharge +=
+                currentCustomer.breakfast.bodybuilderQty *
+                extraBodybuilderPerBreakfast;
+            }
+
+            if (
+              currentCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
+              "Fixed amount"
+            ) {
+              totalBodybuilderSurcharge +=
+                currentCustomer.breakfast.athleticQty *
+                currentCustomer.lifestyle.extraBodybuilder;
+            }
+          }
+
+          if (currentCustomer.lunch.bodybuilderQty > 0) {
+            const extraBodybuilderPerLunch =
+              currentCustomer.lifestyle.extraBodybuilder /
+              100 *
+              currentCustomer.lunchPrice;
+
+            totalBodybuilderSurcharge +=
+              currentCustomer.lunch.bodybuilderQty * extraBodybuilderPerLunch;
+          }
+
+          if (currentCustomer.dinner.bodybuilderQty > 0) {
+            const extraBodybuilderPerDinner =
+              currentCustomer.lifestyle.extraBodybuilder /
+              100 *
+              currentCustomer.dinnerPrice;
+
+            totalBodybuilderSurcharge +=
+              currentCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
+          }
+
+          currentCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
+        }
+
+        console.log(currentCustomer);
+
+        //push
         secondaryCustomers.push(currentCustomer);
       });
     }
+
+    let actualDeliveryCost = 0;
+
+    for (
+      let delivIndex = 0;
+      delivIndex < this.props.customerInfo.deliveryType.length;
+      delivIndex++
+    ) {
+      const daysMealSum =
+        parseInt(
+          this.props.customerInfo.completeSchedule[delivIndex].breakfast,
+          10
+        ) +
+        parseInt(
+          this.props.customerInfo.completeSchedule[delivIndex].lunch,
+          10
+        ) +
+        parseInt(
+          this.props.customerInfo.completeSchedule[delivIndex].dinner,
+          10
+        );
+
+      const deliveryTypeSelected = this.props.customerInfo.deliveryType[
+        delivIndex
+      ];
+
+      if (deliveryTypeSelected == "") {
+        continue;
+      } else if (
+        deliveryTypeSelected == "dayOf" ||
+        deliveryTypeSelected == "dayOfFriday" ||
+        deliveryTypeSelected == "dayOfThursday" ||
+        deliveryTypeSelected == "dayOfWednesday" ||
+        deliveryTypeSelected == "dayOfTuesday" ||
+        deliveryTypeSelected == "dayOfMonday"
+      ) {
+        actualDeliveryCost += 2.5;
+      } else if (
+        daysMealSum == 1 &&
+        (deliveryTypeSelected == "nightBefore" ||
+          deliveryTypeSelected == "sundayNight" ||
+          deliveryTypeSelected == "mondayNight" ||
+          deliveryTypeSelected == "tuesdayNight" ||
+          deliveryTypeSelected == "nightBeforeMonday" ||
+          deliveryTypeSelected == "nightBeforeTuesday" ||
+          deliveryTypeSelected == "nightBeforeWednesday")
+      ) {
+        actualDeliveryCost += 2.5;
+      } else if (delivIndex == 5) {
+        if (
+          this.props.customerInfo.deliveryType[delivIndex - 1] ==
+          "dayOfThursday"
+        ) {
+          if (deliveryTypeSelected == "nightBeforeThursday") {
+            actualDeliveryCost += 2.5;
+          }
+        } else if (
+          this.props.customerInfo.deliveryType[delivIndex - 1] ==
+            "dayOfPaired" &&
+          this.props.customerInfo.deliveryType[delivIndex - 2] == "dayOf"
+        ) {
+          if (deliveryTypeSelected == "nightBeforeThursday") {
+            actualDeliveryCost += 2.5;
+          }
+        }
+      } //else if 5
+    }
+
+    primaryCustomer.deliveryCost = actualDeliveryCost;
 
     this.setState({ primaryProfileBilling: primaryCustomer });
     this.setState({ secondaryProfilesBilling: secondaryCustomers });
@@ -912,6 +1237,24 @@ class Step4Checkout extends React.Component {
                       )}
 
                       {this.state.primaryProfileBilling &&
+                      (this.state.primaryProfileBilling.totalAthleticSurcharge >
+                        0 ||
+                        this.state.primaryProfileBilling
+                          .totalBodybuilderSurcharge > 0) ? (
+                        <Grid item xs={12}>
+                          <Typography
+                            type="body2"
+                            className="font-medium font-uppercase"
+                            style={{ marginTop: ".75em" }}
+                          >
+                            Extra
+                          </Typography>
+                        </Grid>
+                      ) : (
+                        ""
+                      )}
+
+                      {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.totalAthleticSurcharge >
                         0 ? (
                         <Grid container>
@@ -950,12 +1293,12 @@ class Step4Checkout extends React.Component {
                       this.state.primaryProfileBilling
                         .totalBodybuilderSurcharge > 0 ? (
                         <Grid container>
-                          <Grid item xs={6}>
+                          <Grid item xs={12} sm={6}>
                             <Typography type="subheading">
                               Bodybuilder
                             </Typography>
                           </Grid>
-                          <Grid item xs={6}>
+                          <Grid item xs={12} sm={6}>
                             <Typography
                               type="subheading"
                               style={{ textAlign: "right" }}
@@ -984,13 +1327,21 @@ class Step4Checkout extends React.Component {
                         ""
                       )}
 
-                      <Typography
-                        type="body2"
-                        className="font-medium font-uppercase"
-                        style={{ marginTop: ".75em", marginBottom: ".75em" }}
-                      >
-                        Restrictions
-                      </Typography>
+                      {this.state.primaryProfileBilling &&
+                        this.state.primaryProfileBilling.restrictionsActual
+                          .length > 0 && (
+                          <Typography
+                            type="body2"
+                            className="font-medium font-uppercase"
+                            style={{
+                              marginTop: ".75em",
+                              marginBottom: ".75em"
+                            }}
+                          >
+                            Restrictions
+                          </Typography>
+                        )}
+
                       {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.restrictionsActual
                         .length > 0
@@ -1025,49 +1376,231 @@ class Step4Checkout extends React.Component {
                           )
                         : ""}
 
-                      <Typography
-                        type="title"
-                        className="font-medium font-uppercase"
-                        style={{ marginTop: ".75em", marginBottom: ".75em" }}
-                      >
-                        Delivery
-                      </Typography>
+                      {this.state.secondaryProfilesBilling
+                        ? this.state.secondaryProfilesBilling.map((e, i) => {
+                            return (
+                              <div>
+                                <Typography
+                                  type="title"
+                                  style={{
+                                    marginTop: ".75em",
+                                    marginBottom: ".75em"
+                                  }}
+                                >
+                                  {e.lifestyle.title}
+                                </Typography>
 
-                      <Typography
-                        type="title"
-                        style={{ marginTop: ".75em", marginBottom: ".75em" }}
-                      >
-                        Night Before
-                      </Typography>
+                                <Grid container>
+                                  <Grid item xs={6}>
+                                    <Typography type="subheading">
+                                      {`${e.breakfast.totalQty +
+                                        e.lunch.totalQty +
+                                        e.dinner.totalQty} meals`}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={6}>
+                                    <Typography
+                                      type="subheading"
+                                      style={{ textAlign: "right" }}
+                                    >
+                                      ${e.breakfast.totalQty *
+                                        e.breakfastPrice +
+                                        e.lunch.totalQty * e.lunchPrice +
+                                        e.dinner.totalQty * e.dinnerPrice}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                                {/* discount secondary = */}
+                                {e.discountActual && (
+                                  <Grid container>
+                                    <Grid item xs={12}>
+                                      <Typography
+                                        type="body2"
+                                        className="font-medium font-uppercase"
+                                        style={{ marginTop: ".75em" }}
+                                      >
+                                        Discount
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <Typography type="subheading">
+                                        {e.discount.charAt(0).toUpperCase() +
+                                          e.discount.substr(
+                                            1,
+                                            e.discount.length
+                                          )}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <Typography
+                                        type="subheading"
+                                        style={{ textAlign: "right" }}
+                                      >
+                                        -${e.discountActual}{" "}
+                                      </Typography>
+                                    </Grid>
+                                  </Grid>
+                                )}
+
+                                {e.totalAthleticSurcharge > 0 ||
+                                e.totalBodybuilderSurcharge > 0 ? (
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      type="body2"
+                                      className="font-medium font-uppercase"
+                                      style={{ marginTop: ".75em" }}
+                                    >
+                                      Extra
+                                    </Typography>
+                                  </Grid>
+                                ) : (
+                                  ""
+                                )}
+
+                                {e.totalAthleticSurcharge > 0 ? (
+                                  <Grid container>
+                                    <Grid item xs={6}>
+                                      <Typography type="subheading">
+                                        Athletic
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                      <Typography
+                                        type="subheading"
+                                        style={{ textAlign: "right" }}
+                                      >
+                                        ${e.totalAthleticSurcharge} ({e
+                                          .lifestyle
+                                          .discountOrExtraTypeAthletic ==
+                                        "Fixed amount"
+                                          ? "$"
+                                          : ""}
+                                        {e.lifestyle.extraAthletic}
+                                        {e.lifestyle
+                                          .discountOrExtraTypeAthletic ==
+                                        "Percentage"
+                                          ? "%"
+                                          : ""})
+                                      </Typography>
+                                    </Grid>
+                                  </Grid>
+                                ) : (
+                                  ""
+                                )}
+
+                                {e.totalBodybuilderSurcharge > 0 ? (
+                                  <Grid container>
+                                    <Grid item sm={6} xs={12}>
+                                      <Typography type="subheading">
+                                        Bodybuilder
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item sm={6} xs={12}>
+                                      <Typography
+                                        type="subheading"
+                                        style={{ textAlign: "right" }}
+                                      >
+                                        ${e.totalBodybuilderSurcharge} ({e
+                                          .lifestyle
+                                          .discountOrExtraTypeBodybuilder ==
+                                        "Fixed amount"
+                                          ? "$"
+                                          : ""}
+                                        {e.lifestyle.extraBodybuilder}
+                                        {e.lifestyle
+                                          .discountOrExtraTypeBodybuilder ==
+                                        "Percentage"
+                                          ? "%"
+                                          : ""})
+                                      </Typography>
+                                    </Grid>
+                                  </Grid>
+                                ) : (
+                                  ""
+                                )}
+
+                                {e.restrictionsActual.length > 0 && (
+                                  <Typography
+                                    type="body2"
+                                    className="font-medium font-uppercase"
+                                    style={{
+                                      marginTop: ".75em",
+                                      marginBottom: ".75em"
+                                    }}
+                                  >
+                                    Restrictions
+                                  </Typography>
+                                )}
+
+                                {e.restrictionsActual.length > 0 &&
+                                  e.restrictionsActual.map((el, ind) => (
+                                    <Grid container key={ind}>
+                                      <Grid item xs={12} sm={6}>
+                                        <Typography type="subheading">
+                                          {el.title} ({el.discountOrExtraType ==
+                                          "Fixed amount"
+                                            ? "$"
+                                            : ""}
+                                          {el.extra}
+                                          {el.discountOrExtraType ==
+                                          "Percentage"
+                                            ? "%"
+                                            : ""})
+                                        </Typography>
+                                      </Grid>
+                                      <Grid item xs={12} sm={6}>
+                                        <Typography
+                                          type="subheading"
+                                          style={{ textAlign: "right" }}
+                                        >
+                                          ${e.restrictionsSurcharges[ind]}
+                                        </Typography>
+                                      </Grid>
+                                    </Grid>
+                                  ))}
+                              </div>
+                            );
+                          })
+                        : ""}
+
+                      {/*  delivery and other stuff  */}
                       <Grid container>
                         <Grid item xs={6}>
-                          <Typography type="subheading">
-                            Minimum two meals in a day
-                          </Typography>
+                          <Typography type="subheading">Delivery</Typography>
                         </Grid>
                         <Grid item xs={6}>
                           <Typography
                             type="subheading"
                             style={{ textAlign: "right" }}
                           >
-                            Free
+                            {this.state.primaryProfileBilling &&
+                            this.state.primaryProfileBilling.deliveryCost > 0
+                              ? `$${
+                                  this.state.primaryProfileBilling.deliveryCost
+                                }`
+                              : "Free"}
                           </Typography>
                         </Grid>
                       </Grid>
 
-                      <Grid container>
-                        <Grid item xs={6}>
-                          <Typography type="subheading">Cooler bag</Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            type="subheading"
-                            style={{ textAlign: "right" }}
-                          >
-                            $20.00
-                          </Typography>
-                        </Grid>
-                      </Grid>
+                      {this.state.primaryProfileBilling &&
+                        this.state.primaryProfileBilling.coolerBag > 0 && (
+                          <Grid container>
+                            <Grid item xs={6}>
+                              <Typography type="subheading">
+                                Cooler bag
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography
+                                type="subheading"
+                                style={{ textAlign: "right" }}
+                              >
+                                $20.00
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        )}
 
                       {/* <Typography
                         type="title"

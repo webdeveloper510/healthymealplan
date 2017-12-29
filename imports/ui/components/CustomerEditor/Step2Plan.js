@@ -1204,7 +1204,7 @@ class Step2Plan extends React.Component {
   renderMealStepsContent(index) {
     return (
       <Grid container>
-        <Grid xs={12} sm={4}>
+        <Grid item xs={12} sm={4}>
           <Typography type="body1" className="text-uppercase">
             Breakfast
           </Typography>
@@ -1303,7 +1303,7 @@ class Step2Plan extends React.Component {
           </FormControl>
         </Grid>
 
-        <Grid xs={12} sm={4}>
+        <Grid item xs={12} sm={4}>
           <Typography type="body1" className="text-uppercase">
             Lunch
           </Typography>
@@ -1402,7 +1402,7 @@ class Step2Plan extends React.Component {
           </FormControl>
         </Grid>
 
-        <Grid xs={12} sm={4}>
+        <Grid item xs={12} sm={4}>
           <Typography type="body1" className="text-uppercase">
             Dinner
           </Typography>
@@ -1506,7 +1506,7 @@ class Step2Plan extends React.Component {
   renderMealStepsContentSecondary(profileIndex, stepIndex) {
     return (
       <Grid container>
-        <Grid xs={12} sm={4}>
+        <Grid item xs={12} sm={4}>
           <Typography type="body1" className="text-uppercase">
             Breakfast
           </Typography>
@@ -1648,7 +1648,7 @@ class Step2Plan extends React.Component {
           </FormControl>
         </Grid>
 
-        <Grid xs={12} sm={4}>
+        <Grid item xs={12} sm={4}>
           <Typography type="body1" className="text-uppercase">
             Lunch
           </Typography>
@@ -1790,7 +1790,7 @@ class Step2Plan extends React.Component {
           </FormControl>
         </Grid>
 
-        <Grid xs={12} sm={4}>
+        <Grid item xs={12} sm={4}>
           <Typography type="body1" className="text-uppercase">
             Dinner
           </Typography>

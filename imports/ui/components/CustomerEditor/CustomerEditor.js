@@ -44,6 +44,7 @@ import Step1Eligibility from "./Step1Eligibility";
 import Step2Plan from "./Step2Plan";
 import Step3Delivery from "./Step3Delivery";
 import Step4Checkout from "./Step4Checkout";
+import moment from "moment";
 
 import $ from "jquery";
 
@@ -144,8 +145,11 @@ class CustomerEditor extends React.Component {
             dinner: { active: false, portions: "regular", quantity: "1" }
           }
         ],
-        subscriptionStartDate: "",
-        subscriptionStartDateRaw: "",
+        subscriptionStartDate: moment(this.renderStartDays()[0]).format(
+          "dddd MMMM Do YYYY"
+        ),
+        subscriptionStartDateRaw: this.renderStartDays()[0],
+
         secondaryProfileCount: 0,
         secondaryProfiles: [],
 
@@ -155,7 +159,16 @@ class CustomerEditor extends React.Component {
           postalCode: "",
           notes: ""
         },
-        coolerBag: false
+        coolerBag: false,
+        completeSchedule: [
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0 }
+        ]
       }
     };
   }
@@ -176,6 +189,28 @@ class CustomerEditor extends React.Component {
       this.state.customerInfo,
       fields
     );
+  }
+
+  renderStartDays() {
+    const allDates = [];
+
+    // thanks stackoverflow
+    function nextDay(x) {
+      const now = new Date();
+      now.setDate(now.getDate() + (x + (7 - now.getDay())) % 7);
+      return now;
+    }
+
+    const immediateMonday = nextDay(1);
+
+    allDates.push(new Date(immediateMonday));
+
+    for (i = 1; i <= 4; i++) {
+      const nextMonday = immediateMonday.setDate(immediateMonday.getDate() + 7);
+      allDates.push(new Date(nextMonday));
+    }
+
+    return allDates;
   }
 
   handleNext() {
