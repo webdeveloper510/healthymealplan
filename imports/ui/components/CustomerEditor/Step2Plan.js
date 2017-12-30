@@ -288,6 +288,7 @@ class Step2Plan extends React.Component {
         ? this.props.customerInfo.discount
         : "none",
       restrictions: [],
+      activeMealScheduleStep: 0,
       scheduleReal: [
         {
           breakfast: { active: false, portions: "regular", quantity: "1" },
