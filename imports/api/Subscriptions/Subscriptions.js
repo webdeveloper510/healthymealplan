@@ -22,10 +22,16 @@ Subscriptions.schema = new SimpleSchema({
     type: String,
     label: "The customer id"
   },
+  status: {
+    type: String,
+    label: "Status of the subscription"
+  },
+
   paymentMethod: {
     type: String,
     label: "The payment method for the subscription"
   },
+
   amount: {
     type: Number,
     label: "The total amount of the subscription"
@@ -37,19 +43,14 @@ Subscriptions.schema = new SimpleSchema({
     optional: true
   },
 
- "transactions.$" :{
+  "transactions.$": {
     type: String,
-    label: "The transaction id";
+    label: "The transaction id"
   },
 
   taxExempt: {
     type: Boolean,
     label: "Customer is tax exempt."
-  },
-
-  generateReceipts: {
-    type: Boolean,
-    label: "Generate receipts."
   },
 
   createdAt: {

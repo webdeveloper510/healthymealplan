@@ -92,7 +92,7 @@ class Step3Delivery extends React.Component {
       roomNumber:'',
 
       hotelName: '',
-      hotelFrontDesk: false,
+      hotelFrontDesk: true,
 
       dormName: "Algonquin College",
       dormResidence: "Student Residence",
@@ -195,7 +195,7 @@ class Step3Delivery extends React.Component {
       
       address.hotelName = this.state.hotelName;
       address.roomNumber = this.state.roomNumber;
-      address.leaveAtFrontDesk = this.state.leaveAtFrontDesk;
+      address.leaveAtFrontDesk = true;
 
     }else if(this.state.addressType == 'house'){
 
@@ -4327,6 +4327,12 @@ class Step3Delivery extends React.Component {
                       style={{ flexDirection: "row" }}
                     >
                       <FormControlLabel
+                        value="house"
+                        control={<Radio />}
+                        label="House"
+                      />
+
+                      <FormControlLabel
                         value="apartment"
                         control={<Radio />}
                         label="Apartment"
@@ -4349,11 +4355,7 @@ class Step3Delivery extends React.Component {
                         label="Hotel"
                       />
 
-                      <FormControlLabel
-                        value="house"
-                        control={<Radio />}
-                        label="House"
-                      />
+           
                     </RadioGroup>
                   </FormControl>
                 </Grid>
@@ -4694,11 +4696,11 @@ class Step3Delivery extends React.Component {
                   <Grid item xs={12}>
                     <FormGroup>
                       <FormControlLabel
-                        control={<Checkbox checked={this.state.hotelFrontDesk}
+                        control={<Checkbox checked
                         />}
-                        disabled={this.state.roomNumber.length > 0}
+                        disabled
+                        checked
                         label="Leave at front desk"
-                        onChange={this.setHotelFrontDeskCheckbox.bind(this)}
                       />
                     </FormGroup>
                   </Grid>
@@ -5001,7 +5003,7 @@ class Step3Delivery extends React.Component {
             justifyContent: "flex-end"
           }}
         >
-           <Button color="primary" onClick={this.props.handleBack}>
+          <Button color="primary" onClick={this.props.handleBack}>
             Back
           </Button>
           <Button
