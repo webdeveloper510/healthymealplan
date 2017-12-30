@@ -112,9 +112,7 @@ class Step2Plan extends React.Component {
       lifestyle: this.props.customerInfo.adultOrChild
         ? this.props.customerInfo.adultOrChild
         : "traditional",
-      extra: this.props.customerInfo.extra
-        ? this.props.customerInfo.extra
-        : "none",
+
       discount: this.props.customerInfo.discount
         ? this.props.customerInfo.discount
         : "none",
@@ -285,9 +283,7 @@ class Step2Plan extends React.Component {
       lifestyle: this.props.customerInfo.adultOrChild
         ? this.props.customerInfo.adultOrChild
         : "traditional",
-      extra: this.props.customerInfo.extra
-        ? this.props.customerInfo.extra
-        : "none",
+
       discount: this.props.customerInfo.discount
         ? this.props.customerInfo.discount
         : "none",
@@ -329,8 +325,7 @@ class Step2Plan extends React.Component {
           dinner: { active: false, portions: "regular", quantity: "1" }
         }
       ],
-      adultOrChild: "",
-      activeMealScheduleStep: 0
+      adultOrChild: ""
     });
 
     this.setState({
@@ -356,19 +351,13 @@ class Step2Plan extends React.Component {
   }
 
   handleProfileOpen(primary, index) {
-    if (primary) {
-      this.setState({
-        primaryCollapse: !this.state.primaryCollapse
-      });
-    } else {
-      const currentCollapseArr = this.state.secondaryCollapses.slice();
+    const currentCollapseArr = this.state.secondaryCollapses.slice();
 
-      currentCollapseArr[index] = !currentCollapseArr[index];
+    currentCollapseArr[index] = !currentCollapseArr[index];
 
-      this.setState({
-        secondaryCollapses: currentCollapseArr
-      });
-    }
+    this.setState({
+      secondaryCollapses: currentCollapseArr
+    });
   }
 
   renderStartDays() {
@@ -505,7 +494,7 @@ class Step2Plan extends React.Component {
     }
   }
 
-  //remove lifestyles that may have been already checked but get disabled when you select a lifestyle.
+  // remove lifestyles that may have been already checked but get disabled when you select a lifestyle.
   handleChangeRadioLifestyle(event, value) {
     const getLifestyleRestrictions = this.props.lifestyles.find(
       el => el.title === value
@@ -2081,7 +2070,7 @@ class Step2Plan extends React.Component {
                       <FormControlLabel
                         value="student"
                         control={<Radio />}
-                        label={`Student`}
+                        label={"Student"}
                         disabled={
                           this.state.lifestyle &&
                           this.props.lifestyles.find(
@@ -2095,7 +2084,7 @@ class Step2Plan extends React.Component {
                       <FormControlLabel
                         value="senior"
                         control={<Radio />}
-                        label={`Senior`}
+                        label={"Senior"}
                         disabled={
                           this.state.lifestyle &&
                           this.props.lifestyles.find(
