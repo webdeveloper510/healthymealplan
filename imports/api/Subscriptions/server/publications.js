@@ -11,10 +11,10 @@ Meteor.publish("subscriptions", (selector, options) => {
 });
 
 // Note: IngredientTypes.view is also used when editing an existing document.
-Meteor.publish("subscriptions.view", categoryId => {
-  check(categoryId, String);
+Meteor.publish("subscriptions.view", subId => {
+  check(subId, String);
 
-  return Subscriptions.find({ _id: categoryId });
+  return Subscriptions.find({ _id: subId });
 });
 
 Meteor.publish("subscriptions-all-count", function categoryCount() {

@@ -1,8 +1,8 @@
 /* eslint-disable max-len, no-return-assign */
 
-/* 
+/*
   Refactor the autocomplete tabs into their own components
-  not a priority for now, but this is an itch that we should really scratch. 
+  not a priority for now, but this is an itch that we should really scratch.
 */
 
 import React from "react";
@@ -66,7 +66,7 @@ class LifestyleEditor extends React.Component {
     super(props);
 
     this.state = {
-      //I know state is pretty shit and fucked up w.r.t. readability.
+      // I know state is pretty shit and fucked up w.r.t. readability.
 
       valueDiscountOrExtraAthletic:
         !this.props.newLifestyle &&
@@ -378,10 +378,10 @@ class LifestyleEditor extends React.Component {
     });
   }
 
-  //different function for each of the lifestyle discounts/extra types is bad,
-  //make a single function for each (textfield, radiobutton, and selectfield) and pass what needs to
-  //be changed via params
-  //refactor v.75
+  // different function for each of the lifestyle discounts/extra types is bad,
+  // make a single function for each (textfield, radiobutton, and selectfield) and pass what needs to
+  // be changed via params
+  // refactor v.75
 
   handleDiscountChangeAthletic(event, value) {
     // console.log(event.target.value);
@@ -514,7 +514,7 @@ class LifestyleEditor extends React.Component {
       ? "lifestyles.update"
       : "lifestyles.insert";
 
-    let lifestyle = {
+    const lifestyle = {
       title: document.querySelector("#title").value.trim(),
       restrictions: this.state.restrictions.map((e, i) => e._id),
       prices: {
@@ -2078,7 +2078,6 @@ class LifestyleEditor extends React.Component {
                         ? this.handleRemove.bind(this)
                         : () => this.props.history.push("/lifestyles")
                     }
-                    disabled={true}
                   >
                     Delete
                   </Button>

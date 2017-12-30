@@ -50,6 +50,10 @@ class RouteEditor extends React.Component {
       deleteDialogOpen: false,
       hasFormChanged: false,
       city: this.props.newRoute ? "Ottawa" : this.props.route.city,
+      routeActual: this.props.newRoute
+        ? "Downtown"
+        : this.props.route.routeActual,
+
       limitedChecked: this.props.newRoute ? false : this.props.route.limited,
       extraSelected: !!(
         !this.props.newRoute &&
@@ -164,6 +168,7 @@ class RouteEditor extends React.Component {
     const route = {
       title: document.querySelector("#title").value.trim(),
       city: this.state.city,
+      routeActual: this.state.routeActual,
       limited: this.state.limitedChecked
     };
 
@@ -222,6 +227,15 @@ class RouteEditor extends React.Component {
 
     this.setState({
       city: event.target.value,
+      hasFormChanged: true
+    });
+  }
+
+  handleRouteChange(event, value) {
+    // console.log(event.target.value);
+
+    this.setState({
+      routeActual: event.target.value,
       hasFormChanged: true
     });
   }
@@ -382,6 +396,27 @@ class RouteEditor extends React.Component {
                 </MenuItem>
                 <MenuItem key={2} value="Gatineau">
                   Gatineau
+                </MenuItem>
+              </TextField>
+
+              <TextField
+                fullWidth
+                id="select-discount-type"
+                select
+                label="Route"
+                value={this.state.routeActual ? this.state.routeActual : ""}
+                onChange={this.handleRouteChange.bind(this)}
+                SelectProps={{ native: false }}
+                style={{ marginTop: "20px" }}
+              >
+                <MenuItem key={1} value="Downtown">
+                  Downtown
+                </MenuItem>
+                <MenuItem key={2} value="East">
+                  East
+                </MenuItem>
+                <MenuItem key={3} value="West">
+                  West
                 </MenuItem>
               </TextField>
             </Paper>

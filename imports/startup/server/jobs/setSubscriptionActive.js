@@ -1,10 +1,11 @@
-import { Job } from 'meteor/vsivsi:job-collection';
+import { Job } from "meteor/vsivsi:job-collection";
+import { Meteor } from "meteor/meteor";
 
-import Subscriptions from '../../../api/Subscriptions/Subscriptions';
+import Subscriptions from "../../../api/Subscriptions/Subscriptions";
 
 const worker = Job.processJobs(
-  'coreJobQueue',
-  'setSubscriptionActive',
+  "coreJobQueue",
+  "setSubscriptionActive",
   (job, cb) => {
     const insertData = job.data;
     // do anything with the job data here.
@@ -12,21 +13,21 @@ const worker = Job.processJobs(
     try {
       Subscriptions.update(
         {
-          _id: insertData.subscriptionId,
+          _id: insertData.subscriptionId
         },
         {
           $set: {
-            status: 'active',
-          },
-        },
+            status: "active"
+          }
+        }
       );
     } catch (error) {
       job.log(
-        'setSubscriptionActive for customer: ' +
+        "setSubscriptionActive for customer: " +
           insertData.customerId +
-          ' with subscription - ' +
+          " with subscription - " +
           insertData.subscriptionId +
-          ' failed.',
+          " failed."
       );
       job.fail(error); // when failing
     }
@@ -34,21 +35,21 @@ const worker = Job.processJobs(
     try {
       Meteor.users.update(
         {
-          _id: insertData.customerId,
+          _id: insertData.customerId
         },
         {
           $set: {
-            status: 'active',
-          },
-        },
+            status: "active"
+          }
+        }
       );
     } catch (error) {
       job.log(
-        'setSubscriptionActive for customer: ' +
+        "setSubscriptionActive for customer: " +
           insertData.customerId +
-          ' with subscription - ' +
+          " with subscription - " +
           insertData.subscriptionId +
-          ' failed.',
+          " failed."
       );
       job.fail(error); // when failing
     }
@@ -58,7 +59,7 @@ const worker = Job.processJobs(
     // Be sure to invoke the callback
     // when work on this job has finished
     cb();
-  },
+  }
 );
 
 export default worker;

@@ -35,6 +35,11 @@ import '../../api/Sides/methods';
 import '../../api/Sides/server/publications';
 import '../../api/SideImages/server/publications';
 
+import '../../api/Subscriptions/methods';
+import '../../api/Subscriptions/server/publications';
+
+import '../../api/Transactions/methods';
+import '../../api/Transactions/server/publications';
 
 import '../../api/Users/server/methods';
 import '../../api/Users/server/publications';

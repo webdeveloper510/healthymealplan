@@ -14,7 +14,9 @@ import ClearIcon from "material-ui-icons/Clear";
 import AppBar from "material-ui/AppBar";
 import Tabs, { Tab } from "material-ui/Tabs";
 
-// import LifestylesCollection from '../../../api/Lifestyles/Lifestyles';
+import SubscriptionsColl from "../../../api/Subscriptions/Subscriptions";
+import LifestylesColl from "../../../api/Lifestyles/Lifestyles";
+
 // import RestrictionsCollection from '../../../api/Restrictions/Restrictions';
 
 import Loading from "../../components/Loading/Loading";
@@ -208,7 +210,18 @@ class Customers extends React.Component {
             limit={50}
             collection={Meteor.users}
             publication="users.customers"
-            // options={{}}
+            joins={[
+              {
+                foreignProperty: "customerId",
+                collection: SubscriptionsColl,
+                joinAs: "joinedSubscription"
+              },
+              {
+                localProperty: "lifestyle",
+                collection: LifestylesColl,
+                joinAs: "joinedLifestyle"
+              }
+            ]}
             selector={{ roles: ["customer"] }}
           >
             <CustomersTable
@@ -236,8 +249,11 @@ Customers.propTypes = {
 
 export default createContainer(() => {
   const subscription = Meteor.subscribe("users.customers");
+  const subscription2 = Meteor.subscribe("subscriptions");
+  const subscription3 = Meteor.subscribe("lifestyles");
 
   return {
-    loading: !subscription.ready()
+    loading:
+      !subscription.ready() && !subscription2.ready() && !subscription3.ready()
   };
 }, Customers);

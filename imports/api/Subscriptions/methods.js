@@ -53,24 +53,13 @@ Meteor.methods({
       throw new Meteor.Error("500", exception);
     }
   }
-  // "categories.batchRemove": function categoriesBatchRemove(ingredientIds) {
-  //   check(ingredientIds, Array);
-  //   console.log("Server: categories.batchRemove");
-
-  //   try {
-  //     return Subscriptions.remove({ _id: { $in: ingredientIds } });
-  //   } catch (exception) {
-  //     throw new Meteor.Error("500", exception);
-  //   }
-  // }
 });
 
 rateLimit({
   methods: [
     "subscriptions.insert",
     "subscriptions.update",
-    "subscriptions.remove",
-    "categories.batchRemove"
+    "subscriptions.remove"
   ],
   limit: 5,
   timeRange: 1000

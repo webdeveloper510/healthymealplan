@@ -516,7 +516,7 @@ class SideEditor extends React.Component {
       hasFormChanged
     });
   }
-  
+
   changeTableField() {
     this.setState({
       hasFormChanged: true
@@ -525,7 +525,8 @@ class SideEditor extends React.Component {
 
   handleMealTypeChange(event, value) {
     this.setState({
-      valueMealType: event.target.value
+      valueMealType: event.target.value,
+      hasFormChanged: true
     });
   }
 

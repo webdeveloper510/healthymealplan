@@ -378,6 +378,7 @@ class CustomerEditor extends React.Component {
             lifestyles={this.props.lifestyles}
             restrictions={this.props.restrictions}
             ingredients={this.props.potentialSubIngredients}
+            history={this.props.history}
           />
         );
       default:
