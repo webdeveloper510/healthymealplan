@@ -11,7 +11,6 @@ Meteor.methods({
       title: String,
       restrictionType: String,
       ingredients: Array,
-
       types: Array,
       categories: Array,
       discount: Match.Maybe(Number),
@@ -63,7 +62,7 @@ Meteor.methods({
       _id: String,
       title: String,
       restrictionType: String,
-      ingredients: Array,
+      ingredients: Match.Maybe(Array),
       types: Array,
       categories: Array,
       discount: Match.Maybe(Number),
