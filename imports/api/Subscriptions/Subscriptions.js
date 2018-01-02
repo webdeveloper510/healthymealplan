@@ -22,6 +22,10 @@ Subscriptions.schema = new SimpleSchema({
     type: String,
     label: 'The customer id',
   },
+  authorizeSubscriptionId: {
+    type: 'String,',
+    label: 'Authorize.Net subscriptionId if payment is card',
+  },
   status: {
     type: String,
     label: 'Status of the subscription',

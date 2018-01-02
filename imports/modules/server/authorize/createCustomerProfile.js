@@ -10,7 +10,12 @@ import { Random } from 'meteor/random';
 
 */
 
-export default function createCustomerProfile(descriptor, value, callback) {
+export default function createCustomerProfile(
+  descriptor,
+  value,
+  customer,
+  callback,
+) {
   const merchantAuthenticationType = new ApiContracts.MerchantAuthenticationType();
   merchantAuthenticationType.setName(Meteor.settings.public.apiLoginKey);
   merchantAuthenticationType.setTransactionKey(
@@ -27,6 +32,7 @@ export default function createCustomerProfile(descriptor, value, callback) {
   const customerAddress = new ApiContracts.CustomerAddressType();
   customerAddress.setFirstName(Random.id());
   customerAddress.setLastName(Random.id());
+  // customerAddress.setZip(Random.id());
 
   const customerPaymentProfileType = new ApiContracts.CustomerPaymentProfileType();
   customerPaymentProfileType.setCustomerType(
@@ -41,7 +47,7 @@ export default function createCustomerProfile(descriptor, value, callback) {
   const customerProfileType = new ApiContracts.CustomerProfileType();
   customerProfileType.setMerchantCustomerId('M');
   customerProfileType.setDescription('Profile description here');
-  customerProfileType.setEmail(`${Random.id()}@gmail.com`);
+  customerProfileType.setEmail(customer.email);
   customerProfileType.setPaymentProfiles(paymentProfilesList);
 
   const createRequest = new ApiContracts.CreateCustomerProfileRequest();

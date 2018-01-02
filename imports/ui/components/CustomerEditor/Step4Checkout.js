@@ -1007,33 +1007,38 @@ class Step4Checkout extends React.Component {
       console.log(response);
 
       if (response.messages.resultCode === 'Ok' && response.opaqueData) {
-        Meteor.call('customers.step5', response.opaqueData, (err, res) => {
-          if (err) {
-            console.log(err);
+        Meteor.call(
+          'customers.step5',
+          response.opaqueData,
+          customerInfo,
+          (err, res) => {
+            if (err) {
+              console.log(err);
+
+              this.setState({
+                submitSuccess: false,
+                submitLoading: false,
+              });
+
+              this.props.popTheSnackbar({
+                message: 'There was an error saving customer data',
+              });
+            }
+
+            console.log(res);
 
             this.setState({
-              submitSuccess: false,
+              submitSuccess: true,
               submitLoading: false,
             });
 
             this.props.popTheSnackbar({
-              message: 'There was an error saving customer data',
+              message: `Successfully created customer profile and subscription with subscription Id:${
+                res.subscriptionId
+              }`,
             });
-          }
-
-          console.log(res);
-
-          this.setState({
-            submitSuccess: true,
-            submitLoading: false,
-          });
-
-          this.props.popTheSnackbar({
-            message: `Successfully created customer profile and subscription with subscription Id:${
-              res.subscriptionId
-            }`,
-          });
-        });
+          },
+        );
       } else {
         this.setState({
           submitSuccess: false,
@@ -1314,7 +1319,7 @@ class Step4Checkout extends React.Component {
                         0 ||
                         this.state.primaryProfileBilling
                           .totalBodybuilderSurcharge > 0) ? (
-                            <Grid item xs={12}>
+                          <Grid item xs={12}>
                             <Typography
                               type="body2"
                               className="font-medium font-uppercase"
