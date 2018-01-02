@@ -20,13 +20,21 @@ import { MenuItem } from "material-ui/Menu";
 import TextField from "material-ui/TextField";
 import Select from "material-ui/Select";
 import Input, { InputLabel } from "material-ui/Input";
-import { FormControl, FormHelperText } from "material-ui/Form";
+
+import {
+  FormControl,
+  FormControlLabel,
+  FormHelperText
+} from "material-ui/Form";
+
 import Dialog, {
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle
 } from "material-ui/Dialog";
+
+import Radio, { RadioGroup } from "material-ui/Radio";
 
 import classNames from "classnames";
 import { withStyles } from "material-ui/styles";
@@ -111,7 +119,40 @@ class IngredientEditor extends React.Component {
       deleteDialogOpen: false,
       hasFormChanged: false,
       submitLoading: false,
-      submitSuccess: false
+      submitSuccess: false,
+      valueDiscountOrExtra:
+        !this.props.newIngredient &&
+        this.props.ingredient &&
+        (this.props.ingredient.hasOwnProperty("discount") ||
+          this.props.ingredient.hasOwnProperty("extra"))
+          ? this.props.ingredient.hasOwnProperty("discount")
+            ? "discount"
+            : "extra"
+          : "none",
+
+      discountOrExtraSelected: !!(
+        !this.props.newIngredient &&
+        this.props.ingredient &&
+        (this.props.ingredient.hasOwnProperty("discount") ||
+          this.props.ingredient.hasOwnProperty("extra"))
+      ),
+
+      discountType:
+        !this.props.newIngredient &&
+        this.props.ingredient &&
+        this.props.ingredient.discountOrExtraType
+          ? this.props.ingredient.discountOrExtraType
+          : "Percentage",
+
+      discountOrExtraAmount:
+        !this.props.newIngredient &&
+        this.props.ingredient &&
+        (this.props.ingredient.hasOwnProperty("discount") ||
+          this.props.ingredient.hasOwnProperty("extra"))
+          ? this.props.ingredient.hasOwnProperty("discount")
+            ? this.props.ingredient.discount
+            : this.props.ingredient.extra
+          : ""
     };
   }
 
@@ -337,6 +378,22 @@ class IngredientEditor extends React.Component {
       typeActual = this.props.ingredientTypes.find(el => el.title === "N/A");
     }
 
+    if (this.state.discountOrExtraSelected) {
+      const discountOrExtra = this.state.valueDiscountOrExtra;
+      ingredient[discountOrExtra] = parseFloat(
+        this.state.discountOrExtraAmount
+      );
+      ingredient.discountOrExtraType = this.state.discountType;
+    }
+
+    if (existingIngredient) {
+      if (this.state.valueDiscountOrExtra === "none") {
+        delete ingredient.discount;
+        delete ingredient.extra;
+        delete ingredient.discountOrExtraType;
+      }
+    }
+
     ingredient.typeId = typeActual._id;
 
     console.log(ingredient);
@@ -426,6 +483,62 @@ class IngredientEditor extends React.Component {
         </DialogActions>
       </Dialog>
     );
+  }
+
+  handleDiscountChange(event, value) {
+    // console.log(event.target.value);
+
+    this.setState({
+      discountType: event.target.value
+    });
+  }
+
+  handleDiscountOrExtraValueChange(event, value) {
+    this.setState({
+      hasFormChanged: true,
+      discountOrExtraAmount: event.target.value
+    });
+  }
+
+  handleDiscountOrExtraRadioChange(event, value) {
+    let discountOrExtraSelected = true;
+
+    if (value == "none") {
+      discountOrExtraSelected = false;
+    }
+
+    this.setState({
+      discountOrExtraSelected,
+      valueDiscountOrExtra: value,
+      hasFormChanged: true
+    });
+  }
+
+  handleDiscountChange(event, value) {
+    this.setState({
+      discountType: event.target.value
+    });
+  }
+
+  handleDiscountOrExtraValueChange(event, value) {
+    this.setState({
+      hasFormChanged: true,
+      discountOrExtraAmount: event.target.value
+    });
+  }
+
+  handleDiscountOrExtraRadioChange(event, value) {
+    let discountOrExtraSelected = true;
+
+    if (value == "none") {
+      discountOrExtraSelected = false;
+    }
+
+    this.setState({
+      discountOrExtraSelected,
+      valueDiscountOrExtra: value,
+      hasFormChanged: true
+    });
   }
 
   renderSuggestion(suggestion) {
@@ -690,27 +803,127 @@ class IngredientEditor extends React.Component {
                   type="subheading"
                   className="subheading font-medium"
                 >
+                  Value
+                </Typography>
+                <Typography style={{ paddingRight: "80px" }}>
+                  Applying a discount or extra will affect the total amount of a
+                  lifestyle's price plan if ingredients are restricted.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <FormControl component="fieldset">
+                        <RadioGroup
+                          aria-label="discountOrExtra"
+                          name="discountOrExtra"
+                          value={this.state.valueDiscountOrExtra}
+                          onChange={this.handleDiscountOrExtraRadioChange.bind(
+                            this
+                          )}
+                          style={{ flexDirection: "row" }}
+                        >
+                          <FormControlLabel
+                            className="radiobuttonlabel"
+                            value="none"
+                            control={
+                              <Radio
+                                checked={
+                                  this.state.valueDiscountOrExtra === "none"
+                                }
+                              />
+                            }
+                            label="None"
+                          />
+                          <FormControlLabel
+                            className="radiobuttonlabel"
+                            value="discount"
+                            control={
+                              <Radio
+                                checked={
+                                  this.state.valueDiscountOrExtra === "discount"
+                                }
+                              />
+                            }
+                            label="Discount"
+                          />
+                          <FormControlLabel
+                            className="radiobuttonlabel"
+                            value="extra"
+                            control={
+                              <Radio
+                                checked={
+                                  this.state.valueDiscountOrExtra === "extra"
+                                }
+                              />
+                            }
+                            label="Extra"
+                          />
+                        </RadioGroup>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={6} sm={6}>
+                      <TextField
+                        disabled={!this.state.discountOrExtraSelected}
+                        fullWidth
+                        id="select-discount-type"
+                        select
+                        label="Type"
+                        value={
+                          this.state.discountType ? this.state.discountType : ""
+                        }
+                        onChange={this.handleDiscountChange.bind(this)}
+                        SelectProps={{ native: false }}
+                      >
+                        <MenuItem key={1} value="Percentage">
+                          Percentage
+                        </MenuItem>
+                        <MenuItem key={2} value="Fixed amount">
+                          Fixed amount
+                        </MenuItem>
+                      </TextField>
+                    </Grid>
+
+                    <Grid item xs={6} sm={6}>
+                      <TextField
+                        fullWidth
+                        value={this.state.discountOrExtraAmount}
+                        id="discountOrExtraValue"
+                        name="discountOrExtraValue"
+                        disabled={!this.state.discountOrExtraSelected}
+                        onChange={this.handleDiscountOrExtraValueChange.bind(
+                          this
+                        )}
+                        label="Amount"
+                        inputProps={{
+                          "aria-label": "Description",
+                          type: "number"
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Divider light className="divider--space-x" />
+
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
                   Type
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
-                  {/* <FormControl style={{ width: '100%' }}>
-                    <Select
-                      value={this.state.selectedType}
-                      onChange={this.handleTypeChange.bind(this)}
-                      input={<Input id="type" />}
-                      native
-                    >
-
-                      {ingredientTypes && ingredientTypes.map(ingredientType => (
-                        <option key={ingredientType._id} value={ingredientType._id}>
-                          {ingredientType.title}
-                        </option>
-                      ))}
-
-                    </Select>
-                  </FormControl> */}
                   <Search className="autoinput-icon" />
                   <Autosuggest
                     id="1"
