@@ -5,48 +5,45 @@
   not a priority for now, but this is an itch that we should really scratch.
 */
 
-import React from 'react';
-import PropTypes from 'prop-types';
+import React from "react";
+import PropTypes from "prop-types";
 
-import Autosuggest from 'react-autosuggest';
+import Autosuggest from "react-autosuggest";
 
-import _ from 'lodash';
+import _ from "lodash";
 
-import { Meteor } from 'meteor/meteor';
+import { Meteor } from "meteor/meteor";
 
-import Button from 'material-ui/Button';
-import { MenuItem } from 'material-ui/Menu';
-import TextField from 'material-ui/TextField';
+import Button from "material-ui/Button";
+import { MenuItem } from "material-ui/Menu";
+import TextField from "material-ui/TextField";
 // import Select from 'material-ui/Select';
 // import Input, { InputLabel } from 'material-ui/Input';
 // import { FormControl, FormHelperText } from 'material-ui/Form';
 import Dialog, {
   DialogActions,
   DialogContent,
-  DialogContentText,
-} from 'material-ui/Dialog';
+  DialogContentText
+} from "material-ui/Dialog";
 
+import Chip from "material-ui/Chip";
+import Paper from "material-ui/Paper";
 
-import Chip from 'material-ui/Chip';
-import Paper from 'material-ui/Paper';
+import Grid from "material-ui/Grid";
+import Typography from "material-ui/Typography";
+import Divider from "material-ui/Divider";
+import Avatar from "material-ui/Avatar";
 
-import Grid from 'material-ui/Grid';
-import Typography from 'material-ui/Typography';
-import Divider from 'material-ui/Divider';
-import Avatar from 'material-ui/Avatar';
+import { red } from "material-ui/colors";
+import ChevronLeft from "material-ui-icons/ChevronLeft";
+import Search from "material-ui-icons/Search";
 
-import { red } from 'material-ui/colors';
-import ChevronLeft from 'material-ui-icons/ChevronLeft';
-import Search from 'material-ui-icons/Search';
-
-
-import validate from '../../../modules/validate';
+import validate from "../../../modules/validate";
 
 // const primary = teal[500];
 const danger = red[700];
 
-
-const styles = theme => ({ });
+const styles = theme => ({});
 
 class CategoryEditor extends React.Component {
   constructor(props) {
@@ -54,41 +51,53 @@ class CategoryEditor extends React.Component {
 
     this.state = {
       // value: '', // Autosuggest
-      valueTypes: '',
+      valueTypes: "",
       // suggestions: [],
       suggestionsTypes: [],
-      types: this.props.category && this.props.ingredientTypes && !this.props.newCategory ? _.sortBy(this.props.ingredientTypes.filter((e, i) => this.props.category.types.indexOf(e._id) !== -1), 'title') : [],
+      types:
+        this.props.category &&
+        this.props.ingredientTypes &&
+        !this.props.newCategory
+          ? _.sortBy(
+              this.props.ingredientTypes.filter(
+                (e, i) => this.props.category.types.indexOf(e._id) !== -1
+              ),
+              "title"
+            )
+          : [],
       // subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
       // selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
-      hasFormChanged: false,
+      hasFormChanged: false
     };
   }
 
   componentDidMount() {
     const component = this;
     validate(component.form, {
-
       errorPlacement(error, element) {
-        error.insertAfter($(element).parent().parent());
+        error.insertAfter(
+          $(element)
+            .parent()
+            .parent()
+        );
       },
 
       rules: {
         title: {
-          required: true,
-        },
-
+          required: true
+        }
       },
       messages: {
         title: {
-          required: 'Name required.',
-        },
-
+          required: "Name required."
+        }
       },
-      submitHandler() { component.handleSubmit(); },
+      submitHandler() {
+        component.handleSubmit();
+      }
     });
   }
-
 
   /* Dialog box controls */
   deleteDialogHandleClickOpen() {
@@ -99,27 +108,33 @@ class CategoryEditor extends React.Component {
     this.setState({ deleteDialogOpen: false });
   }
 
-
   // Use your imagination to render suggestions.
   onChange(event, { newValue }) {
     this.setState({
-      value: newValue,
+      value: newValue
     });
   }
 
   onChangeTypes(event, { newValue }) {
     this.setState({
-      valueTypes: newValue,
+      valueTypes: newValue
     });
   }
 
-  onSuggestionSelected(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
-    const clonedSubIngredients = this.state.subIngredients ? this.state.subIngredients.slice() : [];
+  onSuggestionSelected(
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+  ) {
+    const clonedSubIngredients = this.state.subIngredients
+      ? this.state.subIngredients.slice()
+      : [];
 
     let isThere = false;
 
     if (clonedSubIngredients.length > 0) {
-      isThere = clonedSubIngredients.filter(present => suggestion._id === present._id);
+      isThere = clonedSubIngredients.filter(
+        present => suggestion._id === present._id
+      );
     }
 
     if (isThere != false) {
@@ -130,11 +145,14 @@ class CategoryEditor extends React.Component {
 
     this.setState({
       subIngredients: clonedSubIngredients,
-      hasFormChanged: true,
+      hasFormChanged: true
     });
   }
 
-  onSuggestionSelectedTypes(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
+  onSuggestionSelectedTypes(
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+  ) {
     console.log(suggestion);
 
     const clonedTypes = this.state.types ? this.state.types.slice() : [];
@@ -153,7 +171,7 @@ class CategoryEditor extends React.Component {
 
     this.setState({
       hasFormChanged: true,
-      types: clonedTypes,
+      types: clonedTypes
     });
   }
 
@@ -161,47 +179,51 @@ class CategoryEditor extends React.Component {
   // You already implemented this logic above, so just use it.
   onSuggestionsFetchRequested({ value }) {
     this.setState({
-      suggestions: this.getSuggestions(value),
+      suggestions: this.getSuggestions(value)
     });
   }
 
   onSuggestionsFetchRequestedTypes({ value }) {
     this.setState({
-      suggestionsTypes: this.getSuggestionsTypes(value),
+      suggestionsTypes: this.getSuggestionsTypes(value)
     });
   }
 
   // Autosuggest will call this function every time you need to clear suggestions.
   onSuggestionsClearRequested() {
     this.setState({
-      suggestions: [],
+      suggestions: []
     });
   }
 
   onSuggestionsClearRequestedTypes() {
     this.setState({
-      suggestionsTypes: [],
+      suggestionsTypes: []
     });
   }
-
 
   // Teach Autosuggest how to calculate suggestions for any given input value.
   getSuggestions(value) {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
-    return inputLength === 0 ? [] : this.props.potentialSubIngredients.filter(ingredient =>
-      ingredient.title.toLowerCase().slice(0, inputLength) === inputValue,
-    );
+    return inputLength === 0
+      ? []
+      : this.props.potentialSubIngredients.filter(
+          ingredient =>
+            ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
+        );
   }
 
   getSuggestionsTypes(value) {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
-    return inputLength === 0 ? [] : this.props.ingredientTypes.filter(type =>
-      type.title.toLowerCase().slice(0, inputLength) === inputValue,
-    );
+    return inputLength === 0
+      ? []
+      : this.props.ingredientTypes.filter(
+          type => type.title.toLowerCase().slice(0, inputLength) === inputValue
+        );
   }
 
   // When suggestion is clicked, Autosuggest needs to populate the input
@@ -219,26 +241,27 @@ class CategoryEditor extends React.Component {
     const { popTheSnackbar, history, category } = this.props;
 
     const exisitingCategory = category && category._id;
-    localStorage.setItem('categoryDeleted', category.title);
-    const categoryDeletedMessage = `${localStorage.getItem('categoryDeleted')} deleted from categories.`;
+    localStorage.setItem("categoryDeleted", category.title);
+    const categoryDeletedMessage = `${localStorage.getItem(
+      "categoryDeleted"
+    )} deleted from categories.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('categories.remove', exisitingCategory, (error) => {
+    Meteor.call("categories.remove", exisitingCategory, error => {
       if (error) {
         popTheSnackbar({
-          message: error.reason,
+          message: error.reason
         });
       } else {
         popTheSnackbar({
-          message: categoryDeletedMessage,
+          message: categoryDeletedMessage
         });
 
-        history.push('/categories');
+        history.push("/categories");
       }
     });
   }
-
 
   handleRemove() {
     this.deleteDialogHandleClickOpen();
@@ -247,12 +270,14 @@ class CategoryEditor extends React.Component {
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
     const existingCategory = this.props.category && this.props.category._id;
-    const methodToCall = existingCategory ? 'categories.update' : 'categories.insert';
+    const methodToCall = existingCategory
+      ? "categories.update"
+      : "categories.insert";
 
     const category = {
-      title: document.querySelector('#title').value.trim(),
+      title: document.querySelector("#title").value.trim(),
       // subIngredients: this.state.subIngredients || [],
-      types: this.state.types.map((e, i) => e._id),
+      types: this.state.types.map((e, i) => e._id)
     };
 
     if (existingCategory) category._id = existingCategory;
@@ -273,44 +298,70 @@ class CategoryEditor extends React.Component {
     Meteor.call(methodToCall, category, (error, categoryId) => {
       if (error) {
         popTheSnackbar({
-          message: error.reason,
+          message: error.reason
         });
       } else {
-        localStorage.setItem('categoryForSnackbar', category.title || $('[name="title"]').val());
+        localStorage.setItem(
+          "categoryForSnackbar",
+          category.title || $('[name="title"]').val()
+        );
 
-        const confirmation = existingCategory ? (`${localStorage.getItem('categoryForSnackbar')} category updated.`)
-          : `${localStorage.getItem('categoryForSnackbar')} category added.`;
+        const confirmation = existingCategory
+          ? `${localStorage.getItem("categoryForSnackbar")} category updated.`
+          : `${localStorage.getItem("categoryForSnackbar")} category added.`;
         // this.form.reset();
 
         popTheSnackbar({
           message: confirmation,
-          buttonText: 'View',
-          buttonLink: `/categories/${categoryId}/edit`,
+          buttonText: "View",
+          buttonLink: `/categories/${categoryId}/edit`
         });
 
-        history.push('/categories');
+        history.push("/categories");
       }
     });
   }
 
   renderDeleteDialog() {
     return (
-      <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
-        <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-        Delete {this.props.category.title.toLowerCase()}?
+      <Dialog
+        open={this.state.deleteDialogOpen}
+        onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+      >
+        <Typography
+          style={{
+            flex: "0 0 auto",
+            margin: "0",
+            padding: "24px 24px 20px 24px"
+          }}
+          className="title font-medium"
+          type="title"
+        >
+          Delete {this.props.category.title.toLowerCase()}?
         </Typography>
         <DialogContent>
           <DialogContentText className="subheading">
-          Are you sure you want to delete {this.props.category.title.toLowerCase()} { (this.props.category && this.props.category.typeMain) ?
-              `from ${this.props.category.typeMain.title.toLowerCase()}?` : '?'}
+            Are you sure you want to delete{" "}
+            {this.props.category.title.toLowerCase()}{" "}
+            {this.props.category && this.props.category.typeMain
+              ? `from ${this.props.category.typeMain.title.toLowerCase()}?`
+              : "?"}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
-          Cancel
+          <Button
+            onClick={this.deleteDialogHandleRequestClose.bind(this)}
+            color="default"
+          >
+            Cancel
           </Button>
-          <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleRemoveActual.bind(this)} color="accent">
-          Delete
+          <Button
+            stroked
+            className="button--bordered button--bordered--accent"
+            onClick={this.handleRemoveActual.bind(this)}
+            color="accent"
+          >
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
@@ -324,7 +375,6 @@ class CategoryEditor extends React.Component {
       </MenuItem>
     );
   }
-
 
   renderSuggestionTypes(suggestion) {
     return (
@@ -341,12 +391,12 @@ class CategoryEditor extends React.Component {
       <TextField
         className={styles.textField}
         value={value}
-        style={{ width: '100%' }}
+        style={{ width: "100%" }}
         InputProps={{
           classes: {
-            input: styles.input,
+            input: styles.input
           },
-          ...other,
+          ...other
         }}
       />
     );
@@ -359,12 +409,12 @@ class CategoryEditor extends React.Component {
       <TextField
         className={styles.textField}
         value={value}
-        style={{ width: '100%' }}
+        style={{ width: "100%" }}
         InputProps={{
           classes: {
-            input: styles.input,
+            input: styles.input
           },
-          ...other,
+          ...other
         }}
       />
     );
@@ -404,7 +454,7 @@ class CategoryEditor extends React.Component {
 
     this.setState({
       subIngredients: stateCopy,
-      hasFormChanged: true,
+      hasFormChanged: true
     });
   }
 
@@ -417,10 +467,9 @@ class CategoryEditor extends React.Component {
 
     this.setState({
       types: stateCopy,
-      hasFormChanged: true,
+      hasFormChanged: true
     });
   }
-
 
   getSubIngredientTitle(subIngredient) {
     // console.log(subIngredient);
@@ -440,11 +489,12 @@ class CategoryEditor extends React.Component {
     }
 
     if (this.props.allIngredients) {
-      const avatarToReturn = this.props.allIngredients.find(el => el._id === subIngredient);
+      const avatarToReturn = this.props.allIngredients.find(
+        el => el._id === subIngredient
+      );
       return avatarToReturn.title.charAt(0);
     }
   }
-
 
   getTypeTitle(type) {
     // console.log(type);
@@ -464,7 +514,9 @@ class CategoryEditor extends React.Component {
     }
 
     if (this.props.ingredientTypes) {
-      const avatarToReturn = this.props.ingredientTypes.find(el => el._id === type._id);
+      const avatarToReturn = this.props.ingredientTypes.find(
+        el => el._id === type._id
+      );
       return avatarToReturn.title.charAt(0);
     }
   }
@@ -475,7 +527,7 @@ class CategoryEditor extends React.Component {
     const hasFormChanged = e.currentTarget.value.length > 0;
 
     this.setState({
-      hasFormChanged,
+      hasFormChanged
     });
   }
 
@@ -484,46 +536,94 @@ class CategoryEditor extends React.Component {
     const { category, ingredientTypes, history } = this.props;
 
     if (!category || !ingredientTypes) {
-      return ('<h1>Loading</h1>');
+      return "<h1>Loading</h1>";
     }
 
     return (
-      <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
+      <form
+        style={{ width: "100%" }}
+        ref={form => (this.form = form)}
+        onSubmit={event => event.preventDefault()}
+      >
         <Grid container justify="center">
           <Grid item xs={12}>
-
-            <Button onClick={() => this.props.history.push('/categories')} className="button button-secondary button-secondary--top">
-              <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                <ChevronLeft style={{ marginRight: '4px' }} /> Categories</Typography>
+            <Button
+              onClick={() => this.props.history.push("/categories")}
+              className="button button-secondary button-secondary--top"
+            >
+              <Typography
+                type="subheading"
+                className="subheading font-medium"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: "row"
+                }}
+              >
+                <ChevronLeft style={{ marginRight: "4px" }} /> Categories
+              </Typography>
             </Button>
-
           </Grid>
         </Grid>
 
-        <Grid container style={{ marginBottom: '50px' }}>
+        <Grid container style={{ marginBottom: "50px" }}>
           <Grid item xs={4}>
-            <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{category && category._id ? `${category.title}` : 'Add category'}</Typography>
+            <Typography
+              type="headline"
+              className="headline"
+              style={{ fontWeight: 500 }}
+            >
+              {category && category._id ? `${category.title}` : "Add category"}
+            </Typography>
 
-            {this.props.category ?
-              (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1">{category.SKU ? (category.SKU) : ''} </Typography>)
-              : '' }
-
+            {this.props.category ? (
+              <Typography
+                type="body1"
+                style={{ color: "rgba(0, 0, 0, 0.54)" }}
+                className="body1"
+              >
+                {category.SKU ? category.SKU : ""}{" "}
+              </Typography>
+            ) : (
+              ""
+            )}
           </Grid>
           <Grid item xs={8}>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-              <Button style={{ marginRight: '10px' }} onClick={() => history.push('/categories')}>Cancel</Button>
-              <Button disabled={!this.state.hasFormChanged} className="btn btn-primary" raised type="submit" color="contrast">Save</Button>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end"
+              }}
+            >
+              <Button
+                style={{ marginRight: "10px" }}
+                onClick={() => history.push("/categories")}
+              >
+                Cancel
+              </Button>
+              <Button
+                disabled={!this.state.hasFormChanged}
+                className="btn btn-primary"
+                raised
+                type="submit"
+                color="contrast"
+              >
+                Save
+              </Button>
             </div>
           </Grid>
         </Grid>
 
-
-        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
-                <Typography type="subheading" className="subheading font-medium">
-              Category
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Category
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
@@ -546,19 +646,19 @@ class CategoryEditor extends React.Component {
 
         <Divider light className="divider--space-x" />
 
-
-        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
-                <Typography type="subheading" className="subheading font-medium">
-                Type
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Type
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
-
-
                   <Search className="autoinput-icon" />
                   <Autosuggest
                     id="1"
@@ -566,53 +666,72 @@ class CategoryEditor extends React.Component {
                     theme={{
                       container: {
                         flexGrow: 1,
-                        position: 'relative',
+                        position: "relative"
                       },
                       suggestionsContainerOpen: {
-                        position: 'absolute',
+                        position: "absolute",
                         left: 0,
-                        right: 0,
+                        right: 0
                       },
                       suggestion: {
-                        display: 'block',
+                        display: "block"
                       },
                       suggestionsList: {
                         margin: 0,
                         padding: 0,
-                        listStyleType: 'none',
-                      },
+                        listStyleType: "none"
+                      }
                     }}
                     renderInputComponent={this.renderInputTypes.bind(this)}
                     suggestions={this.state.suggestionsTypes}
-                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(this)}
-                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(this)}
-                    onSuggestionSelected={this.onSuggestionSelectedTypes.bind(this)}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(
+                      this
+                    )}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(
+                      this
+                    )}
+                    onSuggestionSelected={this.onSuggestionSelectedTypes.bind(
+                      this
+                    )}
                     getSuggestionValue={this.getSuggestionValueTypes.bind(this)}
                     renderSuggestion={this.renderSuggestionTypes.bind(this)}
-                    renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(this)}
-
+                    renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(
+                      this
+                    )}
                     focusInputOnSuggestionClick={false}
-
                     inputProps={{
-                      placeholder: 'Search',
+                      placeholder: "Search",
                       value: this.state.valueTypes,
                       onChange: this.onChangeTypes.bind(this),
-                      className: 'auto type-autocomplete',
+                      className: "auto type-autocomplete"
                     }}
                   />
 
-                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '25px' }}>
-                    {this.state.types.length ? this.state.types.map((type, i) => (
-
-                      <Chip
-                        avatar={<Avatar> {this.getTypeAvatar(type)} </Avatar>}
-                        style={{ marginRight: '8px', marginBottom: '8px' }}
-                        label={type.title}
-                        key={i}
-                        onRequestDelete={this.handleTypeChipDelete.bind(this, type)}
-                      />)) : <Chip className="chip--bordered" label="Type" />}
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      marginTop: "25px"
+                    }}
+                  >
+                    {this.state.types.length ? (
+                      this.state.types.map((type, i) => (
+                        <Chip
+                          avatar={<Avatar> {this.getTypeAvatar(type)} </Avatar>}
+                          style={{ marginRight: "8px", marginBottom: "8px" }}
+                          label={type.title}
+                          key={i}
+                          onRequestDelete={this.handleTypeChipDelete.bind(
+                            this,
+                            type
+                          )}
+                        />
+                      ))
+                    ) : (
+                      <Chip className="chip--bordered" label="Type" />
+                    )}
                   </div>
-
                 </Paper>
               </Grid>
             </Grid>
@@ -693,29 +812,49 @@ class CategoryEditor extends React.Component {
           </Grid>
         </Grid> */}
 
-        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={4}>
-                {
-                  this.props.newCategory ? '' : (
-                    <Button
-                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
-                      raised
-                      onClick={category && category._id ? this.handleRemove.bind(this) : () => this.props.history.push('/categories')}
-                    >
+                {this.props.newCategory ? (
+                  ""
+                ) : (
+                  <Button
+                    style={{ backgroundColor: danger, color: "#FFFFFF" }}
+                    raised
+                    onClick={
+                      category && category._id
+                        ? this.handleRemove.bind(this)
+                        : () => this.props.history.push("/categories")
+                    }
+                  >
                     Delete
-                    </Button>
-                  )
-                }
+                  </Button>
+                )}
               </Grid>
 
               <Grid item xs={8}>
-
-                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                  <Button style={{ marginRight: '10px' }} onClick={() => history.push('/categories')}>Cancel</Button>
-                  <Button disabled={!this.state.hasFormChanged} type="submit" className="btn btn-primary" raised color="contrast">
-                   Save
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end"
+                  }}
+                >
+                  <Button
+                    style={{ marginRight: "10px" }}
+                    onClick={() => history.push("/categories")}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={!this.state.hasFormChanged}
+                    type="submit"
+                    className="btn btn-primary"
+                    raised
+                    color="contrast"
+                  >
+                    Save
                   </Button>
                 </div>
               </Grid>
@@ -724,12 +863,13 @@ class CategoryEditor extends React.Component {
         </Grid>
 
         {this.renderDeleteDialog()}
-      </form>);
+      </form>
+    );
   }
 }
 
 CategoryEditor.defaultProps = {
-  category: { title: '' },
+  category: { title: "" }
 };
 
 CategoryEditor.propTypes = {
@@ -737,7 +877,7 @@ CategoryEditor.propTypes = {
   ingredientTypes: PropTypes.array.isRequired,
   potentialSubIngredients: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
-  popTheSnackbar: PropTypes.func.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired
 };
 
 export default CategoryEditor;

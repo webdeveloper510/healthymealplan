@@ -1,15 +1,14 @@
 /* esling-disable */
 
-import { Meteor } from 'meteor/meteor';
-import { check } from 'meteor/check';
-import { Match } from 'meteor/check';
+import { Meteor } from "meteor/meteor";
+import { check } from "meteor/check";
+import { Match } from "meteor/check";
 
-import Ingredients from '../Ingredients';
+import Ingredients from "../Ingredients";
 
 // import IngredientTypes from '../../IngredientTypes/IngredientTypes';
 
-
-Meteor.publish('ingredients', function ingredients(selector, options){
+Meteor.publish("ingredients", function ingredients(selector, options) {
   check(selector, Match.Any);
   check(options, Match.Any);
 
@@ -18,11 +17,9 @@ Meteor.publish('ingredients', function ingredients(selector, options){
   return Ingredients.publishJoinedCursors(cursor);
 });
 
-
-Meteor.publish('ingredients-all-count', function(){
-  Counts.publish(this, 'ingredients', Ingredients.find())
+Meteor.publish("ingredients-all-count", function() {
+  Counts.publish(this, "ingredients", Ingredients.find());
 });
-
 
 // Meteor.publish('ingredients.table', function ingredientsTable(query, options) {
 //   console.log(query);
@@ -31,14 +28,12 @@ Meteor.publish('ingredients-all-count', function(){
 
 //   check(options, Object || null || undefined);
 
-
 //   const cursor = Ingredients.find({ query, options });
 
 //   Counts.publish(this, 'matching-ingredients', Ingredients.find({ query, options }));
 
 //   return cursor;
 // });
-
 
 // Meteor.publishComposite('ingredients', {
 
@@ -67,11 +62,9 @@ Meteor.publish('ingredients-all-count', function(){
 //       ],
 //     },
 
-
 //   ],
 
 // });
-
 
 // Meteor.publishComposite('ingredients', {
 
@@ -100,17 +93,15 @@ Meteor.publish('ingredients-all-count', function(){
 //       ],
 //     },
 
-
 //   ],
 
 // });
 
 // Note: Ingredients.view is also used when editing an existing document.
-Meteor.publish('ingredients.view', (ingredientId) => {
+Meteor.publish("ingredients.view", ingredientId => {
   check(ingredientId, String);
   return Ingredients.find({ _id: ingredientId });
 });
-
 
 // Meteor.publishComposite('ingredients.view', (ingredientId) => {
 //   check(ingredientId, String);

@@ -5,130 +5,175 @@
   not a priority for now, but this is an itch that we should really scratch.
 */
 
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Meteor } from 'meteor/meteor';
+import React from "react";
+import PropTypes from "prop-types";
+import { Meteor } from "meteor/meteor";
 
-
-import Autosuggest from 'react-autosuggest';
-import _ from 'lodash';
+import Autosuggest from "react-autosuggest";
+import _ from "lodash";
 
 // import NumberFormat from 'react-number-format';
 
-import { MenuItem } from 'material-ui/Menu';
-import TextField from 'material-ui/TextField';
+import { MenuItem } from "material-ui/Menu";
+import TextField from "material-ui/TextField";
 // import IconButton from 'material-ui/IconButton';
 // import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
-import { FormControl, FormControlLabel } from 'material-ui/Form';
-import Radio, { RadioGroup } from 'material-ui/Radio';
+import { FormControl, FormControlLabel } from "material-ui/Form";
+import Radio, { RadioGroup } from "material-ui/Radio";
 
 import Dialog, {
   DialogActions,
   DialogContent,
-  DialogContentText,
-} from 'material-ui/Dialog';
+  DialogContentText
+} from "material-ui/Dialog";
 
-import Button from 'material-ui/Button';
-import Chip from 'material-ui/Chip';
-import Paper from 'material-ui/Paper';
+import Button from "material-ui/Button";
+import Chip from "material-ui/Chip";
+import Paper from "material-ui/Paper";
 
-import Grid from 'material-ui/Grid';
-import Typography from 'material-ui/Typography';
-import Divider from 'material-ui/Divider';
-import Avatar from 'material-ui/Avatar';
+import Grid from "material-ui/Grid";
+import Typography from "material-ui/Typography";
+import Divider from "material-ui/Divider";
+import Avatar from "material-ui/Avatar";
 
-import { red } from 'material-ui/colors';
-import ChevronLeft from 'material-ui-icons/ChevronLeft';
-import Search from 'material-ui-icons/Search';
+import { red } from "material-ui/colors";
+import ChevronLeft from "material-ui-icons/ChevronLeft";
+import Search from "material-ui-icons/Search";
 
-import Loading from '../../components/Loading/Loading';
-import validate from '../../../modules/validate';
+import Loading from "../../components/Loading/Loading";
+import validate from "../../../modules/validate";
 
-// const primary = teal[500];
 const danger = red[700];
 
-const styles = theme => ({
-
-
-});
+const styles = theme => ({});
 
 class RestrictionEditor extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      valueRestriction: this.props.restriction && !this.props.newRestriction ? this.props.restriction.restrictionType : '', // radio
-      valueTypes: '',
-      valueCategories: '',
+      valueRestriction:
+        this.props.restriction && !this.props.newRestriction
+          ? this.props.restriction.restrictionType
+          : "", // radio
 
+      value: "",
+      valueTypes: "",
+      valueCategories: "",
+
+      suggestions: [],
       suggestionsTypes: [],
       suggestionsCategories: [],
 
+      // ingredients:
+      //   this.props.restriction &&
+      //   !this.props.newRestriction &&
+      //   this.props.ingredients
+      //     ? _.sortBy(
+      //         this.props.ingredients.filter(
+      //           (e, i) =>
+      //             this.props.restriction.ingredients.indexOf(e._id) !== -1
+      //         ),
+      //         "title"
+      //       )
+      //     : [],
 
-      // This was working
-      // types: (!this.props.newRestriction && this.props.restriction && this.props.ingredientTypes) ?
-      //   _.sortBy(this.props.ingredientTypes.filter(e => this.props.restriction.types.indexOf(e._id) !== -1), 'title') : [],
+      ingredients:
+        this.props.restriction &&
+        !this.props.newRestriction &&
+        this.props.ingredients
+          ? this.props.restriction.ingredients
+          : [],
 
+      types:
+        !this.props.newRestriction &&
+        this.props.restriction &&
+        this.props.ingredientTypes
+          ? this.props.restriction.types
+          : [],
 
-      // categories: (!this.props.newRestriction && this.props.restriction && this.props.categories) ?
-      //   _.sortBy(this.props.categories.filter(e => this.props.restriction.categories.indexOf(e._id) !== -1), 'title') : [],
-
-      types: (!this.props.newRestriction && this.props.restriction && this.props.ingredientTypes) ?
-        this.props.restriction.types : [],
-
-
-      categories: (!this.props.newRestriction && this.props.restriction && this.props.categories) ?
-        this.props.restriction.categories : [],
+      categories:
+        !this.props.newRestriction &&
+        this.props.restriction &&
+        this.props.categories
+          ? this.props.restriction.categories
+          : [],
 
       deleteDialogOpen: false,
       hasFormChanged: false,
 
-      valueDiscountOrExtra: (!this.props.newRestriction && this.props.restriction && (this.props.restriction.hasOwnProperty('discount') || this.props.restriction.hasOwnProperty('extra'))) ?
-        (this.props.restriction.hasOwnProperty('discount') ? 'discount' : 'extra') : 'none',
+      valueDiscountOrExtra:
+        !this.props.newRestriction &&
+        this.props.restriction &&
+        (this.props.restriction.hasOwnProperty("discount") ||
+          this.props.restriction.hasOwnProperty("extra"))
+          ? this.props.restriction.hasOwnProperty("discount")
+            ? "discount"
+            : "extra"
+          : "none",
 
-      discountOrExtraSelected: !!((!this.props.newRestriction && this.props.restriction && (this.props.restriction.hasOwnProperty('discount') || this.props.restriction.hasOwnProperty('extra')))),
+      discountOrExtraSelected: !!(
+        !this.props.newRestriction &&
+        this.props.restriction &&
+        (this.props.restriction.hasOwnProperty("discount") ||
+          this.props.restriction.hasOwnProperty("extra"))
+      ),
 
-      discountType: (!this.props.newRestriction && this.props.restriction && this.props.restriction.discountOrExtraType) ? this.props.restriction.discountOrExtraType : 'Percentage',
+      discountType:
+        !this.props.newRestriction &&
+        this.props.restriction &&
+        this.props.restriction.discountOrExtraType
+          ? this.props.restriction.discountOrExtraType
+          : "Percentage",
 
-      discountOrExtraAmount: (!this.props.newRestriction && this.props.restriction && (this.props.restriction.hasOwnProperty('discount') || this.props.restriction.hasOwnProperty('extra'))) ?
-        (this.props.restriction.hasOwnProperty('discount') ? this.props.restriction.discount : this.props.restriction.extra) : '',
+      discountOrExtraAmount:
+        !this.props.newRestriction &&
+        this.props.restriction &&
+        (this.props.restriction.hasOwnProperty("discount") ||
+          this.props.restriction.hasOwnProperty("extra"))
+          ? this.props.restriction.hasOwnProperty("discount")
+            ? this.props.restriction.discount
+            : this.props.restriction.extra
+          : ""
     };
   }
 
   componentDidMount() {
     const component = this;
     validate(component.form, {
-
       errorPlacement(error, element) {
-        error.insertAfter($(element).parent().parent());
+        error.insertAfter(
+          $(element)
+            .parent()
+            .parent()
+        );
       },
 
       rules: {
         title: {
-          required: true,
+          required: true
         },
         restrictionType: {
-          required: true,
+          required: true
         },
         discountOrExtraValue: {
           min: -100,
-          max: 100,
-        },
-
+          max: 100
+        }
       },
       messages: {
         title: {
-          required: 'Name required.',
+          required: "Name required."
         },
         restrictionType: {
-          required: 'Restriction type required.',
-        },
-
+          required: "Restriction type required."
+        }
       },
-      submitHandler() { component.handleSubmit(); },
+      submitHandler() {
+        component.handleSubmit();
+      }
     });
   }
-
 
   /* Dialog box controls */
   deleteDialogHandleClickOpen() {
@@ -139,58 +184,95 @@ class RestrictionEditor extends React.Component {
     this.setState({ deleteDialogOpen: false });
   }
 
-
   handleDiscountChange(event, value) {
     // console.log(event.target.value);
 
     this.setState({
-      discountType: event.target.value,
+      discountType: event.target.value
     });
   }
 
   handleDiscountOrExtraValueChange(event, value) {
     this.setState({
       hasFormChanged: true,
-      discountOrExtraAmount: event.target.value,
+      discountOrExtraAmount: event.target.value
     });
   }
 
   handleDiscountOrExtraRadioChange(event, value) {
     let discountOrExtraSelected = true;
 
-    if (value == 'none') {
+    if (value == "none") {
       discountOrExtraSelected = false;
     }
 
     this.setState({
       discountOrExtraSelected,
       valueDiscountOrExtra: value,
-      hasFormChanged: true,
+      hasFormChanged: true
     });
   }
-
 
   handleRestrictionTypeChange(event, value) {
     this.setState({
       valueRestriction: value,
-      hasFormChanged: true,
+      hasFormChanged: true
     });
   }
   // Use your imagination to render suggestions.
 
+  onChange(event, { newValue }) {
+    this.setState({
+      value: newValue
+    });
+  }
+
   onChangeTypes(event, { newValue }) {
     this.setState({
-      valueTypes: newValue,
+      valueTypes: newValue
     });
   }
 
   onChangeCategories(event, { newValue }) {
     this.setState({
-      valueCategories: newValue,
+      valueCategories: newValue
     });
   }
 
-  onSuggestionSelectedTypes(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
+  onSuggestionSelected(
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+  ) {
+    console.log(suggestion);
+
+    const clonedIngredients = this.state.ingredients
+      ? this.state.ingredients.slice()
+      : [];
+
+    let isThere = false;
+
+    if (clonedIngredients.length > 0) {
+      isThere = clonedIngredients.filter(
+        present => suggestion._id === present._id
+      );
+    }
+
+    if (isThere != false) {
+      return;
+    }
+
+    clonedIngredients.push(suggestion._id);
+
+    this.setState({
+      hasFormChanged: true,
+      ingredients: clonedIngredients
+    });
+  }
+
+  onSuggestionSelectedTypes(
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+  ) {
     console.log(suggestion);
 
     const clonedTypes = this.state.types ? this.state.types.slice() : [];
@@ -209,15 +291,19 @@ class RestrictionEditor extends React.Component {
 
     this.setState({
       hasFormChanged: true,
-      types: clonedTypes,
+      types: clonedTypes
     });
   }
 
-
-  onSuggestionSelectedCategories(event, { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
+  onSuggestionSelectedCategories(
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+  ) {
     console.log(suggestion);
 
-    const clonedCats = this.state.categories ? this.state.categories.slice() : [];
+    const clonedCats = this.state.categories
+      ? this.state.categories.slice()
+      : [];
 
     let isThere = false;
 
@@ -233,7 +319,13 @@ class RestrictionEditor extends React.Component {
 
     this.setState({
       hasFormChanged: true,
-      categories: clonedCats,
+      categories: clonedCats
+    });
+  }
+
+  onSuggestionsFetchRequested({ value }) {
+    this.setState({
+      suggestions: this.getSuggestions(value)
     });
   }
 
@@ -241,27 +333,45 @@ class RestrictionEditor extends React.Component {
   // You already implemented this logic above, so just use it.
   onSuggestionsFetchRequestedTypes({ value }) {
     this.setState({
-      suggestionsTypes: this.getSuggestionsTypes(value),
+      suggestionsTypes: this.getSuggestionsTypes(value)
     });
   }
 
   onSuggestionsFetchRequestedCategories({ value }) {
     this.setState({
-      suggestionsCategories: this.getSuggestionsCategories(value),
+      suggestionsCategories: this.getSuggestionsCategories(value)
+    });
+  }
+
+  onSuggestionsClearRequested() {
+    this.setState({
+      suggestions: []
     });
   }
 
   // Autosuggest will call this function every time you need to clear suggestions.
   onSuggestionsClearRequestedTypes() {
     this.setState({
-      suggestionsTypes: [],
+      suggestionsTypes: []
     });
   }
 
   onSuggestionsClearRequestedCategories() {
     this.setState({
-      suggestionsCategories: [],
+      suggestionsCategories: []
     });
+  }
+
+  getSuggestions(value) {
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+
+    return inputLength === 0
+      ? []
+      : this.props.ingredients.filter(
+          ingredient =>
+            ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
+        );
   }
 
   // Teach Autosuggest how to calculate suggestions for any given input value.
@@ -269,9 +379,11 @@ class RestrictionEditor extends React.Component {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
-    return inputLength === 0 ? [] : this.props.ingredientTypes.filter(type =>
-      type.title.toLowerCase().slice(0, inputLength) === inputValue,
-    );
+    return inputLength === 0
+      ? []
+      : this.props.ingredientTypes.filter(
+          type => type.title.toLowerCase().slice(0, inputLength) === inputValue
+        );
   }
 
   getSuggestionsCategories(value) {
@@ -279,9 +391,16 @@ class RestrictionEditor extends React.Component {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
-    return inputLength === 0 ? [] : this.props.categories.filter(category =>
-      category.title.toLowerCase().slice(0, inputLength) === inputValue,
-    );
+    return inputLength === 0
+      ? []
+      : this.props.categories.filter(
+          category =>
+            category.title.toLowerCase().slice(0, inputLength) === inputValue
+        );
+  }
+
+  getSuggestionValue(suggestion) {
+    return suggestion.title;
   }
 
   // When suggestion is clicked, Autosuggest needs to populate the input
@@ -299,26 +418,27 @@ class RestrictionEditor extends React.Component {
     const { popTheSnackbar, history, restriction } = this.props;
 
     const existingRestriction = restriction && restriction._id;
-    localStorage.setItem('restrictionDeleted', restriction.title);
-    const restrictionDeletedMessage = `${localStorage.getItem('restrictionDeleted')} deleted from restrictions.`;
+    localStorage.setItem("restrictionDeleted", restriction.title);
+    const restrictionDeletedMessage = `${localStorage.getItem(
+      "restrictionDeleted"
+    )} deleted from restrictions.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('restrictions.remove', existingRestriction, (error) => {
+    Meteor.call("restrictions.remove", existingRestriction, error => {
       if (error) {
         popTheSnackbar({
-          message: error.reason,
+          message: error.reason
         });
       } else {
         popTheSnackbar({
-          message: restrictionDeletedMessage,
+          message: restrictionDeletedMessage
         });
 
-        history.push('/restrictions');
+        history.push("/restrictions");
       }
     });
   }
-
 
   handleRemove() {
     this.deleteDialogHandleClickOpen();
@@ -326,82 +446,117 @@ class RestrictionEditor extends React.Component {
 
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
-    const existingRestriction = this.props.restriction && this.props.restriction._id;
-    const methodToCall = existingRestriction ? 'restrictions.update' : 'restrictions.insert';
+    const existingRestriction =
+      this.props.restriction && this.props.restriction._id;
+    const methodToCall = existingRestriction
+      ? "restrictions.update"
+      : "restrictions.insert";
 
     const restriction = {
-      title: document.querySelector('#title').value.trim(),
+      title: document.querySelector("#title").value.trim(),
+      ingredients: this.state.ingredients,
       types: this.state.types,
       categories: this.state.categories,
-      restrictionType: this.state.valueRestriction,
+      restrictionType: this.state.valueRestriction
     };
-
 
     if (this.state.discountOrExtraSelected) {
       const discountOrExtra = this.state.valueDiscountOrExtra;
-      restriction[discountOrExtra] = parseFloat(this.state.discountOrExtraAmount);
+      restriction[discountOrExtra] = parseFloat(
+        this.state.discountOrExtraAmount
+      );
       restriction.discountOrExtraType = this.state.discountType;
     }
-
 
     if (existingRestriction) {
       restriction._id = existingRestriction;
 
-      if (this.state.valueDiscountOrExtra === 'none') {
+      if (this.state.valueDiscountOrExtra === "none") {
         delete restriction.discount;
         delete restriction.extra;
         delete restriction.discountOrExtraType;
       }
     }
 
-
     console.log(restriction);
-
 
     Meteor.call(methodToCall, restriction, (error, restrictionId) => {
       if (error) {
         popTheSnackbar({
-          message: error.reason,
+          message: error.reason
         });
       } else {
-        localStorage.setItem('restrictionForSnackbar', restriction.title || $('[name="title"]').val());
+        localStorage.setItem(
+          "restrictionForSnackbar",
+          restriction.title || $('[name="title"]').val()
+        );
 
-        const confirmation = existingRestriction ? (`${localStorage.getItem('restrictionForSnackbar')} restriction updated.`)
-          : `${localStorage.getItem('restrictionForSnackbar')} restriction added.`;
+        const confirmation = existingRestriction
+          ? `${localStorage.getItem(
+              "restrictionForSnackbar"
+            )} restriction updated.`
+          : `${localStorage.getItem(
+              "restrictionForSnackbar"
+            )} restriction added.`;
 
         popTheSnackbar({
           message: confirmation,
-          buttonText: 'View',
-          buttonLink: `/restrictions/${restrictionId}/edit`,
+          buttonText: "View",
+          buttonLink: `/restrictions/${restrictionId}/edit`
         });
 
-        history.push('/restrictions');
+        history.push("/restrictions");
       }
     });
   }
 
   renderDeleteDialog() {
-    return (
-      this.props.restriction ? (
-        <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
-          <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-        Delete {this.props.restriction && this.props.restriction.title.toLowerCase()}?
-          </Typography>
-          <DialogContent>
-            <DialogContentText className="subheading">
-          Are you sure you want to delete {this.props.restriction && this.props.restriction.title.toLowerCase()} { (this.props.restriction && this.props.restriction.typeMain) ?
-                `from ${this.props.restriction.typeMain.title.toLowerCase()}?` : '?'}
-            </DialogContentText>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
-          Cancel
-            </Button>
-            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleRemoveActual.bind(this)} color="accent">
-          Delete
-            </Button>
-          </DialogActions>
-        </Dialog>) : ''
+    return this.props.restriction ? (
+      <Dialog
+        open={this.state.deleteDialogOpen}
+        onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+      >
+        <Typography
+          style={{
+            flex: "0 0 auto",
+            margin: "0",
+            padding: "24px 24px 20px 24px"
+          }}
+          className="title font-medium"
+          type="title"
+        >
+          Delete{" "}
+          {this.props.restriction && this.props.restriction.title.toLowerCase()}?
+        </Typography>
+        <DialogContent>
+          <DialogContentText className="subheading">
+            Are you sure you want to delete{" "}
+            {this.props.restriction &&
+              this.props.restriction.title.toLowerCase()}{" "}
+            {this.props.restriction && this.props.restriction.typeMain
+              ? `from ${this.props.restriction.typeMain.title.toLowerCase()}?`
+              : "?"}
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={this.deleteDialogHandleRequestClose.bind(this)}
+            color="default"
+          >
+            Cancel
+          </Button>
+          <Button
+            stroked
+            className="button--bordered button--bordered--accent"
+            onClick={this.handleRemoveActual.bind(this)}
+            color="accent"
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+    ) : (
+      ""
     );
   }
 
@@ -420,12 +575,12 @@ class RestrictionEditor extends React.Component {
       <TextField
         className={styles.textField}
         value={value}
-        style={{ width: '100%' }}
+        style={{ width: "100%" }}
         InputProps={{
           classes: {
-            input: styles.input,
+            input: styles.input
           },
-          ...other,
+          ...other
         }}
       />
     );
@@ -441,6 +596,17 @@ class RestrictionEditor extends React.Component {
     );
   }
 
+  handleIngredientsChipDelete(type) {
+    const stateCopy = this.state.ingredients.slice();
+
+    stateCopy.splice(stateCopy.indexOf(type), 1);
+
+    this.setState({
+      ingredients: stateCopy,
+      hasFormChanged: true
+    });
+  }
+
   handleTypeChipDelete(type) {
     const stateCopy = this.state.types.slice();
 
@@ -448,7 +614,7 @@ class RestrictionEditor extends React.Component {
 
     this.setState({
       types: stateCopy,
-      hasFormChanged: true,
+      hasFormChanged: true
     });
   }
 
@@ -461,14 +627,21 @@ class RestrictionEditor extends React.Component {
 
     this.setState({
       categories: stateCopy,
-      hasFormChanged: true,
+      hasFormChanged: true
     });
   }
 
+  getIngredientTitle(ingredient) {
+    if (ingredient.title) {
+      return ingredient.title;
+    }
+
+    if (this.props.ingredients) {
+      return this.props.ingredients.find(el => el._id === ingredient);
+    }
+  }
 
   getTypeTitle(type) {
-    // console.log(type);
-
     if (type.title) {
       return type.title;
     }
@@ -479,8 +652,6 @@ class RestrictionEditor extends React.Component {
   }
 
   getCategoryTitle(category) {
-    // console.log(category);
-
     if (category.title) {
       return category.title;
     }
@@ -490,13 +661,27 @@ class RestrictionEditor extends React.Component {
     }
   }
 
+  getIngredientAvatar(ingredient) {
+    if (ingredient.title) {
+      return ingredient.title.charAt(0);
+    }
+
+    if (this.props.ingredients) {
+      return this.props.ingredients
+        .find(el => el._id === ingredient._id)
+        .title.charAt(0);
+    }
+  }
+
   getTypeAvatar(type) {
     if (type.title) {
       return type.title.charAt(0);
     }
 
     if (this.props.ingredientTypes) {
-      const avatarToReturn = this.props.ingredientTypes.find(el => el._id === type._id);
+      const avatarToReturn = this.props.ingredientTypes.find(
+        el => el._id === type._id
+      );
       return avatarToReturn.title.charAt(0);
     }
   }
@@ -507,7 +692,9 @@ class RestrictionEditor extends React.Component {
     }
 
     if (this.props.categories) {
-      const avatarToReturn = this.props.categories.find(el => el._id === category._id);
+      const avatarToReturn = this.props.categories.find(
+        el => el._id === category._id
+      );
       return avatarToReturn.title.charAt(0);
     }
   }
@@ -518,405 +705,663 @@ class RestrictionEditor extends React.Component {
     const hasFormChanged = e.currentTarget.value.length > 0;
 
     this.setState({
-      hasFormChanged,
+      hasFormChanged
     });
   }
 
   render() {
-    // console.log(this.props);
-    const { restriction, categories, ingredientTypes, history, loading } = this.props;
+    const {
+      restriction,
+      categories,
+      ingredientTypes,
+      history,
+      loading
+    } = this.props;
 
-    return (
+    return !loading ? (
+      <form
+        style={{ width: "100%" }}
+        ref={form => (this.form = form)}
+        onSubmit={event => event.preventDefault()}
+      >
+        <Grid container justify="center">
+          <Grid item xs={12}>
+            <Button
+              onClick={() => this.props.history.push("/restrictions")}
+              className="button button-secondary button-secondary--top"
+            >
+              <Typography
+                type="subheading"
+                className="subheading font-medium"
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  flexDirection: "row"
+                }}
+              >
+                <ChevronLeft style={{ marginRight: "4px" }} /> Restrictions
+              </Typography>
+            </Button>
+          </Grid>
+        </Grid>
 
-      !loading ? (
+        <Grid container style={{ marginBottom: "50px" }}>
+          <Grid item xs={4}>
+            <Typography
+              type="headline"
+              className="headline"
+              style={{ fontWeight: 500 }}
+            >
+              {restriction && restriction._id
+                ? `${restriction.title}`
+                : "Add restriction"}
+            </Typography>
 
-        <form style={{ width: '100%' }} ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>
-          <Grid container justify="center">
-            <Grid item xs={12}>
-
-              <Button onClick={() => this.props.history.push('/restrictions')} className="button button-secondary button-secondary--top">
-                <Typography type="subheading" className="subheading font-medium" style={{ display: 'flex', alignItems: 'center', flexDirection: 'row' }}>
-                  <ChevronLeft style={{ marginRight: '4px' }} /> Restrictions</Typography>
+            {this.props.restriction ? (
+              <Typography
+                type="body1"
+                style={{ color: "rgba(0, 0, 0, 0.54)" }}
+                className="body1"
+              >
+                {restriction.SKU ? restriction.SKU : ""}{" "}
+              </Typography>
+            ) : (
+              ""
+            )}
+          </Grid>
+          <Grid item xs={8}>
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end"
+              }}
+            >
+              <Button
+                style={{ marginRight: "10px" }}
+                onClick={() => history.push("/restrictions")}
+              >
+                Cancel
               </Button>
-
-            </Grid>
+              <Button
+                disabled={!this.state.hasFormChanged}
+                className="btn btn-primary"
+                raised
+                type="submit"
+                color="contrast"
+              >
+                Save
+              </Button>
+            </div>
           </Grid>
+        </Grid>
 
-          <Grid container style={{ marginBottom: '50px' }}>
-            <Grid item xs={4}>
-              <Typography type="headline" className="headline" style={{ fontWeight: 500 }}>{restriction && restriction._id ? `${restriction.title}` : 'Add restriction'}</Typography>
-
-              {this.props.restriction ?
-                (<Typography type="body1" style={{ color: 'rgba(0, 0, 0, 0.54)' }} className="body1">{restriction.SKU ? (restriction.SKU) : ''} </Typography>)
-                : '' }
-
-            </Grid>
-            <Grid item xs={8}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                <Button style={{ marginRight: '10px' }} onClick={() => history.push('/restrictions')}>Cancel</Button>
-                <Button disabled={!this.state.hasFormChanged} className="btn btn-primary" raised type="submit" color="contrast">Save</Button>
-              </div>
-            </Grid>
-          </Grid>
-
-
-          <Grid container justify="center" style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Grid container>
-                <Grid item xs={12} sm={4}>
-                  <Typography type="subheading" className="subheading font-medium">
-              Restriction
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                  <Paper elevation={2} className="paper-for-fields">
-                    <TextField
-                      id="title"
-                      label="Name"
-                      name="title"
-                      fullWidth
-                      defaultValue={restriction && restriction.title}
-                      ref={title => (this.title = title)}
-                      inputProps={{}}
-                      onChange={this.titleFieldChanged.bind(this)}
-                    />
-                  </Paper>
-                </Grid>
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Restriction
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <TextField
+                    id="title"
+                    label="Name"
+                    name="title"
+                    fullWidth
+                    defaultValue={restriction && restriction.title}
+                    ref={title => (this.title = title)}
+                    inputProps={{}}
+                    onChange={this.titleFieldChanged.bind(this)}
+                  />
+                </Paper>
               </Grid>
             </Grid>
           </Grid>
+        </Grid>
 
+        <Divider light className="divider--space-x" />
 
-          <Divider light className="divider--space-x" />
-
-          <Grid container justify="center" style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Grid container>
-                <Grid item xs={12} sm={4}>
-                  <Typography type="subheading" className="subheading font-medium">Value</Typography>
-                  <Typography style={{ paddingRight: '80px' }}>
-                  Applying a discount or extra will affect the total amount of a lifestyle's price plan if ingredients are restricted.
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                  <Paper elevation={2} className="paper-for-fields">
-                    <Grid container>
-                      <Grid item xs={12}>
-                        <FormControl component="fieldset">
-                          <RadioGroup
-                            aria-label="discountOrExtra"
-                            name="discountOrExtra"
-                            value={this.state.valueDiscountOrExtra}
-                            onChange={this.handleDiscountOrExtraRadioChange.bind(this)}
-                            style={{ flexDirection: 'row' }}
-                          >
-                            <FormControlLabel className="radiobuttonlabel" value="none" control={<Radio checked={this.state.valueDiscountOrExtra === 'none'} />} label="None" />
-                            <FormControlLabel className="radiobuttonlabel" value="discount" control={<Radio checked={this.state.valueDiscountOrExtra === 'discount'} />} label="Discount" />
-                            <FormControlLabel className="radiobuttonlabel" value="extra" control={<Radio checked={this.state.valueDiscountOrExtra === 'extra'} />} label="Extra" />
-
-                          </RadioGroup>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={6} sm={6}>
-                        <TextField
-                          disabled={!this.state.discountOrExtraSelected}
-                          fullWidth
-                          id="select-discount-type"
-                          select
-                          label="Type"
-                          value={this.state.discountType ? this.state.discountType : ''}
-                          onChange={this.handleDiscountChange.bind(this)}
-                          SelectProps={{ native: false }}
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Value
+                </Typography>
+                <Typography style={{ paddingRight: "80px" }}>
+                  Applying a discount or extra will affect the total amount of a
+                  lifestyle's price plan if ingredients are restricted.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <FormControl component="fieldset">
+                        <RadioGroup
+                          aria-label="discountOrExtra"
+                          name="discountOrExtra"
+                          value={this.state.valueDiscountOrExtra}
+                          onChange={this.handleDiscountOrExtraRadioChange.bind(
+                            this
+                          )}
+                          style={{ flexDirection: "row" }}
                         >
-                          <MenuItem key={1} value="Percentage">Percentage</MenuItem>
-                          <MenuItem key={2} value="Fixed amount">Fixed amount</MenuItem>
-                        </TextField>
-                      </Grid>
-
-                      <Grid item xs={6} sm={6}>
-
-                        <TextField
-                          fullWidth
-                          value={this.state.discountOrExtraAmount}
-                          id="discountOrExtraValue"
-                          name="discountOrExtraValue"
-                          disabled={!this.state.discountOrExtraSelected}
-                          onChange={this.handleDiscountOrExtraValueChange.bind(this)}
-                          label="Amount"
-
-                          inputProps={{
-                            'aria-label': 'Description',
-                            type: 'number',
-                          }}
-                        />
-                      </Grid>
-
+                          <FormControlLabel
+                            className="radiobuttonlabel"
+                            value="none"
+                            control={
+                              <Radio
+                                checked={
+                                  this.state.valueDiscountOrExtra === "none"
+                                }
+                              />
+                            }
+                            label="None"
+                          />
+                          <FormControlLabel
+                            className="radiobuttonlabel"
+                            value="discount"
+                            control={
+                              <Radio
+                                checked={
+                                  this.state.valueDiscountOrExtra === "discount"
+                                }
+                              />
+                            }
+                            label="Discount"
+                          />
+                          <FormControlLabel
+                            className="radiobuttonlabel"
+                            value="extra"
+                            control={
+                              <Radio
+                                checked={
+                                  this.state.valueDiscountOrExtra === "extra"
+                                }
+                              />
+                            }
+                            label="Extra"
+                          />
+                        </RadioGroup>
+                      </FormControl>
                     </Grid>
-                  </Paper>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-
-          <Divider light className="divider--space-x" />
-
-          <Grid container justify="center" style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Grid container>
-                <Grid item xs={12} sm={4}>
-                  <Typography type="subheading" className="subheading font-medium">
-                  Category
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                  <Paper elevation={2} className="paper-for-fields">
-                    <FormControl component="fieldset">
-                      <RadioGroup
-                        aria-label="RestrictionType"
-                        name="restrictionType"
-                        value={this.state.valueRestriction}
-                        style={{ flexDirection: 'row' }}
-                        onChange={this.handleRestrictionTypeChange.bind(this)}
+                    <Grid item xs={6} sm={6}>
+                      <TextField
+                        disabled={!this.state.discountOrExtraSelected}
+                        fullWidth
+                        id="select-discount-type"
+                        select
+                        label="Type"
+                        value={
+                          this.state.discountType ? this.state.discountType : ""
+                        }
+                        onChange={this.handleDiscountChange.bind(this)}
+                        SelectProps={{ native: false }}
                       >
-                        <FormControlLabel className="radiobuttonlabel" value="allergy" control={<Radio />} label="Allergy" />
-                        <FormControlLabel className="radiobuttonlabel" value="dietary" control={<Radio />} label="Dietary" />
-                        <FormControlLabel className="radiobuttonlabel" value="religious" control={<Radio />} label="Religious" />
-                      </RadioGroup>
-                    </FormControl>
-                  </Paper>
-                </Grid>
+                        <MenuItem key={1} value="Percentage">
+                          Percentage
+                        </MenuItem>
+                        <MenuItem key={2} value="Fixed amount">
+                          Fixed amount
+                        </MenuItem>
+                      </TextField>
+                    </Grid>
+
+                    <Grid item xs={6} sm={6}>
+                      <TextField
+                        fullWidth
+                        value={this.state.discountOrExtraAmount}
+                        id="discountOrExtraValue"
+                        name="discountOrExtraValue"
+                        disabled={!this.state.discountOrExtraSelected}
+                        onChange={this.handleDiscountOrExtraValueChange.bind(
+                          this
+                        )}
+                        label="Amount"
+                        inputProps={{
+                          "aria-label": "Description",
+                          type: "number"
+                        }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
               </Grid>
             </Grid>
           </Grid>
+        </Grid>
 
-          <Divider light className="divider--space-x" />
+        <Divider light className="divider--space-x" />
 
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Category
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <FormControl component="fieldset">
+                    <RadioGroup
+                      aria-label="RestrictionType"
+                      name="restrictionType"
+                      value={this.state.valueRestriction}
+                      style={{ flexDirection: "row" }}
+                      onChange={this.handleRestrictionTypeChange.bind(this)}
+                    >
+                      <FormControlLabel
+                        className="radiobuttonlabel"
+                        value="allergy"
+                        control={<Radio />}
+                        label="Allergy"
+                      />
+                      <FormControlLabel
+                        className="radiobuttonlabel"
+                        value="dietary"
+                        control={<Radio />}
+                        label="Dietary"
+                      />
+                      <FormControlLabel
+                        className="radiobuttonlabel"
+                        value="religious"
+                        control={<Radio />}
+                        label="Religious"
+                      />
+                    </RadioGroup>
+                  </FormControl>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
 
-          <Grid container justify="center" style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Grid container>
-                <Grid item xs={12} sm={4}>
-                  <Typography type="subheading" className="subheading font-medium">
-                Type
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                  <Paper elevation={2} className="paper-for-fields">
+        <Divider light className="divider--space-x" />
 
+        <Grid container justify="center" style={{ marginBottom: "75px" }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Ingredients
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Search className="autoinput-icon" />
+                  <Autosuggest
+                    id="2"
+                    className="autosuggest"
+                    theme={{
+                      container: {
+                        flexGrow: 1,
+                        position: "relative",
+                        marginBottom: "2em"
+                      },
+                      suggestionsContainerOpen: {
+                        position: "absolute",
+                        left: 0,
+                        right: 0
+                      },
+                      suggestion: {
+                        display: "block"
+                      },
+                      suggestionsList: {
+                        margin: 0,
+                        padding: 0,
+                        listStyleType: "none"
+                      }
+                    }}
+                    renderInputComponent={this.renderInput.bind(this)}
+                    suggestions={this.state.suggestions}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
+                      this
+                    )}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
+                      this
+                    )}
+                    onSuggestionSelected={this.onSuggestionSelected.bind(this)}
+                    getSuggestionValue={this.getSuggestionValue.bind(this)}
+                    renderSuggestion={this.renderSuggestion.bind(this)}
+                    renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                      this
+                    )}
+                    focusInputOnSuggestionClick={false}
+                    inputProps={{
+                      placeholder: "Search",
+                      value: this.state.value,
+                      onChange: this.onChange.bind(this),
+                      className: "autoinput"
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexWrap: "wrap"
+                    }}
+                  >
+                    {this.props.ingredients && this.state.ingredients ? (
+                      this.props.ingredients
+                        .filter(e => this.state.ingredients.indexOf(e._id) >= 0)
+                        .map((e, i) => (
+                          <Chip
+                            avatar={
+                              <Avatar>{this.getIngredientAvatar(e)}</Avatar>
+                            }
+                            style={{
+                              marginRight: "8px",
+                              marginBottom: "8px"
+                            }}
+                            label={e.title}
+                            key={i}
+                            onRequestDelete={this.handleIngredientsChipDelete.bind(
+                              this,
+                              e
+                            )}
+                          />
+                        ))
+                    ) : (
+                      <Chip className="chip--bordered" label="Ingredient" />
+                    )}
+                  </div>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
 
-                    <Search className="autoinput-icon" />
-                    <Autosuggest
-                      id="1"
-                      className="autosuggest"
-                      theme={{
-                        container: {
-                          flexGrow: 1,
-                          position: 'relative',
-                        },
-                        suggestionsContainerOpen: {
-                          position: 'absolute',
-                          left: 0,
-                          right: 0,
-                        },
-                        suggestion: {
-                          display: 'block',
-                        },
-                        suggestionsList: {
-                          margin: 0,
-                          padding: 0,
-                          listStyleType: 'none',
-                        },
-                      }}
-                      renderInputComponent={this.renderInput.bind(this)}
-                      suggestions={this.state.suggestionsTypes}
-                      onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(this)}
-                      onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(this)}
-                      onSuggestionSelected={this.onSuggestionSelectedTypes.bind(this)}
-                      getSuggestionValue={this.getSuggestionValueTypes.bind(this)}
-                      renderSuggestion={this.renderSuggestion.bind(this)}
-                      renderSuggestionsContainer={this.renderSuggestionsContainer.bind(this)}
-                      focusInputOnSuggestionClick={false}
+        <Divider light className="divider--space-x" />
 
-                      inputProps={{
-                        placeholder: 'Search',
-                        value: this.state.valueTypes,
-                        onChange: this.onChangeTypes.bind(this),
-                        className: 'auto type-autocomplete',
-                      }}
-                    />
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Type
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Search className="autoinput-icon" />
+                  <Autosuggest
+                    id="1"
+                    className="autosuggest"
+                    theme={{
+                      container: {
+                        flexGrow: 1,
+                        position: "relative"
+                      },
+                      suggestionsContainerOpen: {
+                        position: "absolute",
+                        left: 0,
+                        right: 0
+                      },
+                      suggestion: {
+                        display: "block"
+                      },
+                      suggestionsList: {
+                        margin: 0,
+                        padding: 0,
+                        listStyleType: "none"
+                      }
+                    }}
+                    renderInputComponent={this.renderInput.bind(this)}
+                    suggestions={this.state.suggestionsTypes}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(
+                      this
+                    )}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(
+                      this
+                    )}
+                    onSuggestionSelected={this.onSuggestionSelectedTypes.bind(
+                      this
+                    )}
+                    getSuggestionValue={this.getSuggestionValueTypes.bind(this)}
+                    renderSuggestion={this.renderSuggestion.bind(this)}
+                    renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                      this
+                    )}
+                    focusInputOnSuggestionClick={false}
+                    inputProps={{
+                      placeholder: "Search",
+                      value: this.state.valueTypes,
+                      onChange: this.onChangeTypes.bind(this),
+                      className: "auto type-autocomplete"
+                    }}
+                  />
 
-                    {/* {this.state.types.length ? this.state.types.map((type, i) => (
-
-                        <Chip
-                          avatar={<Avatar />}
-                          style={{ marginRight: '8px', marginBottom: '8px' }}
-                          label={type.title}
-                          key={i}
-                          onRequestDelete={this.handleTypeChipDelete.bind(this, type)}
-                        />)) : ''} */}
-
-                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '25px' }}>
-                      {this.props.ingredientTypes && this.state.types ? (
-                        this.props.ingredientTypes.filter((e, i) => {
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      marginTop: "25px"
+                    }}
+                  >
+                    {this.props.ingredientTypes && this.state.types ? (
+                      this.props.ingredientTypes
+                        .filter((e, i) => {
                           if (this.state.types.indexOf(e._id) >= 0) {
                             return e;
                           }
-                        }).map((e, i) => (
+                        })
+                        .map((e, i) => (
                           <Chip
                             avatar={<Avatar>{this.getTypeAvatar(e)}</Avatar>}
-                            style={{ marginRight: '8px', marginBottom: '8px' }}
+                            style={{
+                              marginRight: "8px",
+                              marginBottom: "8px"
+                            }}
                             label={e.title}
                             key={i}
-                            onRequestDelete={this.handleTypeChipDelete.bind(this, e)}
+                            onRequestDelete={this.handleTypeChipDelete.bind(
+                              this,
+                              e
+                            )}
                           />
                         ))
-                      ) : ''}
-                    </div>
-
-
-                  </Paper>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-
-
-          <Divider light className="divider--space-x" />
-
-
-          <Grid container justify="center" style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Grid container>
-                <Grid item xs={12} sm={4}>
-                  <Typography type="subheading" className="subheading font-medium">Category</Typography>
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                  <Paper elevation={2} className="paper-for-fields">
-
-
-                    <Search className="autoinput-icon" />
-                    <Autosuggest
-                      id="2"
-                      className="autosuggest"
-                      theme={{
-                        container: {
-                          flexGrow: 1,
-                          position: 'relative',
-                        },
-                        suggestionsContainerOpen: {
-                          position: 'absolute',
-                          left: 0,
-                          right: 0,
-                        },
-                        suggestion: {
-                          display: 'block',
-                        },
-                        suggestionsList: {
-                          margin: 0,
-                          padding: 0,
-                          listStyleType: 'none',
-                        },
-                      }}
-                      renderInputComponent={this.renderInput.bind(this)}
-                      suggestions={this.state.suggestionsCategories}
-                      onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedCategories.bind(this)}
-                      onSuggestionsClearRequested={this.onSuggestionsClearRequestedCategories.bind(this)}
-                      onSuggestionSelected={this.onSuggestionSelectedCategories.bind(this)}
-                      getSuggestionValue={this.getSuggestionValueCategories.bind(this)}
-                      renderSuggestion={this.renderSuggestion.bind(this)}
-                      renderSuggestionsContainer={this.renderSuggestionsContainer.bind(this)}
-                      focusInputOnSuggestionClick={false}
-
-                      inputProps={{
-                        placeholder: 'Search',
-                        value: this.state.valueCategories,
-                        onChange: this.onChangeCategories.bind(this),
-                        className: 'auto type-autocomplete',
-                      }}
-                    />
-
-                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', marginTop: '25px' }}>
-                      {/* {this.state.categories.length ? this.state.categories.map((category, i) => (
-
-                        <Chip
-                          avatar={<Avatar />}
-                          style={{ marginRight: '8px', marginBottom: '8px' }}
-                          label={category.title}
-                          key={i}
-                          onRequestDelete={this.handleCategoryChipDelete.bind(this, category)}
-                        />)) : ''} */}
-
-
-                      {this.props.categories && this.state.categories ? (
-                        this.props.categories.filter((e, i) => {
-                          if (this.state.categories.indexOf(e._id) >= 0) {
-                            return e;
-                          }
-                        }).map((e, i) => (
-                          <Chip
-                            avatar={<Avatar>{this.getCategoryAvatar(e)}</Avatar>}
-                            style={{ marginRight: '8px', marginBottom: '8px' }}
-                            label={e.title}
-                            key={i}
-                            onRequestDelete={this.handleCategoryChipDelete.bind(this, e)}
-                          />
-                        ))
-                      ) : ''}
-                    </div>
-
-                  </Paper>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
-
-          <Grid container justify="center" style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Grid container>
-                <Grid item xs={4}>
-                  {
-                    this.props.newRestriction ? '' : (
-                      <Button
-                        style={{ backgroundColor: danger, color: '#FFFFFF' }}
-                        raised
-                        onClick={restriction && restriction._id ? this.handleRemove.bind(this) : () => this.props.history.push('/restrictions')}
-                      >
-                    Delete
-                      </Button>
-                    )
-                  }
-                </Grid>
-
-                <Grid item xs={8}>
-
-                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end' }}>
-                    <Button style={{ marginRight: '10px' }} onClick={() => history.push('/restrictions')}>Cancel</Button>
-                    <Button disabled={!this.state.hasFormChanged} type="submit" className="btn btn-primary" raised color="contrast">
-                   Save
-                    </Button>
+                    ) : (
+                      <Chip className="chip--bordered" label="Type" />
+                    )}
                   </div>
-                </Grid>
+                </Paper>
               </Grid>
             </Grid>
           </Grid>
+        </Grid>
 
-          {this.renderDeleteDialog()}
+        <Divider light className="divider--space-x" />
 
-        </form>) : (<Loading />)
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Category
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Search className="autoinput-icon" />
+                  <Autosuggest
+                    id="2"
+                    className="autosuggest"
+                    theme={{
+                      container: {
+                        flexGrow: 1,
+                        position: "relative"
+                      },
+                      suggestionsContainerOpen: {
+                        position: "absolute",
+                        left: 0,
+                        right: 0
+                      },
+                      suggestion: {
+                        display: "block"
+                      },
+                      suggestionsList: {
+                        margin: 0,
+                        padding: 0,
+                        listStyleType: "none"
+                      }
+                    }}
+                    renderInputComponent={this.renderInput.bind(this)}
+                    suggestions={this.state.suggestionsCategories}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedCategories.bind(
+                      this
+                    )}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedCategories.bind(
+                      this
+                    )}
+                    onSuggestionSelected={this.onSuggestionSelectedCategories.bind(
+                      this
+                    )}
+                    getSuggestionValue={this.getSuggestionValueCategories.bind(
+                      this
+                    )}
+                    renderSuggestion={this.renderSuggestion.bind(this)}
+                    renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                      this
+                    )}
+                    focusInputOnSuggestionClick={false}
+                    inputProps={{
+                      placeholder: "Search",
+                      value: this.state.valueCategories,
+                      onChange: this.onChangeCategories.bind(this),
+                      className: "auto type-autocomplete"
+                    }}
+                  />
+
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      flexWrap: "wrap",
+                      marginTop: "25px"
+                    }}
+                  >
+                    {this.props.categories && this.state.categories ? (
+                      this.props.categories
+                        .filter(e => this.state.categories.indexOf(e._id) >= 0)
+                        .map((e, i) => (
+                          <Chip
+                            avatar={
+                              <Avatar>{this.getCategoryAvatar(e)}</Avatar>
+                            }
+                            style={{
+                              marginRight: "8px",
+                              marginBottom: "8px"
+                            }}
+                            label={e.title}
+                            key={i}
+                            onRequestDelete={this.handleCategoryChipDelete.bind(
+                              this,
+                              e
+                            )}
+                          />
+                        ))
+                    ) : (
+                      <Chip className="chip--bordered" label="Category" />
+                    )}
+                  </div>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={4}>
+                {this.props.newRestriction ? (
+                  ""
+                ) : (
+                  <Button
+                    style={{ backgroundColor: danger, color: "#FFFFFF" }}
+                    raised
+                    onClick={
+                      restriction && restriction._id
+                        ? this.handleRemove.bind(this)
+                        : () => this.props.history.push("/restrictions")
+                    }
+                  >
+                    Delete
+                  </Button>
+                )}
+              </Grid>
+
+              <Grid item xs={8}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "flex-end"
+                  }}
+                >
+                  <Button
+                    style={{ marginRight: "10px" }}
+                    onClick={() => history.push("/restrictions")}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    disabled={!this.state.hasFormChanged}
+                    type="submit"
+                    className="btn btn-primary"
+                    raised
+                    color="contrast"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        {this.renderDeleteDialog()}
+      </form>
+    ) : (
+      <Loading />
     );
   }
 }
 
-RestrictionEditor.defaultProps = {
-};
+RestrictionEditor.defaultProps = {};
 
 RestrictionEditor.propTypes = {
   restriction: PropTypes.object.isRequired,
   newRestriction: PropTypes.bool.isRequired,
+  ingredient: PropTypes.array.isRequired,
   ingredientTypes: PropTypes.array.isRequired,
   categories: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
-  popTheSnackbar: PropTypes.func.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired
 };
 
 export default RestrictionEditor;
