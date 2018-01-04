@@ -312,7 +312,7 @@ class AuthenticatedSideNav extends Component {
                 <ListItemIcon>
                   <RoutesIcon className="side-nav-icon" />
                 </ListItemIcon>
-                <ListItemText className="subheading" primary="Postal Codes" />
+                <ListItemText className="subheading" primary="Postal codes" />
               </ListItem>
             </NavLink>
 

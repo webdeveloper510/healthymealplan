@@ -235,16 +235,16 @@ class PostalCodesTable extends React.Component {
                   </TableCell>
                   <TableCell
                     padding="none"
-                    style={{ width: "27.33%" }}
+                    style={{ width: "20%" }}
                     onClick={() => this.props.sortByOptions("title")}
                   >
                     <Typography className="body2" type="body2">
-                      Route
+                      Postal code
                     </Typography>
                   </TableCell>
                   <TableCell
                     padding="none"
-                    style={{ width: "18.1675%" }}
+                    style={{ width: "20%" }}
                     onClick={() => this.props.sortByOptions("city")}
                   >
                     <Typography className="body2" type="body2">
@@ -253,7 +253,7 @@ class PostalCodesTable extends React.Component {
                   </TableCell>
                   <TableCell
                     padding="none"
-                    style={{ width: "18.1675%" }}
+                    style={{ width: "20%" }}
                     onClick={() => this.props.sortByOptions("city")}
                   >
                     <Typography className="body2" type="body2">
@@ -262,14 +262,14 @@ class PostalCodesTable extends React.Component {
                   </TableCell>
                   <TableCell
                     padding="none"
-                    style={{ width: "18.1675%" }}
+                    style={{ width: "20%" }}
                     onClick={() => this.props.sortByOptions("limited")}
                   >
                     <Typography className="body2" type="body2">
                       Limited
                     </Typography>
                   </TableCell>
-                  <TableCell padding="none" style={{ width: "18.1675%" }}>
+                  <TableCell padding="none" style={{ width: "20%" }}>
                     <Typography className="body2" type="body2">
                       Value
                     </Typography>
@@ -307,7 +307,7 @@ class PostalCodesTable extends React.Component {
                       style={{
                         paddingTop: "10px",
                         paddingBottom: "10px",
-                        width: "27.33%"
+                        width: "20%"
                       }}
                       padding="none"
                       onClick={() =>
@@ -326,7 +326,7 @@ class PostalCodesTable extends React.Component {
                       style={{
                         paddingTop: "10px",
                         paddingBottom: "10px",
-                        width: "15.1675%"
+                        width: "20%"
                       }}
                       padding="none"
                       onClick={() =>
@@ -345,7 +345,7 @@ class PostalCodesTable extends React.Component {
                       style={{
                         paddingTop: "10px",
                         paddingBottom: "10px",
-                        width: "15.1675%"
+                        width: "20%"
                       }}
                       padding="none"
                       onClick={() =>
@@ -365,7 +365,7 @@ class PostalCodesTable extends React.Component {
                       style={{
                         paddingTop: "10px",
                         paddingBottom: "10px",
-                        width: "15.1675%"
+                        width: "20%"
                       }}
                       onClick={() =>
                         this.props.history.push(`/postal-codes/${e._id}/edit`)
@@ -385,7 +385,7 @@ class PostalCodesTable extends React.Component {
                       style={{
                         paddingTop: "10px",
                         paddingBottom: "10px",
-                        width: "15.1675%"
+                        width: "20%"
                       }}
                       onClick={() =>
                         this.props.history.push(`/postal-codes/${e._id}/edit`)
