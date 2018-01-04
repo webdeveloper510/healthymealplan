@@ -22,10 +22,10 @@ import Checkbox from "material-ui/Checkbox";
 import Button from "material-ui/Button";
 
 import { createContainer } from "meteor/react-meteor-data";
-// import IngredientsCollection from '../../../api/Ingredients/Ingredients';
+
 import Loading from "../../components/Loading/Loading";
 
-class RoutesTable extends React.Component {
+class PostalCodesTable extends React.Component {
   constructor(props) {
     super(props);
 
@@ -114,7 +114,7 @@ class RoutesTable extends React.Component {
     console.log("Delete selected rows");
 
     localStorage.setItem(
-      "RoutesTableDeleted",
+      "PostalCodesDeleted",
       this.state.selectedCheckboxesNumber
     );
 
@@ -122,7 +122,7 @@ class RoutesTable extends React.Component {
 
     console.log(categoryIds);
 
-    Meteor.call("restrictions.batchRemove", categoryIds, error => {
+    Meteor.call("postalCodes.batchRemove", categoryIds, error => {
       console.log("inside method");
       if (error) {
         this.props.popTheSnackbar({
@@ -131,7 +131,7 @@ class RoutesTable extends React.Component {
       } else {
         this.props.popTheSnackbar({
           message: `${localStorage.getItem(
-            "RoutesTableDeleted"
+            "PostalCodesDeleted"
           )} routes deleted.`
         });
       }
@@ -151,7 +151,7 @@ class RoutesTable extends React.Component {
     if (count == 0) {
       return (
         <p style={{ padding: "25px" }} className="subheading">
-          No route found for{" "}
+          No postal code found for{" "}
           <span className="font-medium">
             {this.props.searchTerm.length > 0
               ? `&lsquo;${this.props.searchTerm}&rsquo;`
@@ -235,11 +235,43 @@ class RoutesTable extends React.Component {
                   </TableCell>
                   <TableCell
                     padding="none"
-                    style={{ width: "88%" }}
+                    style={{ width: "27.33%" }}
                     onClick={() => this.props.sortByOptions("title")}
                   >
                     <Typography className="body2" type="body2">
                       Route
+                    </Typography>
+                  </TableCell>
+                  <TableCell
+                    padding="none"
+                    style={{ width: "18.1675%" }}
+                    onClick={() => this.props.sortByOptions("city")}
+                  >
+                    <Typography className="body2" type="body2">
+                      City
+                    </Typography>
+                  </TableCell>
+                  <TableCell
+                    padding="none"
+                    style={{ width: "18.1675%" }}
+                    onClick={() => this.props.sortByOptions("city")}
+                  >
+                    <Typography className="body2" type="body2">
+                      Route
+                    </Typography>
+                  </TableCell>
+                  <TableCell
+                    padding="none"
+                    style={{ width: "18.1675%" }}
+                    onClick={() => this.props.sortByOptions("limited")}
+                  >
+                    <Typography className="body2" type="body2">
+                      Limited
+                    </Typography>
+                  </TableCell>
+                  <TableCell padding="none" style={{ width: "18.1675%" }}>
+                    <Typography className="body2" type="body2">
+                      Value
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -250,6 +282,8 @@ class RoutesTable extends React.Component {
             <TableBody>
               {this.props.results.map((e, i) => {
                 const isSelected = this.isCheckboxSelected(e._id);
+
+                console.log(e);
 
                 return (
                   <TableRow hover className={e._id} key={e._id}>
@@ -273,11 +307,11 @@ class RoutesTable extends React.Component {
                       style={{
                         paddingTop: "10px",
                         paddingBottom: "10px",
-                        width: "88%"
+                        width: "27.33%"
                       }}
                       padding="none"
                       onClick={() =>
-                        this.props.history.push(`/routes/${e._id}/edit`)
+                        this.props.history.push(`/postal-codes/${e._id}/edit`)
                       }
                     >
                       <Typography
@@ -287,6 +321,93 @@ class RoutesTable extends React.Component {
                       >
                         {e.title}
                       </Typography>
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        paddingTop: "10px",
+                        paddingBottom: "10px",
+                        width: "15.1675%"
+                      }}
+                      padding="none"
+                      onClick={() =>
+                        this.props.history.push(`/postal-codes/${e._id}/edit`)
+                      }
+                    >
+                      <Typography
+                        type="subheading"
+                        className="subheading"
+                        style={{ textTransform: "capitalize" }}
+                      >
+                        {e.city}
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      style={{
+                        paddingTop: "10px",
+                        paddingBottom: "10px",
+                        width: "15.1675%"
+                      }}
+                      padding="none"
+                      onClick={() =>
+                        this.props.history.push(`/postal-codes/${e._id}/edit`)
+                      }
+                    >
+                      <Typography
+                        type="subheading"
+                        className="subheading"
+                        style={{ textTransform: "capitalize" }}
+                      >
+                        {e.routeActual.title}
+                      </Typography>
+                    </TableCell>
+                    <TableCell
+                      padding="none"
+                      style={{
+                        paddingTop: "10px",
+                        paddingBottom: "10px",
+                        width: "15.1675%"
+                      }}
+                      onClick={() =>
+                        this.props.history.push(`/postal-codes/${e._id}/edit`)
+                      }
+                    >
+                      <Typography
+                        className="body1"
+                        type="body1"
+                        style={{ textTransform: "capitalize" }}
+                      >
+                        {e.limited ? "Yes" : "No"}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell
+                      padding="none"
+                      style={{
+                        paddingTop: "10px",
+                        paddingBottom: "10px",
+                        width: "15.1675%"
+                      }}
+                      onClick={() =>
+                        this.props.history.push(`/postal-codes/${e._id}/edit`)
+                      }
+                    >
+                      <Typography type="subheading" className="subheading">
+                        {this.renderDiscountOrExtra(e)}
+                      </Typography>
+                      {e.extraSurcharge ? (
+                        <Typography
+                          className="body1"
+                          type="body1"
+                          style={{
+                            textTransform: "capitalize",
+                            color: "rgba(0, 0, 0, .54)"
+                          }}
+                        >
+                          Extra
+                        </Typography>
+                      ) : (
+                        ""
+                      )}
                     </TableCell>
                   </TableRow>
                 );
@@ -371,11 +492,11 @@ class RoutesTable extends React.Component {
   }
 }
 
-RoutesTable.defaultProps = {
+PostalCodesTable.defaultProps = {
   searchTerm: ""
 };
 
-RoutesTable.propTypes = {
+PostalCodesTable.propTypes = {
   // results: PropType.isRequired,
   searchTerm: PropTypes.string,
   history: PropTypes.func.isRequired,
@@ -387,9 +508,9 @@ RoutesTable.propTypes = {
 };
 
 export default createContainer(() => {
-  const restrictionsCountSub = Meteor.subscribe("routes-all-count");
+  const restrictionsCountSub = Meteor.subscribe("postalcodes-all-count");
 
   return {
-    categoryCount: Counts.get("routes-count")
+    categoryCount: Counts.get("postalcodes-count")
   };
-}, RoutesTable);
+}, PostalCodesTable);

@@ -1,32 +1,30 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
+import React from "react";
+import PropTypes from "prop-types";
+import { Meteor } from "meteor/meteor";
+import { createContainer } from "meteor/react-meteor-data";
 
-import $ from 'jquery';
+import $ from "jquery";
 
-import Button from 'material-ui/Button';
-import Grid from 'material-ui/Grid';
-import Typography from 'material-ui/Typography';
-import Input from 'material-ui/Input';
-import SearchIcon from 'material-ui-icons/Search';
-import ClearIcon from 'material-ui-icons/Clear';
-import AppBar from 'material-ui/AppBar';
-import Tabs, { Tab } from 'material-ui/Tabs';
+import Button from "material-ui/Button";
+import Grid from "material-ui/Grid";
+import Typography from "material-ui/Typography";
+import Input from "material-ui/Input";
+import SearchIcon from "material-ui-icons/Search";
+import ClearIcon from "material-ui-icons/Clear";
+import AppBar from "material-ui/AppBar";
+import Tabs, { Tab } from "material-ui/Tabs";
 
-import RoutesCollection from '../../../api/Routes/Routes';
-// import CategoriesCollection from '../../../api/Categories/Categories';
+import PostalCodesCollection from "../../../api/PostalCodes/PostalCodes";
+import Routes from "../../../api/Routes/Routes";
 
-// import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
+import Loading from "../../components/Loading/Loading";
+import PostalCodesTable from "./PostalCodesTable";
 
-import Loading from '../../components/Loading/Loading';
-import RoutesTable from './RoutesTable';
-
-import Containers from 'meteor/utilities:react-list-container';
+import Containers from "meteor/utilities:react-list-container";
 
 const ListContainer = Containers.ListContainer;
 
-class Routes extends React.Component {
+class PostalCodes extends React.Component {
   constructor(props) {
     super(props);
 
@@ -34,26 +32,47 @@ class Routes extends React.Component {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
 
-      searchByKey: '',
+      searchByKey: "",
       options: { sort: { SKU: -1 } },
-      searchSelector: '',
-      currentTabValue: 0,
+      searchSelector: "",
+      currentTabValue: 0
     };
   }
 
   componentDidMount() {}
 
   searchByName() {
+    // const searchValue = new RegExp(, 'i');
+    // console.log(searchValue);
+
     this.setState({
-      searchSelector: $('#search-type-text').val(),
+      searchSelector: $("#search-type-text").val()
     });
+
+    // const query = {
+    //   title: { $regex: searchValue },
+    // };
+
+    // if ($('#search-type-text').val() > 1) {
+    //   this.setState({
+    //     searchSelector: query,
+    //   });
+
+    //   return true;
+    // }
+
+    // this.setState({
+    //   searchSelector: {},
+    // });
+
+    // return false;
   }
 
   clearSearchBox() {
-    $('#search-type-text').val('');
+    $("#search-type-text").val("");
 
     this.setState({
-      searchSelector: {},
+      searchSelector: {}
     });
   }
 
@@ -81,25 +100,25 @@ class Routes extends React.Component {
     }
 
     this.setState({
-      options: { sort: newOptions },
+      options: { sort: newOptions }
     });
 
     // console.log('Data sorting changed');
     // console.log(this.state.options);
   }
 
-  searchByKey(restrictionType = '', key = '') {
+  searchByKey(restrictionType = "", key = "") {
     if (key.length && restrictionType.length) {
       const searchSelector = {};
 
       searchSelector[restrictionType] = key;
 
       this.setState({
-        searchByKey: searchSelector,
+        searchByKey: searchSelector
       });
     } else {
       this.setState({
-        searchByKey: '',
+        searchByKey: ""
       });
     }
   }
@@ -125,23 +144,23 @@ class Routes extends React.Component {
                 className="headline pull-left"
                 style={{ fontWeight: 500 }}
               >
-                Routes
+                Postal Codes
               </Typography>
             </Grid>
             <Grid item xs={6}>
               <Button
                 className="btn btn-primary"
-                onClick={() => history.push('/routes/new')}
+                onClick={() => history.push("/postal-codes/new")}
                 raised
                 color="primary"
-                style={{ float: 'right' }}
+                style={{ float: "right" }}
               >
-                Add Route
+                Add Postal code
               </Button>
             </Grid>
           </Grid>
 
-          <div style={{ marginTop: '25px' }}>
+          <div style={{ marginTop: "25px" }}>
             <AppBar
               position="static"
               className="appbar--no-background appbar--no-shadow"
@@ -153,7 +172,7 @@ class Routes extends React.Component {
               >
                 <Tab
                   label="All"
-                  onClick={() => this.searchByKey('', '').bind(this)}
+                  onClick={() => this.searchByKey("", "").bind(this)}
                 />
                 {/* <Tab label="Limited" onClick={() => this.searchByKey('limited', true).bind(this)} /> */}
               </Tabs>
@@ -162,24 +181,24 @@ class Routes extends React.Component {
 
           <div
             style={{
-              width: '100%',
-              background: '#FFF',
-              borderTopRightRadius: '2px',
-              borderTopLeftRadius: '2px',
-              marginTop: '3em',
-              padding: '16px 25px 1em',
+              width: "100%",
+              background: "#FFF",
+              borderTopRightRadius: "2px",
+              borderTopLeftRadius: "2px",
+              marginTop: "3em",
+              padding: "16px 25px 1em",
               boxShadow:
-                '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
-              position: 'relative',
+                "0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)",
+              position: "relative"
             }}
           >
             <SearchIcon
               className="autoinput-icon autoinput-icon--search"
               style={{
                 display:
-                  this.state.searchSelector.length > 0 ? 'none' : 'block',
-                top: '33%',
-                right: '1.8em !important',
+                  this.state.searchSelector.length > 0 ? "none" : "block",
+                top: "33%",
+                right: "1.8em !important"
               }}
             />
 
@@ -187,49 +206,56 @@ class Routes extends React.Component {
               className="autoinput-icon--clear"
               onClick={this.clearSearchBox.bind(this)}
               style={{
-                cursor: 'pointer',
-                display: this.state.searchSelector.length > 0 ? 'block' : 'none',
+                cursor: "pointer",
+                display: this.state.searchSelector.length > 0 ? "block" : "none"
               }}
             />
 
             <Input
               className="input-box"
-              style={{ width: '100%', position: 'relative' }}
+              style={{ width: "100%", position: "relative" }}
               placeholder="Search Routes"
               onKeyUp={this.searchByName.bind(this)}
               inputProps={{
-                id: 'search-type-text',
-                'aria-label': 'Description',
+                id: "search-type-text",
+                "aria-label": "Description"
               }}
             />
           </div>
           <ListContainer
             limit={50}
-            collection={RoutesCollection}
-            publication="routes"
+            collection={PostalCodesCollection}
+            publication="postalcodes"
             options={this.state.options}
+            joins={[
+              {
+                localProperty: "route",
+                collection: Routes,
+                joinAs: "routeActual"
+              }
+            ]}
             selector={
-              typeof this.state.searchByKey === 'object'
+              typeof this.state.searchByKey === "object"
                 ? this.state.searchByKey
                 : {
-                  $or: [
-                    {
-                      title: {
-                        $regex: new RegExp(this.state.searchSelector),
-                        $options: 'i',
+                    $or: [
+                      {
+                        title: {
+                          $regex: new RegExp(this.state.searchSelector),
+                          $options: "i"
+                        }
                       },
-                    },
-                    {
-                      SKU: {
-                        $regex: new RegExp(this.state.searchSelector),
-                        $options: 'i',
-                      },
-                    },
-                  ],
-                }
+                      {
+                        SKU: {
+                          $regex: new RegExp(this.state.searchSelector),
+                          $options: "i"
+                        }
+                      }
+                    ]
+                  }
             }
           >
-            <RoutesTable
+            <PostalCodesTable
               popTheSnackbar={this.props.popTheSnackbar}
               searchTerm={this.state.searchSelector}
               rowsLimit={this.state.rowsVisible}
@@ -245,18 +271,19 @@ class Routes extends React.Component {
   }
 }
 
-Routes.propTypes = {
+PostalCodes.propTypes = {
   loading: PropTypes.bool.isRequired,
   // categories: PropTypes.arrayOf(PropTypes.object).isRequired,
   match: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired,
+  history: PropTypes.object.isRequired
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe('routes');
+  const subscription = Meteor.subscribe("postalcodes");
+  const subscription2 = Meteor.subscribe("routes");
 
   return {
-    loading: !subscription.ready(),
-    routes: RoutesCollection.find().fetch(),
+    loading: !subscription.ready() && !subscription2.ready(),
+    postalCodes: PostalCodesCollection.find().fetch()
   };
-}, Routes);
+}, PostalCodes);

@@ -307,21 +307,21 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/routes">
+            <NavLink to="/postal-codes">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <RoutesIcon className="side-nav-icon" />
                 </ListItemIcon>
-                <ListItemText className="subheading" primary="Routes" />
+                <ListItemText className="subheading" primary="Postal Codes" />
               </ListItem>
             </NavLink>
 
-            <NavLink to="/drivers">
+            <NavLink to="/routes">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <DriversIcon className="side-nav-icon" />
                 </ListItemIcon>
-                <ListItemText className="subheading" primary="Drivers" />
+                <ListItemText className="subheading" primary="Routes" />
               </ListItem>
             </NavLink>
           </Collapse>

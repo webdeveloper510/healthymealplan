@@ -10,7 +10,7 @@ import rateLimit from '../../../modules/rate-limit';
 import createCustomerProfile from '../../../modules/server/authorize/createCustomerProfile';
 import createSubscriptionFromCustomerProfile from '../../../modules/server/authorize/createSubscriptionFromCustomerProfile';
 
-import Routes from '../../Routes/Routes';
+import PostalCodes from '../../PostalCodes/PostalCodes';
 import Subscriptions from '../../Subscriptions/Subscriptions';
 import Jobs from '../../Jobs/Jobs';
 
@@ -57,7 +57,7 @@ Meteor.methods({
       phoneNumber: String,
     });
 
-    const postalCodeExists = Routes.find({
+    const postalCodeExists = PostalCodes.find({
       title: data.postalCode.substr(0, 3),
     }).fetch();
 

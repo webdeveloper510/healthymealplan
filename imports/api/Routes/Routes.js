@@ -22,44 +22,20 @@ Routes.schema = new SimpleSchema({
     type: String,
     label: 'The title of the category.',
   },
-  city: {
-    type: String,
-    label: 'City of the route',
-  },
-  limited: {
-    type: Boolean,
-    label: 'Limited coverage for this route',
-  },
-  extraSurcharge: {
-    type: Number,
-    label: 'Route surcharge',
-    optional: true,
-  },
-
-  extraSurchargeType: {
-    type: String,
-    label: 'Percentage or Fixed amount',
-    optional: true,
-  },
-  owner: {
-    type: String,
-    label: 'The ID of the user this category belongs to.',
-  },
   createdAt: {
     type: String,
     label: 'The date this category was created.',
     autoValue() {
-      if (this.isInsert) return (new Date()).toISOString();
+      if (this.isInsert) return new Date().toISOString();
     },
   },
   updatedAt: {
     type: String,
     label: 'The date this category was last updated.',
     autoValue() {
-      if (this.isInsert || this.isUpdate) return (new Date()).toISOString();
+      if (this.isInsert || this.isUpdate) return new Date().toISOString();
     },
   },
-
 });
 
 Routes.attachSchema(Routes.schema);

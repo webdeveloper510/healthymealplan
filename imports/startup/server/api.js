@@ -16,12 +16,6 @@ import '../../api/Categories/server/publications';
 import '../../api/Lifestyles/methods';
 import '../../api/Lifestyles/server/publications';
 
-import '../../api/Restrictions/methods';
-import '../../api/Restrictions/server/publications';
-
-import '../../api/Routes/methods';
-import '../../api/Routes/server/publications';
-
 import '../../api/Meals/methods';
 import '../../api/Meals/server/publications';
 
@@ -30,6 +24,15 @@ import '../../api/OAuth/server/methods';
 import '../../api/Plates/methods';
 import '../../api/Plates/server/publications';
 import '../../api/PlateImages/server/publications';
+
+import '../../api/PostalCodes/methods';
+import '../../api/PostalCodes/server/publications';
+
+import '../../api/Restrictions/methods';
+import '../../api/Restrictions/server/publications';
+
+import '../../api/Routes/methods';
+import '../../api/Routes/server/publications';
 
 import '../../api/Sides/methods';
 import '../../api/Sides/server/publications';

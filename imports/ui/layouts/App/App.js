@@ -64,6 +64,10 @@ import Routes from "../../pages/Routes/Routes";
 import NewRoute from "../../pages/NewRoute/NewRoute";
 import EditRoute from "../../pages/EditRoute/EditRoute";
 
+import PostalCodes from "../../pages/PostalCodes/PostalCodes";
+import NewPostalCode from "../../pages/NewPostalCode/NewPostalCode";
+import EditPostalCode from "../../pages/EditPostalCode/EditPostalCode";
+
 import Ingredients from "../../pages/Ingredients/Ingredients";
 import NewIngredient from "../../pages/NewIngredient/NewIngredient";
 import EditIngredient from "../../pages/EditIngredient/EditIngredient";
@@ -637,6 +641,28 @@ class App extends React.Component {
                         path="/plates/:_id/edit"
                         popTheSnackbar={this.popTheSnackbar.bind(this)}
                         component={EditPlate}
+                        {...this.props}
+                      />
+
+                      <Authenticated
+                        exact
+                        path="/postal-codes"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={PostalCodes}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/postal-codes/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewPostalCode}
+                        {...this.props}
+                      />
+                      <Authenticated
+                        exact
+                        path="/postal-codes/:_id/edit"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={EditPostalCode}
                         {...this.props}
                       />
 

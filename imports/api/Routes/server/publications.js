@@ -20,4 +20,3 @@ Meteor.publish('routes.view', (routeId) => {
 Meteor.publish('routes-all-count', function categoryCount() {
   Counts.publish(this, 'routes-count', Routes.find());
 });
-
