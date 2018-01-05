@@ -1017,10 +1017,7 @@ class Step2Plan extends React.Component {
       return;
     }
 
-    clonedSubIngredients.push({
-      _id: suggestion._id,
-      title: suggestion.title
-    });
+    clonedSubIngredients.push(suggestion);
 
     if (this.state.addRestrictionType == "Preference") {
       this.setState({

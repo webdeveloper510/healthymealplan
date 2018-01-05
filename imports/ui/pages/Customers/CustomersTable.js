@@ -36,16 +36,6 @@ class CustomersTable extends React.Component {
     };
   }
 
-  // renderSubIngredientsNumber(subIngredient) {
-  //   if (subIngredient && subIngredient.length > 1) {
-  //     return `${subIngredient.length} sub-ingredients`;
-  //   } else if (subIngredient && subIngredient.length == 1) {
-  //     return `${subIngredient.length} sub-ingredient`;
-  //   }
-
-  //   return '';
-  // }
-
   renderType(type) {
     console.log(type);
   }
@@ -272,6 +262,7 @@ class CustomersTable extends React.Component {
             <TableBody>
               {this.props.results.map((e, i) => {
                 console.log(e);
+                const subscription = e.subscription.fetch()[0];
                 const isSelected = this.isCheckboxSelected(e._id);
 
                 return (
@@ -348,9 +339,7 @@ class CustomersTable extends React.Component {
                       }
                     >
                       <Typography className="subheading" type="subheading">
-                        {e.joinedSubscription
-                          ? e.joinedSubscription.status
-                          : ""}
+                        {subscription ? subscription.status.toUpperCase() : "-"}
                       </Typography>
                     </TableCell>
                   </TableRow>

@@ -15,7 +15,7 @@ import CustomerEditor from "../../components/CustomerEditor/CustomerEditor";
 const NewCustomer = ({
   history,
   ingredientTypes,
-  potentialSubIngredients,
+  ingredients,
   newCategory,
   popTheSnackbar,
   lifestyles,
@@ -28,7 +28,7 @@ const NewCustomer = ({
     >
       <CustomerEditor
         ingredientTypes={ingredientTypes}
-        potentialSubIngredients={potentialSubIngredients}
+        potentialSubIngredients={ingredients}
         history={history}
         popTheSnackbar={popTheSnackbar}
         newCategory={newCategory}
@@ -52,7 +52,7 @@ export default createContainer(() => {
 
   return {
     loading: !subscription2.ready() || !subscription.ready(),
-    potentialSubIngredients: Ingredients.find().fetch(),
+    ingredients: Ingredients.find().fetch(),
     ingredientTypes: IngredientTypes.find().fetch(),
     lifestyles: Lifestyles.find().fetch(),
     restrictions: Restrictions.find().fetch()

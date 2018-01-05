@@ -3,10 +3,7 @@ import { check } from "meteor/check";
 import { Match } from "meteor/check";
 import Subscriptions from "../Subscriptions";
 
-Meteor.publish("subscriptions", (selector, options) => {
-  check(selector, Match.Any);
-  check(options, Match.Any);
-
+Meteor.publish("subscriptions", function() {
   return Subscriptions.find();
 });
 

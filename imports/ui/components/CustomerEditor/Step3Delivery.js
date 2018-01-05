@@ -5000,7 +5000,7 @@ class Step3Delivery extends React.Component {
           style={{
             display: "flex",
             alignItems: "center",
-            justifyContent: "flex-end"
+            justifyContent: "space-between"
           }}
         >
           <Button color="primary" onClick={this.props.handleBack}>

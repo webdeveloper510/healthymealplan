@@ -214,7 +214,7 @@ class Customers extends React.Component {
               {
                 foreignProperty: "customerId",
                 collection: SubscriptionsColl,
-                joinAs: "joinedSubscription"
+                joinAs: "subscription"
               },
               {
                 localProperty: "lifestyle",
