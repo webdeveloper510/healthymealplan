@@ -210,7 +210,7 @@ class PostalCodesTable extends React.Component {
                 className="subheading"
                 type="subheading"
               >
-                {this.state.selectedCheckboxesNumber} restriction{this.state
+                {this.state.selectedCheckboxesNumber} postal code{this.state
                   .selectedCheckboxes.length > 1
                   ? "s"
                   : ""}{" "}
@@ -458,7 +458,7 @@ class PostalCodesTable extends React.Component {
             className="title font-medium"
             type="title"
           >
-            Delete {this.state.selectedCheckboxesNumber} restriction{this.state
+            Delete {this.state.selectedCheckboxesNumber} postal code{this.state
               .selectedCheckboxes.length > 1
               ? "s"
               : ""}?
