@@ -118,11 +118,9 @@ class RoutesTable extends React.Component {
       this.state.selectedCheckboxesNumber
     );
 
-    const categoryIds = this.state.selectedCheckboxes;
+    const routeIds = this.state.selectedCheckboxes;
 
-    console.log(categoryIds);
-
-    Meteor.call("restrictions.batchRemove", categoryIds, error => {
+    Meteor.call("routes.batchRemove", routeIds, error => {
       console.log("inside method");
       if (error) {
         this.props.popTheSnackbar({

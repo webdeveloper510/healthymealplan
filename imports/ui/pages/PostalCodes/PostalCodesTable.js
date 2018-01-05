@@ -118,11 +118,11 @@ class PostalCodesTable extends React.Component {
       this.state.selectedCheckboxesNumber
     );
 
-    const categoryIds = this.state.selectedCheckboxes;
+    const postalCodeIds = this.state.selectedCheckboxes;
 
-    console.log(categoryIds);
+    console.log(postalCodeIds);
 
-    Meteor.call("postalCodes.batchRemove", categoryIds, error => {
+    Meteor.call("postalCodes.batchRemove", postalCodeIds, error => {
       console.log("inside method");
       if (error) {
         this.props.popTheSnackbar({
