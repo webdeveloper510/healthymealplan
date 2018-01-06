@@ -33,9 +33,9 @@ export default function createCustomerProfile(
   paymentType.setOpaqueData(opaqueData);
 
   const customerAddress = new ApiContracts.CustomerAddressType();
-  customerAddress.setFirstName(Random.id());
-  customerAddress.setLastName(Random.id());
-  customerAddress.setZip(customerInfo.billingZipCode);
+  customerAddress.setFirstName(customer.nameOnCard);
+  customerAddress.setLastName("-");
+  customerAddress.setZip(customer.postalCode);
 
   const customerPaymentProfileType = new ApiContracts.CustomerPaymentProfileType();
   customerPaymentProfileType.setCustomerType(

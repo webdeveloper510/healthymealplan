@@ -89,7 +89,18 @@ class Step4Checkout extends React.Component {
         );
       },
 
-      rules: {},
+      rules: {
+        nameOnCard: {
+          required: true
+        },
+
+        postal_code: {
+          minlength: 6,
+          maxlength: 6,
+          cdnPostal: true,
+          required: true
+        }
+      },
 
       submitHandler() {
         component.handleSubmitStep();
@@ -1030,6 +1041,12 @@ class Step4Checkout extends React.Component {
     customerInfo.secondaryProfilesBilling = this.state.secondaryProfilesBilling;
     customerInfo.taxExempt = this.state.taxExempt;
     customerInfo.paymentMethod = this.state.paymentMethod;
+    customerInfo.nameOnCard = $('[name="nameOnCard"]')
+      .val()
+      .trim();
+    customerInfo.billingPostalCode = $('[name="postal_code"]')
+      .val()
+      .trim();
 
     if (
       this.state.paymentMethod == "interac" ||
@@ -1112,10 +1129,12 @@ class Step4Checkout extends React.Component {
               });
 
               this.props.popTheSnackbar({
-                message: `Successfully created customer profile and subscription with subscription Id:${
+                message: `Successfully created subscription with ID:${
                   res.subscriptionId
                 }`
               });
+
+              this.props.history.push("/customers");
             }
           }
         );
@@ -1259,7 +1278,7 @@ class Step4Checkout extends React.Component {
                         <Input
                           placeholder="Postal code"
                           inputProps={{
-                            name: "postalCode",
+                            name: "postal_code",
                             id: "postalCode"
                           }}
                           fullWidth

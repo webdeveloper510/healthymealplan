@@ -27,6 +27,11 @@ Subscriptions.schema = new SimpleSchema({
     label: "Authorize.Net subscriptionId (Card only)",
     optional: true
   },
+  authorizeCustomerProfileId: {
+    type: String,
+    label: "Authorize.Net customer profileId",
+    optional: true
+  },
   authorizePaymentProfileId: {
     type: String,
     label: "Authorize.Net paymentProfileId (Card only)",

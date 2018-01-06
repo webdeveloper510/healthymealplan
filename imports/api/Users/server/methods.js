@@ -273,7 +273,9 @@ Meteor.methods({
       opaqueData.dataValue,
       {
         email: customerInfo.email,
-        id: customerInfo.id
+        id: customerInfo.id,
+        postalCode: customerInfo.billingPostalCode,
+        nameOnCard: customerInfo.nameOnCard
       }
     );
 
@@ -374,7 +376,7 @@ Meteor.methods({
         customerInfo.primaryProfileBilling.taxes;
     }
 
-    console.log(actualTotal);
+    actualTotal = parseFloat(actualTotal.toFixed(2));
 
     // subscriptionDate (Previous saturday)
     const lastWeeksSaturday = moment(
@@ -405,6 +407,14 @@ Meteor.methods({
       );
     }
 
+    console.log("create customer profile res");
+
+    console.log(createCustomerProfileRes);
+
+    console.log("create subscription from profile res");
+
+    console.log(createSubscriptionFromCustomerProfileRes);
+
     const subscriptionId = Subscriptions.insert({
       customerId: customerInfo.id,
       authorizeSubscriptionId:
@@ -412,7 +422,8 @@ Meteor.methods({
       authorizeCustomerProfileId:
         createSubscriptionFromCustomerProfileRes.profile.customerProfileId,
       authorizePaymentProfileId:
-        createSubscriptionFromCustomerProfileRes.profile.paymentProfileIdList,
+        createSubscriptionFromCustomerProfileRes.profile
+          .customerPaymentProfileId,
 
       status: "paused",
       paymentMethod: customerInfo.paymentMethod,

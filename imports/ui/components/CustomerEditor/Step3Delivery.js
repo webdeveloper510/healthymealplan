@@ -81,7 +81,7 @@ class Step3Delivery extends React.Component {
     this.state = {
       submitLoading: false,
       submitSuccess: false,
-      addressType: "apartment",
+      addressType: "house",
 
       apartmentName: '',
       unit: '',

@@ -1,99 +1,99 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import { Meteor } from "meteor/meteor";
+import { Meteor } from 'meteor/meteor';
 
-import Grid from "material-ui/Grid";
-import Button from "material-ui/Button";
-import { MenuItem } from "material-ui/Menu";
-import TextField from "material-ui/TextField";
-import Paper from "material-ui/Paper";
+import Grid from 'material-ui/Grid';
+import Button from 'material-ui/Button';
+import { MenuItem } from 'material-ui/Menu';
+import TextField from 'material-ui/TextField';
+import Paper from 'material-ui/Paper';
 
-import Input from "material-ui/Input";
-import Typography from "material-ui/Typography";
-import Radio, { RadioGroup } from "material-ui/Radio";
-import Checkbox from "material-ui/Checkbox";
+import Input from 'material-ui/Input';
+import Typography from 'material-ui/Typography';
+import Radio, { RadioGroup } from 'material-ui/Radio';
+import Checkbox from 'material-ui/Checkbox';
 
-import Stepper, { Step, StepLabel } from "material-ui/Stepper";
+import Stepper, { Step, StepLabel } from 'material-ui/Stepper';
 
-import Divider from "material-ui/Divider";
+import Divider from 'material-ui/Divider';
 
-import moment from "moment";
+import moment from 'moment';
 
 import {
   FormLabel,
   FormControl,
   FormControlLabel,
   FormHelperText,
-  FormGroup
-} from "material-ui/Form";
+  FormGroup,
+} from 'material-ui/Form';
 
 import Table, {
   TableBody,
   TableCell,
   TableFooter,
   TableHead,
-  TableRow
-} from "material-ui/Table";
+  TableRow,
+} from 'material-ui/Table';
 
 import Dialog, {
   DialogActions,
   DialogContent,
-  DialogContentText
-} from "material-ui/Dialog";
+  DialogContentText,
+} from 'material-ui/Dialog';
 
-import classNames from "classnames";
-import { withStyles } from "material-ui/styles";
-import { CircularProgress } from "material-ui/Progress";
-import green from "material-ui/colors/green";
+import classNames from 'classnames';
+import { withStyles } from 'material-ui/styles';
+import { CircularProgress } from 'material-ui/Progress';
+import green from 'material-ui/colors/green';
 
-import List, { ListItem, ListItemText } from "material-ui/List";
-import Collapse from "material-ui/transitions/Collapse";
-import ExpandLess from "material-ui-icons/ExpandLess";
-import ExpandMore from "material-ui-icons/ExpandMore";
+import List, { ListItem, ListItemText } from 'material-ui/List';
+import Collapse from 'material-ui/transitions/Collapse';
+import ExpandLess from 'material-ui-icons/ExpandLess';
+import ExpandMore from 'material-ui-icons/ExpandMore';
 
-import Autosuggest from "react-autosuggest";
-import _ from "lodash";
-import Search from "material-ui-icons/Search";
-import Chip from "material-ui/Chip";
-import Avatar from "material-ui/Avatar";
+import Autosuggest from 'react-autosuggest';
+import _ from 'lodash';
+import Search from 'material-ui-icons/Search';
+import Chip from 'material-ui/Chip';
+import Avatar from 'material-ui/Avatar';
 
-import $ from "jquery";
+import $ from 'jquery';
 
-import update from "react-addons-update";
+import update from 'react-addons-update';
 
-import validate from "../../../modules/validate";
+import validate from '../../../modules/validate';
 
 const styles = theme => ({
   root: {
-    display: "flex",
-    alignItems: "center"
+    display: 'flex',
+    alignItems: 'center',
   },
   wrapper: {
     margin: theme.spacing.unit,
-    position: "relative"
+    position: 'relative',
   },
   buttonSuccess: {
     backgroundColor: green[500],
-    "&:hover": {
-      backgroundColor: green[700]
-    }
+    '&:hover': {
+      backgroundColor: green[700],
+    },
   },
   fabProgress: {
     color: green[500],
-    position: "absolute",
+    position: 'absolute',
     top: -6,
     left: -6,
-    zIndex: 1
+    zIndex: 1,
   },
   buttonProgress: {
     color: green[500],
-    position: "absolute",
-    top: "50%",
-    left: "50%",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
     marginTop: -12,
-    marginLeft: -12
-  }
+    marginLeft: -12,
+  },
 });
 
 class Step2Plan extends React.Component {
@@ -101,72 +101,72 @@ class Step2Plan extends React.Component {
     super(props);
 
     this.state = {
-      value: "",
+      value: '',
       suggestions: [],
       submitLoading: false,
       submitSuccess: false,
       subIngredients: [],
       specificRestrictions: [],
       deleteDialogOpen: false,
-      addRestrictionType: "Restriction",
+      addRestrictionType: 'Restriction',
       lifestyle: this.props.customerInfo.adultOrChild
         ? this.props.customerInfo.adultOrChild
-        : "traditional",
+        : 'traditional',
 
       discount: this.props.customerInfo.discount
         ? this.props.customerInfo.discount
-        : "none",
+        : 'none',
 
       restrictions: [],
       completeSchedule: [],
       scheduleReal: [
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
-        }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
+        },
       ],
 
       activeMealScheduleStep: 0,
       subscriptionStartDate: moment(this.renderStartDays()[0]).format(
-        "dddd MMMM Do YYYY"
+        'dddd MMMM Do YYYY',
       ),
       subscriptionStartDateRaw: this.renderStartDays()[0],
 
       // collapse
       secondaryCollapses: [false, false, false, false, false, false],
       secondaryProfileCount: 0,
-      secondaryProfilesData: []
+      secondaryProfilesData: [],
     };
   }
 
@@ -178,7 +178,7 @@ class Step2Plan extends React.Component {
         error.insertAfter(
           $(element)
             .parent()
-            .parent()
+            .parent(),
         );
       },
 
@@ -228,13 +228,13 @@ class Step2Plan extends React.Component {
         adultOrChild7: { required: true },
 
         type: {
-          required: true
-        }
+          required: true,
+        },
       },
 
       submitHandler() {
         component.handleSubmitStep();
-      }
+      },
     });
   }
 
@@ -258,14 +258,14 @@ class Step2Plan extends React.Component {
     console.log(finalSchedule);
 
     this.setState({
-      subscriptionSchedule: finalSchedule
+      subscriptionSchedule: finalSchedule,
     });
   }
 
   increaseProfileCount() {
     if (this.state.secondaryProfileCount === 7) {
       this.props.popTheSnackbar({
-        message: "Cannot add more than 7 profiles"
+        message: 'Cannot add more than 7 profiles',
       });
 
       return;
@@ -276,62 +276,62 @@ class Step2Plan extends React.Component {
     const currentSecondaryProfiles = this.state.secondaryProfilesData.slice();
 
     currentSecondaryProfiles.push({
-      first_name: "",
-      last_name: "",
+      first_name: '',
+      last_name: '',
       subIngredients: [],
       specificRestrictions: [],
       lifestyle: this.props.customerInfo.adultOrChild
         ? this.props.customerInfo.adultOrChild
-        : "traditional",
+        : 'traditional',
 
       discount: this.props.customerInfo.discount
         ? this.props.customerInfo.discount
-        : "none",
+        : 'none',
       restrictions: [],
       activeMealScheduleStep: 0,
       scheduleReal: [
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
-          breakfast: { active: false, portions: "regular", quantity: "1" },
-          lunch: { active: false, portions: "regular", quantity: "1" },
-          dinner: { active: false, portions: "regular", quantity: "1" }
-        }
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
+        },
       ],
-      adultOrChild: ""
+      adultOrChild: 'adult',
     });
 
     this.setState({
       secondaryProfileCount: increasedProfileCount,
-      secondaryProfilesData: currentSecondaryProfiles
+      secondaryProfilesData: currentSecondaryProfiles,
     });
   }
 
@@ -347,7 +347,7 @@ class Step2Plan extends React.Component {
 
     this.setState({
       secondaryProfileCount: decreasedProfileCount,
-      secondaryProfilesData: profileToRemove
+      secondaryProfilesData: profileToRemove,
     });
   }
 
@@ -357,7 +357,7 @@ class Step2Plan extends React.Component {
     currentCollapseArr[index] = !currentCollapseArr[index];
 
     this.setState({
-      secondaryCollapses: currentCollapseArr
+      secondaryCollapses: currentCollapseArr,
     });
   }
 
@@ -385,13 +385,13 @@ class Step2Plan extends React.Component {
 
   deleteDialogHandleRequestClose() {
     this.setState({
-      deleteDialogOpen: false
+      deleteDialogOpen: false,
     });
   }
 
   deleteDialogHandleOpen() {
     this.setState({
-      deleteDialogOpen: true
+      deleteDialogOpen: true,
     });
   }
 
@@ -403,17 +403,17 @@ class Step2Plan extends React.Component {
       { breakfast: 0, lunch: 0, dinner: 0 },
       { breakfast: 0, lunch: 0, dinner: 0 },
       { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 }
+      { breakfast: 0, lunch: 0, dinner: 0 },
     ];
 
     if (
       this.state.scheduleReal.find(
-        el => el.breakfast.active || el.lunch.active || el.dinner.active
+        el => el.breakfast.active || el.lunch.active || el.dinner.active,
       ) === undefined
     ) {
       this.props.popTheSnackbar({
         message:
-          "There should be at least one meal type selected in the primary profile."
+          'There should be at least one meal type selected in the primary profile.',
       });
 
       return;
@@ -428,12 +428,12 @@ class Step2Plan extends React.Component {
         const element = this.state.secondaryProfilesData[index];
         if (
           element.scheduleReal.find(
-            el => el.breakfast.active || el.lunch.active || el.dinner.active
+            el => el.breakfast.active || el.lunch.active || el.dinner.active,
           ) === undefined
         ) {
           this.popTheSnackbar({
             message: `There should be at least one meal type selected in one of the secondary profile ${index +
-              1}.`
+              1}.`,
           });
 
           return;
@@ -460,7 +460,7 @@ class Step2Plan extends React.Component {
         if (el.breakfast.active) {
           scheduleSummation[index].breakfast += parseInt(
             el.breakfast.quantity,
-            10
+            10,
           );
         }
 
@@ -487,10 +487,10 @@ class Step2Plan extends React.Component {
       secondaryProfiles: this.state.secondaryProfilesData,
       subscriptionStartDate: this.state.subscriptionStartDate,
       subscriptionStartDateRaw: this.state.subscriptionStartDateRaw,
-      completeSchedule: scheduleSummation
+      completeSchedule: scheduleSummation,
     });
 
-    if ($("#step3").valid()) {
+    if ($('#step3').valid()) {
       this.props.handleNext();
     }
   }
@@ -498,7 +498,7 @@ class Step2Plan extends React.Component {
   // remove lifestyles that may have been already checked but get disabled when you select a lifestyle.
   handleChangeRadioLifestyle(event, value) {
     const getLifestyleRestrictions = this.props.lifestyles.find(
-      el => el.title === value
+      el => el.title === value,
     );
 
     const currentRestrictionsIds = [];
@@ -507,7 +507,7 @@ class Step2Plan extends React.Component {
 
     this.setState({
       lifestyle: value,
-      lifestyleRestrictions: currentRestrictionsIds
+      lifestyleRestrictions: currentRestrictionsIds,
     });
   }
 
@@ -520,7 +520,7 @@ class Step2Plan extends React.Component {
     scheduleRealCopy[index][mealType].quantity = event.target.value;
 
     this.setState({
-      scheduleReal: scheduleRealCopy
+      scheduleReal: scheduleRealCopy,
     });
   }
 
@@ -529,7 +529,7 @@ class Step2Plan extends React.Component {
     index,
     mealType,
     event,
-    value
+    value,
   ) {
     console.log(mealType);
     console.log(event.target.value);
@@ -542,7 +542,7 @@ class Step2Plan extends React.Component {
       event.target.value;
 
     this.setState({
-      secondaryProfilesData: secondaryProfilesDataCopy
+      secondaryProfilesData: secondaryProfilesDataCopy,
     });
   }
 
@@ -555,7 +555,7 @@ class Step2Plan extends React.Component {
     scheduleRealCopy[index][mealType].portions = event.target.value;
 
     this.setState({
-      scheduleReal: scheduleRealCopy
+      scheduleReal: scheduleRealCopy,
     });
   }
 
@@ -564,7 +564,7 @@ class Step2Plan extends React.Component {
     index,
     mealType,
     event,
-    value
+    value,
   ) {
     const secondaryProfilesDataCopy = this.state.secondaryProfilesData.slice();
 
@@ -574,7 +574,7 @@ class Step2Plan extends React.Component {
       event.target.value;
 
     this.setState({
-      secondaryProfilesData: secondaryProfilesDataCopy
+      secondaryProfilesData: secondaryProfilesDataCopy,
     });
   }
 
@@ -586,7 +586,7 @@ class Step2Plan extends React.Component {
     ].active;
 
     this.setState({
-      scheduleReal: scheduleRealCopy
+      scheduleReal: scheduleRealCopy,
     });
   }
 
@@ -600,7 +600,7 @@ class Step2Plan extends React.Component {
     ].active;
 
     this.setState({
-      secondaryProfilesData: secondaryProfilesDataCopy
+      secondaryProfilesData: secondaryProfilesDataCopy,
     });
   }
 
@@ -610,17 +610,17 @@ class Step2Plan extends React.Component {
     secondaryProfilesDataCopy[profileIndex].adultOrChild = event.target.value;
 
     this.setState({
-      secondaryProfilesData: secondaryProfilesDataCopy
+      secondaryProfilesData: secondaryProfilesDataCopy,
     });
   }
 
   handleChangeRadioFrequencyType(event, value) {
     const scheduleCopy = _.cloneDeep(this.state.scheduleReal);
     const subscriptionScheduleCopy = _.cloneDeep(
-      this.state.subscriptionSchedule
+      this.state.subscriptionSchedule,
     );
 
-    if (value == "weekdays") {
+    if (value == 'weekdays') {
       for (let i = 0; i <= 6; i += 1) {
         if (i <= 4) {
           scheduleCopy[i].breakfast = 1;
@@ -642,7 +642,7 @@ class Step2Plan extends React.Component {
       }
     }
 
-    if (value == "weekends") {
+    if (value == 'weekends') {
       for (let i = 0; i <= 6; i += 1) {
         if (i >= 5) {
           scheduleCopy[i].breakfast = 1;
@@ -664,7 +664,7 @@ class Step2Plan extends React.Component {
       }
     }
 
-    if (value == "custom") {
+    if (value == 'custom') {
       for (let i = 0; i <= 6; i += 1) {
         scheduleCopy[i].breakfast = 1;
         scheduleCopy[i].lunch = 1;
@@ -680,10 +680,10 @@ class Step2Plan extends React.Component {
   handleChangeRadioscheduleType(event, value) {
     const scheduleCopy = _.cloneDeep(this.state.schedule);
     const subscriptionScheduleCopy = _.cloneDeep(
-      this.state.subscriptionSchedule
+      this.state.subscriptionSchedule,
     );
 
-    if (value == "weekdays") {
+    if (value == 'weekdays') {
       for (let i = 0; i <= 6; i += 1) {
         if (i <= 4) {
           scheduleCopy[i].breakfast = 1;
@@ -705,7 +705,7 @@ class Step2Plan extends React.Component {
       }
     }
 
-    if (value == "weekends") {
+    if (value == 'weekends') {
       for (let i = 0; i <= 6; i += 1) {
         if (i >= 5) {
           scheduleCopy[i].breakfast = 1;
@@ -727,7 +727,7 @@ class Step2Plan extends React.Component {
       }
     }
 
-    if (value == "custom") {
+    if (value == 'custom') {
       for (let i = 0; i <= 6; i += 1) {
         scheduleCopy[i].breakfast = 1;
         scheduleCopy[i].lunch = 1;
@@ -742,12 +742,12 @@ class Step2Plan extends React.Component {
     this.setState({
       schedule: scheduleCopy,
       scheduleType: value,
-      subscriptionSchedule: subscriptionScheduleCopy
+      subscriptionSchedule: subscriptionScheduleCopy,
     });
   }
 
   handleChangeRadioscheduleTypeSecondary(profileIndex, event, value) {
-    if (value == "weekdays") {
+    if (value == 'weekdays') {
       for (let i = 0; i <= 6; i += 1) {
         if (i <= 4) {
           this.state.secondaryProfilesData[profileIndex].schedule[
@@ -773,7 +773,7 @@ class Step2Plan extends React.Component {
       }
     }
 
-    if (value == "weekends") {
+    if (value == 'weekends') {
       for (let i = 0; i <= 6; i += 1) {
         if (i >= 5) {
           this.state.secondaryProfilesData[profileIndex].schedule[
@@ -799,7 +799,7 @@ class Step2Plan extends React.Component {
       }
     }
 
-    if (value == "custom") {
+    if (value == 'custom') {
       for (let i = 0; i <= 6; i += 1) {
         this.state.secondaryProfilesData[profileIndex].schedule[
           i
@@ -822,7 +822,7 @@ class Step2Plan extends React.Component {
     const { activeMealScheduleStep } = this.state;
 
     this.setState({
-      activeMealScheduleStep: activeMealScheduleStep + 1
+      activeMealScheduleStep: activeMealScheduleStep + 1,
     });
   }
 
@@ -830,7 +830,7 @@ class Step2Plan extends React.Component {
     const { activeMealScheduleStep } = this.state;
 
     this.setState({
-      activeMealScheduleStep: activeMealScheduleStep - 1
+      activeMealScheduleStep: activeMealScheduleStep - 1,
     });
   }
 
@@ -841,7 +841,7 @@ class Step2Plan extends React.Component {
       secondaryProfilesDataCopy[profileIndex].activeMealScheduleStep + 1;
 
     this.setState({
-      secondaryProfilesData: secondaryProfilesDataCopy
+      secondaryProfilesData: secondaryProfilesDataCopy,
     });
   }
 
@@ -852,19 +852,19 @@ class Step2Plan extends React.Component {
       secondaryProfilesDataCopy[profileIndex].activeMealScheduleStep - 1;
 
     this.setState({
-      secondaryProfilesData: secondaryProfilesDataCopy
+      secondaryProfilesData: secondaryProfilesDataCopy,
     });
   }
 
   getMealSteps() {
     return [
-      "Monday",
-      "Tuesday",
-      "Wednesday",
-      "Thursday",
-      "Friday",
-      "Saturday",
-      "Sunday"
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday',
+      'Sunday',
     ];
   }
 
@@ -872,7 +872,7 @@ class Step2Plan extends React.Component {
     this.state.secondaryProfilesData[i].lifestyle = value;
 
     const getLifestyleRestrictions = this.props.lifestyles.find(
-      el => el.title === value
+      el => el.title === value,
     );
 
     // const currentRestrictionsIds = [this.state.secondaryProfilesData[i]
@@ -891,13 +891,13 @@ class Step2Plan extends React.Component {
 
   handleChangeRadioRestriction(event, value) {
     this.setState({
-      addRestrictionType: value
+      addRestrictionType: value,
     });
   }
 
   handleChangeRadioExtra(event, value) {
     this.setState({
-      extra: value
+      extra: value,
     });
   }
 
@@ -908,7 +908,7 @@ class Step2Plan extends React.Component {
 
   handleChangeRadioDiscount(event, value) {
     this.setState({
-      discount: value
+      discount: value,
     });
   }
 
@@ -929,7 +929,7 @@ class Step2Plan extends React.Component {
     }
 
     this.setState({
-      restrictions: clonedRestrictionIds
+      restrictions: clonedRestrictionIds,
     });
   }
 
@@ -952,7 +952,7 @@ class Step2Plan extends React.Component {
 
   onChange(event, { newValue }) {
     this.setState({
-      value: newValue
+      value: newValue,
     });
   }
 
@@ -963,9 +963,9 @@ class Step2Plan extends React.Component {
     return inputLength === 0
       ? []
       : this.props.potentialSubIngredients.filter(
-          ingredient =>
-            ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        ingredient =>
+          ingredient.title.toLowerCase().slice(0, inputLength) === inputValue,
+      );
   }
 
   getSuggestionValue(suggestion) {
@@ -991,11 +991,11 @@ class Step2Plan extends React.Component {
   }
   onSuggestionSelected(
     event,
-    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
     let clonedSubIngredients;
 
-    if (this.state.addRestrictionType == "Preference") {
+    if (this.state.addRestrictionType == 'Preference') {
       clonedSubIngredients = this.state.subIngredients
         ? this.state.subIngredients.slice()
         : [];
@@ -1009,7 +1009,7 @@ class Step2Plan extends React.Component {
 
     if (clonedSubIngredients.length > 0) {
       isThere = clonedSubIngredients.filter(
-        present => suggestion._id === present._id
+        present => suggestion._id === present._id,
       );
     }
 
@@ -1019,13 +1019,13 @@ class Step2Plan extends React.Component {
 
     clonedSubIngredients.push(suggestion);
 
-    if (this.state.addRestrictionType == "Preference") {
+    if (this.state.addRestrictionType == 'Preference') {
       this.setState({
-        subIngredients: clonedSubIngredients
+        subIngredients: clonedSubIngredients,
       });
     } else {
       this.setState({
-        specificRestrictions: clonedSubIngredients
+        specificRestrictions: clonedSubIngredients,
       });
     }
 
@@ -1035,19 +1035,19 @@ class Step2Plan extends React.Component {
   onSuggestionSelectedSecondary(
     index,
     event,
-    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
     let clonedSubIngredients;
 
     console.log(index);
 
-    if (this.state.addRestrictionType == "Preference") {
+    if (this.state.addRestrictionType == 'Preference') {
       // subingredients
       let isThere = false;
 
       if (this.state.secondaryProfilesData[index].subIngredients.length > 0) {
         isThere = this.state.secondaryProfilesData[index].subIngredients.filter(
-          present => suggestion._id === present._id
+          present => suggestion._id === present._id,
         );
       }
 
@@ -1057,7 +1057,7 @@ class Step2Plan extends React.Component {
 
       this.state.secondaryProfilesData[index].subIngredients.push({
         _id: suggestion._id,
-        title: suggestion.title
+        title: suggestion.title,
       });
     } else {
       // specificRestrictions
@@ -1070,7 +1070,7 @@ class Step2Plan extends React.Component {
         isThere = this.state.secondaryProfilesData[
           index
         ].specificRestrictions.filter(
-          present => suggestion._id === present._id
+          present => suggestion._id === present._id,
         );
       }
 
@@ -1080,7 +1080,7 @@ class Step2Plan extends React.Component {
 
       this.state.secondaryProfilesData[index].specificRestrictions.push({
         _id: suggestion._id,
-        title: suggestion.title
+        title: suggestion.title,
       });
     }
 
@@ -1091,13 +1091,13 @@ class Step2Plan extends React.Component {
 
   onSuggestionsFetchRequested({ value }) {
     this.setState({
-      suggestions: this.getSuggestions(value)
+      suggestions: this.getSuggestions(value),
     });
   }
 
   onSuggestionsClearRequested() {
     this.setState({
-      suggestions: []
+      suggestions: [],
     });
   }
 
@@ -1109,7 +1109,7 @@ class Step2Plan extends React.Component {
     stateCopy.splice(stateCopy.indexOf(subIngredient), 1);
 
     this.setState({
-      subIngredients: stateCopy
+      subIngredients: stateCopy,
     });
   }
 
@@ -1121,7 +1121,7 @@ class Step2Plan extends React.Component {
     stateCopy.splice(stateCopy.indexOf(subIngredient), 1);
 
     this.setState({
-      specificRestrictions: stateCopy
+      specificRestrictions: stateCopy,
     });
   }
 
@@ -1144,7 +1144,7 @@ class Step2Plan extends React.Component {
 
     if (this.props.potentialSubIngredients) {
       const avatarToReturn = this.props.potentialSubIngredients.find(
-        el => el._id === subIngredient
+        el => el._id === subIngredient,
       );
       return avatarToReturn.title.charAt(0);
     }
@@ -1157,12 +1157,12 @@ class Step2Plan extends React.Component {
       <TextField
         className={styles.textField}
         value={value}
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         InputProps={{
           classes: {
-            input: styles.input
+            input: styles.input,
           },
-          ...other
+          ...other,
         }}
       />
     );
@@ -1170,22 +1170,22 @@ class Step2Plan extends React.Component {
 
   renderDiscountValue(discountType) {
     const lifestyle = this.props.lifestyles.find(
-      e => e.title == this.state.lifestyle
+      e => e.title == this.state.lifestyle,
     );
 
-    if (discountType == "student") {
+    if (discountType == 'student') {
       if (lifestyle.discountStudent) {
         return lifestyle.discountStudent;
       }
     }
 
-    if (discountType == "senior") {
+    if (discountType == 'senior') {
       if (lifestyle.discountSenior) {
         return lifestyle.discountSenior;
       }
     }
 
-    return "";
+    return '';
   }
 
   renderMealStepsContent(index) {
@@ -1203,10 +1203,10 @@ class Step2Plan extends React.Component {
                 onChange={this.handleScheduleMealTypeCheck.bind(
                   this,
                   index,
-                  "breakfast"
+                  'breakfast',
                 )}
-                control={<Checkbox value={"breakfast"} />}
-                label={"Breakfast"}
+                control={<Checkbox value={'breakfast'} />}
+                label={'Breakfast'}
               />
             </FormGroup>
           </FormControl>
@@ -1223,32 +1223,32 @@ class Step2Plan extends React.Component {
               onChange={this.handleChangeRadioSchedulePortion.bind(
                 this,
                 index,
-                "breakfast"
+                'breakfast',
               )}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
                 key={index}
-                value={"regular"}
+                value={'regular'}
                 disabled={!this.state.scheduleReal[index].breakfast.active}
                 control={<Radio />}
-                label={"Regular"}
+                label={'Regular'}
               />
 
               <FormControlLabel
                 key={index}
-                value={"athletic"}
+                value={'athletic'}
                 disabled={!this.state.scheduleReal[index].breakfast.active}
                 control={<Radio />}
-                label={"Athletic"}
+                label={'Athletic'}
               />
 
               <FormControlLabel
                 key={index}
-                value={"bodybuilder"}
+                value={'bodybuilder'}
                 disabled={!this.state.scheduleReal[index].breakfast.active}
                 control={<Radio />}
-                label={"Bodybuilder"}
+                label={'Bodybuilder'}
               />
             </RadioGroup>
           </FormControl>
@@ -1265,23 +1265,23 @@ class Step2Plan extends React.Component {
               onChange={this.handleChangeRadioScheduleQuantity.bind(
                 this,
                 index,
-                "breakfast"
+                'breakfast',
               )}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
-                value={"1"}
+                value={'1'}
                 control={<Radio />}
-                label={"1"}
+                label={'1'}
                 selected
                 key={index}
                 disabled={!this.state.scheduleReal[index].breakfast.active}
               />
 
               <FormControlLabel
-                value={"2"}
+                value={'2'}
                 control={<Radio />}
-                label={"2"}
+                label={'2'}
                 selected
                 key={index}
                 disabled={!this.state.scheduleReal[index].breakfast.active}
@@ -1302,10 +1302,10 @@ class Step2Plan extends React.Component {
                 onChange={this.handleScheduleMealTypeCheck.bind(
                   this,
                   index,
-                  "lunch"
+                  'lunch',
                 )}
-                control={<Checkbox value={"value"} />}
-                label={"Lunch"}
+                control={<Checkbox value={'value'} />}
+                label={'Lunch'}
               />
             </FormGroup>
           </FormControl>
@@ -1322,32 +1322,32 @@ class Step2Plan extends React.Component {
               onChange={this.handleChangeRadioSchedulePortion.bind(
                 this,
                 index,
-                "lunch"
+                'lunch',
               )}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
                 key={index}
-                value={"regular"}
+                value={'regular'}
                 disabled={!this.state.scheduleReal[index].lunch.active}
                 control={<Radio />}
-                label={"Regular"}
+                label={'Regular'}
               />
 
               <FormControlLabel
                 key={index}
-                value={"athletic"}
+                value={'athletic'}
                 disabled={!this.state.scheduleReal[index].lunch.active}
                 control={<Radio />}
-                label={"Athletic"}
+                label={'Athletic'}
               />
 
               <FormControlLabel
                 key={index}
-                value={"bodybuilder"}
+                value={'bodybuilder'}
                 disabled={!this.state.scheduleReal[index].lunch.active}
                 control={<Radio />}
-                label={"Bodybuilder"}
+                label={'Bodybuilder'}
               />
             </RadioGroup>
           </FormControl>
@@ -1364,23 +1364,23 @@ class Step2Plan extends React.Component {
               onChange={this.handleChangeRadioScheduleQuantity.bind(
                 this,
                 index,
-                "lunch"
+                'lunch',
               )}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
-                value={"1"}
+                value={'1'}
                 control={<Radio />}
-                label={"1"}
+                label={'1'}
                 selected
                 key={index}
                 disabled={!this.state.scheduleReal[index].lunch.active}
               />
 
               <FormControlLabel
-                value={"2"}
+                value={'2'}
                 control={<Radio />}
-                label={"2"}
+                label={'2'}
                 selected
                 key={index}
                 disabled={!this.state.scheduleReal[index].lunch.active}
@@ -1401,10 +1401,10 @@ class Step2Plan extends React.Component {
                 onChange={this.handleScheduleMealTypeCheck.bind(
                   this,
                   index,
-                  "dinner"
+                  'dinner',
                 )}
-                control={<Checkbox value={"value"} />}
-                label={"Dinner"}
+                control={<Checkbox value={'value'} />}
+                label={'Dinner'}
               />
             </FormGroup>
           </FormControl>
@@ -1420,33 +1420,33 @@ class Step2Plan extends React.Component {
               onChange={this.handleChangeRadioSchedulePortion.bind(
                 this,
                 index,
-                "dinner"
+                'dinner',
               )}
               disabled={!this.state.scheduleReal[index].dinner.active}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
                 key={index}
-                value={"regular"}
+                value={'regular'}
                 disabled={!this.state.scheduleReal[index].dinner.active}
                 control={<Radio />}
-                label={"Regular"}
+                label={'Regular'}
               />
 
               <FormControlLabel
                 key={index}
-                value={"athletic"}
+                value={'athletic'}
                 disabled={!this.state.scheduleReal[index].dinner.active}
                 control={<Radio />}
-                label={"Athletic"}
+                label={'Athletic'}
               />
 
               <FormControlLabel
                 key={index}
-                value={"bodybuilder"}
+                value={'bodybuilder'}
                 disabled={!this.state.scheduleReal[index].dinner.active}
                 control={<Radio />}
-                label={"Bodybuilder"}
+                label={'Bodybuilder'}
               />
             </RadioGroup>
           </FormControl>
@@ -1462,23 +1462,23 @@ class Step2Plan extends React.Component {
               onChange={this.handleChangeRadioScheduleQuantity.bind(
                 this,
                 index,
-                "dinner"
+                'dinner',
               )}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
-                value={"1"}
+                value={'1'}
                 control={<Radio />}
-                label={"1"}
+                label={'1'}
                 selected
                 key={index}
                 disabled={!this.state.scheduleReal[index].dinner.active}
               />
 
               <FormControlLabel
-                value={"2"}
+                value={'2'}
                 control={<Radio />}
-                label={"2"}
+                label={'2'}
                 selected
                 key={index}
                 disabled={!this.state.scheduleReal[index].dinner.active}
@@ -1510,10 +1510,10 @@ class Step2Plan extends React.Component {
                   this,
                   profileIndex,
                   stepIndex,
-                  "breakfast"
+                  'breakfast',
                 )}
-                control={<Checkbox value={"breakfast"} />}
-                label={"Breakfast"}
+                control={<Checkbox value={'breakfast'} />}
+                label={'Breakfast'}
               />
             </FormGroup>
           </FormControl>
@@ -1539,44 +1539,44 @@ class Step2Plan extends React.Component {
                 this,
                 profileIndex,
                 stepIndex,
-                "breakfast"
+                'breakfast',
               )}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
                 key={stepIndex}
-                value={"regular"}
+                value={'regular'}
                 disabled={
                   !this.state.secondaryProfilesData[profileIndex].scheduleReal[
                     stepIndex
                   ].breakfast.active
                 }
                 control={<Radio />}
-                label={"Regular"}
+                label={'Regular'}
               />
 
               <FormControlLabel
                 key={stepIndex}
-                value={"athletic"}
+                value={'athletic'}
                 disabled={
                   !this.state.secondaryProfilesData[profileIndex].scheduleReal[
                     stepIndex
                   ].breakfast.active
                 }
                 control={<Radio />}
-                label={"Athletic"}
+                label={'Athletic'}
               />
 
               <FormControlLabel
                 key={stepIndex}
-                value={"bodybuilder"}
+                value={'bodybuilder'}
                 disabled={
                   !this.state.secondaryProfilesData[profileIndex].scheduleReal[
                     stepIndex
                   ].breakfast.active
                 }
                 control={<Radio />}
-                label={"Bodybuilder"}
+                label={'Bodybuilder'}
               />
             </RadioGroup>
           </FormControl>
@@ -1602,14 +1602,14 @@ class Step2Plan extends React.Component {
                 this,
                 profileIndex,
                 stepIndex,
-                "breakfast"
+                'breakfast',
               )}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
-                value={"1"}
+                value={'1'}
                 control={<Radio />}
-                label={"1"}
+                label={'1'}
                 selected
                 key={stepIndex}
                 disabled={
@@ -1620,9 +1620,9 @@ class Step2Plan extends React.Component {
               />
 
               <FormControlLabel
-                value={"2"}
+                value={'2'}
                 control={<Radio />}
-                label={"2"}
+                label={'2'}
                 selected
                 key={stepIndex}
                 disabled={
@@ -1652,10 +1652,10 @@ class Step2Plan extends React.Component {
                   this,
                   profileIndex,
                   stepIndex,
-                  "lunch"
+                  'lunch',
                 )}
-                control={<Checkbox value={"value"} />}
-                label={"Lunch"}
+                control={<Checkbox value={'value'} />}
+                label={'Lunch'}
               />
             </FormGroup>
           </FormControl>
@@ -1681,44 +1681,44 @@ class Step2Plan extends React.Component {
                 this,
                 profileIndex,
                 stepIndex,
-                "lunch"
+                'lunch',
               )}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
                 key={stepIndex}
-                value={"regular"}
+                value={'regular'}
                 disabled={
                   !this.state.secondaryProfilesData[profileIndex].scheduleReal[
                     stepIndex
                   ].lunch.active
                 }
                 control={<Radio />}
-                label={"Regular"}
+                label={'Regular'}
               />
 
               <FormControlLabel
                 key={stepIndex}
-                value={"athletic"}
+                value={'athletic'}
                 disabled={
                   !this.state.secondaryProfilesData[profileIndex].scheduleReal[
                     stepIndex
                   ].lunch.active
                 }
                 control={<Radio />}
-                label={"Athletic"}
+                label={'Athletic'}
               />
 
               <FormControlLabel
                 key={stepIndex}
-                value={"bodybuilder"}
+                value={'bodybuilder'}
                 disabled={
                   !this.state.secondaryProfilesData[profileIndex].scheduleReal[
                     stepIndex
                   ].lunch.active
                 }
                 control={<Radio />}
-                label={"Bodybuilder"}
+                label={'Bodybuilder'}
               />
             </RadioGroup>
           </FormControl>
@@ -1744,14 +1744,14 @@ class Step2Plan extends React.Component {
                 this,
                 profileIndex,
                 stepIndex,
-                "lunch"
+                'lunch',
               )}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
-                value={"1"}
+                value={'1'}
                 control={<Radio />}
-                label={"1"}
+                label={'1'}
                 selected
                 key={stepIndex}
                 disabled={
@@ -1762,9 +1762,9 @@ class Step2Plan extends React.Component {
               />
 
               <FormControlLabel
-                value={"2"}
+                value={'2'}
                 control={<Radio />}
-                label={"2"}
+                label={'2'}
                 selected
                 key={stepIndex}
                 disabled={
@@ -1794,10 +1794,10 @@ class Step2Plan extends React.Component {
                   this,
                   profileIndex,
                   stepIndex,
-                  "dinner"
+                  'dinner',
                 )}
-                control={<Checkbox value={"value"} />}
-                label={"Dinner"}
+                control={<Checkbox value={'value'} />}
+                label={'Dinner'}
               />
             </FormGroup>
           </FormControl>
@@ -1818,49 +1818,49 @@ class Step2Plan extends React.Component {
                 this,
                 profileIndex,
                 stepIndex,
-                "dinner"
+                'dinner',
               )}
               disabled={
                 !this.state.secondaryProfilesData[profileIndex].scheduleReal[
                   stepIndex
                 ].dinner.active
               }
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
                 key={stepIndex}
-                value={"regular"}
+                value={'regular'}
                 disabled={
                   !this.state.secondaryProfilesData[profileIndex].scheduleReal[
                     stepIndex
                   ].dinner.active
                 }
                 control={<Radio />}
-                label={"Regular"}
+                label={'Regular'}
               />
 
               <FormControlLabel
                 key={stepIndex}
-                value={"athletic"}
+                value={'athletic'}
                 disabled={
                   !this.state.secondaryProfilesData[profileIndex].scheduleReal[
                     stepIndex
                   ].dinner.active
                 }
                 control={<Radio />}
-                label={"Athletic"}
+                label={'Athletic'}
               />
 
               <FormControlLabel
                 key={stepIndex}
-                value={"bodybuilder"}
+                value={'bodybuilder'}
                 disabled={
                   !this.state.secondaryProfilesData[profileIndex].scheduleReal[
                     stepIndex
                   ].dinner.active
                 }
                 control={<Radio />}
-                label={"Bodybuilder"}
+                label={'Bodybuilder'}
               />
             </RadioGroup>
           </FormControl>
@@ -1885,14 +1885,14 @@ class Step2Plan extends React.Component {
                 this,
                 profileIndex,
                 stepIndex,
-                "dinner"
+                'dinner',
               )}
-              style={{ flexDirection: "row" }}
+              style={{ flexDirection: 'row' }}
             >
               <FormControlLabel
-                value={"1"}
+                value={'1'}
                 control={<Radio />}
-                label={"1"}
+                label={'1'}
                 selected
                 key={stepIndex}
                 disabled={
@@ -1903,9 +1903,9 @@ class Step2Plan extends React.Component {
               />
 
               <FormControlLabel
-                value={"2"}
+                value={'2'}
                 control={<Radio />}
-                label={"2"}
+                label={'2'}
                 selected
                 key={stepIndex}
                 disabled={
@@ -1923,7 +1923,7 @@ class Step2Plan extends React.Component {
 
   render() {
     const buttonClassname = classNames({
-      [this.props.classes.buttonSuccess]: this.state.submitSuccess
+      [this.props.classes.buttonSuccess]: this.state.submitSuccess,
     });
 
     const mealSteps = this.getMealSteps();
@@ -1938,11 +1938,11 @@ class Step2Plan extends React.Component {
         <Grid
           container
           justify="center"
-          style={{ marginBottom: "50px", marginTop: "25px" }}
+          style={{ marginBottom: '50px', marginTop: '25px' }}
         >
           <Grid item xs={12}>
             <Paper elevation={2} className="paper-for-fields">
-              <Typography type="headline" style={{ marginBottom: "25px" }}>
+              <Typography type="headline" style={{ marginBottom: '25px' }}>
                 {`${this.props.customerInfo.firstName}'s profile`}
               </Typography>
 
@@ -1962,7 +1962,7 @@ class Step2Plan extends React.Component {
                       name="lifestyle"
                       value={this.state.lifestyle}
                       onChange={this.handleChangeRadioLifestyle.bind(this)}
-                      style={{ flexDirection: "row" }}
+                      style={{ flexDirection: 'row' }}
                     >
                       {this.props.lifestyles.map((e, i) => (
                         <FormControlLabel
@@ -2048,7 +2048,7 @@ class Step2Plan extends React.Component {
                       name="discount"
                       value={this.state.discount}
                       onChange={this.handleChangeRadioDiscount.bind(this)}
-                      style={{ flexDirection: "row" }}
+                      style={{ flexDirection: 'row' }}
                     >
                       <FormControlLabel
                         value="none"
@@ -2061,44 +2061,44 @@ class Step2Plan extends React.Component {
                             element =>
                               element.title == this.state.lifestyle &&
                               !element.discountStudent &&
-                              !element.discountSenior
+                              !element.discountSenior,
                           )
                         }
                       />
                       <FormControlLabel
                         value="student"
                         control={<Radio />}
-                        label={"Student"}
+                        label={'Student'}
                         disabled={
                           this.state.lifestyle &&
                           this.props.lifestyles.find(
                             element =>
                               element.title == this.state.lifestyle &&
-                              !element.discountStudent
+                              !element.discountStudent,
                           )
                         }
                       />
-                      {this.renderDiscountValue.bind(this, "student")}
+                      {this.renderDiscountValue.bind(this, 'student')}
                       <FormControlLabel
                         value="senior"
                         control={<Radio />}
-                        label={"Senior"}
+                        label={'Senior'}
                         disabled={
                           this.state.lifestyle &&
                           this.props.lifestyles.find(
                             element =>
                               element.title == this.state.lifestyle &&
-                              !element.discountSenior
+                              !element.discountSenior,
                           )
                         }
                       />
-                      {this.renderDiscountValue.bind(this, "senior")}
+                      {this.renderDiscountValue.bind(this, 'senior')}
                     </RadioGroup>
                   </FormControl>
                 </Grid>
               </Grid>
 
-              <Grid container style={{ marginTop: "25px" }}>
+              <Grid container style={{ marginTop: '25px' }}>
                 <Grid item xs={12} sm={6}>
                   <Typography
                     type="body1"
@@ -2115,22 +2115,22 @@ class Step2Plan extends React.Component {
                     fullWidth
                     value={this.state.subscriptionStartDate}
                     SelectProps={{ native: false }}
-                    onChange={event => {
+                    onChange={(event) => {
                       this.setState({
                         subscriptionStartDate: event.target.value,
                         subscriptionStartDateRaw: new Date(
-                          event.currentTarget.getAttribute("data-original-date")
-                        )
+                          event.currentTarget.getAttribute('data-original-date'),
+                        ),
                       });
                     }}
                   >
                     {this.renderStartDays().map((e, i) => (
                       <MenuItem
                         key={i}
-                        value={moment(e).format("dddd MMMM Do YYYY")}
+                        value={moment(e).format('dddd MMMM Do YYYY')}
                         data-original-date={e}
                       >
-                        {moment(e).format("dddd MMMM Do YYYY")}
+                        {moment(e).format('dddd MMMM Do YYYY')}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -2174,9 +2174,9 @@ class Step2Plan extends React.Component {
               <Stepper
                 activeStep={activeMealScheduleStep}
                 style={{
-                  marginTop: "40px",
-                  marginBottom: "20px",
-                  background: "none !important"
+                  marginTop: '40px',
+                  marginBottom: '20px',
+                  background: 'none !important',
                 }}
               >
                 {mealSteps.map((label, index) => {
@@ -2185,10 +2185,10 @@ class Step2Plan extends React.Component {
                   const momentDateObj = moment();
 
                   const stepLabel = `${label} ${moment(
-                    this.state.subscriptionStartDateRaw
+                    this.state.subscriptionStartDateRaw,
                   )
-                    .add(index, "d")
-                    .format("DD")}`;
+                    .add(index, 'd')
+                    .format('DD')}`;
 
                   return (
                     <Step key={index} {...props}>
@@ -2197,33 +2197,33 @@ class Step2Plan extends React.Component {
                   );
                 })}
               </Stepper>
-              <div style={{ marginBottom: "30px" }}>
+              <div style={{ marginBottom: '30px' }}>
                 {this.renderMealStepsContent(this.state.activeMealScheduleStep)}
 
                 {activeMealScheduleStep >= 1 ? (
                   <Button
                     onClick={this.handleBackMealSchedule.bind(this)}
-                    style={{ marginTop: "20px" }}
+                    style={{ marginTop: '20px' }}
                   >
                     Back
                   </Button>
                 ) : (
-                  ""
+                  ''
                 )}
 
                 {activeMealScheduleStep < 6 ? (
                   <Button
                     onClick={this.handleNextMealSchedule.bind(this)}
-                    style={{ marginTop: "20px" }}
+                    style={{ marginTop: '20px' }}
                   >
                     Next
                   </Button>
                 ) : (
-                  ""
+                  ''
                 )}
               </div>
               <Grid container>
-                <Grid item xs={12} style={{ marginTop: "25px" }}>
+                <Grid item xs={12} style={{ marginTop: '25px' }}>
                   <Typography
                     type="body1"
                     className="text-uppercase font-medium"
@@ -2236,7 +2236,7 @@ class Step2Plan extends React.Component {
                     <FormLabel component="legend">Allergies</FormLabel>
                     <FormGroup>
                       {this.props.restrictions
-                        .filter(e => e.restrictionType === "allergy")
+                        .filter(e => e.restrictionType === 'allergy')
                         .map((e, i) => {
                           const isSelected = this.state.restrictions.length
                             ? this.state.restrictions.indexOf(e._id) != -1
@@ -2270,7 +2270,7 @@ class Step2Plan extends React.Component {
                     <FormLabel component="legend">Dietary</FormLabel>
                     <FormGroup>
                       {this.props.restrictions
-                        .filter(e => e.restrictionType === "dietary")
+                        .filter(e => e.restrictionType === 'dietary')
                         .map((e, i) => {
                           const isSelected = this.state.restrictions.length
                             ? this.state.restrictions.indexOf(e._id) != -1
@@ -2304,7 +2304,7 @@ class Step2Plan extends React.Component {
                     <FormLabel component="legend">Religious</FormLabel>
                     <FormGroup>
                       {this.props.restrictions
-                        .filter(e => e.restrictionType === "religious")
+                        .filter(e => e.restrictionType === 'religious')
                         .map((e, i) => {
                           const isSelected = this.state.restrictions.length
                             ? this.state.restrictions.indexOf(e._id) != -1
@@ -2341,9 +2341,9 @@ class Step2Plan extends React.Component {
               >
                 <Typography
                   style={{
-                    flex: "0 0 auto",
-                    margin: "0",
-                    padding: "24px 24px 20px 24px"
+                    flex: '0 0 auto',
+                    margin: '0',
+                    padding: '24px 24px 20px 24px',
                   }}
                   className="title font-medium"
                   type="title"
@@ -2361,7 +2361,7 @@ class Step2Plan extends React.Component {
                       name="restritionOrPref"
                       value={this.state.addRestrictionType}
                       onChange={this.handleChangeRadioRestriction.bind(this)}
-                      style={{ flexDirection: "row" }}
+                      style={{ flexDirection: 'row' }}
                     >
                       <FormControlLabel
                         value="Restriction"
@@ -2383,44 +2383,44 @@ class Step2Plan extends React.Component {
                     theme={{
                       container: {
                         flexGrow: 1,
-                        position: "relative",
-                        marginBottom: "2em"
+                        position: 'relative',
+                        marginBottom: '2em',
                       },
                       suggestionsContainerOpen: {
-                        position: "absolute",
+                        position: 'absolute',
                         left: 0,
-                        right: 0
+                        right: 0,
                       },
                       suggestion: {
-                        display: "block"
+                        display: 'block',
                       },
                       suggestionsList: {
                         margin: 0,
                         padding: 0,
-                        listStyleType: "none"
-                      }
+                        listStyleType: 'none',
+                      },
                     }}
                     renderInputComponent={this.renderInput.bind(this)}
                     suggestions={this.state.suggestions}
                     onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                      this
+                      this,
                     )}
                     onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                      this
+                      this,
                     )}
                     onSuggestionSelected={this.onSuggestionSelected.bind(this)}
                     getSuggestionValue={this.getSuggestionValue.bind(this)}
                     renderSuggestion={this.renderSuggestion.bind(this)}
                     renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                      this
+                      this,
                     )}
                     fullWidth
                     focusInputOnSuggestionClick={false}
                     inputProps={{
-                      placeholder: "Search",
+                      placeholder: 'Search',
                       value: this.state.value,
                       onChange: this.onChange.bind(this),
-                      className: "autoinput"
+                      className: 'autoinput',
                     }}
                   />
                 </DialogContent>
@@ -2437,10 +2437,10 @@ class Step2Plan extends React.Component {
 
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      flexWrap: "wrap",
-                      marginTop: "25px"
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      marginTop: '25px',
                     }}
                   >
                     {this.state.subIngredients.length ? (
@@ -2448,19 +2448,19 @@ class Step2Plan extends React.Component {
                         <Chip
                           avatar={
                             <Avatar>
-                              {" "}
-                              {this.getSubIngredientAvatar(subIngredient)}{" "}
+                              {' '}
+                              {this.getSubIngredientAvatar(subIngredient)}{' '}
                             </Avatar>
                           }
                           style={{
-                            marginRight: "8px",
-                            marginBottom: "8px"
+                            marginRight: '8px',
+                            marginBottom: '8px',
                           }}
                           label={this.getSubIngredientTitle(subIngredient)}
                           key={i}
                           onRequestDelete={this.handleSubIngredientChipDelete.bind(
                             this,
-                            subIngredient
+                            subIngredient,
                           )}
                         />
                       ))
@@ -2480,10 +2480,10 @@ class Step2Plan extends React.Component {
 
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      flexWrap: "wrap",
-                      marginTop: "25px"
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      marginTop: '25px',
                     }}
                   >
                     {this.state.specificRestrictions.length ? (
@@ -2492,24 +2492,24 @@ class Step2Plan extends React.Component {
                           <Chip
                             avatar={
                               <Avatar>
-                                {" "}
+                                {' '}
                                 {this.getSubIngredientAvatar(
-                                  subIngredient
-                                )}{" "}
+                                  subIngredient,
+                                )}{' '}
                               </Avatar>
                             }
                             style={{
-                              marginRight: "8px",
-                              marginBottom: "8px"
+                              marginRight: '8px',
+                              marginBottom: '8px',
                             }}
                             label={this.getSubIngredientTitle(subIngredient)}
                             key={i}
                             onRequestDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
                               this,
-                              subIngredient
+                              subIngredient,
                             )}
                           />
-                        )
+                        ),
                       )
                     ) : (
                       <Chip className="chip--bordered" label="Ingredient" />
@@ -2520,7 +2520,7 @@ class Step2Plan extends React.Component {
               <Grid container>
                 <Grid item xs={12}>
                   <Button
-                    style={{ marginTop: "25px" }}
+                    style={{ marginTop: '25px' }}
                     color="primary"
                     onClick={this.deleteDialogHandleOpen.bind(this)}
                   >
@@ -2532,12 +2532,12 @@ class Step2Plan extends React.Component {
               {this.state.secondaryProfilesData.map((e, profileIndex) => (
                 <div key={profileIndex}>
                   <ListItem
-                    style={{ marginTop: "15px", marginBottom: "15px" }}
+                    style={{ marginTop: '15px', marginBottom: '15px' }}
                     button
                     onClick={this.handleProfileOpen.bind(
                       this,
                       false,
-                      profileIndex
+                      profileIndex,
                     )}
                   >
                     <ListItemText
@@ -2545,9 +2545,9 @@ class Step2Plan extends React.Component {
                         this.state.secondaryProfilesData[profileIndex]
                           .first_name
                           ? `${
-                              this.state.secondaryProfilesData[profileIndex]
-                                .first_name
-                            }'s Profile`
+                            this.state.secondaryProfilesData[profileIndex]
+                              .first_name
+                          }'s Profile`
                           : `Profile ${profileIndex + 2}`
                       }
                     />
@@ -2562,7 +2562,7 @@ class Step2Plan extends React.Component {
                     transitionDuration="auto"
                     component="div"
                   >
-                    <div style={{ paddingLeft: "16px", paddingRight: "16px" }}>
+                    <div style={{ paddingLeft: '16px', paddingRight: '16px' }}>
                       <Grid container>
                         <Grid item xs={12} sm={6}>
                           <TextField
@@ -2576,13 +2576,13 @@ class Step2Plan extends React.Component {
                                 profileIndex
                               ]
                                 ? this.props.customerInfo.secondaryProfiles[
-                                    profileIndex
-                                  ].firstName
-                                : ""
+                                  profileIndex
+                                ].firstName
+                                : ''
                             }
                             data-rule-required="true"
                             inputProps={{}}
-                            onChange={event => {
+                            onChange={(event) => {
                               this.state.secondaryProfilesData[
                                 profileIndex
                               ].first_name =
@@ -2604,9 +2604,9 @@ class Step2Plan extends React.Component {
                                 profileIndex
                               ]
                                 ? this.props.customerInfo.secondaryProfiles[
-                                    profileIndex
-                                  ].lastName
-                                : ""
+                                  profileIndex
+                                ].lastName
+                                : ''
                             }
                             inputProps={{}}
                           />
@@ -2630,9 +2630,9 @@ class Step2Plan extends React.Component {
                               }
                               onChange={this.handleChangeRadioLifestyleSecondary.bind(
                                 this,
-                                profileIndex
+                                profileIndex,
                               )}
-                              style={{ flexDirection: "row" }}
+                              style={{ flexDirection: 'row' }}
                               data-rule-required="true"
                             >
                               {this.props.lifestyles.map(e => (
@@ -2739,9 +2739,9 @@ class Step2Plan extends React.Component {
                               }
                               onChange={this.handleChangeRadioDiscountSecondary.bind(
                                 this,
-                                profileIndex
+                                profileIndex,
                               )}
-                              style={{ flexDirection: "row" }}
+                              style={{ flexDirection: 'row' }}
                             >
                               <FormControlLabel
                                 value="none"
@@ -2758,7 +2758,7 @@ class Step2Plan extends React.Component {
                                           profileIndex
                                         ].lifestyle &&
                                       !element.discountStudent &&
-                                      !element.discountSenior
+                                      !element.discountSenior,
                                   )
                                 }
                               />
@@ -2774,7 +2774,7 @@ class Step2Plan extends React.Component {
                                       element.title ==
                                         this.state.secondaryProfilesData[
                                           profileIndex
-                                        ].lifestyle && !element.discountStudent
+                                        ].lifestyle && !element.discountStudent,
                                   )
                                 }
                               />
@@ -2790,7 +2790,7 @@ class Step2Plan extends React.Component {
                                       element.title ==
                                         this.state.secondaryProfilesData[
                                           profileIndex
-                                        ].lifestyle && !element.discountSenior
+                                        ].lifestyle && !element.discountSenior,
                                   )
                                 }
                               />
@@ -2819,20 +2819,20 @@ class Step2Plan extends React.Component {
                               }
                               onChange={this.handleChangeRadioAdultOrChild.bind(
                                 this,
-                                profileIndex
+                                profileIndex,
                               )}
-                              style={{ flexDirection: "row" }}
+                              style={{ flexDirection: 'row' }}
                             >
                               <FormControlLabel
-                                value={"adult"}
-                                control={<Radio selected />}
-                                label={"Adult"}
+                                value={'adult'}
+                                control={<Radio />}
+                                label={'Adult'}
                               />
 
                               <FormControlLabel
-                                value={"child"}
+                                value={'child'}
                                 control={<Radio />}
-                                label={"Child"}
+                                label={'Child'}
                               />
                             </RadioGroup>
                           </FormControl>
@@ -2845,18 +2845,18 @@ class Step2Plan extends React.Component {
                             .activeMealScheduleStep
                         }
                         style={{
-                          marginTop: "40px",
-                          marginBottom: "20px",
-                          background: "none !important"
+                          marginTop: '40px',
+                          marginBottom: '20px',
+                          background: 'none !important',
                         }}
                       >
                         {mealSteps.map((label, index) => {
                           const props = {};
                           const stepLabel = `${label} ${moment(
-                            this.state.subscriptionStartDateRaw
+                            this.state.subscriptionStartDateRaw,
                           )
-                            .add(index, "d")
-                            .format("DD")}`;
+                            .add(index, 'd')
+                            .format('DD')}`;
 
                           return (
                             <Step key={index} {...props}>
@@ -2866,46 +2866,46 @@ class Step2Plan extends React.Component {
                         })}
                       </Stepper>
 
-                      <div style={{ marginBottom: "30px" }}>
+                      <div style={{ marginBottom: '30px' }}>
                         {this.renderMealStepsContentSecondary(
                           profileIndex,
                           this.state.secondaryProfilesData[profileIndex]
-                            .activeMealScheduleStep
+                            .activeMealScheduleStep,
                         )}
 
                         {this.state.secondaryProfilesData[profileIndex]
                           .activeMealScheduleStep >= 1 ? (
-                          <Button
-                            onClick={this.handleBackMealScheduleSecondary.bind(
-                              this,
-                              profileIndex
-                            )}
-                            style={{ marginTop: "20px" }}
-                          >
+                            <Button
+                              onClick={this.handleBackMealScheduleSecondary.bind(
+                                this,
+                                profileIndex,
+                              )}
+                              style={{ marginTop: '20px' }}
+                            >
                             Back
-                          </Button>
-                        ) : (
-                          ""
-                        )}
+                            </Button>
+                          ) : (
+                            ''
+                          )}
 
                         {this.state.secondaryProfilesData[profileIndex]
                           .activeMealScheduleStep < 6 ? (
-                          <Button
-                            onClick={this.handleNextMealScheduleSecondary.bind(
-                              this,
-                              profileIndex
-                            )}
-                            style={{ marginTop: "20px" }}
-                          >
+                            <Button
+                              onClick={this.handleNextMealScheduleSecondary.bind(
+                                this,
+                                profileIndex,
+                              )}
+                              style={{ marginTop: '20px' }}
+                            >
                             Next
-                          </Button>
-                        ) : (
-                          ""
-                        )}
+                            </Button>
+                          ) : (
+                            ''
+                          )}
                       </div>
 
                       <Grid container>
-                        <Grid item xs={12} style={{ marginTop: "25px" }}>
+                        <Grid item xs={12} style={{ marginTop: '25px' }}>
                           <Typography
                             type="body1"
                             className="text-uppercase font-medium"
@@ -2918,22 +2918,22 @@ class Step2Plan extends React.Component {
                             <FormLabel component="legend">Allergies</FormLabel>
                             <FormGroup>
                               {this.props.restrictions
-                                .filter(e => e.restrictionType === "allergy")
+                                .filter(e => e.restrictionType === 'allergy')
                                 .map((e, i) => {
                                   const isSelected = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .restrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].restrictions.indexOf(e._id) != -1
+                                      profileIndex
+                                    ].restrictions.indexOf(e._id) != -1
                                     : false;
 
                                   const isAlreadyChecked = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .lifestyleRestrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].lifestyleRestrictions.indexOf(e._id) !=
+                                      profileIndex
+                                    ].lifestyleRestrictions.indexOf(e._id) !=
                                       -1
                                     : false;
                                   return (
@@ -2948,7 +2948,7 @@ class Step2Plan extends React.Component {
                                           onChange={this.handleChangeSecondary.bind(
                                             this,
                                             profileIndex,
-                                            e._id
+                                            e._id,
                                           )}
                                           value={e.title.toLowerCase()}
                                         />
@@ -2965,21 +2965,21 @@ class Step2Plan extends React.Component {
                             <FormLabel component="legend">Dietary</FormLabel>
                             <FormGroup>
                               {this.props.restrictions
-                                .filter(e => e.restrictionType === "dietary")
+                                .filter(e => e.restrictionType === 'dietary')
                                 .map((e, i) => {
                                   const isSelected = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .restrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].restrictions.indexOf(e._id) != -1
+                                      profileIndex
+                                    ].restrictions.indexOf(e._id) != -1
                                     : false;
                                   const isAlreadyChecked = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .lifestyleRestrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].lifestyleRestrictions.indexOf(e._id) !=
+                                      profileIndex
+                                    ].lifestyleRestrictions.indexOf(e._id) !=
                                       -1
                                     : false;
 
@@ -2995,7 +2995,7 @@ class Step2Plan extends React.Component {
                                           onChange={this.handleChangeSecondary.bind(
                                             this,
                                             profileIndex,
-                                            e._id
+                                            e._id,
                                           )}
                                           value={e.title.toLowerCase()}
                                         />
@@ -3012,21 +3012,21 @@ class Step2Plan extends React.Component {
                             <FormLabel component="legend">Religious</FormLabel>
                             <FormGroup>
                               {this.props.restrictions
-                                .filter(e => e.restrictionType === "religious")
+                                .filter(e => e.restrictionType === 'religious')
                                 .map((e, i) => {
                                   const isSelected = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .restrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].restrictions.indexOf(e._id) != -1
+                                      profileIndex
+                                    ].restrictions.indexOf(e._id) != -1
                                     : false;
                                   const isAlreadyChecked = this.state
                                     .secondaryProfilesData[profileIndex]
                                     .lifestyleRestrictions
                                     ? this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].lifestyleRestrictions.indexOf(e._id) !=
+                                      profileIndex
+                                    ].lifestyleRestrictions.indexOf(e._id) !=
                                       -1
                                     : false;
                                   return (
@@ -3041,7 +3041,7 @@ class Step2Plan extends React.Component {
                                           onChange={this.handleChangeSecondary.bind(
                                             this,
                                             profileIndex,
-                                            e._id
+                                            e._id,
                                           )}
                                           value={e.title.toLowerCase()}
                                         />
@@ -3058,14 +3058,14 @@ class Step2Plan extends React.Component {
                       <Dialog
                         open={this.state.deleteDialogOpen}
                         onRequestClose={this.deleteDialogHandleRequestClose.bind(
-                          this
+                          this,
                         )}
                       >
                         <Typography
                           style={{
-                            flex: "0 0 auto",
-                            margin: "0",
-                            padding: "24px 24px 20px 24px"
+                            flex: '0 0 auto',
+                            margin: '0',
+                            padding: '24px 24px 20px 24px',
                           }}
                           className="title font-medium"
                           type="title"
@@ -3083,9 +3083,9 @@ class Step2Plan extends React.Component {
                               name="restritionOrPref"
                               value={this.state.addRestrictionType}
                               onChange={this.handleChangeRadioRestriction.bind(
-                                this
+                                this,
                               )}
-                              style={{ flexDirection: "row" }}
+                              style={{ flexDirection: 'row' }}
                             >
                               <FormControlLabel
                                 value="Restriction"
@@ -3107,49 +3107,49 @@ class Step2Plan extends React.Component {
                             theme={{
                               container: {
                                 flexGrow: 1,
-                                position: "relative",
-                                marginBottom: "2em"
+                                position: 'relative',
+                                marginBottom: '2em',
                               },
                               suggestionsContainerOpen: {
-                                position: "absolute",
+                                position: 'absolute',
                                 left: 0,
-                                right: 0
+                                right: 0,
                               },
                               suggestion: {
-                                display: "block"
+                                display: 'block',
                               },
                               suggestionsList: {
                                 margin: 0,
                                 padding: 0,
-                                listStyleType: "none"
-                              }
+                                listStyleType: 'none',
+                              },
                             }}
                             renderInputComponent={this.renderInput.bind(this)}
                             suggestions={this.state.suggestions}
                             onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                              this
+                              this,
                             )}
                             onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                              this
+                              this,
                             )}
                             onSuggestionSelected={this.onSuggestionSelectedSecondary.bind(
                               this,
-                              profileIndex
+                              profileIndex,
                             )}
                             getSuggestionValue={this.getSuggestionValue.bind(
-                              this
+                              this,
                             )}
                             renderSuggestion={this.renderSuggestion.bind(this)}
                             renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                              this
+                              this,
                             )}
                             fullWidth
                             focusInputOnSuggestionClick={false}
                             inputProps={{
-                              placeholder: "Search",
+                              placeholder: 'Search',
                               value: this.state.value,
                               onChange: this.onChange.bind(this),
-                              className: "autoinput"
+                              className: 'autoinput',
                             }}
                           />
                         </DialogContent>
@@ -3160,53 +3160,53 @@ class Step2Plan extends React.Component {
                           <Typography
                             type="body1"
                             className="text-uppercase font-medium"
-                            style={{ marginTop: "25px" }}
+                            style={{ marginTop: '25px' }}
                           >
                             Preferences
                           </Typography>
 
                           <div
                             style={{
-                              display: "flex",
-                              alignItems: "center",
-                              flexWrap: "wrap",
-                              marginTop: "25px"
+                              display: 'flex',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              marginTop: '25px',
                             }}
                           >
                             {this.state.secondaryProfilesData[profileIndex]
                               .subIngredients.length ? (
-                              this.state.secondaryProfilesData[
-                                profileIndex
-                              ].subIngredients.map((subIngredient, i) => (
+                                this.state.secondaryProfilesData[
+                                  profileIndex
+                                ].subIngredients.map((subIngredient, i) => (
+                                  <Chip
+                                    avatar={
+                                      <Avatar>
+                                        {' '}
+                                        {this.getSubIngredientAvatar(
+                                          subIngredient,
+                                        )}{' '}
+                                      </Avatar>
+                                    }
+                                    style={{
+                                      marginRight: '8px',
+                                      marginBottom: '8px',
+                                    }}
+                                    label={this.getSubIngredientTitle(
+                                      subIngredient,
+                                    )}
+                                    key={i}
+                                    onRequestDelete={this.handleSubIngredientChipDelete.bind(
+                                      this,
+                                      subIngredient,
+                                    )}
+                                  />
+                                ))
+                              ) : (
                                 <Chip
-                                  avatar={
-                                    <Avatar>
-                                      {" "}
-                                      {this.getSubIngredientAvatar(
-                                        subIngredient
-                                      )}{" "}
-                                    </Avatar>
-                                  }
-                                  style={{
-                                    marginRight: "8px",
-                                    marginBottom: "8px"
-                                  }}
-                                  label={this.getSubIngredientTitle(
-                                    subIngredient
-                                  )}
-                                  key={i}
-                                  onRequestDelete={this.handleSubIngredientChipDelete.bind(
-                                    this,
-                                    subIngredient
-                                  )}
+                                  className="chip--bordered"
+                                  label="Ingredient"
                                 />
-                              ))
-                            ) : (
-                              <Chip
-                                className="chip--bordered"
-                                label="Ingredient"
-                              />
-                            )}
+                              )}
                           </div>
                         </Grid>
 
@@ -3220,46 +3220,46 @@ class Step2Plan extends React.Component {
 
                           <div
                             style={{
-                              display: "flex",
-                              alignItems: "center",
-                              flexWrap: "wrap",
-                              marginTop: "25px"
+                              display: 'flex',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              marginTop: '25px',
                             }}
                           >
                             {this.state.secondaryProfilesData[profileIndex]
                               .specificRestrictions.length ? (
-                              this.state.secondaryProfilesData[
-                                profileIndex
-                              ].specificRestrictions.map((subIngredient, i) => (
+                                this.state.secondaryProfilesData[
+                                  profileIndex
+                                ].specificRestrictions.map((subIngredient, i) => (
+                                  <Chip
+                                    avatar={
+                                      <Avatar>
+                                        {' '}
+                                        {this.getSubIngredientAvatar(
+                                          subIngredient,
+                                        )}{' '}
+                                      </Avatar>
+                                    }
+                                    style={{
+                                      marginRight: '8px',
+                                      marginBottom: '8px',
+                                    }}
+                                    label={this.getSubIngredientTitle(
+                                      subIngredient,
+                                    )}
+                                    key={i}
+                                    onRequestDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                                      this,
+                                      subIngredient,
+                                    )}
+                                  />
+                                ))
+                              ) : (
                                 <Chip
-                                  avatar={
-                                    <Avatar>
-                                      {" "}
-                                      {this.getSubIngredientAvatar(
-                                        subIngredient
-                                      )}{" "}
-                                    </Avatar>
-                                  }
-                                  style={{
-                                    marginRight: "8px",
-                                    marginBottom: "8px"
-                                  }}
-                                  label={this.getSubIngredientTitle(
-                                    subIngredient
-                                  )}
-                                  key={i}
-                                  onRequestDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
-                                    this,
-                                    subIngredient
-                                  )}
+                                  className="chip--bordered"
+                                  label="Ingredient"
                                 />
-                              ))
-                            ) : (
-                              <Chip
-                                className="chip--bordered"
-                                label="Ingredient"
-                              />
-                            )}
+                              )}
                           </div>
                         </Grid>
                       </Grid>
@@ -3479,7 +3479,7 @@ class Step2Plan extends React.Component {
                       <Button
                         raised
                         onClick={this.removeProfile.bind(this, profileIndex)}
-                        style={{ float: "right", marginTop: "25px" }}
+                        style={{ float: 'right', marginTop: '25px' }}
                       >
                         Remove profile
                       </Button>
@@ -3490,7 +3490,7 @@ class Step2Plan extends React.Component {
               <Button
                 color="danger"
                 onClick={this.increaseProfileCount.bind(this)}
-                style={{ marginTop: "50px", marginBottom: "50px" }}
+                style={{ marginTop: '50px', marginBottom: '50px' }}
               >
                 Add a profile
               </Button>
@@ -3500,9 +3500,9 @@ class Step2Plan extends React.Component {
 
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end"
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'flex-end',
           }}
         >
           <Button
@@ -3530,7 +3530,7 @@ Step2Plan.defaultProps = {
   popTheSnackbar: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
   handleNext: PropTypes.func.isRequired,
-  handleBack: PropTypes.func.isRequired
+  handleBack: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(Step2Plan);
