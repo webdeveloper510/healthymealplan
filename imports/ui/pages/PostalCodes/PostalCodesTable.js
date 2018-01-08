@@ -357,7 +357,7 @@ class PostalCodesTable extends React.Component {
                         className="subheading"
                         style={{ textTransform: "capitalize" }}
                       >
-                        {e.routeActual.title}
+                        {e.routeActual ? e.routeActual.title : "-"}
                       </Typography>
                     </TableCell>
                     <TableCell
