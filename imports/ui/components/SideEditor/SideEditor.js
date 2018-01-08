@@ -17,9 +17,9 @@ import { Meteor } from "meteor/meteor";
 import Button from "material-ui/Button";
 import { MenuItem } from "material-ui/Menu";
 import TextField from "material-ui/TextField";
-// import Select from 'material-ui/Select';
-// import Input, { InputLabel } from 'material-ui/Input';
-// import { FormControl, FormHelperText } from 'material-ui/Form';
+import Checkbox from "material-ui/Checkbox";
+import FormControlLabel from "material-ui/Form/FormControlLabel";
+
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -70,7 +70,10 @@ class SideEditor extends React.Component {
       value: "", // Autosuggest
       valueMealType: this.props.plate ? this.props.plate.mealType : "Desserts",
       valueInstructionActual: "None",
-
+      custom:
+        this.props.plate && !this.props.newPlate
+          ? this.props.plate.custom
+          : false,
       suggestions: [],
       subIngredients:
         this.props.plate && this.props.plate.ingredients
@@ -254,6 +257,7 @@ class SideEditor extends React.Component {
       title: document.querySelector("#title").value.trim(),
       subtitle: document.querySelector("#subtitle").value.trim(),
       mealType: this.state.valueMealType.trim(),
+      custom: this.state.custom,
       ingredients: this.state.subIngredients,
       nutritional: {
         regular: {
@@ -694,6 +698,23 @@ class SideEditor extends React.Component {
                       Juices
                     </MenuItem>
                   </TextField>
+
+                  <FormControlLabel
+                    style={{ marginTop: "1em" }}
+                    control={
+                      <Checkbox
+                        checked={this.state.custom}
+                        onChange={(event, checked) => {
+                          this.setState({
+                            custom: checked,
+                            hasFormChanged: true
+                          });
+                        }}
+                        value="checked"
+                      />
+                    }
+                    label="Custom"
+                  />
                 </Paper>
               </Grid>
             </Grid>

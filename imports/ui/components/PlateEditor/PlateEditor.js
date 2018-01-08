@@ -17,9 +17,9 @@ import { Meteor } from "meteor/meteor";
 import Button from "material-ui/Button";
 import { MenuItem } from "material-ui/Menu";
 import TextField from "material-ui/TextField";
-// import Select from 'material-ui/Select';
-// import Input, { InputLabel } from 'material-ui/Input';
-// import { FormControl, FormHelperText } from 'material-ui/Form';
+
+import Checkbox from "material-ui/Checkbox";
+import FormControlLabel from "material-ui/Form/FormControlLabel";
 
 import Table, {
   TableBody,
@@ -77,6 +77,10 @@ class PlateEditor extends React.Component {
           ? _.sortBy(this.props.plate.ingredients, "title")
           : [],
       instructions: this.props.instructions || [],
+      custom:
+        this.props.plate && !this.props.newPlate
+          ? this.props.plate.custom
+          : false,
 
       deleteDialogOpen: false,
       hasFormChanged: false,
@@ -261,6 +265,7 @@ class PlateEditor extends React.Component {
       subtitle: document.querySelector("#subtitle").value.trim(),
       mealType: this.state.valueMealType.trim(),
       ingredients: this.state.subIngredients || [],
+      custom: this.state.custom,
       nutritional: {
         regular: {
           fat: $("[name='regular_fat']").val(),
@@ -708,6 +713,23 @@ class PlateEditor extends React.Component {
                       Dinner
                     </MenuItem>
                   </TextField>
+
+                  <FormControlLabel
+                    style={{ marginTop: "1em" }}
+                    control={
+                      <Checkbox
+                        checked={this.state.custom}
+                        onChange={(event, checked) => {
+                          this.setState({
+                            custom: checked,
+                            hasFormChanged: true
+                          });
+                        }}
+                        value="checked"
+                      />
+                    }
+                    label="Custom"
+                  />
                 </Paper>
               </Grid>
             </Grid>
@@ -868,9 +890,10 @@ class PlateEditor extends React.Component {
                   >
                     <option
                       selected={
-                        !this.props.newPlate && !this.props.plate.instructionId
-                          ? true
-                          : false
+                        !!(
+                          !this.props.newPlate &&
+                          !this.props.plate.instructionId
+                        )
                       }
                     >
                       None
