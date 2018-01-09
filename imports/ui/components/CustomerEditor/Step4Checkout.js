@@ -151,7 +151,8 @@ class Step4Checkout extends React.Component {
       specificRestrictionsSurcharges: [],
       preferences: this.props.customerInfo.preferences,
       totalAthleticSurcharge: 0,
-      totalBodybuilderSurcharge: 0
+      totalBodybuilderSurcharge: 0,
+      deliverySurcharges: 0
     };
 
     const secondaryCustomers = [];
@@ -161,19 +162,15 @@ class Step4Checkout extends React.Component {
     );
 
     // calculating basePrices for Breakfast, lunch and dinner
-    const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
 
-    primaryCustomer.breakfastPrice =
-      primaryCustomer.lifestyle.prices.breakfast[numberOfProfiles];
-
-    primaryCustomer.lunchPrice =
-      primaryCustomer.lifestyle.prices.lunch[numberOfProfiles];
-
-    primaryCustomer.dinnerPrice =
-      primaryCustomer.lifestyle.prices.dinner[numberOfProfiles];
+    let metCriteria = 0;
+    let customerScheduleTotals = [];
+    let secondaryCustomerTotals = [];
 
     // calculating total quantities and extra quantities and regular quantites
     this.props.customerInfo.scheduleReal.forEach((e, i) => {
+      let thisDaysQty = 0;
+
       if (e.breakfast.active) {
         primaryCustomer.breakfast.totalQty =
           primaryCustomer.breakfast.totalQty +
@@ -195,6 +192,8 @@ class Step4Checkout extends React.Component {
             10
           );
         }
+
+        thisDaysQty += parseInt(e.breakfast.quantity, 10);
       }
 
       if (e.lunch.active) {
@@ -211,6 +210,8 @@ class Step4Checkout extends React.Component {
             10
           );
         }
+
+        thisDaysQty += parseInt(e.lunch.quantity, 10);
       }
 
       if (e.dinner.active) {
@@ -227,8 +228,80 @@ class Step4Checkout extends React.Component {
             10
           );
         }
+
+        thisDaysQty += parseInt(e.dinner.quantity, 10);
+      }
+
+      customerScheduleTotals.push(thisDaysQty);
+    });
+
+    console.log(customerScheduleTotals);
+
+    if (
+      customerScheduleTotals[0] >= 2 &&
+      customerScheduleTotals[1] >= 2 &&
+      customerScheduleTotals[2] >= 2 &&
+      customerScheduleTotals[3] >= 2 &&
+      customerScheduleTotals[4] >= 2
+    ) {
+      metCriteria += 1;
+    }
+
+    console.log("met criteria after primary customer");
+    console.log(metCriteria);
+
+    if (this.props.customerInfo.secondaryProfileCount > 0) {
+      this.props.customerInfo.secondaryProfiles.forEach((el, index) => {
+        let currentProfileQtys;
+
+        currentProfileQtys = el.scheduleReal.map((e, i) => {
+          let thisDaysQty = 0;
+
+          if (e.breakfast.active) {
+            thisDaysQty += parseInt(e.breakfast.quantity, 10);
+          }
+
+          if (e.lunch.active) {
+            thisDaysQty += parseInt(e.lunch.quantity, 10);
+          }
+
+          if (e.dinner.active) {
+            thisDaysQty += parseInt(e.dinner.quantity, 10);
+          }
+
+          return thisDaysQty;
+        });
+
+        secondaryCustomerTotals.push(currentProfileQtys);
+      });
+    }
+
+    console.log("Secondary customer totals");
+    console.log(secondaryCustomerTotals);
+
+    secondaryCustomerTotals.forEach((e, i) => {
+      if (e[0] >= 2 && e[1] >= 2 && e[2] >= 2 && e[3] >= 2 && e[4] >= 2) {
+        metCriteria += 1;
       }
     });
+
+    console.log("met criteria after secondary customers");
+    console.log(metCriteria);
+
+    const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
+
+    if (metCriteria > 0) {
+      metCriteria -= 1;
+    }
+
+    primaryCustomer.breakfastPrice =
+      primaryCustomer.lifestyle.prices.breakfast[metCriteria];
+
+    primaryCustomer.lunchPrice =
+      primaryCustomer.lifestyle.prices.lunch[metCriteria];
+
+    primaryCustomer.dinnerPrice =
+      primaryCustomer.lifestyle.prices.dinner[metCriteria];
 
     // total base price based on per meal type base price, (before restrictions and extras and discounts)
     primaryCustomer.baseMealPriceTotal =
@@ -327,34 +400,34 @@ class Step4Checkout extends React.Component {
         );
       });
 
-      primaryCustomer.specificRestrictionsActual.forEach((e, i) => {
-        if (e.hasOwnProperty("extra")) {
-          let totalSurcharges = 0;
-          console.log(e);
+      // primaryCustomer.specificRestrictionsActual.forEach((e, i) => {
+      //   if (e.hasOwnProperty("extra")) {
+      //     let totalSurcharges = 0;
+      //     console.log(e);
 
-          const totalBaseMealsCharge =
-            primaryCustomer.breakfast.totalQty *
-              primaryCustomer.breakfastPrice +
-            primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-            primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
+      //     const totalBaseMealsCharge =
+      //       primaryCustomer.breakfast.totalQty *
+      //         primaryCustomer.breakfastPrice +
+      //       primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
+      //       primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
 
-          if (e.discountOrExtraType == "Percentage") {
-            totalSurcharges = e.extra / 100 * totalBaseMealsCharge;
-          }
+      //     if (e.discountOrExtraType == "Percentage") {
+      //       totalSurcharges = e.extra / 100 * totalBaseMealsCharge;
+      //     }
 
-          if (e.discountOrExtraType == "Fixed amount") {
-            totalSurcharges =
-              (primaryCustomer.breakfast.totalQty +
-                primaryCustomer.lunch.totalQty +
-                primaryCustomer.dinner.totalQty) *
-              e.extra;
-          }
+      //     if (e.discountOrExtraType == "Fixed amount") {
+      //       totalSurcharges =
+      //         (primaryCustomer.breakfast.totalQty +
+      //           primaryCustomer.lunch.totalQty +
+      //           primaryCustomer.dinner.totalQty) *
+      //         e.extra;
+      //     }
 
-          primaryCustomer.specificRestrictionsSurcharges.push(totalSurcharges);
-        } else {
-          primaryCustomer.specificRestrictionsSurcharges.push(0);
-        }
-      });
+      //     primaryCustomer.specificRestrictionsSurcharges.push(totalSurcharges);
+      //   } else {
+      //     primaryCustomer.specificRestrictionsSurcharges.push(0);
+      //   }
+      // });
     }
 
     // calculating athletic surcharge for all meals
@@ -545,16 +618,16 @@ class Step4Checkout extends React.Component {
         );
 
         // calculating basePrices for Breakfast, lunch and dinner
-        const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
+        // const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
 
         currentCustomer.breakfastPrice =
-          currentCustomer.lifestyle.prices.breakfast[numberOfProfiles];
+          currentCustomer.lifestyle.prices.breakfast[metCriteria];
 
         currentCustomer.lunchPrice =
-          currentCustomer.lifestyle.prices.lunch[numberOfProfiles];
+          currentCustomer.lifestyle.prices.lunch[metCriteria];
 
         currentCustomer.dinnerPrice =
-          currentCustomer.lifestyle.prices.dinner[numberOfProfiles];
+          currentCustomer.lifestyle.prices.dinner[metCriteria];
 
         el.scheduleReal.forEach((e, i) => {
           if (e.breakfast.active) {
@@ -728,39 +801,39 @@ class Step4Checkout extends React.Component {
             );
           });
 
-          currentCustomer.specificRestrictionsActual.forEach((e, i) => {
-            if (e.hasOwnProperty("extra")) {
-              let totalRestrictionsSurcharge = 0;
-              console.log(e);
+          // currentCustomer.specificRestrictionsActual.forEach((e, i) => {
+          //   if (e.hasOwnProperty("extra")) {
+          //     let totalRestrictionsSurcharge = 0;
+          //     console.log(e);
 
-              const totalBaseMealsCharge =
-                currentCustomer.breakfast.totalQty *
-                  currentCustomer.breakfastPrice +
-                currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-                currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
+          //     const totalBaseMealsCharge =
+          //       currentCustomer.breakfast.totalQty *
+          //         currentCustomer.breakfastPrice +
+          //       currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
+          //       currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
 
-              if (e.discountOrExtraType == "Percentage") {
-                totalRestrictionsSurcharge =
-                  e.extra / 100 * totalBaseMealsCharge;
-              }
+          //     if (e.discountOrExtraType == "Percentage") {
+          //       totalRestrictionsSurcharge =
+          //         e.extra / 100 * totalBaseMealsCharge;
+          //     }
 
-              if (e.discountOrExtraType == "Fixed amount") {
-                totalRestrictionsSurcharge =
-                  (currentCustomer.breakfast.totalQty +
-                    currentCustomer.lunch.totalQty +
-                    currentCustomer.dinner.totalQty) *
-                  e.extra;
-              }
+          //     if (e.discountOrExtraType == "Fixed amount") {
+          //       totalRestrictionsSurcharge =
+          //         (currentCustomer.breakfast.totalQty +
+          //           currentCustomer.lunch.totalQty +
+          //           currentCustomer.dinner.totalQty) *
+          //         e.extra;
+          //     }
 
-              console.log(totalRestrictionsSurcharge);
+          //     console.log(totalRestrictionsSurcharge);
 
-              currentCustomer.specificRestrictionsSurcharges.push(
-                totalRestrictionsSurcharge
-              );
-            } else {
-              currentCustomer.specificrestrictionsSurcharges.push(0);
-            }
-          });
+          //     currentCustomer.specificRestrictionsSurcharges.push(
+          //       totalRestrictionsSurcharge
+          //     );
+          //   } else {
+          //     currentCustomer.specificrestrictionsSurcharges.push(0);
+          //   }
+          // });
         }
 
         // calculating athletic surcharge for all meals
@@ -1553,7 +1626,7 @@ class Step4Checkout extends React.Component {
                           )
                         : ""}
 
-                      {this.state.primaryProfileBilling &&
+                      {/* this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling
                         .specificRestrictionsActual.length > 0
                         ? this.state.primaryProfileBilling.specificRestrictionsActual.map(
@@ -1585,7 +1658,7 @@ class Step4Checkout extends React.Component {
                               </Grid>
                             )
                           )
-                        : ""}
+                        : "" */}
 
                       {this.state.secondaryProfilesBilling
                         ? this.state.secondaryProfilesBilling.map((e, i) => (
@@ -1620,33 +1693,37 @@ class Step4Checkout extends React.Component {
                                 </Grid>
                               </Grid>
                               {/* discount secondary = */}
-                              {e.discountActual && (
-                                <Grid container>
-                                  <Grid item xs={12}>
-                                    <Typography
-                                      type="body2"
-                                      className="font-medium font-uppercase"
-                                      style={{ marginTop: ".75em" }}
-                                    >
-                                      Discount
-                                    </Typography>
+                              {e.discountActual &&
+                                e.discountActual > 0 && (
+                                  <Grid container>
+                                    <Grid item xs={12}>
+                                      <Typography
+                                        type="body2"
+                                        className="font-medium font-uppercase"
+                                        style={{ marginTop: ".75em" }}
+                                      >
+                                        Discount
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <Typography type="subheading">
+                                        {e.discount.charAt(0).toUpperCase() +
+                                          e.discount.substr(
+                                            1,
+                                            e.discount.length
+                                          )}
+                                      </Typography>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                      <Typography
+                                        type="subheading"
+                                        style={{ textAlign: "right" }}
+                                      >
+                                        -${e.discountActual}{" "}
+                                      </Typography>
+                                    </Grid>
                                   </Grid>
-                                  <Grid item xs={12} sm={6}>
-                                    <Typography type="subheading">
-                                      {e.discount.charAt(0).toUpperCase() +
-                                        e.discount.substr(1, e.discount.length)}
-                                    </Typography>
-                                  </Grid>
-                                  <Grid item xs={12} sm={6}>
-                                    <Typography
-                                      type="subheading"
-                                      style={{ textAlign: "right" }}
-                                    >
-                                      -${e.discountActual}{" "}
-                                    </Typography>
-                                  </Grid>
-                                </Grid>
-                              )}
+                                )}
 
                               {e.totalAthleticSurcharge > 0 ||
                               e.totalBodybuilderSurcharge > 0 ? (
@@ -1763,7 +1840,7 @@ class Step4Checkout extends React.Component {
                                   </Grid>
                                 ))}
 
-                              {e.specificRestrictionsActual.length > 0 &&
+                              {/* e.specificRestrictionsActual.length > 0 &&
                                 e.specificRestrictionsActual.map((el, ind) => (
                                   <Grid container key={ind}>
                                     <Grid item xs={12} sm={6}>
@@ -1787,7 +1864,7 @@ class Step4Checkout extends React.Component {
                                       </Typography>
                                     </Grid>
                                   </Grid>
-                                ))}
+                                )) */}
                             </div>
                           ))
                         : ""}

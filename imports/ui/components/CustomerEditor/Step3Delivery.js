@@ -2240,6 +2240,41 @@ class Step3Delivery extends React.Component {
               />
             </RadioGroup>
           );
+        } else if(this.state.deliveryType[1] == 'dayOfPaired' && this.state.deliveryType[2] == 'dayOfPaired'){
+          
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+  
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
         } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'dayOfPaired') {
 
           radioGroup = (
@@ -2754,6 +2789,41 @@ class Step3Delivery extends React.Component {
               />
             </RadioGroup>
           );
+        } else if(this.state.deliveryType[1] == 'dayOfPaired' && this.state.deliveryType[2] == 'dayOfPaired'){
+          
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+  
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+              />
+  
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+
         } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'dayOfPaired') {
 
           radioGroup = (
@@ -3516,6 +3586,7 @@ class Step3Delivery extends React.Component {
             />
           </RadioGroup>
         );
+
         if (this.state.deliveryType[3] === 'nightBefore') {
           radioGroup = (
             <RadioGroup

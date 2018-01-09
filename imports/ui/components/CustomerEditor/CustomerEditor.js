@@ -352,6 +352,7 @@ class CustomerEditor extends React.Component {
             potentialSubIngredients={this.props.potentialSubIngredients}
             lifestyles={this.props.lifestyles}
             restrictions={this.props.restrictions}
+            postalCodes={this.props.postalCodes}
             addSecondaryProfile={this.increaseProfileCount.bind(this)}
           />
         );
@@ -378,6 +379,7 @@ class CustomerEditor extends React.Component {
             lifestyles={this.props.lifestyles}
             restrictions={this.props.restrictions}
             ingredients={this.props.potentialSubIngredients}
+            postalCodes={this.props.postalCodes}
             history={this.props.history}
           />
         );

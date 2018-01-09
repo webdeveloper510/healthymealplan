@@ -68,6 +68,11 @@ Subscriptions.schema = new SimpleSchema({
     label: "Customer is tax exempt."
   },
 
+  subscriptionItems: {
+    type: Array,
+    label: "This will contain each profiles` line items"
+  },
+
   createdAt: {
     type: String,
     label: "The date this subscription was created.",

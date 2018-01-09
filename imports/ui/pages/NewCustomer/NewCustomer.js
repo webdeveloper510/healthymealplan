@@ -19,7 +19,8 @@ const NewCustomer = ({
   newCategory,
   popTheSnackbar,
   lifestyles,
-  restrictions
+  restrictions,
+  postalCodes
 }) => (
   <div>
     <Grid
@@ -34,6 +35,7 @@ const NewCustomer = ({
         newCategory={newCategory}
         lifestyles={lifestyles}
         restrictions={restrictions}
+        postalCodes={postalCodes}
       />
     </Grid>
   </div>
@@ -49,9 +51,15 @@ export default createContainer(() => {
   const subscription2 = Meteor.subscribe("ingredientTypes");
   const subscription3 = Meteor.subscribe("lifestyles");
   const subscription4 = Meteor.subscribe("restrictions");
+  const subscription5 = Meteor.subscribe("postalcodes");
 
   return {
-    loading: !subscription2.ready() || !subscription.ready(),
+    loading:
+      !subscription2.ready() &&
+      !subscription.ready() &&
+      !subscription3.ready() &&
+      !subscription4.ready() &&
+      !subscription5.ready(),
     ingredients: Ingredients.find().fetch(),
     ingredientTypes: IngredientTypes.find().fetch(),
     lifestyles: Lifestyles.find().fetch(),
