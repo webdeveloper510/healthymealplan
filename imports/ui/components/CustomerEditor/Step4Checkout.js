@@ -164,8 +164,8 @@ class Step4Checkout extends React.Component {
     // calculating basePrices for Breakfast, lunch and dinner
 
     let metCriteria = 0;
-    let customerScheduleTotals = [];
-    let secondaryCustomerTotals = [];
+    const customerScheduleTotals = [];
+    const secondaryCustomerTotals = [];
 
     // calculating total quantities and extra quantities and regular quantites
     this.props.customerInfo.scheduleReal.forEach((e, i) => {
@@ -993,6 +993,19 @@ class Step4Checkout extends React.Component {
     }
 
     let actualDeliveryCost = 0;
+    const surchargePerDelivery = 0;
+
+    const selectedPostalCode = this.props.postalCodes.find(
+      el => el.title === this.props.customerInfo.postalCode.substring(0, 3)
+    );
+
+    console.log(selectedPostalCode);
+
+    if (selectedPostalCode.hasOwnProperty("extraSurcharge")) {
+      surchargePerDelivery = selectedPostalCode.extraSurcharge;
+    }
+
+    console.log(surchargePerDelivery);
 
     for (
       let delivIndex = 0;
@@ -1017,6 +1030,47 @@ class Step4Checkout extends React.Component {
         delivIndex
       ];
 
+      // calculate surcharges
+
+      if (deliveryTypeSelected == "") {
+        continue;
+      } else if (
+        deliveryTypeSelected == "dayOf" ||
+        deliveryTypeSelected == "nightBefore"
+      ) {
+        primaryCustomer.deliverySurcharges += surchargePerDelivery;
+      } else if (
+        //tuesday
+        deliveryTypeSelected == "sundayNight" ||
+        deliveryTypeSelected == "dayOfMonday"
+      ) {
+        primaryCustomer.deliverySurcharges += surchargePerDelivery;
+      } else if (
+        //wednesday
+        deliveryTypeSelected == "sundayNight" ||
+        deliveryTypeSelected == "dayOfMonday" ||
+        deliveryTypeSelected == "nightBeforeMonday" ||
+        deliveryTypeSelected == "dayOfTuesday"
+      ) {
+        primaryCustomer.deliverySurcharges += surchargePerDelivery;
+      } else if (
+        //thursday
+        deliveryTypeSelected == "mondayNight" ||
+        deliveryTypeSelected == "dayOfTuesday" ||
+        deliveryTypeSelected == "nightBeforeTuesday" ||
+        deliveryTypeSelected == "dayOfWednesday"
+      ) {
+        primaryCustomer.deliverySurcharges += surchargePerDelivery;
+      } else if (
+        //friday
+        deliveryTypeSelected == "tuesdayNight" ||
+        deliveryTypeSelected == "dayOfWednesday" ||
+        deliveryTypeSelected == "nightBeforeWednesday" ||
+        deliveryTypeSelected == "dayOfThursday"
+      ) {
+        primaryCustomer.deliverySurcharges += surchargePerDelivery;
+      }
+      // calculate actual delivery cost / delivery
       if (deliveryTypeSelected == "") {
         continue;
       } else if (
@@ -1040,12 +1094,16 @@ class Step4Checkout extends React.Component {
       ) {
         actualDeliveryCost += 2.5;
       } else if (delivIndex == 5) {
+        //these explicit conditions because they depend on friday's/thursday's selections
         if (
           this.props.customerInfo.deliveryType[delivIndex - 1] ==
           "dayOfThursday"
         ) {
           if (deliveryTypeSelected == "nightBeforeThursday") {
             actualDeliveryCost += 2.5;
+
+            //mixing surcharges here
+            primaryCustomer.deliverySurcharges += surchargePerDelivery;
           }
         } else if (
           this.props.customerInfo.deliveryType[delivIndex - 1] ==
@@ -1054,10 +1112,15 @@ class Step4Checkout extends React.Component {
         ) {
           if (deliveryTypeSelected == "nightBeforeThursday") {
             actualDeliveryCost += 2.5;
+
+            //mixing surcharges here
+            primaryCustomer.deliverySurcharges += surchargePerDelivery;
           }
         }
       } // else if 5
     }
+
+    // calculate delivery surcharges
 
     primaryCustomer.deliveryCost = actualDeliveryCost;
 
@@ -1888,6 +1951,42 @@ class Step4Checkout extends React.Component {
                           </Typography>
                         </Grid>
                       </Grid>
+
+                      {this.state.primaryProfileBilling &&
+                        this.state.primaryProfileBilling.deliverySurcharges >
+                          0 && (
+                          <Grid container>
+                            <Grid item xs={6}>
+                              <Typography type="subheading">
+                                Delivery Surcharge (${
+                                  this.props.postalCodes.find(
+                                    el =>
+                                      el.title ===
+                                      this.props.customerInfo.postalCode.substring(
+                                        0,
+                                        3
+                                      )
+                                  ).extraSurcharge
+                                })
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography
+                                type="subheading"
+                                style={{ textAlign: "right" }}
+                              >
+                                {this.state.primaryProfileBilling &&
+                                this.state.primaryProfileBilling
+                                  .deliverySurcharges > 0
+                                  ? `$${
+                                      this.state.primaryProfileBilling
+                                        .deliverySurcharges
+                                    }`
+                                  : ""}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        )}
 
                       {this.state.primaryProfileBilling &&
                         this.state.primaryProfileBilling.coolerBag > 0 && (

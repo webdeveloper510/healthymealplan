@@ -9,6 +9,7 @@ import Ingredients from "../../../api/Ingredients/Ingredients";
 import IngredientTypes from "../../../api/IngredientTypes/IngredientTypes";
 import Lifestyles from "../../../api/Lifestyles/Lifestyles";
 import Restrictions from "../../../api/Restrictions/Restrictions";
+import PostalCodes from "../../../api/PostalCodes/PostalCodes";
 
 import CustomerEditor from "../../components/CustomerEditor/CustomerEditor";
 
@@ -63,6 +64,7 @@ export default createContainer(() => {
     ingredients: Ingredients.find().fetch(),
     ingredientTypes: IngredientTypes.find().fetch(),
     lifestyles: Lifestyles.find().fetch(),
-    restrictions: Restrictions.find().fetch()
+    restrictions: Restrictions.find().fetch(),
+    postalCodes: PostalCodes.find().fetch()
   };
 }, NewCustomer);

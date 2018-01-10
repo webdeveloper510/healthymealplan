@@ -2340,7 +2340,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(3, 'd')
-                  .format('D')} evening - Free is it showing this`}
+                  .format('D')} evening - Free`}
               />
 
               <FormControlLabel
@@ -2367,7 +2367,7 @@ class Step3Delivery extends React.Component {
             </RadioGroup>
           );
 
-        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0 //mondayNight is here
           radioGroup = (
             <RadioGroup
               aria-label={`delivery_${step}`}
@@ -2949,7 +2949,7 @@ class Step3Delivery extends React.Component {
               />
             </RadioGroup>
           );
-        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0 //mondayNight is here
           radioGroup = (
             <RadioGroup
               aria-label={`delivery_${step}`}

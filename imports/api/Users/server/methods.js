@@ -223,7 +223,8 @@ Meteor.methods({
       amount: actualTotal,
       taxExempt: customerInfo.taxExempt,
       completeSchedule: customerInfo.completeSchedule,
-      delivery: customerInfo.deliveryType
+      delivery: customerInfo.deliveryType,
+      subscriptionItems: subscriptionItemsReal
     });
 
     console.log(subscriptionId);

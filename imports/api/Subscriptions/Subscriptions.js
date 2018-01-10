@@ -22,6 +22,10 @@ Subscriptions.schema = new SimpleSchema({
     type: String,
     label: "The customer id"
   },
+  delivery: {
+    type: Array,
+    label: "Delivery Schedule"
+  },
   authorizeSubscriptionId: {
     type: String,
     label: "Authorize.Net subscriptionId (Card only)",
