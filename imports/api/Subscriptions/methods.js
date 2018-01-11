@@ -1,39 +1,39 @@
-import { Meteor } from "meteor/meteor";
-import { check } from "meteor/check";
-import Subscriptions from "./Subscriptions";
-import rateLimit from "../../modules/rate-limit";
-import { getNextSequence } from "../../modules/server/get-next-sequence";
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
+import Subscriptions from './Subscriptions';
+import rateLimit from '../../modules/rate-limit';
+import { getNextSequence } from '../../modules/server/get-next-sequence';
 
 Meteor.methods({
-  "subscription.insert": function subscriptionInsert(sub) {
+  'subscription.insert': function subscriptionInsert(sub) {
     check(sub, {
-      customerId: String
+      customerId: String,
     });
 
     const subExists = Subscriptions.findOne({ customerId: sub.title });
 
     if (subExists) {
       throw new Meteor.Error(
-        "500",
-        `Subscription for customer ${sub.customerId} is already present`
+        '500',
+        `Subscription for customer ${sub.customerId} is already present`,
       );
     }
 
     try {
       return Subscriptions.insert({
         paymentMethod: sub.title,
-        types: sub.types
+        types: sub.types,
       });
     } catch (exception) {
-      throw new Meteor.Error("500", exception);
+      throw new Meteor.Error('500', exception);
     }
   },
 
-  "subscriptions.update": function subscriptionsUpdate(sub) {
+  'subscriptions.update': function subscriptionsUpdate(sub) {
     check(sub, {
       _id: String,
       customerId: String,
-      types: Array
+      types: Array,
     });
 
     try {
@@ -41,26 +41,26 @@ Meteor.methods({
       Subscriptions.update(subId, { $set: sub });
       return subId; // Return _id so we can redirect to document after update.
     } catch (exception) {
-      throw new Meteor.Error("500", exception);
+      throw new Meteor.Error('500', exception);
     }
   },
-  "subscriptions.remove": function subscriptionsRemove(subId) {
+  'subscriptions.remove': function subscriptionsRemove(subId) {
     check(subId, String);
 
     try {
       return Subscriptions.remove(subId);
     } catch (exception) {
-      throw new Meteor.Error("500", exception);
+      throw new Meteor.Error('500', exception);
     }
-  }
+  },
 });
 
 rateLimit({
   methods: [
-    "subscriptions.insert",
-    "subscriptions.update",
-    "subscriptions.remove"
+    'subscriptions.insert',
+    'subscriptions.update',
+    'subscriptions.remove',
   ],
   limit: 5,
-  timeRange: 1000
+  timeRange: 1000,
 });

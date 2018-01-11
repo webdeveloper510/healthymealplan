@@ -3,86 +3,33 @@
 import { Mongo } from 'meteor/mongo';
 import SimpleSchema from 'simpl-schema';
 
-const Subscriptions = new Mongo.Collection('Subscriptions');
+const Invoices = new Mongo.Collection('Invoices');
 
-Subscriptions.allow({
+Invoices.allow({
   insert: () => false,
   update: () => false,
   remove: () => false,
 });
 
-Subscriptions.deny({
+Invoices.deny({
   insert: () => true,
   update: () => true,
   remove: () => true,
 });
 
-Subscriptions.schema = new SimpleSchema({
-  customerId: {
+Invoices.schema = new SimpleSchema({
+  subscriptionId: {
     type: String,
-    label: 'The customer id',
-  },
-  delivery: {
-    type: Array,
-    label: 'Delivery Schedule',
-  },
-  'delivery.$': {
-    type: String,
-    label: "Day's delivery",
-  },
-  authorizeSubscriptionId: {
-    type: String,
-    label: 'Authorize.Net subscriptionId (Card only)',
-    optional: true,
-  },
-  authorizeCustomerProfileId: {
-    type: String,
-    label: 'Authorize.Net customer profileId',
-    optional: true,
-  },
-  authorizePaymentProfileId: {
-    type: String,
-    label: 'Authorize.Net paymentProfileId (Card only)',
-    optional: true,
-  },
-  status: {
-    type: String,
-    label: 'Status of the subscription',
+    label: 'The subscription id',
   },
 
-  paymentMethod: {
-    type: String,
-    label: 'The payment method for the subscription',
-  },
-
-  amount: {
-    type: Number,
-    label: 'The total amount of the subscription',
-  },
-
-  transactions: {
-    type: Array,
-    label: 'All the transaction ids for this subscription',
-    optional: true,
-  },
-
-  // "transactions.$": {
-  //   type: String,
-  //   label: "The transaction id"
-  // },
-
-  taxExempt: {
-    type: Boolean,
-    label: 'Customer is tax exempt.',
-  },
-
-  subscriptionItems: {
+  lineItems: {
     type: Array,
     label: 'This will contain each profiles` line items',
     blackbox: true,
   },
 
-  'subscriptionItems.$': {
+  'lineItems.$': {
     type: Object,
     label: 'Each profile line item data',
     blackbox: true,
@@ -165,6 +112,6 @@ Subscriptions.schema = new SimpleSchema({
   },
 });
 
-Subscriptions.attachSchema(Subscriptions.schema);
+Invoices.attachSchema(Invoices.schema);
 
-export default Subscriptions;
+export default Invoices;

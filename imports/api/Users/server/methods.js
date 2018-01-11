@@ -131,7 +131,7 @@ Meteor.methods({
   "customer.step5.noCreditCard": function noCreditCard(customerInfo) {
     check(customerInfo, Object);
 
-    console.log(customerInfo);
+    // console.log(customerInfo);
 
     Meteor.users.update(
       { _id: customerInfo.id },
@@ -215,6 +215,186 @@ Meteor.methods({
         customerInfo.primaryProfileBilling.groupTotal -
         customerInfo.primaryProfileBilling.taxes;
     }
+
+    let subscriptionItemsReal = [];
+
+    let primaryProfileLineItems = {
+      lifestyle: {
+        title: customerInfo.primaryProfileBilling.lifestyle.title,
+        meals:
+          customerInfo.primaryProfileBilling.breakfast.totalQty +
+          customerInfo.primaryProfileBilling.lunch.totalQty +
+          customerInfo.primaryProfileBilling.dinner.totalQty,
+
+        price:
+          customerInfo.primaryProfileBilling.breakfast.totalQty *
+            customerInfo.primaryProfileBilling.breakfastPrice +
+          customerInfo.primaryProfileBilling.lunch.totalQty *
+            customerInfo.primaryProfileBilling.lunchPrice +
+          customerInfo.primaryProfileBilling.dinner.totalQty *
+            customerInfo.primaryProfileBilling.dinnerPrice
+      },
+      restrictions: []
+    };
+
+    if (customerInfo.primaryProfileBilling.discountActual > 0) {
+      primaryProfileLineItems.discount = {
+        title:
+          customerInfo.primaryProfileBilling.discount.charAt(0).toUpperCase() +
+          customerInfo.primaryProfileBilling.discount.substr(
+            1,
+            customerInfo.primaryProfileBilling.discount.length
+          ),
+        amount: customerInfo.primaryProfileBilling.discountActual
+      };
+    }
+
+    if (customerInfo.primaryProfileBilling.totalAthleticSurcharge > 0) {
+      primaryProfileLineItems.extraAthletic = {
+        title: "Athletic",
+        amount: customerInfo.primaryProfileBilling.totalAthleticSurcharge,
+        actual: customerInfo.primaryProfileBilling.lifestyle.extraAthletic,
+        type:
+          customerInfo.primaryProfileBilling.lifestyle
+            .discountOrExtraTypeAthletic
+      };
+    }
+
+    if (customerInfo.primaryProfileBilling.totalBodybuilderSurcharge > 0) {
+      primaryProfileLineItems.extraBodybuilder = {
+        title: "Bodybuilder",
+        amount: customerInfo.primaryProfileBilling.totalBodybuilderSurcharge,
+        actual: customerInfo.primaryProfileBilling.lifestyle.extraBodybuilder,
+        type:
+          customerInfo.primaryProfileBilling.lifestyle
+            .discountOrExtraTypeBodybuilder
+      };
+    }
+
+    if (customerInfo.primaryProfileBilling.restrictionsActual.length > 0) {
+      customerInfo.primaryProfileBilling.restrictionsActual.forEach((e, i) => {
+        primaryProfileLineItems.restrictions.push({
+          title: e.title,
+          extra: e.extra,
+          type: e.discountOrExtraType,
+          surcharge:
+            customerInfo.primaryProfileBilling.restrictionsSurcharges[i]
+        });
+      });
+    }
+
+    if (customerInfo.primaryProfileBilling.deliveryCost > 0) {
+      primaryProfileLineItems.deliveryCost =
+        customerInfo.primaryProfileBilling.deliveryCost;
+    }
+
+    if (customerInfo.primaryProfileBilling.deliverySurcharges > 0) {
+      primaryProfileLineItems.deliverySurcharges =
+        customerInfo.primaryProfileBilling.deliverySurcharges;
+    }
+
+    primaryProfileLineItems.taxes = customerInfo.primaryProfileBilling.taxes;
+
+    if (customerInfo.taxExempt) {
+      primaryProfileLineItems.taxes =
+        customerInfo.primaryProfileBilling.groupTotal -
+        customerInfo.primaryProfileBilling.taxes;
+    } else {
+      primaryProfileLineItems.taxExempt = true;
+      primaryProfileLineItems.total =
+        customerInfo.primaryProfileBilling.groupTotal;
+    }
+
+    subscriptionItemsReal.push(primaryProfileLineItems);
+
+    if (customerInfo.secondaryProfileCount > 0) {
+      customerInfo.secondaryProfilesBilling.forEach((e, i) => {
+        let currentProfileLineItems = {
+          lifestyle: {
+            title: customerInfo.secondaryProfilesBilling[i].lifestyle.title,
+            meals:
+              customerInfosecondaryProfilesBilling[i].breakfast.totalQty +
+              customerInfosecondaryProfilesBilling[i].lunch.totalQty +
+              customerInfosecondaryProfilesBilling[i].dinner.totalQty,
+
+            price:
+              customerInfo.secondaryProfilesBilling[i].breakfast.totalQty *
+                customerInfo.secondaryProfilesBilling[i].breakfastPrice +
+              customerInfo.secondaryProfilesBilling[i].lunch.totalQty *
+                customerInfo.secondaryProfilesBilling[i].lunchPrice +
+              customerInfo.secondaryProfilesBilling[i].dinner.totalQty *
+                customerInfo.secondaryProfilesBilling[i].dinnerPrice
+          },
+          restrictions: []
+        };
+
+        if (customerInfo.secondaryProfilesBilling[i].discountActual > 0) {
+          primaryProfileLineItems.discount = {
+            title:
+              customerInfo.secondaryProfilesBilling[i].discount
+                .charAt(0)
+                .toUpperCase() +
+              customerInfo.secondaryProfilesBilling[i].discount.substr(
+                1,
+                customerInfo.secondaryProfilesBilling[i].discount.length
+              ),
+            amount: customerInfo.secondaryProfilesBilling[i].discountActual
+          };
+        }
+
+        if (
+          customerInfo.secondaryProfilesBilling[i].totalAthleticSurcharge > 0
+        ) {
+          primaryProfileLineItems.extraAthletic = {
+            title: "Athletic",
+            amount:
+              customerInfo.secondaryProfilesBilling[i].totalAthleticSurcharge,
+            actual:
+              customerInfo.secondaryProfilesBilling[i].lifestyle.extraAthletic,
+            type:
+              customerInfo.secondaryProfilesBilling[i].lifestyle
+                .discountOrExtraTypeAthletic
+          };
+        }
+
+        if (
+          customerInfo.secondaryProfilesBilling[i].totalBodybuilderSurcharge > 0
+        ) {
+          primaryProfileLineItems.extraBodybuilder = {
+            title: "Bodybuilder",
+            amount:
+              customerInfo.secondaryProfilesBilling[i]
+                .totalBodybuilderSurcharge,
+            actual:
+              customerInfo.secondaryProfilesBilling[i].lifestyle
+                .extraBodybuilder,
+            type:
+              customerInfo.secondaryProfilesBilling[i].lifestyle
+                .discountOrExtraTypeBodybuilder
+          };
+        }
+
+        if (
+          customerInfo.secondaryProfilesBilling[i].restrictionsActual.length > 0
+        ) {
+          customerInfo.secondaryProfilesBilling[i].restrictionsActual.forEach(
+            (e, i) => {
+              primaryProfileLineItems.restrictions.push({
+                title: e.title,
+                extra: e.extra,
+                type: e.discountOrExtraType,
+                surcharge:
+                  customerInfo.secondaryProfilesBilling[i]
+                    .restrictionsSurcharges[i]
+              });
+            }
+          );
+        }
+
+        subscriptionItemsReal.push(currentProfileLineItems);
+      });
+    }
+    console.log(subscriptionItemsReal);
 
     const subscriptionId = Subscriptions.insert({
       customerId: customerInfo.id,
