@@ -1,46 +1,46 @@
-import { Meteor } from "meteor/meteor";
-import { check } from "meteor/check";
-import { Roles } from "meteor/alanning:roles";
-import { Random } from "meteor/random";
-import moment from "moment";
+import { Meteor } from 'meteor/meteor';
+import { check } from 'meteor/check';
+import { Roles } from 'meteor/alanning:roles';
+import { Random } from 'meteor/random';
+import moment from 'moment';
 
-import { Accounts } from "meteor/accounts-base";
-import editProfile from "./edit-profile";
-import rateLimit from "../../../modules/rate-limit";
-import createCustomerProfile from "../../../modules/server/authorize/createCustomerProfile";
-import createSubscriptionFromCustomerProfile from "../../../modules/server/authorize/createSubscriptionFromCustomerProfile";
+import { Accounts } from 'meteor/accounts-base';
+import editProfile from './edit-profile';
+import rateLimit from '../../../modules/rate-limit';
+import createCustomerProfile from '../../../modules/server/authorize/createCustomerProfile';
+import createSubscriptionFromCustomerProfile from '../../../modules/server/authorize/createSubscriptionFromCustomerProfile';
 
-import PostalCodes from "../../PostalCodes/PostalCodes";
-import Subscriptions from "../../Subscriptions/Subscriptions";
-import Jobs from "../../Jobs/Jobs";
+import PostalCodes from '../../PostalCodes/PostalCodes';
+import Subscriptions from '../../Subscriptions/Subscriptions';
+import Jobs from '../../Jobs/Jobs';
 
 Meteor.methods({
-  "users.sendVerificationEmail": function usersSendVerificationEmail() {
+  'users.sendVerificationEmail': function usersSendVerificationEmail() {
     return Accounts.sendVerificationEmail(this.userId);
   },
-  "users.editProfile": function usersEditProfile(profile) {
+  'users.editProfile': function usersEditProfile(profile) {
     check(profile, {
       emailAddress: String,
       profile: {
         name: {
           first: String,
-          last: String
+          last: String,
         },
-        phone: String
-      }
+        phone: String,
+      },
     });
 
     return editProfile({ userId: this.userId, profile })
       .then(response => response)
-      .catch(exception => {
-        throw new Meteor.Error("500", exception);
+      .catch((exception) => {
+        throw new Meteor.Error('500', exception);
       });
   },
 
-  "users.addNewStaff": function addNewStaff(data) {
+  'users.addNewStaff': function addNewStaff(data) {
     const empId = Accounts.createUser({
       email: data.email,
-      password: data.password
+      password: data.password,
     });
 
     Roles.addUsersToRoles(empId, [data.staffType]);
@@ -48,17 +48,17 @@ Meteor.methods({
     return empId;
   },
 
-  "customers.step1": function customerStep1(data) {
+  'customers.step1': function customerStep1(data) {
     check(data, {
       email: String,
       postalCode: String,
       firstName: String,
       lastName: String,
-      phoneNumber: String
+      phoneNumber: String,
     });
 
     const postalCodeExists = PostalCodes.find({
-      title: data.postalCode.substr(0, 3)
+      title: data.postalCode.substr(0, 3),
     }).fetch();
 
     console.log(postalCodeExists);
@@ -71,44 +71,44 @@ Meteor.methods({
         profile: {
           name: {
             first: data.firstName,
-            last: data.lastName
-          }
-        }
+            last: data.lastName,
+          },
+        },
       });
     } catch (exception) {
-      throw new Meteor.Error("500", exception);
+      throw new Meteor.Error('500', exception);
     }
 
-    Roles.addUsersToRoles(userId, ["customer"]);
+    Roles.addUsersToRoles(userId, ['customer']);
 
     Meteor.users.update(
       { _id: userId },
       {
         $set: {
           postalCode: data.postalCode,
-          status: "abandoned",
+          status: 'abandoned',
           phone: data.phoneNumber,
-          adultOrChild: "adult"
-        }
-      }
+          adultOrChild: 'adult',
+        },
+      },
     );
 
     if (postalCodeExists.length == 0) {
       console.log(postalCodeExists);
-      throw new Meteor.Error(400, "Delivery not available in that area.");
+      throw new Meteor.Error(400, 'Delivery not available in that area.');
     }
 
     return userId;
   },
 
-  "customers.step2": function customerStep2(data) {
+  'customers.step2': function customerStep2(data) {
     check(data, {
       id: String,
       email: String,
       firstName: String,
       lastName: String,
       phoneNumber: String,
-      adultOrChild: String
+      adultOrChild: String,
     });
 
     try {
@@ -116,19 +116,19 @@ Meteor.methods({
         { _id: data.id },
         {
           $set: {
-            "profile.name.first": data.firstName,
-            "profile.name.last": data.lastName,
+            'profile.name.first': data.firstName,
+            'profile.name.last': data.lastName,
             phone: data.phoneNumber,
-            adultOrChild: "adult"
-          }
-        }
+            adultOrChild: 'adult',
+          },
+        },
       );
     } catch (exception) {
-      throw new Meteor.Error("500", exception);
+      throw new Meteor.Error('500', exception);
     }
   },
 
-  "customer.step5.noCreditCard": function noCreditCard(customerInfo) {
+  'customer.step5.noCreditCard': function noCreditCard(customerInfo) {
     check(customerInfo, Object);
 
     // console.log(customerInfo);
@@ -147,9 +147,9 @@ Meteor.methods({
 
           subscriptionStartDate: customerInfo.subscriptionStartDate,
           subscriptionStartDateRaw: customerInfo.subscriptionStartDateRaw,
-          associatedProfiles: customerInfo.secondaryProfileCount
-        }
-      }
+          associatedProfiles: customerInfo.secondaryProfileCount,
+        },
+      },
     );
 
     const secondaryAccountIds = [];
@@ -164,15 +164,15 @@ Meteor.methods({
             profile: {
               name: {
                 first: element.first_name,
-                last: element.last_name
-              }
-            }
+                last: element.last_name,
+              },
+            },
           });
         } catch (exception) {
-          throw new Meteor.Error("500", exception);
+          throw new Meteor.Error('500', exception);
         }
 
-        Roles.addUsersToRoles(userId, ["customer"]);
+        Roles.addUsersToRoles(userId, ['customer']);
 
         secondaryAccountIds.push(userId);
 
@@ -192,9 +192,9 @@ Meteor.methods({
               preferences:
                 customerInfo.secondaryProfilesBilling[index].preferences,
               schedule: element.scheduleReal,
-              adultOrChild: element.adultOrChild
-            }
-          }
+              adultOrChild: element.adultOrChild,
+            },
+          },
         );
       });
 
@@ -202,9 +202,9 @@ Meteor.methods({
         { _id: customerInfo.id },
         {
           $set: {
-            secondaryAccounts: secondaryAccountIds
-          }
-        }
+            secondaryAccounts: secondaryAccountIds,
+          },
+        },
       );
     }
 
@@ -216,9 +216,9 @@ Meteor.methods({
         customerInfo.primaryProfileBilling.taxes;
     }
 
-    let subscriptionItemsReal = [];
+    const subscriptionItemsReal = [];
 
-    let primaryProfileLineItems = {
+    const primaryProfileLineItems = {
       lifestyle: {
         title: customerInfo.primaryProfileBilling.lifestyle.title,
         meals:
@@ -232,9 +232,9 @@ Meteor.methods({
           customerInfo.primaryProfileBilling.lunch.totalQty *
             customerInfo.primaryProfileBilling.lunchPrice +
           customerInfo.primaryProfileBilling.dinner.totalQty *
-            customerInfo.primaryProfileBilling.dinnerPrice
+            customerInfo.primaryProfileBilling.dinnerPrice,
       },
-      restrictions: []
+      restrictions: [],
     };
 
     if (customerInfo.primaryProfileBilling.discountActual > 0) {
@@ -243,31 +243,31 @@ Meteor.methods({
           customerInfo.primaryProfileBilling.discount.charAt(0).toUpperCase() +
           customerInfo.primaryProfileBilling.discount.substr(
             1,
-            customerInfo.primaryProfileBilling.discount.length
+            customerInfo.primaryProfileBilling.discount.length,
           ),
-        amount: customerInfo.primaryProfileBilling.discountActual
+        amount: customerInfo.primaryProfileBilling.discountActual,
       };
     }
 
     if (customerInfo.primaryProfileBilling.totalAthleticSurcharge > 0) {
       primaryProfileLineItems.extraAthletic = {
-        title: "Athletic",
+        title: 'Athletic',
         amount: customerInfo.primaryProfileBilling.totalAthleticSurcharge,
         actual: customerInfo.primaryProfileBilling.lifestyle.extraAthletic,
         type:
           customerInfo.primaryProfileBilling.lifestyle
-            .discountOrExtraTypeAthletic
+            .discountOrExtraTypeAthletic,
       };
     }
 
     if (customerInfo.primaryProfileBilling.totalBodybuilderSurcharge > 0) {
       primaryProfileLineItems.extraBodybuilder = {
-        title: "Bodybuilder",
+        title: 'Bodybuilder',
         amount: customerInfo.primaryProfileBilling.totalBodybuilderSurcharge,
         actual: customerInfo.primaryProfileBilling.lifestyle.extraBodybuilder,
         type:
           customerInfo.primaryProfileBilling.lifestyle
-            .discountOrExtraTypeBodybuilder
+            .discountOrExtraTypeBodybuilder,
       };
     }
 
@@ -278,7 +278,7 @@ Meteor.methods({
           extra: e.extra,
           type: e.discountOrExtraType,
           surcharge:
-            customerInfo.primaryProfileBilling.restrictionsSurcharges[i]
+            customerInfo.primaryProfileBilling.restrictionsSurcharges[i],
         });
       });
     }
@@ -309,13 +309,13 @@ Meteor.methods({
 
     if (customerInfo.secondaryProfileCount > 0) {
       customerInfo.secondaryProfilesBilling.forEach((e, i) => {
-        let currentProfileLineItems = {
+        const currentProfileLineItems = {
           lifestyle: {
             title: customerInfo.secondaryProfilesBilling[i].lifestyle.title,
             meals:
-              customerInfosecondaryProfilesBilling[i].breakfast.totalQty +
-              customerInfosecondaryProfilesBilling[i].lunch.totalQty +
-              customerInfosecondaryProfilesBilling[i].dinner.totalQty,
+              customerInfo.secondaryProfilesBilling[i].breakfast.totalQty +
+              customerInfo.secondaryProfilesBilling[i].lunch.totalQty +
+              customerInfo.secondaryProfilesBilling[i].dinner.totalQty,
 
             price:
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty *
@@ -323,9 +323,9 @@ Meteor.methods({
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty *
                 customerInfo.secondaryProfilesBilling[i].lunchPrice +
               customerInfo.secondaryProfilesBilling[i].dinner.totalQty *
-                customerInfo.secondaryProfilesBilling[i].dinnerPrice
+                customerInfo.secondaryProfilesBilling[i].dinnerPrice,
           },
-          restrictions: []
+          restrictions: [],
         };
 
         if (customerInfo.secondaryProfilesBilling[i].discountActual > 0) {
@@ -336,9 +336,9 @@ Meteor.methods({
                 .toUpperCase() +
               customerInfo.secondaryProfilesBilling[i].discount.substr(
                 1,
-                customerInfo.secondaryProfilesBilling[i].discount.length
+                customerInfo.secondaryProfilesBilling[i].discount.length,
               ),
-            amount: customerInfo.secondaryProfilesBilling[i].discountActual
+            amount: customerInfo.secondaryProfilesBilling[i].discountActual,
           };
         }
 
@@ -346,14 +346,14 @@ Meteor.methods({
           customerInfo.secondaryProfilesBilling[i].totalAthleticSurcharge > 0
         ) {
           primaryProfileLineItems.extraAthletic = {
-            title: "Athletic",
+            title: 'Athletic',
             amount:
               customerInfo.secondaryProfilesBilling[i].totalAthleticSurcharge,
             actual:
               customerInfo.secondaryProfilesBilling[i].lifestyle.extraAthletic,
             type:
               customerInfo.secondaryProfilesBilling[i].lifestyle
-                .discountOrExtraTypeAthletic
+                .discountOrExtraTypeAthletic,
           };
         }
 
@@ -361,7 +361,7 @@ Meteor.methods({
           customerInfo.secondaryProfilesBilling[i].totalBodybuilderSurcharge > 0
         ) {
           primaryProfileLineItems.extraBodybuilder = {
-            title: "Bodybuilder",
+            title: 'Bodybuilder',
             amount:
               customerInfo.secondaryProfilesBilling[i]
                 .totalBodybuilderSurcharge,
@@ -370,7 +370,7 @@ Meteor.methods({
                 .extraBodybuilder,
             type:
               customerInfo.secondaryProfilesBilling[i].lifestyle
-                .discountOrExtraTypeBodybuilder
+                .discountOrExtraTypeBodybuilder,
           };
         }
 
@@ -385,9 +385,9 @@ Meteor.methods({
                 type: e.discountOrExtraType,
                 surcharge:
                   customerInfo.secondaryProfilesBilling[i]
-                    .restrictionsSurcharges[i]
+                    .restrictionsSurcharges[i],
               });
-            }
+            },
           );
         }
 
@@ -398,45 +398,45 @@ Meteor.methods({
 
     const subscriptionId = Subscriptions.insert({
       customerId: customerInfo.id,
-      status: "paused",
+      status: 'paused',
       paymentMethod: customerInfo.paymentMethod,
       amount: actualTotal,
       taxExempt: customerInfo.taxExempt,
       completeSchedule: customerInfo.completeSchedule,
       delivery: customerInfo.deliveryType,
-      subscriptionItems: subscriptionItemsReal
+      subscriptionItems: subscriptionItemsReal,
     });
 
     console.log(subscriptionId);
 
     const lastWeeksSaturday = moment(
-      customerInfo.subscriptionStartDateRaw
-    ).subtract(2, "d");
+      customerInfo.subscriptionStartDateRaw,
+    ).subtract(2, 'd');
 
     const job = new Job(
       Jobs,
-      "setSubscriptionActive", // type of job
+      'setSubscriptionActive', // type of job
       {
         subscriptionId,
-        customerId: customerInfo.id
-      }
+        customerId: customerInfo.id,
+      },
     );
     const a = moment(lastWeeksSaturday);
-    const b = moment().startOf("day");
+    const b = moment().startOf('day');
     a.diff(b);
 
     console.log(a.diff(b));
 
     job
-      .priority("normal")
+      .priority('normal')
       .delay(Math.abs(a.diff(b))) // Wait an hour before first try
       .save(); // Commit it to the server
   },
 
-  "customers.step5": function customerStep5(opaqueData, customerInfo) {
+  'customers.step5': function customerStep5(opaqueData, customerInfo) {
     check(opaqueData, {
       dataDescriptor: String,
-      dataValue: String
+      dataValue: String,
     });
 
     check(customerInfo, Object);
@@ -445,7 +445,7 @@ Meteor.methods({
 
     const syncCreateCustomerProfile = Meteor.wrapAsync(createCustomerProfile);
     const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(
-      createSubscriptionFromCustomerProfile
+      createSubscriptionFromCustomerProfile,
     );
 
     // create primary profile over on Authorize
@@ -456,18 +456,18 @@ Meteor.methods({
         email: customerInfo.email,
         id: customerInfo.id,
         postalCode: customerInfo.billingPostalCode,
-        nameOnCard: customerInfo.nameOnCard
-      }
+        nameOnCard: customerInfo.nameOnCard,
+      },
     );
 
     if (
       createCustomerProfileRes.resultCode &&
-      createCustomerProfileRes.resultCode != "Ok"
+      createCustomerProfileRes.resultCode != 'Ok'
     ) {
-      throw new Meteor.Error(500, "There was a problem creating user profile.");
+      throw new Meteor.Error(500, 'There was a problem creating user profile.');
     }
 
-    console.log("Customer");
+    console.log('Customer');
     console.log(createCustomerProfileRes);
 
     // primary profile created successfully on authorize
@@ -487,9 +487,9 @@ Meteor.methods({
 
           subscriptionStartDate: customerInfo.subscriptionStartDate,
           subscriptionStartDateRaw: customerInfo.subscriptionStartDateRaw,
-          associatedProfiles: customerInfo.secondaryProfileCount
-        }
-      }
+          associatedProfiles: customerInfo.secondaryProfileCount,
+        },
+      },
     );
 
     const secondaryAccountIds = [];
@@ -504,15 +504,15 @@ Meteor.methods({
             profile: {
               name: {
                 first: element.first_name,
-                last: element.last_name
-              }
-            }
+                last: element.last_name,
+              },
+            },
           });
         } catch (exception) {
-          throw new Meteor.Error("500", exception);
+          throw new Meteor.Error('500', exception);
         }
 
-        Roles.addUsersToRoles(userId, ["customer"]);
+        Roles.addUsersToRoles(userId, ['customer']);
 
         secondaryAccountIds.push(userId);
 
@@ -532,9 +532,9 @@ Meteor.methods({
               preferences:
                 customerInfo.secondaryProfilesBilling[index].preferences,
               schedule: element.scheduleReal,
-              adultOrChild: element.adultOrChild
-            }
-          }
+              adultOrChild: element.adultOrChild,
+            },
+          },
         );
       });
 
@@ -542,9 +542,9 @@ Meteor.methods({
         { _id: customerInfo.id },
         {
           $set: {
-            secondaryAccounts: secondaryAccountIds
-          }
-        }
+            secondaryAccounts: secondaryAccountIds,
+          },
+        },
       );
     }
 
@@ -561,40 +561,220 @@ Meteor.methods({
 
     // subscriptionDate (Previous saturday)
     const lastWeeksSaturday = moment(
-      customerInfo.subscriptionStartDateRaw
-    ).subtract(2, "d");
+      customerInfo.subscriptionStartDateRaw,
+    ).subtract(2, 'd');
 
-    const a = moment(lastWeeksSaturday);
-    const b = moment().startOf("day");
+    // const a = moment(lastWeeksSaturday);
+    // const b = moment();
 
     // subscription
     const createSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
       createCustomerProfileRes.customerProfileId,
       createCustomerProfileRes.customerPaymentProfileIdList.numericString[0],
-      moment(lastWeeksSaturday).format("YYYY-MM-DD"),
-      actualTotal
+      // moment(lastWeeksSaturday).format('YYYY-MM-DD'),
+      moment().format('YYYY-MM-DD'),
+      actualTotal,
     );
 
-    console.log("Subscription data");
+    console.log('Subscription data');
     console.log(createSubscriptionFromCustomerProfileRes);
 
     if (
       createSubscriptionFromCustomerProfileRes.resultCode &&
-      createSubscriptionFromCustomerProfileRes.resultCode != "Ok"
+      createSubscriptionFromCustomerProfileRes.resultCode != 'Ok'
     ) {
       throw new Meteor.Error(
         500,
-        "There was a problem creating subscription from user profile."
+        'There was a problem creating subscription from user profile.',
       );
     }
 
-    console.log("create customer profile res");
+    console.log('create customer profile res');
 
     console.log(createCustomerProfileRes);
 
-    console.log("create subscription from profile res");
+    console.log('create subscription from profile res');
 
     console.log(createSubscriptionFromCustomerProfileRes);
+
+    const subscriptionItemsReal = [];
+
+    const primaryProfileLineItems = {
+      lifestyle: {
+        title: customerInfo.primaryProfileBilling.lifestyle.title,
+        meals:
+          customerInfo.primaryProfileBilling.breakfast.totalQty +
+          customerInfo.primaryProfileBilling.lunch.totalQty +
+          customerInfo.primaryProfileBilling.dinner.totalQty,
+
+        price:
+          customerInfo.primaryProfileBilling.breakfast.totalQty *
+            customerInfo.primaryProfileBilling.breakfastPrice +
+          customerInfo.primaryProfileBilling.lunch.totalQty *
+            customerInfo.primaryProfileBilling.lunchPrice +
+          customerInfo.primaryProfileBilling.dinner.totalQty *
+            customerInfo.primaryProfileBilling.dinnerPrice,
+      },
+      restrictions: [],
+    };
+
+    if (customerInfo.primaryProfileBilling.discountActual > 0) {
+      primaryProfileLineItems.discount = {
+        title:
+          customerInfo.primaryProfileBilling.discount.charAt(0).toUpperCase() +
+          customerInfo.primaryProfileBilling.discount.substr(
+            1,
+            customerInfo.primaryProfileBilling.discount.length,
+          ),
+        amount: customerInfo.primaryProfileBilling.discountActual,
+      };
+    }
+
+    if (customerInfo.primaryProfileBilling.totalAthleticSurcharge > 0) {
+      primaryProfileLineItems.extraAthletic = {
+        title: 'Athletic',
+        amount: customerInfo.primaryProfileBilling.totalAthleticSurcharge,
+        actual: customerInfo.primaryProfileBilling.lifestyle.extraAthletic,
+        type:
+          customerInfo.primaryProfileBilling.lifestyle
+            .discountOrExtraTypeAthletic,
+      };
+    }
+
+    if (customerInfo.primaryProfileBilling.totalBodybuilderSurcharge > 0) {
+      primaryProfileLineItems.extraBodybuilder = {
+        title: 'Bodybuilder',
+        amount: customerInfo.primaryProfileBilling.totalBodybuilderSurcharge,
+        actual: customerInfo.primaryProfileBilling.lifestyle.extraBodybuilder,
+        type:
+          customerInfo.primaryProfileBilling.lifestyle
+            .discountOrExtraTypeBodybuilder,
+      };
+    }
+
+    if (customerInfo.primaryProfileBilling.restrictionsActual.length > 0) {
+      customerInfo.primaryProfileBilling.restrictionsActual.forEach((e, i) => {
+        primaryProfileLineItems.restrictions.push({
+          title: e.title,
+          extra: e.extra,
+          type: e.discountOrExtraType,
+          surcharge:
+            customerInfo.primaryProfileBilling.restrictionsSurcharges[i],
+        });
+      });
+    }
+
+    if (customerInfo.primaryProfileBilling.deliveryCost > 0) {
+      primaryProfileLineItems.deliveryCost =
+        customerInfo.primaryProfileBilling.deliveryCost;
+    }
+
+    if (customerInfo.primaryProfileBilling.deliverySurcharges > 0) {
+      primaryProfileLineItems.deliverySurcharges =
+        customerInfo.primaryProfileBilling.deliverySurcharges;
+    }
+
+    primaryProfileLineItems.taxes = customerInfo.primaryProfileBilling.taxes;
+
+    if (customerInfo.taxExempt) {
+      primaryProfileLineItems.taxes =
+        customerInfo.primaryProfileBilling.groupTotal -
+        customerInfo.primaryProfileBilling.taxes;
+    } else {
+      primaryProfileLineItems.taxExempt = true;
+      primaryProfileLineItems.total =
+        customerInfo.primaryProfileBilling.groupTotal;
+    }
+
+    subscriptionItemsReal.push(primaryProfileLineItems);
+
+    if (customerInfo.secondaryProfileCount > 0) {
+      customerInfo.secondaryProfilesBilling.forEach((e, i) => {
+        const currentProfileLineItems = {
+          lifestyle: {
+            title: customerInfo.secondaryProfilesBilling[i].lifestyle.title,
+            meals:
+              customerInfo.secondaryProfilesBilling[i].breakfast.totalQty +
+              customerInfo.secondaryProfilesBilling[i].lunch.totalQty +
+              customerInfo.secondaryProfilesBilling[i].dinner.totalQty,
+
+            price:
+              customerInfo.secondaryProfilesBilling[i].breakfast.totalQty *
+                customerInfo.secondaryProfilesBilling[i].breakfastPrice +
+              customerInfo.secondaryProfilesBilling[i].lunch.totalQty *
+                customerInfo.secondaryProfilesBilling[i].lunchPrice +
+              customerInfo.secondaryProfilesBilling[i].dinner.totalQty *
+                customerInfo.secondaryProfilesBilling[i].dinnerPrice,
+          },
+          restrictions: [],
+        };
+
+        if (customerInfo.secondaryProfilesBilling[i].discountActual > 0) {
+          primaryProfileLineItems.discount = {
+            title:
+              customerInfo.secondaryProfilesBilling[i].discount
+                .charAt(0)
+                .toUpperCase() +
+              customerInfo.secondaryProfilesBilling[i].discount.substr(
+                1,
+                customerInfo.secondaryProfilesBilling[i].discount.length,
+              ),
+            amount: customerInfo.secondaryProfilesBilling[i].discountActual,
+          };
+        }
+
+        if (
+          customerInfo.secondaryProfilesBilling[i].totalAthleticSurcharge > 0
+        ) {
+          primaryProfileLineItems.extraAthletic = {
+            title: 'Athletic',
+            amount:
+              customerInfo.secondaryProfilesBilling[i].totalAthleticSurcharge,
+            actual:
+              customerInfo.secondaryProfilesBilling[i].lifestyle.extraAthletic,
+            type:
+              customerInfo.secondaryProfilesBilling[i].lifestyle
+                .discountOrExtraTypeAthletic,
+          };
+        }
+
+        if (
+          customerInfo.secondaryProfilesBilling[i].totalBodybuilderSurcharge > 0
+        ) {
+          primaryProfileLineItems.extraBodybuilder = {
+            title: 'Bodybuilder',
+            amount:
+              customerInfo.secondaryProfilesBilling[i]
+                .totalBodybuilderSurcharge,
+            actual:
+              customerInfo.secondaryProfilesBilling[i].lifestyle
+                .extraBodybuilder,
+            type:
+              customerInfo.secondaryProfilesBilling[i].lifestyle
+                .discountOrExtraTypeBodybuilder,
+          };
+        }
+
+        if (
+          customerInfo.secondaryProfilesBilling[i].restrictionsActual.length > 0
+        ) {
+          customerInfo.secondaryProfilesBilling[i].restrictionsActual.forEach(
+            (e, i) => {
+              primaryProfileLineItems.restrictions.push({
+                title: e.title,
+                extra: e.extra,
+                type: e.discountOrExtraType,
+                surcharge:
+                  customerInfo.secondaryProfilesBilling[i]
+                    .restrictionsSurcharges[i],
+              });
+            },
+          );
+        }
+
+        subscriptionItemsReal.push(currentProfileLineItems);
+      });
+    }
 
     const subscriptionId = Subscriptions.insert({
       customerId: customerInfo.id,
@@ -606,26 +786,27 @@ Meteor.methods({
         createSubscriptionFromCustomerProfileRes.profile
           .customerPaymentProfileId,
 
-      status: "paused",
+      status: 'paused',
       paymentMethod: customerInfo.paymentMethod,
       amount: actualTotal,
       taxExempt: customerInfo.taxExempt,
       completeSchedule: customerInfo.completeSchedule,
-      delivery: customerInfo.deliveryType
+      delivery: customerInfo.deliveryType,
+      subscriptionItems: subscriptionItemsReal,
     });
 
     return createSubscriptionFromCustomerProfileRes;
-  }
+  },
 });
 
 rateLimit({
   methods: [
-    "users.sendVerificationEmail",
-    "users.editProfile",
-    "users.addNewStaff",
-    "customers.step1",
-    "customers.step5"
+    'users.sendVerificationEmail',
+    'users.editProfile',
+    'users.addNewStaff',
+    'customers.step1',
+    'customers.step5',
   ],
   limit: 5,
-  timeRange: 1000
+  timeRange: 1000,
 });

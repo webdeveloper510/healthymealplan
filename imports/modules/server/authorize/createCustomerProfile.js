@@ -1,9 +1,9 @@
-import { Meteor } from "meteor/meteor";
+import { Meteor } from 'meteor/meteor';
 
-const ApiContracts = require("authorizenet").APIContracts;
-const ApiControllers = require("authorizenet").APIControllers;
+const ApiContracts = require('authorizenet').APIContracts;
+const ApiControllers = require('authorizenet').APIControllers;
 
-import { Random } from "meteor/random";
+import { Random } from 'meteor/random';
 
 /*
   opaque Object - comes from Accept.js authorization response
@@ -14,16 +14,16 @@ export default function createCustomerProfile(
   descriptor,
   value,
   customer,
-  callback
+  callback,
 ) {
   const merchantAuthenticationType = new ApiContracts.MerchantAuthenticationType();
   merchantAuthenticationType.setName(Meteor.settings.public.apiLoginKey);
   merchantAuthenticationType.setTransactionKey(
-    Meteor.settings.private.transactionKey
+    Meteor.settings.private.transactionKey,
   );
 
-  console.log("Inside createCustomerProfile");
-  console.log(customer);
+  // console.log("Inside createCustomerProfile");
+  // console.log(customer);
 
   const opaqueData = new ApiContracts.OpaqueDataType();
   opaqueData.setDataDescriptor(descriptor);
@@ -34,12 +34,12 @@ export default function createCustomerProfile(
 
   const customerAddress = new ApiContracts.CustomerAddressType();
   customerAddress.setFirstName(customer.nameOnCard);
-  customerAddress.setLastName("-");
+  customerAddress.setLastName('-');
   customerAddress.setZip(customer.postalCode);
 
   const customerPaymentProfileType = new ApiContracts.CustomerPaymentProfileType();
   customerPaymentProfileType.setCustomerType(
-    ApiContracts.CustomerTypeEnum.INDIVIDUAL
+    ApiContracts.CustomerTypeEnum.INDIVIDUAL,
   );
   customerPaymentProfileType.setPayment(paymentType);
   customerPaymentProfileType.setBillTo(customerAddress);
@@ -49,7 +49,7 @@ export default function createCustomerProfile(
 
   const customerProfileType = new ApiContracts.CustomerProfileType();
   customerProfileType.setMerchantCustomerId(customer.id);
-  customerProfileType.setDescription("Profile description here");
+  customerProfileType.setDescription('Profile description here');
   customerProfileType.setEmail(customer.email);
   customerProfileType.setPaymentProfiles(paymentProfilesList);
 
@@ -62,14 +62,14 @@ export default function createCustomerProfile(
   // console.log(JSON.stringify(createRequest.getJSON(), null, 2));
 
   const ctrl = new ApiControllers.CreateCustomerProfileController(
-    createRequest.getJSON()
+    createRequest.getJSON(),
   );
 
   ctrl.execute(() => {
     const apiResponse = ctrl.getResponse();
     let err;
     const response = new ApiContracts.CreateCustomerProfileResponse(
-      apiResponse
+      apiResponse,
     );
 
     // pretty print response
@@ -81,24 +81,24 @@ export default function createCustomerProfile(
         ApiContracts.MessageTypeEnum.OK
       ) {
         console.log(
-          "Successfully created a customer profile with id: " +
-            response.getCustomerProfileId()
+          'Successfully created a customer profile with id: ' +
+            response.getCustomerProfileId(),
         );
       } else {
-        console.log("Result Code: " + response.getMessages().getResultCode());
+        console.log('Result Code: ' + response.getMessages().getResultCode());
         console.log(
-          "Error Code: " +
+          'Error Code: ' +
             response
               .getMessages()
               .getMessage()[0]
-              .getCode()
+              .getCode(),
         );
         console.log(
-          "Error message: " +
+          'Error message: ' +
             response
               .getMessages()
               .getMessage()[0]
-              .getText()
+              .getText(),
         );
 
         err = {
@@ -109,12 +109,12 @@ export default function createCustomerProfile(
           code: response
             .getMessages()
             .getMessage()[0]
-            .getCode()
+            .getCode(),
         };
       }
     } else {
-      console.log("Null response received");
-      err = "null response received";
+      console.log('Null response received');
+      err = 'null response received';
     }
 
     callback(err, response);

@@ -18,9 +18,20 @@ Invoices.deny({
 });
 
 Invoices.schema = new SimpleSchema({
+  customerId: {
+    type: String,
+    label: 'Customer which this invoice belongs to.',
+  },
+
   subscriptionId: {
     type: String,
     label: 'The subscription id',
+    optional: true,
+  },
+
+  transactionId: {
+    type: String,
+    optional: true,
   },
 
   lineItems: {
