@@ -1,44 +1,44 @@
-import React, { Component } from "react";
-import PropTypes from "prop-types";
-import { withRouter, Link, NavLink } from "react-router-dom";
-import Button from "material-ui/Button";
-import List, { ListItem, ListItemIcon, ListItemText } from "material-ui/List";
-import Divider from "material-ui/Divider";
-import ExpandLess from "material-ui-icons/ExpandLess";
-import ExpandMore from "material-ui-icons/ExpandMore";
+import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+import { withRouter, Link, NavLink } from 'react-router-dom';
+import Button from 'material-ui/Button';
+import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
+import Divider from 'material-ui/Divider';
+import ExpandLess from 'material-ui-icons/ExpandLess';
+import ExpandMore from 'material-ui-icons/ExpandMore';
 
-import HomeIcon from "material-ui-icons/Home";
-import KitchenIcon from "material-ui-icons/Kitchen";
-import OrderIcon from "material-ui-icons/AttachMoney";
-import MealsIcon from "material-ui-icons/LocalDining";
-import IngredientsIcon from "material-ui-icons/Layers";
-import TypesIcon from "material-ui-icons/List";
-import FolderIcon from "material-ui-icons/Folder";
+import HomeIcon from 'material-ui-icons/Home';
+import KitchenIcon from 'material-ui-icons/Kitchen';
+import OrderIcon from 'material-ui-icons/AttachMoney';
+import MealsIcon from 'material-ui-icons/LocalDining';
+import IngredientsIcon from 'material-ui-icons/Layers';
+import TypesIcon from 'material-ui-icons/List';
+import FolderIcon from 'material-ui-icons/Folder';
 
-import LifestylesIcon from "material-ui-icons/FitnessCenter";
-import PlatingIcon from "material-ui-icons/RoomService";
-import SubscriptionsIcon from "material-ui-icons/CreditCard";
-import DiscountsIcon from "material-ui-icons/LocalOffer";
+import LifestylesIcon from 'material-ui-icons/FitnessCenter';
+import PlatingIcon from 'material-ui-icons/RoomService';
+import SubscriptionsIcon from 'material-ui-icons/CreditCard';
+import DiscountsIcon from 'material-ui-icons/LocalOffer';
 
-import RestrictionsIcon from "material-ui-icons/DoNotDisturbAlt";
-import PlatesIcon from "material-ui-icons/LocalPizza";
-import SidesIcon from "material-ui-icons/LibraryAdd";
-import InstructionsIcon from "material-ui-icons/Note";
+import RestrictionsIcon from 'material-ui-icons/DoNotDisturbAlt';
+import PlatesIcon from 'material-ui-icons/LocalPizza';
+import SidesIcon from 'material-ui-icons/LibraryAdd';
+import InstructionsIcon from 'material-ui-icons/Note';
 
-import DeliveryIcon from "material-ui-icons/LocalShipping";
-import DirectionsIcon from "material-ui-icons/Directions";
-import RoutesIcon from "material-ui-icons/MyLocation";
-import DriversIcon from "material-ui-icons/DriveEta";
+import DeliveryIcon from 'material-ui-icons/LocalShipping';
+import DirectionsIcon from 'material-ui-icons/Directions';
+import RoutesIcon from 'material-ui-icons/MyLocation';
+import DriversIcon from 'material-ui-icons/DriveEta';
 
-import CustomersIcon from "material-ui-icons/Person";
-import SettingsIcon from "material-ui-icons/Settings";
-import TeamIcon from "material-ui-icons/SupervisorAccount";
+import CustomersIcon from 'material-ui-icons/Person';
+import SettingsIcon from 'material-ui-icons/Settings';
+import TeamIcon from 'material-ui-icons/SupervisorAccount';
 
-import Collapse from "material-ui/transitions/Collapse";
+import Collapse from 'material-ui/transitions/Collapse';
 
-import { Meteor } from "meteor/meteor";
+import { Meteor } from 'meteor/meteor';
 
-import "./AuthenticatedSideNav.scss";
+import './AuthenticatedSideNav.scss';
 
 class AuthenticatedSideNav extends Component {
   constructor(props) {
@@ -48,43 +48,43 @@ class AuthenticatedSideNav extends Component {
       settingsOpen: false,
       kitchenOpen: false,
       deliveryOpen: false,
-      ordersOpen: false
+      ordersOpen: false,
     };
   }
 
   handleToggle() {
     this.setState({
-      open: !this.state.open
+      open: !this.state.open,
     });
   }
 
   handleToggleSettings() {
     this.setState({
-      settingsOpen: !this.state.settingsOpen
+      settingsOpen: !this.state.settingsOpen,
     });
   }
 
   handleToggleKitchen() {
     this.setState({
-      kitchenOpen: !this.state.kitchenOpen
+      kitchenOpen: !this.state.kitchenOpen,
     });
   }
 
   handleToggleDelivery() {
     this.setState({
-      deliveryOpen: !this.state.deliveryOpen
+      deliveryOpen: !this.state.deliveryOpen,
     });
   }
 
   handleToggleOrder() {
     this.setState({
-      ordersOpen: !this.state.ordersOpen
+      ordersOpen: !this.state.ordersOpen,
     });
   }
 
   handleNestedListToggle(item) {
     this.setState({
-      open: item.state.open
+      open: item.state.open,
     });
   }
 
@@ -92,10 +92,10 @@ class AuthenticatedSideNav extends Component {
     return this.props.location.pathname;
 
     if (expected.indexOf(this.props.location.pathname) !== -1) {
-      return "list-item-active";
+      return 'list-item-active';
     }
 
-    return "";
+    return '';
 
     // switch (currentPath) {
     //   case '/':
@@ -120,7 +120,7 @@ class AuthenticatedSideNav extends Component {
 
     return (
       <div className="page-container__side-nav">
-        <List style={{ paddingTop: "0 !important" }}>
+        <List style={{ paddingTop: '0 !important' }}>
           <NavLink exact to="/">
             <ListItem button>
               <ListItemIcon>
@@ -162,12 +162,12 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/subscriptions">
+            <NavLink to="/invoices">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <SubscriptionsIcon className="side-nav-icon" />
                 </ListItemIcon>
-                <ListItemText className="subheading" primary="Subscriptions" />
+                <ListItemText className="subheading" primary="Invoices" />
               </ListItem>
             </NavLink>
 
@@ -391,7 +391,7 @@ class AuthenticatedSideNav extends Component {
 }
 
 AuthenticatedSideNav.propTypes = {
-  history: PropTypes.object.isRequired
+  history: PropTypes.object.isRequired,
 };
 
 export default withRouter(AuthenticatedSideNav);

@@ -2,10 +2,9 @@ import { Meteor } from "meteor/meteor";
 import { check } from "meteor/check";
 import Invoices from "./Invoices";
 import rateLimit from "../../modules/rate-limit";
-import { getNextSequence } from "../../modules/server/get-next-sequence";
 
 Meteor.methods({
-  "subscription.insert": function subscriptionInsert(sub) {
+  "invoice.insert": function invoiceInsert(sub) {
     check(sub, {
       customerId: String
     });
@@ -15,7 +14,7 @@ Meteor.methods({
     if (subExists) {
       throw new Meteor.Error(
         "500",
-        `Subscription for customer ${sub.customerId} is already present`
+        `Invoice for customer ${sub.customerId} is already present`
       );
     }
 
@@ -29,7 +28,7 @@ Meteor.methods({
     }
   },
 
-  "subscriptions.update": function subscriptionsUpdate(sub) {
+  "invoices.update": function invoicesUpdate(sub) {
     check(sub, {
       _id: String,
       customerId: String,
@@ -38,17 +37,17 @@ Meteor.methods({
 
     try {
       const subId = sub._id;
-      Subscriptions.update(subId, { $set: sub });
+      Invoices.update(subId, { $set: sub });
       return subId; // Return _id so we can redirect to document after update.
     } catch (exception) {
       throw new Meteor.Error("500", exception);
     }
   },
-  "subscriptions.remove": function subscriptionsRemove(subId) {
+  "invoices.remove": function invoicesRemove(subId) {
     check(subId, String);
 
     try {
-      return Subscriptions.remove(subId);
+      return Invoices.remove(subId);
     } catch (exception) {
       throw new Meteor.Error("500", exception);
     }
@@ -56,11 +55,7 @@ Meteor.methods({
 });
 
 rateLimit({
-  methods: [
-    "subscriptions.insert",
-    "subscriptions.update",
-    "subscriptions.remove"
-  ],
+  methods: ["invoices.insert", "invoices.update", "invoices.remove"],
   limit: 5,
   timeRange: 1000
 });
