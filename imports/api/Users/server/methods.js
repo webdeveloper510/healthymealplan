@@ -228,11 +228,11 @@ Meteor.methods({
 
         price:
           customerInfo.primaryProfileBilling.breakfast.totalQty *
-            customerInfo.primaryProfileBilling.breakfastPrice +
+          customerInfo.primaryProfileBilling.breakfastPrice +
           customerInfo.primaryProfileBilling.lunch.totalQty *
-            customerInfo.primaryProfileBilling.lunchPrice +
+          customerInfo.primaryProfileBilling.lunchPrice +
           customerInfo.primaryProfileBilling.dinner.totalQty *
-            customerInfo.primaryProfileBilling.dinnerPrice,
+          customerInfo.primaryProfileBilling.dinnerPrice,
       },
       restrictions: [],
     };
@@ -319,11 +319,11 @@ Meteor.methods({
 
             price:
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty *
-                customerInfo.secondaryProfilesBilling[i].breakfastPrice +
+              customerInfo.secondaryProfilesBilling[i].breakfastPrice +
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty *
-                customerInfo.secondaryProfilesBilling[i].lunchPrice +
+              customerInfo.secondaryProfilesBilling[i].lunchPrice +
               customerInfo.secondaryProfilesBilling[i].dinner.totalQty *
-                customerInfo.secondaryProfilesBilling[i].dinnerPrice,
+              customerInfo.secondaryProfilesBilling[i].dinnerPrice,
           },
           restrictions: [],
         };
@@ -396,6 +396,21 @@ Meteor.methods({
     }
     console.log(subscriptionItemsReal);
 
+    const newDeliveryType = customerInfo.deliveryType.map((e, i) => {
+
+      if (e == '') {
+        return customerInfo.deliveryType[i] == null;
+      }
+
+      return e;
+
+
+    });
+
+
+    console.log(newDeliveryType);
+
+
     const subscriptionId = Subscriptions.insert({
       customerId: customerInfo.id,
       status: 'paused',
@@ -403,7 +418,7 @@ Meteor.methods({
       amount: actualTotal,
       taxExempt: customerInfo.taxExempt,
       completeSchedule: customerInfo.completeSchedule,
-      delivery: customerInfo.deliveryType,
+      delivery: newDeliveryType,
       subscriptionItems: subscriptionItemsReal,
     });
 
@@ -564,15 +579,11 @@ Meteor.methods({
       customerInfo.subscriptionStartDateRaw,
     ).subtract(2, 'd');
 
-    // const a = moment(lastWeeksSaturday);
-    // const b = moment();
-
     // subscription
     const createSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
       createCustomerProfileRes.customerProfileId,
       createCustomerProfileRes.customerPaymentProfileIdList.numericString[0],
-      // moment(lastWeeksSaturday).format('YYYY-MM-DD'),
-      moment().format('YYYY-MM-DD'),
+      moment(lastWeeksSaturday).format('YYYY-MM-DD'),
       actualTotal,
     );
 
@@ -609,11 +620,11 @@ Meteor.methods({
 
         price:
           customerInfo.primaryProfileBilling.breakfast.totalQty *
-            customerInfo.primaryProfileBilling.breakfastPrice +
+          customerInfo.primaryProfileBilling.breakfastPrice +
           customerInfo.primaryProfileBilling.lunch.totalQty *
-            customerInfo.primaryProfileBilling.lunchPrice +
+          customerInfo.primaryProfileBilling.lunchPrice +
           customerInfo.primaryProfileBilling.dinner.totalQty *
-            customerInfo.primaryProfileBilling.dinnerPrice,
+          customerInfo.primaryProfileBilling.dinnerPrice,
       },
       restrictions: [],
     };
@@ -700,11 +711,11 @@ Meteor.methods({
 
             price:
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty *
-                customerInfo.secondaryProfilesBilling[i].breakfastPrice +
+              customerInfo.secondaryProfilesBilling[i].breakfastPrice +
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty *
-                customerInfo.secondaryProfilesBilling[i].lunchPrice +
+              customerInfo.secondaryProfilesBilling[i].lunchPrice +
               customerInfo.secondaryProfilesBilling[i].dinner.totalQty *
-                customerInfo.secondaryProfilesBilling[i].dinnerPrice,
+              customerInfo.secondaryProfilesBilling[i].dinnerPrice,
           },
           restrictions: [],
         };
@@ -776,6 +787,17 @@ Meteor.methods({
       });
     }
 
+    const newDeliveryType = customerInfo.deliveryType.map((e, i) => {
+
+      if (e == '') {
+        return customerInfo.deliveryType[i] == null;
+      }
+
+      return e;
+
+
+    });
+
     const subscriptionId = Subscriptions.insert({
       customerId: customerInfo.id,
       authorizeSubscriptionId:
@@ -791,7 +813,7 @@ Meteor.methods({
       amount: actualTotal,
       taxExempt: customerInfo.taxExempt,
       completeSchedule: customerInfo.completeSchedule,
-      delivery: customerInfo.deliveryType,
+      delivery: newDeliveryType,
       subscriptionItems: subscriptionItemsReal,
     });
 

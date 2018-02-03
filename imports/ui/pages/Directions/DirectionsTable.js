@@ -281,7 +281,6 @@ class DirectionsTable extends React.Component {
                       <TableCell
                         style={{ paddingTop: '10px', paddingBottom: '10px', width: '17.6%' }}
                         padding="none"
-                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                       >
 
                         <TextField
@@ -290,6 +289,7 @@ class DirectionsTable extends React.Component {
                           select
                           SelectProps={{ native: true }}
                           name="status"
+                          style={{ width: '90%', margin: '0 auto' }}
                         >
                           <option>
                             In-Transit

@@ -2208,8 +2208,8 @@ class Step2Plan extends React.Component {
                     Back
                   </Button>
                 ) : (
-                  ''
-                )}
+                    ''
+                  )}
 
                 {activeMealScheduleStep < 6 ? (
                   <Button
@@ -2219,8 +2219,8 @@ class Step2Plan extends React.Component {
                     Next
                   </Button>
                 ) : (
-                  ''
-                )}
+                    ''
+                  )}
               </div>
               <Grid container>
                 <Grid item xs={12} style={{ marginTop: '25px' }}>
@@ -2245,7 +2245,7 @@ class Step2Plan extends React.Component {
                           const isAlreadyChecked = this.state
                             .lifestyleRestrictions
                             ? this.state.lifestyleRestrictions.indexOf(e._id) !=
-                              -1
+                            -1
                             : false;
                           return (
                             <FormControlLabel
@@ -2279,7 +2279,7 @@ class Step2Plan extends React.Component {
                           const isAlreadyChecked = this.state
                             .lifestyleRestrictions
                             ? this.state.lifestyleRestrictions.indexOf(e._id) !=
-                              -1
+                            -1
                             : false;
                           return (
                             <FormControlLabel
@@ -2313,7 +2313,7 @@ class Step2Plan extends React.Component {
                           const isAlreadyChecked = this.state
                             .lifestyleRestrictions
                             ? this.state.lifestyleRestrictions.indexOf(e._id) !=
-                              -1
+                            -1
                             : false;
                           return (
                             <FormControlLabel
@@ -2465,8 +2465,8 @@ class Step2Plan extends React.Component {
                         />
                       ))
                     ) : (
-                      <Chip className="chip--bordered" label="Ingredient" />
-                    )}
+                        <Chip className="chip--bordered" label="Ingredient" />
+                      )}
                   </div>
                 </Grid>
 
@@ -2512,8 +2512,8 @@ class Step2Plan extends React.Component {
                         ),
                       )
                     ) : (
-                      <Chip className="chip--bordered" label="Ingredient" />
-                    )}
+                        <Chip className="chip--bordered" label="Ingredient" />
+                      )}
                   </div>
                 </Grid>
               </Grid>
@@ -2545,8 +2545,8 @@ class Step2Plan extends React.Component {
                         this.state.secondaryProfilesData[profileIndex]
                           .first_name
                           ? `${
-                            this.state.secondaryProfilesData[profileIndex]
-                              .first_name
+                          this.state.secondaryProfilesData[profileIndex]
+                            .first_name
                           }'s Profile`
                           : `Profile ${profileIndex + 2}`
                       }
@@ -2554,8 +2554,8 @@ class Step2Plan extends React.Component {
                     {this.state.secondaryCollapses[profileIndex] ? (
                       <ExpandLess />
                     ) : (
-                      <ExpandMore />
-                    )}
+                        <ExpandMore />
+                      )}
                   </ListItem>
                   <Collapse
                     in={this.state.secondaryCollapses[profileIndex]}
@@ -2754,9 +2754,9 @@ class Step2Plan extends React.Component {
                                   this.props.lifestyles.find(
                                     element =>
                                       element.title ==
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].lifestyle &&
+                                      this.state.secondaryProfilesData[
+                                        profileIndex
+                                      ].lifestyle &&
                                       !element.discountStudent &&
                                       !element.discountSenior,
                                   )
@@ -2772,9 +2772,9 @@ class Step2Plan extends React.Component {
                                   this.props.lifestyles.find(
                                     element =>
                                       element.title ==
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].lifestyle && !element.discountStudent,
+                                      this.state.secondaryProfilesData[
+                                        profileIndex
+                                      ].lifestyle && !element.discountStudent,
                                   )
                                 }
                               />
@@ -2788,9 +2788,9 @@ class Step2Plan extends React.Component {
                                   this.props.lifestyles.find(
                                     element =>
                                       element.title ==
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].lifestyle && !element.discountSenior,
+                                      this.state.secondaryProfilesData[
+                                        profileIndex
+                                      ].lifestyle && !element.discountSenior,
                                   )
                                 }
                               />
@@ -2882,7 +2882,7 @@ class Step2Plan extends React.Component {
                               )}
                               style={{ marginTop: '20px' }}
                             >
-                            Back
+                              Back
                             </Button>
                           ) : (
                             ''
@@ -2897,7 +2897,7 @@ class Step2Plan extends React.Component {
                               )}
                               style={{ marginTop: '20px' }}
                             >
-                            Next
+                              Next
                             </Button>
                           ) : (
                             ''
@@ -2934,7 +2934,7 @@ class Step2Plan extends React.Component {
                                     ? this.state.secondaryProfilesData[
                                       profileIndex
                                     ].lifestyleRestrictions.indexOf(e._id) !=
-                                      -1
+                                    -1
                                     : false;
                                   return (
                                     <FormControlLabel
@@ -2980,7 +2980,7 @@ class Step2Plan extends React.Component {
                                     ? this.state.secondaryProfilesData[
                                       profileIndex
                                     ].lifestyleRestrictions.indexOf(e._id) !=
-                                      -1
+                                    -1
                                     : false;
 
                                   return (
@@ -3027,7 +3027,7 @@ class Step2Plan extends React.Component {
                                     ? this.state.secondaryProfilesData[
                                       profileIndex
                                     ].lifestyleRestrictions.indexOf(e._id) !=
-                                      -1
+                                    -1
                                     : false;
                                   return (
                                     <FormControlLabel

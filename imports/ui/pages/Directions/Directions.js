@@ -13,6 +13,7 @@ import SearchIcon from 'material-ui-icons/Search';
 import ClearIcon from 'material-ui-icons/Clear';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
+import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 
 import LeftArrow from 'material-ui-icons/ArrowBack';
 import RightArrow from 'material-ui-icons/ArrowForward';
@@ -132,7 +133,7 @@ class Directions extends React.Component {
                 <ListItemIcon>
                   <LeftArrow label="Yesterday" />
                 </ListItemIcon>
-                <ListItemText className="subheading" primary="Directions" />
+                <ListItemText className="subheading" primary="Yesterday" />
               </ListItem>
 
 

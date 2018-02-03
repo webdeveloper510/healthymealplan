@@ -29,6 +29,7 @@ Subscriptions.schema = new SimpleSchema({
   'delivery.$': {
     type: String,
     label: "Day's delivery",
+    optional: true,
   },
   authorizeSubscriptionId: {
     type: String,
