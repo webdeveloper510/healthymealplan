@@ -4,8 +4,8 @@ import getPrivateFile from '../../../modules/server/get-private-file';
 import templateToHTML from '../../../modules/server/handlebars-email-to-html';
 import templateToText from '../../../modules/server/handlebars-email-to-text';
 
-const name = 'Healthy Meal Plan';
-const email = '<support@healthymealplan.ca>';
+const name = 'Vittle';
+const email = '<support@vitle.ca>';
 const from = `${name} ${email}`;
 const emailTemplates = Accounts.emailTemplates;
 

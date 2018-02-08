@@ -18,6 +18,9 @@ Meteor.methods({
   'users.sendVerificationEmail': function usersSendVerificationEmail() {
     return Accounts.sendVerificationEmail(this.userId);
   },
+  'users.sendEnrollmentEmail': function usersSendEnrollmentEmail(userId) {
+    return Accounts.sendEnrollmentEmail(userId);
+  },
   'users.editProfile': function usersEditProfile(profile) {
     check(profile, {
       emailAddress: String,
