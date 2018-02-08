@@ -195,7 +195,7 @@ class Step3Delivery extends React.Component {
     } else if (this.state.addressType == 'house') {
       address.unit = this.state.unit;
     } else if (this.state.addressType == 'business') {
-      address.apartmentName = this.state.businessName;
+      address.businessName = this.state.businessName;
       address.unit = this.state.unit;
       address.buzzer = this.state.buzzer;
     } else if (this.state.addressType == 'dormitory') {
@@ -204,7 +204,6 @@ class Step3Delivery extends React.Component {
       address.roomNumber = this.state.roomNumber;
       address.buzzer = this.state.buzzer;
     }
-
 
     this.props.saveValues({
       address,
@@ -4985,7 +4984,7 @@ class Step3Delivery extends React.Component {
                       >
                         {steps.map((label, index) => {
                           const props = {};
-                          const stepLabel = `${label} ${moment(
+                          let stepLabel = `${label} ${moment(
                             new Date(this.props.customerInfo.subscriptionStartDateRaw),
                           )
                             .add(index, 'd')

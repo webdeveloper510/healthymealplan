@@ -1,3 +1,6 @@
+import "../../api/Deliveries/methods";
+import "../../api/Deliveries/server/publications";
+
 import "../../api/Documents/methods";
 import "../../api/Documents/server/publications";
 

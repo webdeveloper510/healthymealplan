@@ -31,6 +31,22 @@ Subscriptions.schema = new SimpleSchema({
     label: "Day's delivery",
     optional: true,
   },
+  completeSchedule: {
+    type: Array,
+    label: 'Complete shcedule of the subscription',
+  },
+  'completeSchedule.$': {
+    type: Object,
+  },
+  'completeSchedule.$.breakfast': {
+    type: Number,
+  },
+  'completeSchedule.$.lunch': {
+    type: Number,
+  },
+  'completeSchedule.$.dinner': {
+    type: Number,
+  },
   authorizeSubscriptionId: {
     type: String,
     label: 'Authorize.Net subscriptionId (Card only)',
@@ -66,6 +82,7 @@ Subscriptions.schema = new SimpleSchema({
     label: 'All the transaction ids for this subscription',
     optional: true,
   },
+
 
   // "transactions.$": {
   //   type: String,

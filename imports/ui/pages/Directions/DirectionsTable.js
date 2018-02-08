@@ -23,9 +23,7 @@ import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
 
-
 import { createContainer } from 'meteor/react-meteor-data';
-// import IngredientsCollection from '../../../api/Ingredients/Ingredients';
 import Loading from '../../components/Loading/Loading';
 
 class DirectionsTable extends React.Component {
@@ -35,30 +33,19 @@ class DirectionsTable extends React.Component {
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      deleteDialogOpen: false,
+      updateDialogOpen: false,
+      batchDeliveryStatus: '',
     };
+
+    this.handleStatusChange = this.handleStatusChange.bind(this);
   }
-
-  // renderSubIngredientsNumber(subIngredient) {
-  //   if (subIngredient && subIngredient.length > 1) {
-  //     return `${subIngredient.length} sub-ingredients`;
-  //   } else if (subIngredient && subIngredient.length == 1) {
-  //     return `${subIngredient.length} sub-ingredient`;
-  //   }
-
-  //   return '';
-  // }
 
   renderType(type) {
     console.log(type);
   }
 
   rowSelected(e, event, checked) {
-    // console.log(e);
     console.log(checked);
-    // console.log($(event.target).prop('checked'));
-    // console.log(event.target.parentNode.parentNode);
-
 
     const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
     $(`.${selectedRowId}`).toggleClass('row-selected');
@@ -73,7 +60,6 @@ class DirectionsTable extends React.Component {
       currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber - 1;
       clonedSelectedCheckboxes.splice(clonedSelectedCheckboxes.indexOf(e._id), 1);
     }
-
 
     this.setState({
       selectedCheckboxesNumber: currentlySelectedCheckboxes,
@@ -114,16 +100,16 @@ class DirectionsTable extends React.Component {
     });
   }
 
-  deleteSelectedRows() {
-    console.log('Delete selected rows');
+  handleBatchStatusChange() {
+    console.log('Update selected rows');
 
-    localStorage.setItem('categoriesTableDeleted', this.state.selectedCheckboxesNumber);
+    localStorage.setItem('deliveryUpdated', this.state.selectedCheckboxesNumber);
 
     const categoryIds = this.state.selectedCheckboxes;
 
     console.log(categoryIds);
 
-    Meteor.call('categories.batchRemove', categoryIds, (error) => {
+    Meteor.call('deliveries.batchUpdate', this.state.selectedCheckboxes, this.state.batchDeliveryStatus, (error) => {
       console.log('inside method');
       if (error) {
         this.props.popTheSnackbar({
@@ -131,7 +117,7 @@ class DirectionsTable extends React.Component {
         });
       } else {
         this.props.popTheSnackbar({
-          message: `${localStorage.getItem('categoriesTableDeleted')} categories deleted.`,
+          message: `${localStorage.getItem('deliveryUpdated')} delivery statuses updated.`,
         });
       }
     });
@@ -139,18 +125,38 @@ class DirectionsTable extends React.Component {
     this.setState({
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      deleteDialogOpen: false,
+      updateDialogOpen: false,
     });
 
-    // this.deleteDialogHandleRe/questClose.bind(this)
-    // $('.row-selected').toggleClass('row-selected');
+    this.forceUpdate();
   }
 
+  handleStatusChange(event, deliveryId, batchChange) {
+    if (batchChange) {
+      this.setState({
+        updateDialogOpen: true,
+        batchDeliveryStatus: event.target.value,
+      });
+    } else {
+      Meteor.call('deliveries.update', deliveryId, event.target.value, (error) => {
+        console.log('inside method');
+        if (error) {
+          this.props.popTheSnackbar({
+            message: error.reason,
+          });
+        } else {
+          this.props.popTheSnackbar({
+            message: 'Delivery status updated.',
+          });
+        }
+      });
+    }
+  }
 
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No category found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
+        <p style={{ padding: '25px' }} className="subheading">No delivery found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
       );
     }
   }
@@ -167,35 +173,47 @@ class DirectionsTable extends React.Component {
     return false;
   }
 
-  deleteDialogHandleClickOpen() {
-    this.setState({ deleteDialogOpen: true });
+  updateDialogHandleClickOpen() {
+    this.setState({ updateDialogOpen: true });
   }
 
-  deleteDialogHandleRequestClose() {
-    this.setState({ deleteDialogOpen: false });
+  updateDialogHandleRequestClose() {
+    this.setState({ updateDialogOpen: false });
   }
-
-  // renderDeleteDialog() {
-  //   return (
-  //   );
-  // }
-
-  // Address, Postal Code
-  // Route
-  // Customer
-  // Meals
-  // Status
 
   render() {
     return (
       <div>
         <Paper elevation={2} className="table-container">
           {this.state.selectedCheckboxes.length > 0 ? (
-            <div className="table-container--delete-rows-container">
+            <div className="table-container--delete-rows-container" style={{ backgroundColor: '#607d8b' }}>
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
-                {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'} selected
+                {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'} selected
               </Typography>
-              <Button style={{ color: '#FFF' }} onClick={this.deleteDialogHandleClickOpen.bind(this)}>Delete</Button>
+              <TextField
+                fullWidth
+                id="select-delivery-status"
+                select
+                SelectProps={{ native: true }}
+                name="status"
+                style={{
+                  float: 'right', width: '200px',
+                }}
+                onChange={e => this.handleStatusChange(e, null, true)}
+              >
+                <option value="In-Transit">
+                  In-Transit
+                </option>
+                <option value="Delivered">
+                  Delivered
+                </option>
+                <option value="Not delivered">
+                  Not delivered
+                </option>
+                <option value="Scheduled">
+                  Scheduled
+                </option>
+              </TextField>
             </div>
           )
             : ''
@@ -206,25 +224,26 @@ class DirectionsTable extends React.Component {
               (<TableHead>
                 <TableRow>
                   <TableCell padding="checkbox" style={{ width: '12%' }}>
-                    <Checkbox onChange={this.selectAllRows.bind(this)} /></TableCell>
-                  <TableCell padding="none" style={{ width: '17.6%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                    <Typography className="body2" type="body2">Address</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '17.6%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Route</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '17.6%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Checkbox onChange={this.selectAllRows.bind(this)} />
+                  </TableCell>
+                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('SKU')}>
                     <Typography className="body2" type="body2">Customer</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '17.6%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Address</Typography></TableCell>
+                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Route</Typography></TableCell>
+                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Delivery Type</Typography></TableCell>
+                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
                     <Typography className="body2" type="body2">Meals</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '17.6%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
                     <Typography className="body2" type="body2">Status</Typography></TableCell>
-
 
                 </TableRow>
               </TableHead>)
               : ''
             }
             <TableBody>
-
 
               {
                 this.props.results.map((e, i) => {
@@ -241,12 +260,66 @@ class DirectionsTable extends React.Component {
                         />
                       </TableCell>
 
-                      <TableCell padding="none" style={{ width: '17.6%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
-                        <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
+                      <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
+                        <Typography className="subheading" type="subheading">{e.customer ? (
+                          `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''} 
+                          ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''}`
+                        ) : ''}</Typography>
+                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                          {e.customer ? (
+                            `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''}${e.customer.associatedProfiles > 1 ? 's' : ''}`
+                          ) : ''}
+                        </Typography>
                       </TableCell>
 
                       <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '17.6%' }}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
+                        padding="none"
+                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
+                      >
+
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          {e.customer ? (
+                            `${e.customer.address.streetAddress}`
+                          ) : ''}
+                        </Typography>
+                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                          {e.customer ? (
+                            `${e.customer.postalCode}`
+                          ) : ''}
+                        </Typography>
+
+                      </TableCell>
+
+                      <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
+                        padding="none"
+                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
+                      >
+
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          {e.route ? (
+                            `${e.route.title}`
+                          ) : ''}
+                        </Typography>
+                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                          {e.customer ? (
+                            `${e.customer.postalCode}`
+                          ) : ''}
+                        </Typography>
+
+                      </TableCell>
+
+                      <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
+                        padding="none"
+                      >
+                        {e.title}
+                        {e.onDate}
+                      </TableCell>
+
+                      <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
                         padding="none"
                         onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                       >
@@ -257,55 +330,35 @@ class DirectionsTable extends React.Component {
                       </TableCell>
 
                       <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '17.6%' }}
-                        padding="none"
-                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
-                      >
-
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }} />
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }} />
-
-                      </TableCell>
-
-                      <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '17.6%' }}
-                        padding="none"
-                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
-                      >
-
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }} />
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }} />
-
-                      </TableCell>
-
-                      <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '17.6%' }}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
                         padding="none"
                       >
-
                         <TextField
                           fullWidth
-                          id="select-instruction"
+                          id="select-delivery-status"
                           select
                           SelectProps={{ native: true }}
                           name="status"
                           style={{ width: '90%', margin: '0 auto' }}
+                          onChange={event => this.handleStatusChange(event, e._id, false)}
+                          value={e.status}
                         >
-                          <option>
+                          <option value="In-Transit">
                             In-Transit
                           </option>
-                          <option>
+                          <option value="Delivered">
                             Delivered
                           </option>
-                          <option>
+                          <option value="Not delivered">
                             Not delivered
                           </option>
-                          <option>
+                          <option value="Scheduled">
                             Scheduled
                           </option>
                         </TextField>
 
                       </TableCell>
+
 
                     </TableRow>
                   );
@@ -320,7 +373,7 @@ class DirectionsTable extends React.Component {
               <TableRow>
                 <TableCell>
                   <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                    {this.props.count} of {this.props.categoryCount} categories
+                    {this.props.count} of {this.props.categoryCount} deliveries
                   </Typography>
                 </TableCell>
                 <TableCell />
@@ -334,19 +387,19 @@ class DirectionsTable extends React.Component {
             </TableFooter>
           </Table>
         </Paper>
-        <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
+        <Dialog open={this.state.updateDialogOpen} onRequestClose={this.updateDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-            Delete {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?
+            Update {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?
           </Typography>
           <DialogContent>
-            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} categories?</DialogContentText>
+            <DialogContentText className="subheading"> Are you sure you want to update {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?</DialogContentText>
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
+            <Button onClick={this.updateDialogHandleRequestClose.bind(this)} color="default">
               Cancel
             </Button>
-            <Button stroked className="button--bordered button--bordered--accent" onClick={this.deleteSelectedRows.bind(this)} color="accent">
-              Delete
+            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleBatchStatusChange.bind(this)} color="accent">
+              Update
             </Button>
           </DialogActions>
         </Dialog>
@@ -367,10 +420,10 @@ DirectionsTable.propTypes = {
 
 
 export default createContainer(() => {
-  const categoryCountSub = Meteor.subscribe('categories-all-count');
+  const deliveryCountSub = Meteor.subscribe('deliveries-all-count');
 
   return {
     // ingredientTypes: IngredientsWithTypes.find().fetch(),
-    categoryCount: Counts.get('categories'),
+    categoryCount: Counts.get('deliveries'),
   };
 }, DirectionsTable);

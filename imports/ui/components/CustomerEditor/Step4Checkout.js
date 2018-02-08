@@ -367,7 +367,7 @@ class Step4Checkout extends React.Component {
 
           const totalBaseMealsCharge =
             primaryCustomer.breakfast.totalQty *
-              primaryCustomer.breakfastPrice +
+            primaryCustomer.breakfastPrice +
             primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
             primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
 
@@ -436,7 +436,7 @@ class Step4Checkout extends React.Component {
       primaryCustomer.lunch.athleticQty > 0 ||
       primaryCustomer.dinner.athleticQty > 0
     ) {
-      const totalAthleticSurcharge = 0;
+      let totalAthleticSurcharge = 0;
 
       if (primaryCustomer.breakfast.athleticQty > 0) {
         if (
@@ -516,7 +516,7 @@ class Step4Checkout extends React.Component {
       primaryCustomer.lunch.bodybuilderQty > 0 ||
       primaryCustomer.dinner.bodybuilderQty > 0
     ) {
-      const totalBodybuilderSurcharge = 0;
+      let totalBodybuilderSurcharge = 0;
 
       if (primaryCustomer.breakfast.bodybuilderQty > 0) {
         if (
@@ -764,7 +764,7 @@ class Step4Checkout extends React.Component {
 
               const totalBaseMealsCharge =
                 currentCustomer.breakfast.totalQty *
-                  currentCustomer.breakfastPrice +
+                currentCustomer.breakfastPrice +
                 currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
                 currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
 
@@ -842,7 +842,7 @@ class Step4Checkout extends React.Component {
           currentCustomer.lunch.athleticQty > 0 ||
           currentCustomer.dinner.athleticQty > 0
         ) {
-          const totalAthleticSurcharge = 0;
+          let totalAthleticSurcharge = 0;
 
           if (currentCustomer.breakfast.athleticQty > 0) {
             if (
@@ -926,7 +926,7 @@ class Step4Checkout extends React.Component {
           currentCustomer.lunch.bodybuilderQty > 0 ||
           currentCustomer.dinner.bodybuilderQty > 0
         ) {
-          const totalBodybuilderSurcharge = 0;
+          let totalBodybuilderSurcharge = 0;
 
           if (currentCustomer.breakfast.bodybuilderQty > 0) {
             if (
@@ -993,7 +993,7 @@ class Step4Checkout extends React.Component {
     }
 
     let actualDeliveryCost = 0;
-    const surchargePerDelivery = 0;
+    let surchargePerDelivery = 0;
 
     const selectedPostalCode = this.props.postalCodes.find(
       el => el.title === this.props.customerInfo.postalCode.substring(0, 3)
@@ -1107,7 +1107,7 @@ class Step4Checkout extends React.Component {
           }
         } else if (
           this.props.customerInfo.deliveryType[delivIndex - 1] ==
-            "dayOfPaired" &&
+          "dayOfPaired" &&
           this.props.customerInfo.deliveryType[delivIndex - 2] == "dayOf"
         ) {
           if (deliveryTypeSelected == "nightBeforeThursday") {
@@ -1267,7 +1267,7 @@ class Step4Checkout extends React.Component {
               this.props.popTheSnackbar({
                 message: `Successfully created subscription with ID:${
                   res.subscriptionId
-                }`
+                  }`
               });
 
               this.props.history.push("/customers");
@@ -1424,26 +1424,26 @@ class Step4Checkout extends React.Component {
                   </div>
 
                   {this.state.paymentMethod == "interac" ||
-                  this.state.paymentMethod == "cash" ? (
-                    <div>
-                      <Grid container>
-                        <Grid item xs={12} sm={6}>
-                          <FormControlLabel
-                            control={
-                              <Checkbox
-                                value="taxExempt"
-                                checked={this.state.taxExempt}
-                              />
-                            }
-                            onChange={this.handleTaxExempt.bind(this)}
-                            label="Customer is tax exempt"
-                          />
+                    this.state.paymentMethod == "cash" ? (
+                      <div>
+                        <Grid container>
+                          <Grid item xs={12} sm={6}>
+                            <FormControlLabel
+                              control={
+                                <Checkbox
+                                  value="taxExempt"
+                                  checked={this.state.taxExempt}
+                                />
+                              }
+                              onChange={this.handleTaxExempt.bind(this)}
+                              label="Customer is tax exempt"
+                            />
+                          </Grid>
                         </Grid>
-                      </Grid>
-                    </div>
-                  ) : (
-                    ""
-                  )}
+                      </div>
+                    ) : (
+                      ""
+                    )}
                 </Paper>
               </Grid>
               <Grid item xs={12} sm={5}>
@@ -1481,11 +1481,11 @@ class Step4Checkout extends React.Component {
                           <Typography type="subheading">
                             {this.state.primaryProfileBilling
                               ? `${this.state.primaryProfileBilling.breakfast
-                                  .totalQty +
-                                  this.state.primaryProfileBilling.lunch
-                                    .totalQty +
-                                  this.state.primaryProfileBilling.dinner
-                                    .totalQty} meals`
+                                .totalQty +
+                              this.state.primaryProfileBilling.lunch
+                                .totalQty +
+                              this.state.primaryProfileBilling.dinner
+                                .totalQty} meals`
                               : ""}
                           </Typography>
                         </Grid>
@@ -1496,149 +1496,149 @@ class Step4Checkout extends React.Component {
                           >
                             ${this.state.primaryProfileBilling
                               ? this.state.primaryProfileBilling.breakfast
-                                  .totalQty *
-                                  this.state.primaryProfileBilling
-                                    .breakfastPrice +
-                                this.state.primaryProfileBilling.lunch
-                                  .totalQty *
-                                  this.state.primaryProfileBilling.lunchPrice +
-                                this.state.primaryProfileBilling.dinner
-                                  .totalQty *
-                                  this.state.primaryProfileBilling.dinnerPrice
+                                .totalQty *
+                              this.state.primaryProfileBilling
+                                .breakfastPrice +
+                              this.state.primaryProfileBilling.lunch
+                                .totalQty *
+                              this.state.primaryProfileBilling.lunchPrice +
+                              this.state.primaryProfileBilling.dinner
+                                .totalQty *
+                              this.state.primaryProfileBilling.dinnerPrice
                               : ""}
                           </Typography>
                         </Grid>
                       </Grid>
 
                       {this.state.primaryProfileBilling &&
-                      this.state.primaryProfileBilling.discountActual ? (
-                        <Grid container>
+                        this.state.primaryProfileBilling.discountActual ? (
+                          <Grid container>
+                            <Grid item xs={12}>
+                              <Typography
+                                type="body2"
+                                className="font-medium font-uppercase"
+                                style={{ marginTop: ".75em" }}
+                              >
+                                Discount
+                            </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography type="subheading">
+                                {this.state.primaryProfileBilling.discount
+                                  .charAt(0)
+                                  .toUpperCase() +
+                                  this.state.primaryProfileBilling.discount.substr(
+                                    1,
+                                    this.state.primaryProfileBilling.discount
+                                      .length
+                                  )}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography
+                                type="subheading"
+                                style={{ textAlign: "right" }}
+                              >
+                                -${
+                                  this.state.primaryProfileBilling.discountActual
+                                }{" "}
+                              </Typography>
+                            </Grid>
+                          </Grid>
+                        ) : (
+                          ""
+                        )}
+
+                      {this.state.primaryProfileBilling &&
+                        (this.state.primaryProfileBilling.totalAthleticSurcharge >
+                          0 ||
+                          this.state.primaryProfileBilling
+                            .totalBodybuilderSurcharge > 0) ? (
                           <Grid item xs={12}>
                             <Typography
                               type="body2"
                               className="font-medium font-uppercase"
                               style={{ marginTop: ".75em" }}
                             >
-                              Discount
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <Typography type="subheading">
-                              {this.state.primaryProfileBilling.discount
-                                .charAt(0)
-                                .toUpperCase() +
-                                this.state.primaryProfileBilling.discount.substr(
-                                  1,
-                                  this.state.primaryProfileBilling.discount
-                                    .length
-                                )}
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <Typography
-                              type="subheading"
-                              style={{ textAlign: "right" }}
-                            >
-                              -${
-                                this.state.primaryProfileBilling.discountActual
-                              }{" "}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      ) : (
-                        ""
-                      )}
-
-                      {this.state.primaryProfileBilling &&
-                      (this.state.primaryProfileBilling.totalAthleticSurcharge >
-                        0 ||
-                        this.state.primaryProfileBilling
-                          .totalBodybuilderSurcharge > 0) ? (
-                        <Grid item xs={12}>
-                          <Typography
-                            type="body2"
-                            className="font-medium font-uppercase"
-                            style={{ marginTop: ".75em" }}
-                          >
-                            Extra
+                              Extra
                           </Typography>
-                        </Grid>
-                      ) : (
-                        ""
-                      )}
+                          </Grid>
+                        ) : (
+                          ""
+                        )}
 
                       {this.state.primaryProfileBilling &&
-                      this.state.primaryProfileBilling.totalAthleticSurcharge >
+                        this.state.primaryProfileBilling.totalAthleticSurcharge >
                         0 ? (
-                        <Grid container>
-                          <Grid item xs={6}>
-                            <Typography type="subheading">Athletic</Typography>
-                          </Grid>
-                          <Grid item xs={6}>
-                            <Typography
-                              type="subheading"
-                              style={{ textAlign: "right" }}
-                            >
-                              ${
-                                this.state.primaryProfileBilling
-                                  .totalAthleticSurcharge
-                              }{" "}
-                              ({this.state.primaryProfileBilling.lifestyle
-                                .discountOrExtraTypeAthletic == "Fixed amount"
-                                ? "$"
-                                : ""}
-                              {
-                                this.state.primaryProfileBilling.lifestyle
-                                  .extraAthletic
-                              }
-                              {this.state.primaryProfileBilling.lifestyle
-                                .discountOrExtraTypeAthletic == "Percentage"
-                                ? "%"
-                                : ""})
+                          <Grid container>
+                            <Grid item xs={6}>
+                              <Typography type="subheading">Athletic</Typography>
+                            </Grid>
+                            <Grid item xs={6}>
+                              <Typography
+                                type="subheading"
+                                style={{ textAlign: "right" }}
+                              >
+                                ${
+                                  this.state.primaryProfileBilling
+                                    .totalAthleticSurcharge
+                                }{" "}
+                                ({this.state.primaryProfileBilling.lifestyle
+                                  .discountOrExtraTypeAthletic == "Fixed amount"
+                                  ? "$"
+                                  : ""}
+                                {
+                                  this.state.primaryProfileBilling.lifestyle
+                                    .extraAthletic
+                                }
+                                {this.state.primaryProfileBilling.lifestyle
+                                  .discountOrExtraTypeAthletic == "Percentage"
+                                  ? "%"
+                                  : ""})
                             </Typography>
+                            </Grid>
                           </Grid>
-                        </Grid>
-                      ) : (
-                        ""
-                      )}
+                        ) : (
+                          ""
+                        )}
 
                       {this.state.primaryProfileBilling &&
-                      this.state.primaryProfileBilling
-                        .totalBodybuilderSurcharge > 0 ? (
-                        <Grid container>
-                          <Grid item xs={12} sm={6}>
-                            <Typography type="subheading">
-                              Bodybuilder
+                        this.state.primaryProfileBilling
+                          .totalBodybuilderSurcharge > 0 ? (
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <Typography type="subheading">
+                                Bodybuilder
                             </Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <Typography
-                              type="subheading"
-                              style={{ textAlign: "right" }}
-                            >
-                              ${
-                                this.state.primaryProfileBilling
-                                  .totalBodybuilderSurcharge
-                              }{" "}
-                              ({this.state.primaryProfileBilling.lifestyle
-                                .discountOrExtraTypeBodybuilder ==
-                              "Fixed amount"
-                                ? "$"
-                                : ""}
-                              {
-                                this.state.primaryProfileBilling.lifestyle
-                                  .extraBodybuilder
-                              }
-                              {this.state.primaryProfileBilling.lifestyle
-                                .discountOrExtraTypeBodybuilder == "Percentage"
-                                ? "%"
-                                : ""})
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography
+                                type="subheading"
+                                style={{ textAlign: "right" }}
+                              >
+                                ${
+                                  this.state.primaryProfileBilling
+                                    .totalBodybuilderSurcharge
+                                }{" "}
+                                ({this.state.primaryProfileBilling.lifestyle
+                                  .discountOrExtraTypeBodybuilder ==
+                                  "Fixed amount"
+                                  ? "$"
+                                  : ""}
+                                {
+                                  this.state.primaryProfileBilling.lifestyle
+                                    .extraBodybuilder
+                                }
+                                {this.state.primaryProfileBilling.lifestyle
+                                  .discountOrExtraTypeBodybuilder == "Percentage"
+                                  ? "%"
+                                  : ""})
                             </Typography>
+                            </Grid>
                           </Grid>
-                        </Grid>
-                      ) : (
-                        ""
-                      )}
+                        ) : (
+                          ""
+                        )}
 
                       {this.state.primaryProfileBilling &&
                         this.state.primaryProfileBilling.restrictionsActual
@@ -1656,37 +1656,37 @@ class Step4Checkout extends React.Component {
                         )}
 
                       {this.state.primaryProfileBilling &&
-                      this.state.primaryProfileBilling.restrictionsActual
-                        .length > 0
+                        this.state.primaryProfileBilling.restrictionsActual
+                          .length > 0
                         ? this.state.primaryProfileBilling.restrictionsActual.map(
-                            (e, i) => (
-                              <Grid container key={i}>
-                                <Grid item xs={12} sm={6}>
-                                  <Typography type="subheading">
-                                    {e.title} ({e.discountOrExtraType ==
+                          (e, i) => (
+                            <Grid container key={i}>
+                              <Grid item xs={12} sm={6}>
+                                <Typography type="subheading">
+                                  {e.title} ({e.discountOrExtraType ==
                                     "Fixed amount"
-                                      ? "$"
-                                      : ""}
-                                    {e.extra}
-                                    {e.discountOrExtraType == "Percentage"
-                                      ? "%"
-                                      : ""})
+                                    ? "$"
+                                    : ""}
+                                  {e.extra}
+                                  {e.discountOrExtraType == "Percentage"
+                                    ? "%"
+                                    : ""})
                                   </Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <Typography
-                                    type="subheading"
-                                    style={{ textAlign: "right" }}
-                                  >
-                                    ${
-                                      this.state.primaryProfileBilling
-                                        .restrictionsSurcharges[i]
-                                    }
-                                  </Typography>
-                                </Grid>
                               </Grid>
-                            )
+                              <Grid item xs={12} sm={6}>
+                                <Typography
+                                  type="subheading"
+                                  style={{ textAlign: "right" }}
+                                >
+                                  ${
+                                    this.state.primaryProfileBilling
+                                      .restrictionsSurcharges[i]
+                                  }
+                                </Typography>
+                              </Grid>
+                            </Grid>
                           )
+                        )
                         : ""}
 
                       {/* this.state.primaryProfileBilling &&
@@ -1725,70 +1725,70 @@ class Step4Checkout extends React.Component {
 
                       {this.state.secondaryProfilesBilling
                         ? this.state.secondaryProfilesBilling.map((e, i) => (
-                            <div>
-                              <Typography
-                                type="title"
-                                style={{
-                                  marginTop: ".75em",
-                                  marginBottom: ".75em"
-                                }}
-                              >
-                                {e.lifestyle.title}
-                              </Typography>
+                          <div>
+                            <Typography
+                              type="title"
+                              style={{
+                                marginTop: ".75em",
+                                marginBottom: ".75em"
+                              }}
+                            >
+                              {e.lifestyle.title}
+                            </Typography>
 
-                              <Grid container>
-                                <Grid item xs={6}>
-                                  <Typography type="subheading">
-                                    {`${e.breakfast.totalQty +
-                                      e.lunch.totalQty +
-                                      e.dinner.totalQty} meals`}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                  <Typography
-                                    type="subheading"
-                                    style={{ textAlign: "right" }}
-                                  >
-                                    ${e.breakfast.totalQty * e.breakfastPrice +
-                                      e.lunch.totalQty * e.lunchPrice +
-                                      e.dinner.totalQty * e.dinnerPrice}
-                                  </Typography>
-                                </Grid>
+                            <Grid container>
+                              <Grid item xs={6}>
+                                <Typography type="subheading">
+                                  {`${e.breakfast.totalQty +
+                                    e.lunch.totalQty +
+                                    e.dinner.totalQty} meals`}
+                                </Typography>
                               </Grid>
-                              {/* discount secondary = */}
-                              {e.discountActual &&
-                                e.discountActual > 0 && (
-                                  <Grid container>
-                                    <Grid item xs={12}>
-                                      <Typography
-                                        type="body2"
-                                        className="font-medium font-uppercase"
-                                        style={{ marginTop: ".75em" }}
-                                      >
-                                        Discount
+                              <Grid item xs={6}>
+                                <Typography
+                                  type="subheading"
+                                  style={{ textAlign: "right" }}
+                                >
+                                  ${e.breakfast.totalQty * e.breakfastPrice +
+                                    e.lunch.totalQty * e.lunchPrice +
+                                    e.dinner.totalQty * e.dinnerPrice}
+                                </Typography>
+                              </Grid>
+                            </Grid>
+                            {/* discount secondary = */}
+                            {e.discountActual &&
+                              e.discountActual > 0 && (
+                                <Grid container>
+                                  <Grid item xs={12}>
+                                    <Typography
+                                      type="body2"
+                                      className="font-medium font-uppercase"
+                                      style={{ marginTop: ".75em" }}
+                                    >
+                                      Discount
                                       </Typography>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                      <Typography type="subheading">
-                                        {e.discount.charAt(0).toUpperCase() +
-                                          e.discount.substr(
-                                            1,
-                                            e.discount.length
-                                          )}
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                      <Typography
-                                        type="subheading"
-                                        style={{ textAlign: "right" }}
-                                      >
-                                        -${e.discountActual}{" "}
-                                      </Typography>
-                                    </Grid>
                                   </Grid>
-                                )}
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography type="subheading">
+                                      {e.discount.charAt(0).toUpperCase() +
+                                        e.discount.substr(
+                                          1,
+                                          e.discount.length
+                                        )}
+                                    </Typography>
+                                  </Grid>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography
+                                      type="subheading"
+                                      style={{ textAlign: "right" }}
+                                    >
+                                      -${e.discountActual}{" "}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              )}
 
-                              {e.totalAthleticSurcharge > 0 ||
+                            {e.totalAthleticSurcharge > 0 ||
                               e.totalBodybuilderSurcharge > 0 ? (
                                 <Grid item xs={12}>
                                   <Typography
@@ -1803,107 +1803,107 @@ class Step4Checkout extends React.Component {
                                 ""
                               )}
 
-                              {e.totalAthleticSurcharge > 0 ? (
-                                <Grid container>
-                                  <Grid item xs={6}>
-                                    <Typography type="subheading">
-                                      Athletic
+                            {e.totalAthleticSurcharge > 0 ? (
+                              <Grid container>
+                                <Grid item xs={6}>
+                                  <Typography type="subheading">
+                                    Athletic
                                     </Typography>
-                                  </Grid>
-                                  <Grid item xs={6}>
-                                    <Typography
-                                      type="subheading"
-                                      style={{ textAlign: "right" }}
-                                    >
-                                      ${e.totalAthleticSurcharge} ({e.lifestyle
-                                        .discountOrExtraTypeAthletic ==
-                                      "Fixed amount"
-                                        ? "$"
-                                        : ""}
-                                      {e.lifestyle.extraAthletic}
-                                      {e.lifestyle
-                                        .discountOrExtraTypeAthletic ==
-                                      "Percentage"
-                                        ? "%"
-                                        : ""})
-                                    </Typography>
-                                  </Grid>
                                 </Grid>
-                              ) : (
+                                <Grid item xs={6}>
+                                  <Typography
+                                    type="subheading"
+                                    style={{ textAlign: "right" }}
+                                  >
+                                    ${e.totalAthleticSurcharge} ({e.lifestyle
+                                      .discountOrExtraTypeAthletic ==
+                                      "Fixed amount"
+                                      ? "$"
+                                      : ""}
+                                    {e.lifestyle.extraAthletic}
+                                    {e.lifestyle
+                                      .discountOrExtraTypeAthletic ==
+                                      "Percentage"
+                                      ? "%"
+                                      : ""})
+                                    </Typography>
+                                </Grid>
+                              </Grid>
+                            ) : (
                                 ""
                               )}
 
-                              {e.totalBodybuilderSurcharge > 0 ? (
-                                <Grid container>
-                                  <Grid item sm={6} xs={12}>
-                                    <Typography type="subheading">
-                                      Bodybuilder
+                            {e.totalBodybuilderSurcharge > 0 ? (
+                              <Grid container>
+                                <Grid item sm={6} xs={12}>
+                                  <Typography type="subheading">
+                                    Bodybuilder
                                     </Typography>
-                                  </Grid>
-                                  <Grid item sm={6} xs={12}>
-                                    <Typography
-                                      type="subheading"
-                                      style={{ textAlign: "right" }}
-                                    >
-                                      ${e.totalBodybuilderSurcharge} ({e
-                                        .lifestyle
-                                        .discountOrExtraTypeBodybuilder ==
-                                      "Fixed amount"
-                                        ? "$"
-                                        : ""}
-                                      {e.lifestyle.extraBodybuilder}
-                                      {e.lifestyle
-                                        .discountOrExtraTypeBodybuilder ==
-                                      "Percentage"
-                                        ? "%"
-                                        : ""})
-                                    </Typography>
-                                  </Grid>
                                 </Grid>
-                              ) : (
+                                <Grid item sm={6} xs={12}>
+                                  <Typography
+                                    type="subheading"
+                                    style={{ textAlign: "right" }}
+                                  >
+                                    ${e.totalBodybuilderSurcharge} ({e
+                                      .lifestyle
+                                      .discountOrExtraTypeBodybuilder ==
+                                      "Fixed amount"
+                                      ? "$"
+                                      : ""}
+                                    {e.lifestyle.extraBodybuilder}
+                                    {e.lifestyle
+                                      .discountOrExtraTypeBodybuilder ==
+                                      "Percentage"
+                                      ? "%"
+                                      : ""})
+                                    </Typography>
+                                </Grid>
+                              </Grid>
+                            ) : (
                                 ""
                               )}
 
-                              {e.restrictionsActual.length > 0 && (
-                                <Typography
-                                  type="body2"
-                                  className="font-medium font-uppercase"
-                                  style={{
-                                    marginTop: ".75em",
-                                    marginBottom: ".75em"
-                                  }}
-                                >
-                                  Restrictions
+                            {e.restrictionsActual.length > 0 && (
+                              <Typography
+                                type="body2"
+                                className="font-medium font-uppercase"
+                                style={{
+                                  marginTop: ".75em",
+                                  marginBottom: ".75em"
+                                }}
+                              >
+                                Restrictions
                                 </Typography>
-                              )}
+                            )}
 
-                              {e.restrictionsActual.length > 0 &&
-                                e.restrictionsActual.map((el, ind) => (
-                                  <Grid container key={ind}>
-                                    <Grid item xs={12} sm={6}>
-                                      <Typography type="subheading">
-                                        {el.title} ({el.discountOrExtraType ==
+                            {e.restrictionsActual.length > 0 &&
+                              e.restrictionsActual.map((el, ind) => (
+                                <Grid container key={ind}>
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography type="subheading">
+                                      {el.title} ({el.discountOrExtraType ==
                                         "Fixed amount"
-                                          ? "$"
-                                          : ""}
-                                        {el.extra}
-                                        {el.discountOrExtraType == "Percentage"
-                                          ? "%"
-                                          : ""})
+                                        ? "$"
+                                        : ""}
+                                      {el.extra}
+                                      {el.discountOrExtraType == "Percentage"
+                                        ? "%"
+                                        : ""})
                                       </Typography>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                      <Typography
-                                        type="subheading"
-                                        style={{ textAlign: "right" }}
-                                      >
-                                        ${e.restrictionsSurcharges[ind]}
-                                      </Typography>
-                                    </Grid>
                                   </Grid>
-                                ))}
+                                  <Grid item xs={12} sm={6}>
+                                    <Typography
+                                      type="subheading"
+                                      style={{ textAlign: "right" }}
+                                    >
+                                      ${e.restrictionsSurcharges[ind]}
+                                    </Typography>
+                                  </Grid>
+                                </Grid>
+                              ))}
 
-                              {/* e.specificRestrictionsActual.length > 0 &&
+                            {/* e.specificRestrictionsActual.length > 0 &&
                                 e.specificRestrictionsActual.map((el, ind) => (
                                   <Grid container key={ind}>
                                     <Grid item xs={12} sm={6}>
@@ -1928,8 +1928,8 @@ class Step4Checkout extends React.Component {
                                     </Grid>
                                   </Grid>
                                 )) */}
-                            </div>
-                          ))
+                          </div>
+                        ))
                         : ""}
 
                       {/*  delivery and other stuff  */}
@@ -1943,10 +1943,10 @@ class Step4Checkout extends React.Component {
                             style={{ textAlign: "right" }}
                           >
                             {this.state.primaryProfileBilling &&
-                            this.state.primaryProfileBilling.deliveryCost > 0
+                              this.state.primaryProfileBilling.deliveryCost > 0
                               ? `$${
-                                  this.state.primaryProfileBilling.deliveryCost
-                                }`
+                              this.state.primaryProfileBilling.deliveryCost
+                              }`
                               : "Free"}
                           </Typography>
                         </Grid>
@@ -1954,7 +1954,7 @@ class Step4Checkout extends React.Component {
 
                       {this.state.primaryProfileBilling &&
                         this.state.primaryProfileBilling.deliverySurcharges >
-                          0 && (
+                        0 && (
                           <Grid container>
                             <Grid item xs={6}>
                               <Typography type="subheading">
@@ -1976,12 +1976,12 @@ class Step4Checkout extends React.Component {
                                 style={{ textAlign: "right" }}
                               >
                                 {this.state.primaryProfileBilling &&
-                                this.state.primaryProfileBilling
-                                  .deliverySurcharges > 0
+                                  this.state.primaryProfileBilling
+                                    .deliverySurcharges > 0
                                   ? `$${
-                                      this.state.primaryProfileBilling
-                                        .deliverySurcharges
-                                    }`
+                                  this.state.primaryProfileBilling
+                                    .deliverySurcharges
+                                  }`
                                   : ""}
                               </Typography>
                             </Grid>
@@ -2031,8 +2031,8 @@ class Step4Checkout extends React.Component {
                           </Grid>
                         </Grid>
                       ) : (
-                        ""
-                      )}
+                          ""
+                        )}
                       <Grid container>
                         <Grid item xs={12} sm={6}>
                           <Typography type="title">Total</Typography>
@@ -2047,13 +2047,13 @@ class Step4Checkout extends React.Component {
                           >
                             {this.state.taxExempt
                               ? this.state.primaryProfileBilling &&
-                                `$${this.state.primaryProfileBilling
-                                  .groupTotal -
-                                  this.state.primaryProfileBilling.taxes}/week`
+                              `$${this.state.primaryProfileBilling
+                                .groupTotal -
+                              this.state.primaryProfileBilling.taxes}/week`
                               : this.state.primaryProfileBilling &&
-                                `$${
-                                  this.state.primaryProfileBilling.groupTotal
-                                }/week`}
+                              `$${
+                              this.state.primaryProfileBilling.groupTotal
+                              }/week`}
                           </Typography>
                         </Grid>
                       </Grid>

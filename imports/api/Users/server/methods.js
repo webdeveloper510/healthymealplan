@@ -86,6 +86,7 @@ Meteor.methods({
       {
         $set: {
           postalCode: data.postalCode,
+          postalCodeId: postalCodeExists.length ? postalCodeExists[0]._id : null,
           status: 'abandoned',
           phone: data.phoneNumber,
           adultOrChild: 'adult',

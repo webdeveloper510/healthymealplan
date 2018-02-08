@@ -1,15 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Route, Redirect } from 'react-router-dom';
+import { Roles } from 'meteor/alanning:roles';
 
-const Authenticated = ({ loggingIn, authenticated, component, path, exact, ...rest }) => (
+const Authenticated = ({ loggingIn, authenticated, component, path, exact, roles, user, ...rest }) => (
   <Route
     path={path}
     exact={exact}
     render={props => (
-      authenticated ?
+      authenticated && roles.indexOf('admin') !== -1 ?
         (React.createElement(component, { ...props, ...rest, loggingIn, authenticated })) :
-        (<Redirect to="/login" />)
+        authenticated && roles.indexOf('admin') == -1 ? <Redirect to="/login" /> && Meteor.logout() :
+          (<Redirect to="/login" />)
     )}
   />
 );

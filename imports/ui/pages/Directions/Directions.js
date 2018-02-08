@@ -20,9 +20,13 @@ import RightArrow from 'material-ui-icons/ArrowForward';
 
 
 import moment from 'moment';
+import jsPDF from 'jspdf';
 
-import CategoriesCollection from '../../../api/Categories/Categories';
-import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTypes';
+
+import Deliveries from '../../../api/Deliveries/Deliveries';
+import Subscriptions from '../../../api/Subscriptions/Subscriptions';
+import PostalCodes from '../../../api/PostalCodes/PostalCodes';
+import Routes from '../../../api/Routes/Routes';
 
 import Loading from '../../components/Loading/Loading';
 import DirectionsTable from './DirectionsTable';
@@ -39,13 +43,24 @@ class Directions extends React.Component {
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      options: { sort: { SKU: -1 } },
+      options: {
+        sort: {
+          onDate: -1,
+        },
+      },
       searchSelector: '',
       currentTabValue: 0,
     };
   }
 
-  componentDidMount() { }
+  componentDidMount() {
+    // const doc = new jsPDF();
+    // doc.text('Hello world!', 10, 10);
+    // doc.addPage();
+    // doc.setPage(2);
+    // doc.text('Hello World 2');
+    // doc.save('a42.pdf');
+  }
 
   searchByName() {
     // const searchValue = new RegExp(, 'i');
@@ -127,9 +142,9 @@ class Directions extends React.Component {
 
 
           <Grid container>
-            <Grid item xs={12}>
+            <Grid item xs={12} style={{ marginBottom: '25px' }}>
 
-              <ListItem button>
+              <ListItem button style={{ float: 'left' }} onClick={() => Meteor.call('deliveries.downloadLabels', 'nightBefore', (err, res) => { console.log(err); console.log(res); })}>
                 <ListItemIcon>
                   <LeftArrow label="Yesterday" />
                 </ListItemIcon>
@@ -137,11 +152,11 @@ class Directions extends React.Component {
               </ListItem>
 
 
-              <ListItem button>
-                <ListItemIcon>
-                  <RightArrow label="" />
-                </ListItemIcon>
+              <ListItem button style={{ float: 'right' }} onClick={() => Meteor.call('deliveries.downloadLabels', 'dayOf', (err, res) => { console.log(err); console.log(res); })}>
                 <ListItemText className="subheading" primary="Tomorrow" />
+                <ListItemIcon>
+                  <RightArrow label="Tomorrow" />
+                </ListItemIcon>
               </ListItem>
             </Grid>
           </Grid>
@@ -164,9 +179,9 @@ class Directions extends React.Component {
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
               <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
                 <Tab label="All" />
-                <Tab label="East" />
-                <Tab label="West" />
-                <Tab label="Downtown" />
+                {this.props.routes && this.props.routes.map((e, i) => (
+                  <Tab key={i} label={e.title} />
+                ))}
               </Tabs>
             </AppBar>
           </div>
@@ -200,7 +215,7 @@ class Directions extends React.Component {
             <Input
               className="input-box"
               style={{ width: '100%', position: 'relative' }}
-              placeholder="Search categories"
+              placeholder="Search directions"
               onKeyUp={this.searchByName.bind(this)}
               inputProps={{
                 id: 'search-type-text',
@@ -210,19 +225,34 @@ class Directions extends React.Component {
           </div>
           <ListContainer
             limit={50}
-            collection={CategoriesCollection}
-            publication="categories"
+            collection={Deliveries}
+            publication="deliveries"
             joins={[
               {
-                localProperty: 'types',
-                collection: IngredientTypesCollection,
-                joinAs: 'joinedTypes',
+                localProperty: 'routeId',
+                collection: Routes,
+                joinAs: 'route',
+              },
+              {
+                localProperty: 'postalCode',
+                collection: PostalCodes,
+                joinAs: 'postalCode',
+              },
+              {
+                localProperty: 'customerId',
+                collection: Meteor.users,
+                joinAs: 'customer',
+              },
+              {
+                localProperty: 'subscriptionId',
+                collection: Subscriptions,
+                joinAs: 'subscription',
               },
             ]}
             options={this.state.options}
             selector={{
-              $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-                { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }],
+              title: 'dayOf',
+              $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }],
             }}
           >
             <DirectionsTable
@@ -237,24 +267,29 @@ class Directions extends React.Component {
 
 
         </Grid>
-      </div>
+      </div >
     ) : <Loading />);
   }
 }
 
 Directions.propTypes = {
   loading: PropTypes.bool.isRequired,
-  categories: PropTypes.arrayOf(PropTypes.object).isRequired,
+  delvieries: PropTypes.arrayOf(PropTypes.object).isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe('categories');
-  const subscription2 = Meteor.subscribe('ingredientTypes');
+  const subscription = Meteor.subscribe('directions');
+  const subscription2 = Meteor.subscribe('postalcodes');
+  const subscription3 = Meteor.subscribe('routes');
+  const subscription4 = Meteor.subscribe('subscriptions');
+  const subscription5 = Meteor.subscribe('users.customers');
+
 
   return {
-    loading: !subscription.ready() && !subscription2.ready(),
-    categories: CategoriesCollection.find().fetch(),
+    loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready(),
+    deliveries: Deliveries.find().fetch(),
+    routes: Routes.find().fetch(),
   };
 }, Directions);
