@@ -1,4 +1,6 @@
-import { Email } from 'meteor/email';
+// import { Email } from 'meteor/email';
+import moment from 'moment';
+
 import './accounts';
 import './api';
 // import './fixtures';
@@ -13,8 +15,7 @@ import '../../modules/server/authorize/webhooks/';
 
 import Jobs from '../../api/Jobs/Jobs';
 import Subscriptions from '../../api/Subscriptions/Subscriptions';
-
-import moment from 'moment';
+import Deliveries from '../../api/Deliveries/Deliveries';
 
 
 // Email.send({
@@ -135,6 +136,9 @@ aggregation.forEach((el, i) => {
   console.log('Schedule');
   console.log(primarySchedule);
   console.log('Secondary accounts');
+  console.log(secondaryCustomerNames);
+
+  console.log('Secondary schedules');
   console.log(secondarySchedules);
 
 
@@ -145,7 +149,7 @@ aggregation.forEach((el, i) => {
   //   console.log(el.secondaryProfiles[0]);
   // }
 
-  const deliveries = [];
+  var deliveries = [];
   const cooking = [];
   const daysPaired = [];
 
@@ -157,7 +161,7 @@ aggregation.forEach((el, i) => {
     const nextDay = index < 6 ? el.delivery[index + 1] : null;
     const dayAfterTomorrow = index < 5 ? el.delivery[index + 2] : null;
 
-    const delivery = {
+    let delivery = {
       customerId: el.customerId,
       subscriptionId: el._id,
       postalCode: el.postalCode[0]._id,
@@ -183,15 +187,15 @@ aggregation.forEach((el, i) => {
 
           // set delivery for monday tuesday and wednesday as sunday night
           delivery.title = 'nightBefore';
-          delivery.onDate = moment().isoWeekday(7).format('MM-DD-YY');
+          delivery.onDate = moment().isoWeekday(7).format('YYYY-MM-DD');
 
 
           // meal summation
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 1]) +
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
 
           if (containsSecondaries) {
@@ -200,11 +204,13 @@ aggregation.forEach((el, i) => {
               delivery.meals.push({
                 name: secondaryCustomerNames[profileIndex],
                 total: addMealsForTheDay(secondarySchedule[index]) +
-                      addMealsForTheDay(secondarySchedule[index + 1]) +
-                      addMealsForTheDay(secondarySchedule[index + 2]),
+                  addMealsForTheDay(secondarySchedule[index + 1]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
               });
 
             });
+
+            console.log(delivery.meals);
           }
 
           // set cooking as sunday
@@ -221,8 +227,22 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as sunday
 
@@ -233,13 +253,27 @@ aggregation.forEach((el, i) => {
 
           // set delivery for monday and tuesday as sunday night
           delivery.title = 'nightBefore';
-          delivery.onDate = moment().isoWeekday(7).format('MM-DD-YY');
+          delivery.onDate = moment().isoWeekday(7).format('YYYY-MM-DD');
 
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]),
+              addMealsForTheDay(primarySchedule[index + 1]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as sunday
 
@@ -247,12 +281,25 @@ aggregation.forEach((el, i) => {
 
           // set delivery for monday as sunday night
           delivery.title = 'nightBefore';
-          delivery.onDate = moment().isoWeekday(7).format('MM-DD-YY');
+          delivery.onDate = moment().isoWeekday(7).format('YYYY-MM-DD');
 
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as sunday
 
@@ -260,7 +307,7 @@ aggregation.forEach((el, i) => {
       } else if (e === 'dayOf') {
 
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(1).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(1).format('YYYY-MM-DD');
 
         if (nextDay === 'dayOfPaired' && dayAfterTomorrow === 'dayOfPaired') {
           daysPaired.push(1);
@@ -273,9 +320,25 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 1]) +
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking for sunday
 
@@ -289,8 +352,22 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking for sunday
 
@@ -303,8 +380,22 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]),
+              addMealsForTheDay(primarySchedule[index + 1]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as sunday
 
@@ -319,6 +410,19 @@ aggregation.forEach((el, i) => {
             total: addMealsForTheDay(primarySchedule[index]),
           });
 
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
+
           // set cooking as sunday
 
         }
@@ -330,7 +434,7 @@ aggregation.forEach((el, i) => {
       if (e === 'nightBefore') {
 
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(1).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(1).format('YYYY-MM-DD');
 
         if (nextDay === 'nightBeforePaired' && dayAfterTomorrow === 'nightBeforePaired') {
           daysPaired.push(2);
@@ -341,9 +445,24 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 1]) +
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as monday
 
@@ -355,8 +474,22 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as monday
 
@@ -368,8 +501,22 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]),
+              addMealsForTheDay(primarySchedule[index + 1]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as monday
 
@@ -381,13 +528,26 @@ aggregation.forEach((el, i) => {
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
           // set cooking as monday
 
         }
       } else if (e === 'dayOf') {
         // set delivery as tuesday day
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(2).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(2).format('YYYY-MM-DD');
 
         if (nextDay === 'dayOfPaired' && dayAfterTomorrow === 'dayOfPaired') {
           daysPaired.push(2);
@@ -398,9 +558,24 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 1]) +
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as monday
 
@@ -413,8 +588,23 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
+
           // set cooking as monday
 
         } else if (nextDay === 'dayOfPaired') {
@@ -426,8 +616,22 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]),
+              addMealsForTheDay(primarySchedule[index + 1]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as monday
 
@@ -440,32 +644,72 @@ aggregation.forEach((el, i) => {
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]),
+
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
           // set cooking as monday
 
         }
       } else if (e === 'sundayNight') {
         // set delivery for tuesday as sunday night
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().isoWeekday(7).format('MM-DD-YY');
+        delivery.onDate = moment().isoWeekday(7).format('YYYY-MM-DD');
 
         // summation of tuesday meals
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
         // set cooking as sunday
 
       } else if (e === 'dayOfMonday') {
         // set delivery for tuesday as monday day
 
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(1).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(1).format('YYYY-MM-DD');
 
         // summation of tuesday meals
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
 
         // set cooking as sunday
 
@@ -476,7 +720,7 @@ aggregation.forEach((el, i) => {
       if (e === 'nightBefore') {
 
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(2).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(2).format('YYYY-MM-DD');
 
 
         if (nextDay === 'nightBeforePaired' && dayAfterTomorrow === 'nightBeforePaired') {
@@ -488,9 +732,24 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 1]) +
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as tuesday
 
@@ -502,8 +761,22 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking as tuesday
 
@@ -515,8 +788,22 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]),
+              addMealsForTheDay(primarySchedule[index + 1]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
           // set cooking as tuesday
 
         } else {
@@ -527,13 +814,26 @@ aggregation.forEach((el, i) => {
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
           // set cooking as tuesday
 
         }
       } else if (e === 'dayOf') {
 
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('YYYY-MM-DD');
 
 
         if (nextDay === 'dayOfPaired' && dayAfterTomorrow === 'dayOfPaired') {
@@ -545,9 +845,25 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 1]) +
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
+
           // set cooking as tuesday
 
         } else if (nextDay === '' && dayAfterTomorrow === 'dayOfPaired') {
@@ -558,8 +874,22 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
           // set cooking as tuesday
 
         } else if (nextDay === 'dayOfPaired') {
@@ -570,8 +900,23 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]),
+              addMealsForTheDay(primarySchedule[index + 1]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
+
           // set cooking as tuesday
 
         } else {
@@ -583,55 +928,124 @@ aggregation.forEach((el, i) => {
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
+
           // set cooking as tuesday
 
         }
       } else if (e === 'sundayNight') {
         // set delivery for wednesday as sunday night
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().isoWeekday(7).format('MM-DD-YY');
+        delivery.onDate = moment().isoWeekday(7).format('YYYY-MM-DD');
 
         // summation of wednesday meals
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
+
         // set cooking as sunday
 
       } else if (e === 'dayOfMonday') {
         // set delivery for wednesday as monday day
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(1).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(1).format('YYYY-MM-DD');
 
         // summation of wednesday meals
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
+
         // set cooking as sunday
 
       } else if (e === 'nightBeforeMonday') {
         // set delivery for wednesday as monday night
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('YYYY-MM-DD');
 
         // summation of wednesday meals
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
+
         // set cooking as monday
 
       } else if (e === 'dayOfTuesday') {
         // set delivery for wednesday as tuesday day
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('YYYY-MM-DD');
 
         // summation of wednesday meals
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
 
         // set cooking as monday
 
@@ -643,7 +1057,7 @@ aggregation.forEach((el, i) => {
       if (e === 'nightBefore') {
 
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('YYYY-MM-DD');
 
         if (nextDay === 'nightBeforePaired') {
           daysPaired.push(3);
@@ -652,8 +1066,24 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]),
+              addMealsForTheDay(primarySchedule[index + 1]),
           });
+
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
+
           // summation
 
           // set cooking as wednesday
@@ -666,13 +1096,27 @@ aggregation.forEach((el, i) => {
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
+
           // set cooking as wednesday
 
         }
       } else if (e === 'dayOf') {
 
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(4).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(4).format('YYYY-MM-DD');
 
         if (nextDay === 'dayOfPaired') {
           daysPaired.push(3);
@@ -681,8 +1125,23 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]),
+              addMealsForTheDay(primarySchedule[index + 1]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
+
           // set cooking as wednesday
 
         } else {
@@ -691,24 +1150,50 @@ aggregation.forEach((el, i) => {
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
           // set cooking as wednesday
 
         }
       } else if (e === 'mondayNight') {
         // set delivery for thursday as monday night
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(1).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(1).format('YYYY-MM-DD');
 
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
 
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
+
         // set cooking as monday
 
       } else if (e === 'dayOfTuesday') {
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(2).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(2).format('YYYY-MM-DD');
         // set delivery for thursday as tuesday day
 
 
@@ -717,28 +1202,67 @@ aggregation.forEach((el, i) => {
           total: addMealsForTheDay(primarySchedule[index]),
         });
 
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
+
         // set cooking as monday
 
       } else if (e === 'nightBeforeTuesday') {
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(2).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(2).format('YYYY-MM-DD');
         // set delivery for thursday as tuesday night
 
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
         // set cooking as tuesday
 
       } else if (e === 'dayOfWednesday') {
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('YYYY-MM-DD');
         // set delivery for thursday as wednesday day
 
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
 
         // set cooking as tuesday
 
@@ -749,7 +1273,7 @@ aggregation.forEach((el, i) => {
       if (e === 'nightBefore') {
 
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(4).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(4).format('YYYY-MM-DD');
 
         if (nextDay == 'nightBeforeThursday') {
           daysPaired.push(5);
@@ -760,9 +1284,25 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 1]) +
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
           // set cooking for fri, sat and sun to thursday
 
@@ -773,12 +1313,25 @@ aggregation.forEach((el, i) => {
             total: addMealsForTheDay(primarySchedule[index]),
           });
 
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
+
         }
 
       } else if (e === 'dayOf') {
 
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(5).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(5).format('YYYY-MM-DD');
 
         if (nextDay == 'dayOfFriday' || nextDay == 'dayOf') {
           daysPaired.push(5);
@@ -786,15 +1339,43 @@ aggregation.forEach((el, i) => {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]) +
-                  addMealsForTheDay(primarySchedule[index + 1]) +
-                  addMealsForTheDay(primarySchedule[index + 2]),
+              addMealsForTheDay(primarySchedule[index + 1]) +
+              addMealsForTheDay(primarySchedule[index + 2]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]) +
+                  addMealsForTheDay(secondarySchedule[index + 1]) +
+                  addMealsForTheDay(secondarySchedule[index + 2]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
 
         } else {
           delivery.meals.push({
             name: primaryCustomerName,
             total: addMealsForTheDay(primarySchedule[index]),
           });
+
+          if (containsSecondaries) {
+            secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+              delivery.meals.push({
+                name: secondaryCustomerNames[profileIndex],
+                total: addMealsForTheDay(secondarySchedule[index]),
+              });
+
+            });
+
+            console.log(delivery.meals);
+          }
         }
 
 
@@ -802,33 +1383,73 @@ aggregation.forEach((el, i) => {
 
         // set delivery for friday as tuesday night
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(2).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(2).format('YYYY-MM-DD');
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
         // set cooking as tuesday
 
       } else if (e === 'dayOfWednesday') {
         // set delivery for friday as wednesday day
 
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('YYYY-MM-DD');
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
         // set cooking as tuesday
 
       } else if (e === 'nightBeforeWednesday') {
         // set delivery for friday as wednesday night
 
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(3).format('YYYY-MM-DD');
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
 
         // set cooking as wednesday
 
@@ -836,12 +1457,26 @@ aggregation.forEach((el, i) => {
         // set delivery for friday as thursday day
 
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(4).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(4).format('YYYY-MM-DD');
 
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]),
         });
+
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]),
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
         // set cooking as wednesday
       }
     } // friday
@@ -853,13 +1488,29 @@ aggregation.forEach((el, i) => {
         // set delivery for saturday-sunday as thursday night
 
         delivery.title = 'nightBefore';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(4).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(4).format('YYYY-MM-DD');
 
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]) +
-                addMealsForTheDay(primarySchedule[index + 1]),
+            addMealsForTheDay(primarySchedule[index + 1]),
         });
+
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]) +
+                addMealsForTheDay(secondarySchedule[index + 1]),
+
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
 
         // set cooking as thursday
 
@@ -867,13 +1518,28 @@ aggregation.forEach((el, i) => {
         // set delivery for saturday-sunday as friday day
 
         delivery.title = 'dayOf';
-        delivery.onDate = moment().add(1, 'weeks').isoWeekday(5).format('MM-DD-YY');
+        delivery.onDate = moment().add(1, 'weeks').isoWeekday(5).format('YYYY-MM-DD');
         delivery.meals.push({
           name: primaryCustomerName,
           total: addMealsForTheDay(primarySchedule[index]) +
-                addMealsForTheDay(primarySchedule[index + 1]),
+            addMealsForTheDay(primarySchedule[index + 1]),
 
         });
+
+        if (containsSecondaries) {
+          secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+
+            delivery.meals.push({
+              name: secondaryCustomerNames[profileIndex],
+              total: addMealsForTheDay(secondarySchedule[index]) +
+                addMealsForTheDay(secondarySchedule[index + 1]),
+
+            });
+
+          });
+
+          console.log(delivery.meals);
+        }
         // set cooking as thursday
       }
     } // saturday-sunday
@@ -886,8 +1552,12 @@ aggregation.forEach((el, i) => {
     // if a day is not paired and not empty only then push the document into deliveries array
 
     if ((e != '' || e != 'false') && daysPaired.indexOf(index) == -1) {
+      console.log('Pushing this delivery');
       deliveries.push(delivery);
-      // console.log(daysPaired);
+
+      console.log('Meals inside this delivery')
+      console.log(delivery.meals);
+
     }
 
   }
@@ -901,8 +1571,17 @@ aggregation.forEach((el, i) => {
     console.log(e.meals);
   });
 
+  // if (deliveries.length > 0) {
+
+  //   deliveries.forEach((deliveryIn, indexForDelivery) => {
+  //     Deliveries.insert(deliveryIn);
+  //   });
+  // }
+
   console.log('Delivery selections');
   console.log(el.delivery);
-
+  console.log('Delivery meals actual')
 
 }); // aggregate loop
+
+

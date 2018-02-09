@@ -21,6 +21,7 @@ import RightArrow from 'material-ui-icons/ArrowForward';
 
 import moment from 'moment';
 import jsPDF from 'jspdf';
+import vittlebase64 from '../../../modules/vittlelogobase64';
 
 
 import Deliveries from '../../../api/Deliveries/Deliveries';
@@ -40,6 +41,8 @@ class Directions extends React.Component {
   constructor(props) {
     super(props);
 
+    this.changeDate = this.changeDate.bind(this);
+
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
@@ -49,7 +52,9 @@ class Directions extends React.Component {
         },
       },
       searchSelector: '',
-      currentTabValue: 0,
+      currentTabValue: /./,
+      selectedRoute: '',
+      currentSelectorDate: moment(new Date()).format('YYYY-MM-DD')
     };
   }
 
@@ -124,12 +129,89 @@ class Directions extends React.Component {
       options: { sort: newOptions },
     });
 
-    // console.log('Data sorting changed');
-    // console.log(this.state.options);
   }
 
   handleTabChange(event, value) {
     this.setState({ currentTabValue: value });
+  }
+
+  changeDate(operation) {
+    if (operation === "add") {
+      this.setState({
+        currentSelectorDate: moment(this.state.currentSelectorDate).add(1, "d").format('YYYY-MM-DD')
+      });
+    } else {
+      this.setState({
+        currentSelectorDate: moment(this.state.currentSelectorDate).subtract(1, "d").format('YYYY-MM-DD')
+      });
+    }
+  }
+
+  printLabels(type) {
+
+    const sweetType = type == 'dayOf' ? 'Morning' : type == 'nightBefore' ? 'Evening' : '';
+    const formalType = type == 'dayOf' ? 'Day of' : type == 'nightBefore' ? 'Evening' : '';
+
+
+    const currentDate = this.state.currentSelectorDate;
+
+    const deliveries = this.props.deliveries.filter(e => e.onDate == currentDate && e.title == type);
+
+    if (deliveries.length) {
+
+      let doc = new jsPDF({
+        orientation: 'landscape',
+        unit: 'in',
+        format: [4, 3]
+      });
+
+      deliveries.forEach((e, i) => {
+
+        if (i > 0) {
+          doc.addPage();
+          doc.setPage(i + 1)
+        }
+
+        doc.addImage(vittlebase64, "PNG", 1.78, 0.15, 0.4, 0.4);
+
+        doc.setFontSize(14.5); // name
+
+        let names = [];
+
+        e.meals.forEach((meal) => {
+          if (meal.total > 0) {
+            names.push(`${meal.name} (${meal.total})`)
+          }
+        });
+
+        doc.text(names, 1, 1.15);
+
+        doc.setFontSize(48); // Route
+        doc.setFontStyle("bold"); // Route
+
+        const route = this.props.routes.find(rt => rt._id == e.routeId);
+        const postalCode = this.props.postalCodes.find(pc => pc._id == e.postalCode);
+
+
+        doc.text(route.title === "Downtown" ? "DT" : route.title.slice(0, 1), 0.3, 2.75);
+
+        doc.setFontSize(12); // day postalcode
+        doc.setFontStyle("normal"); // Route
+
+        let info = [`${formalType} ${moment(e.onDate).format("MMMM D")}`, `${postalCode.title}`];
+
+        doc.text(info, 1.5, 2.4);
+
+      });
+
+      doc.save(`Delivery_${this.state.currentSelectorDate}.pdf`);
+
+    } else {
+      this.props.popTheSnackbar({
+        message: 'There are no ' + sweetType + ' labels to print for this day'
+      });
+    }
+
   }
 
   render() {
@@ -144,7 +226,7 @@ class Directions extends React.Component {
           <Grid container>
             <Grid item xs={12} style={{ marginBottom: '25px' }}>
 
-              <ListItem button style={{ float: 'left' }} onClick={() => Meteor.call('deliveries.downloadLabels', 'nightBefore', (err, res) => { console.log(err); console.log(res); })}>
+              <ListItem button style={{ float: 'left' }} onClick={() => this.changeDate('subtract')}>
                 <ListItemIcon>
                   <LeftArrow label="Yesterday" />
                 </ListItemIcon>
@@ -152,7 +234,7 @@ class Directions extends React.Component {
               </ListItem>
 
 
-              <ListItem button style={{ float: 'right' }} onClick={() => Meteor.call('deliveries.downloadLabels', 'dayOf', (err, res) => { console.log(err); console.log(res); })}>
+              <ListItem button style={{ float: 'right' }} onClick={() => this.changeDate('add')} >
                 <ListItemText className="subheading" primary="Tomorrow" />
                 <ListItemIcon>
                   <RightArrow label="Tomorrow" />
@@ -163,14 +245,14 @@ class Directions extends React.Component {
 
           <Grid container className="clearfix">
             <Grid item xs={6} style={{ alignItems: 'center' }}>
-              <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }}>Directions for {moment().format('DD MMM, YYYY')}
+              <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }}>Directions for {moment(this.state.currentSelectorDate).format('dddd, MMMM D')}
 
               </Typography>
 
             </Grid>
             <Grid item xs={6}>
-              <Button className="btn btn-primary" onClick={() => history.push('/categories/new')} raised color="primary" style={{ float: 'right', marginLeft: '1em' }}>Print evening labels</Button>
-              <Button className="btn btn-primary" onClick={() => history.push('/categories/new')} raised color="primary" style={{ float: 'right' }}>Print day of labels</Button>
+              <Button className="btn btn-primary" onClick={() => this.printLabels('nightBefore')} raised color="primary" style={{ float: 'right', marginLeft: '1em' }}>Print evening labels</Button>
+              <Button className="btn btn-primary" onClick={() => this.printLabels('dayOf')} raised color="primary" style={{ float: 'right' }}>Print day of labels</Button>
 
             </Grid>
           </Grid>
@@ -178,9 +260,9 @@ class Directions extends React.Component {
           <div style={{ marginTop: '25px' }}>
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
               <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
-                <Tab label="All" />
+                <Tab label="All" value={/./} />
                 {this.props.routes && this.props.routes.map((e, i) => (
-                  <Tab key={i} label={e.title} />
+                  <Tab key={i} label={e.title} value={e._id} />
                 ))}
               </Tabs>
             </AppBar>
@@ -251,8 +333,10 @@ class Directions extends React.Component {
             ]}
             options={this.state.options}
             selector={{
-              title: 'dayOf',
-              $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }],
+              onDate: this.state.currentSelectorDate,
+              routeId: { $regex: new RegExp(this.state.currentTabValue), $options: 'i' },
+              $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+              ],
             }}
           >
             <DirectionsTable
@@ -261,6 +345,7 @@ class Directions extends React.Component {
               rowsLimit={this.state.rowsVisible}
               history={this.props.history}
               sortByOptions={this.sortByOption.bind(this)}
+              currentSelectorDate={this.state.currentSelectorDate}
             />
 
           </ListContainer>
@@ -291,5 +376,6 @@ export default createContainer(() => {
     loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready(),
     deliveries: Deliveries.find().fetch(),
     routes: Routes.find().fetch(),
+    postalCodes: PostalCodes.find().fetch(),
   };
 }, Directions);

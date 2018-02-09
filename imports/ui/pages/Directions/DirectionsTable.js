@@ -23,6 +23,10 @@ import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
 
+import moment from 'moment';
+
+import sumBy from 'lodash/sumBy';
+
 import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
 
@@ -156,9 +160,15 @@ class DirectionsTable extends React.Component {
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No delivery found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
+        <p style={{ padding: '25px' }} className="subheading">No delivery found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo; on {moment(this.props.currentSelectorDate).format('DD MMMM, YYYY')}</p>
       );
     }
+  }
+
+  renderAddress(address) {
+
+    return address.streetAddress;
+
   }
 
   isCheckboxSelected(id) {
@@ -182,6 +192,7 @@ class DirectionsTable extends React.Component {
   }
 
   render() {
+
     return (
       <div>
         <Paper elevation={2} className="table-container">
@@ -267,7 +278,7 @@ class DirectionsTable extends React.Component {
                         ) : ''}</Typography>
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
                           {e.customer ? (
-                            `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''}${e.customer.associatedProfiles > 1 ? 's' : ''}`
+                            `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''}${e.customer.associatedProfiles > 1 ? ' profiles' : ''}`
                           ) : ''}
                         </Typography>
                       </TableCell>
@@ -280,7 +291,7 @@ class DirectionsTable extends React.Component {
 
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
                           {e.customer ? (
-                            `${e.customer.address.streetAddress}`
+                            this.renderAddress.bind(this, e.customer.address)
                           ) : ''}
                         </Typography>
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
@@ -302,6 +313,7 @@ class DirectionsTable extends React.Component {
                             `${e.route.title}`
                           ) : ''}
                         </Typography>
+
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
                           {e.customer ? (
                             `${e.customer.postalCode}`
@@ -314,8 +326,12 @@ class DirectionsTable extends React.Component {
                         style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
                         padding="none"
                       >
-                        {e.title}
-                        {e.onDate}
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          {e.title === 'nightBefore' ? 'Evening' : e.title === "dayOf" ? 'Day' : ''}
+                        </Typography>
+                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                          {moment(e.onDate).format('MMMM D')}
+                        </Typography>
                       </TableCell>
 
                       <TableCell
@@ -324,8 +340,12 @@ class DirectionsTable extends React.Component {
                         onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                       >
 
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }} />
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }} />
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+
+                          {sumBy(e.meals, 'total')}
+                        </Typography>
+
+                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>0 sides</Typography>
 
                       </TableCell>
 

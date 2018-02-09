@@ -47,6 +47,25 @@ Deliveries.schema = new SimpleSchema({
     type: String,
     label: 'Date of the delivery',
   },
+  meals: {
+    type: Array,
+    label: 'Meals per profile',
+    blackbox: true,
+  },
+  'meals.$': {
+    type: Object,
+    label: 'Meals per profile',
+  },
+  'meals.$.name': {
+    type: String,
+    label: 'Name of the profile',
+  },
+  'meals.$.total': {
+    type: Number,
+    label: 'Name of the profile',
+    optional: true,
+  },
+
   activity: {
     type: Object,
     label: 'All acitivity that happened',
