@@ -166,9 +166,7 @@ class DirectionsTable extends React.Component {
   }
 
   renderAddress(address) {
-
     return address.streetAddress;
-
   }
 
   isCheckboxSelected(id) {
@@ -192,7 +190,6 @@ class DirectionsTable extends React.Component {
   }
 
   render() {
-
     return (
       <div>
         <Paper elevation={2} className="table-container">
@@ -260,8 +257,9 @@ class DirectionsTable extends React.Component {
                 this.props.results.map((e, i) => {
                   const isSelected = this.isCheckboxSelected(e._id);
 
+
                   return (
-                    <TableRow hover className={e._id} key={e._id}>
+                    <TableRow hover className={`${e._id}`} key={e._id}>
                       <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
                         <Checkbox
                           className="row-checkbox"
@@ -327,7 +325,7 @@ class DirectionsTable extends React.Component {
                         padding="none"
                       >
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                          {e.title === 'nightBefore' ? 'Evening' : e.title === "dayOf" ? 'Day' : ''}
+                          {e.title === 'nightBefore' ? 'Evening' : e.title === 'dayOf' ? 'Day' : ''}
                         </Typography>
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
                           {moment(e.onDate).format('MMMM D')}

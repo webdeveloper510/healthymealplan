@@ -2,8 +2,11 @@ import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import Deliveries from './Deliveries';
 import rateLimit from '../../modules/rate-limit';
-import { generateComponentAsPDF } from '../../modules/server/generate-labels.js';
-import Label from '../../ui/components/Label/Label';
+
+import sumBy from 'lodash/sumBy';
+import moment from 'moment';
+
+import sendDeliveredEmail from '../Deliveries/server/send-delivered-email';
 
 Meteor.methods({
   'deliveries.insert': function deliveriesInsert(cat) {
@@ -32,8 +35,60 @@ Meteor.methods({
     console.log(deliveryId);
     console.log(statusChange);
 
+
+
+
     try {
-      Deliveries.update({ _id: deliveryId }, { $set: { status: statusChange } });
+      const updated = Deliveries.update({ _id: deliveryId }, { $set: { status: statusChange } });
+
+      if (updated && statusChange == "Delivered") {
+
+        let delivery = Deliveries.findOne({ _id: deliveryId });
+        let deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
+
+        console.log(deliveryUser);
+
+        sendDeliveredEmail({
+          firstName: deliveryUser.profile.name.first,
+          // email: deliveryUser.emails[0].address,
+          email: 'jivanyesh@gmail.com',
+          totalMeals: sumBy(delivery.meals, 'total'),
+          address: deliveryUser.address.streetAddress + deliveryUser.address.postalCode,
+          deliveredAt: moment(new Date()).format('h:mm a'),
+        });
+
+      } else if (updated && statusChange == "Not delivered") {
+
+        // let delivery = Deliveries.findOne({ _id: deliveryId });
+        // let deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
+
+        // console.log(deliveryUser);
+
+        // sendDeliveredEmail({
+        //   firstName: deliveryUser.profile.name.first,
+        //   email: deliveryUser.emails[0].address,
+        //   totalMeals: sumBy(delivery.meals, 'total'),
+        //   address: deliveryUser.streetAddress + deliveryUser.postalCode,
+        //   deliveredAt: moment(new Date()).format('h:mm a'),
+        // });
+
+      } else if (updated && statusChange == "Delayed") {
+
+        // let delivery = Deliveries.findOne({ _id: deliveryId });
+        // let deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
+
+        // console.log(deliveryUser);
+
+        // sendDeliveredEmail({
+        //   firstName: deliveryUser.profile.name.first,
+        //   email: deliveryUser.emails[0].address,
+        //   totalMeals: sumBy(delivery.meals, 'total'),
+        //   address: deliveryUser.streetAddress + deliveryUser.postalCode,
+        //   deliveredAt: moment(new Date()).format('h:mm a'),
+        // });
+
+      }
+
       return deliveryId;
     } catch (exception) {
       throw new Meteor.Error('500', exception);
@@ -54,21 +109,6 @@ Meteor.methods({
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
-  },
-  'deliveries.downloadLabels': function downloadLabels(type) {
-    check(type, String);
-
-    const deliveries = Deliveries.find({ title: type }).fetch();
-
-    deliveries.forEach((e) => {
-      const fileName = `labels_${new Date().toDateString().pdf}_morning_${e.customerId}.pdf`;
-
-      console.log(e);
-
-      return generateComponentAsPDF({ component: Label, props: { title: e.title, postalCode: e.postalCode, date: e.onDate }, fileName })
-        .then(result => result)
-        .catch((error) => { throw new Meteor.Error('500', error); });
-    });
   },
 });
 

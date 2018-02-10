@@ -25,5 +25,6 @@ export default ({ text, html, template, templateVars, ...rest }) => {
       }, { resolve, reject });
     });
   }
+
   throw new Error('Please pass an HTML string, text, or template name to compile for your message\'s body.');
 };

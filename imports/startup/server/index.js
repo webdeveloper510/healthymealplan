@@ -16,6 +16,7 @@ import '../../modules/server/authorize/webhooks/';
 import Jobs from '../../api/Jobs/Jobs';
 import Subscriptions from '../../api/Subscriptions/Subscriptions';
 import Deliveries from '../../api/Deliveries/Deliveries';
+import sendDeliveredEmail from '../../api/Deliveries/server/send-delivered-email';
 
 
 // Email.send({
@@ -31,6 +32,15 @@ const job = new Job(Jobs, 'createInvoices', {});
 const createInvoicesExists = Jobs.findOne({ type: 'createInvoices' });
 
 // console.log(createInvoicesExists);
+
+
+// sendDeliveredEmail({
+//   firstName: 'Jivanysh',
+//   email: 'jivanyesh@gmail.com',
+//   totalMeals: '2 meals',
+//   address: 'ABC1, ABC2',
+//   deliveredAt: '10:30 AM'
+// })
 
 if (!createInvoicesExists) {
   job
@@ -149,7 +159,7 @@ aggregation.forEach((el, i) => {
   //   console.log(el.secondaryProfiles[0]);
   // }
 
-  var deliveries = [];
+  const deliveries = [];
   const cooking = [];
   const daysPaired = [];
 
@@ -161,7 +171,7 @@ aggregation.forEach((el, i) => {
     const nextDay = index < 6 ? el.delivery[index + 1] : null;
     const dayAfterTomorrow = index < 5 ? el.delivery[index + 2] : null;
 
-    let delivery = {
+    const delivery = {
       customerId: el.customerId,
       subscriptionId: el._id,
       postalCode: el.postalCode[0]._id,
@@ -1555,7 +1565,7 @@ aggregation.forEach((el, i) => {
       console.log('Pushing this delivery');
       deliveries.push(delivery);
 
-      console.log('Meals inside this delivery')
+      console.log('Meals inside this delivery');
       console.log(delivery.meals);
 
     }
@@ -1580,8 +1590,7 @@ aggregation.forEach((el, i) => {
 
   console.log('Delivery selections');
   console.log(el.delivery);
-  console.log('Delivery meals actual')
+  console.log('Delivery meals actual');
 
 }); // aggregate loop
-
 
