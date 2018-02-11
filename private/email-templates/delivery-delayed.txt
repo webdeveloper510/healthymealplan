@@ -1,0 +1,7 @@
+Hi, {{firstName}}
+
+We are currently experiencing delays with our deliveries and expect to deliver your {{totalMeals}} meals later than expected
+today. Please get in touch with us if you cannot accept a late delivery.
+
+Sorry for any inconvenience,
+The Vittle Team

@@ -6,7 +6,9 @@ import rateLimit from '../../modules/rate-limit';
 import sumBy from 'lodash/sumBy';
 import moment from 'moment';
 
-import sendDeliveredEmail from '../Deliveries/server/send-delivered-email';
+import sendDeliveredEmail from './server/send-delivered-email';
+import sendDeliveryDelayedEmail from './server/send-delivery-delayed-email';
+import sendNotDeliveredEmail from './server/send-not-delivered-email';
 
 Meteor.methods({
   'deliveries.insert': function deliveriesInsert(cat) {
@@ -36,57 +38,42 @@ Meteor.methods({
     console.log(statusChange);
 
 
-
-
     try {
       const updated = Deliveries.update({ _id: deliveryId }, { $set: { status: statusChange } });
 
-      if (updated && statusChange == "Delivered") {
+      const delivery = Deliveries.findOne({ _id: deliveryId });
+      const deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
 
-        let delivery = Deliveries.findOne({ _id: deliveryId });
-        let deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
-
-        console.log(deliveryUser);
+      if (updated && statusChange == 'Delivered') {
 
         sendDeliveredEmail({
           firstName: deliveryUser.profile.name.first,
           // email: deliveryUser.emails[0].address,
           email: 'jivanyesh@gmail.com',
           totalMeals: sumBy(delivery.meals, 'total'),
-          address: deliveryUser.address.streetAddress + deliveryUser.address.postalCode,
+          address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
           deliveredAt: moment(new Date()).format('h:mm a'),
         });
+      } else if (updated && statusChange == 'Not delivered') {
 
-      } else if (updated && statusChange == "Not delivered") {
+        sendNotDeliveredEmail({
+          firstName: deliveryUser.profile.name.first,
+          // email: deliveryUser.emails[0].address,
+          email: 'jivanyesh@gmail.com',
+          totalMeals: sumBy(delivery.meals, 'total'),
+          address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+          deliveredAt: moment(new Date()).format('h:mm a'),
+        });
+      } else if (updated && statusChange == 'Delayed') {
 
-        // let delivery = Deliveries.findOne({ _id: deliveryId });
-        // let deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
-
-        // console.log(deliveryUser);
-
-        // sendDeliveredEmail({
-        //   firstName: deliveryUser.profile.name.first,
-        //   email: deliveryUser.emails[0].address,
-        //   totalMeals: sumBy(delivery.meals, 'total'),
-        //   address: deliveryUser.streetAddress + deliveryUser.postalCode,
-        //   deliveredAt: moment(new Date()).format('h:mm a'),
-        // });
-
-      } else if (updated && statusChange == "Delayed") {
-
-        // let delivery = Deliveries.findOne({ _id: deliveryId });
-        // let deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
-
-        // console.log(deliveryUser);
-
-        // sendDeliveredEmail({
-        //   firstName: deliveryUser.profile.name.first,
-        //   email: deliveryUser.emails[0].address,
-        //   totalMeals: sumBy(delivery.meals, 'total'),
-        //   address: deliveryUser.streetAddress + deliveryUser.postalCode,
-        //   deliveredAt: moment(new Date()).format('h:mm a'),
-        // });
-
+        sendDeliveryDelayedEmail({
+          firstName: deliveryUser.profile.name.first,
+          // email: deliveryUser.emails[0].address,
+          email: 'jivanyesh@gmail.com',
+          totalMeals: sumBy(delivery.meals, 'total'),
+          address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+          deliveredAt: moment(new Date()).format('h:mm a'),
+        });
       }
 
       return deliveryId;
@@ -105,7 +92,49 @@ Meteor.methods({
     console.log('Server: deliveries.batchUpdate');
 
     try {
-      return Deliveries.update({ _id: { $in: deliveryIds } }, { $set: { status: statusChange } }, { multi: true });
+      const batchUpdate = Deliveries.update({ _id: { $in: deliveryIds } }, { $set: { status: statusChange } }, { multi: true });
+
+      if (!batchUpdate) {
+        return false;
+      }
+
+      deliveryIds.forEach((deliveryId) => {
+        const delivery = Deliveries.findOne({ _id: deliveryId });
+        const deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
+
+        if (statusChange == 'Delivered') {
+
+          sendDeliveredEmail({
+            firstName: deliveryUser.profile.name.first,
+            // email: deliveryUser.emails[0].address,
+            email: 'jivanyesh@gmail.com',
+            totalMeals: sumBy(delivery.meals, 'total'),
+            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+            deliveredAt: moment(new Date()).format('h:mm a'),
+          });
+        } else if (statusChange == 'Not delivered') {
+
+          sendNotDeliveredEmail({
+            firstName: deliveryUser.profile.name.first,
+            // email: deliveryUser.emails[0].address,
+            email: 'jivanyesh@gmail.com',
+            totalMeals: sumBy(delivery.meals, 'total'),
+            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+            deliveredAt: moment(new Date()).format('h:mm a'),
+          });
+        } else if (statusChange == 'Delayed') {
+
+          sendDeliveryDelayedEmail({
+            firstName: deliveryUser.profile.name.first,
+            // email: deliveryUser.emails[0].address,
+            email: 'jivanyesh@gmail.com',
+            totalMeals: sumBy(delivery.meals, 'total'),
+            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+            deliveredAt: moment(new Date()).format('h:mm a'),
+          });
+        }
+      });
+
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }

@@ -3,20 +3,26 @@ import { Meteor } from 'meteor/meteor';
 
 import sendEmail from '../../../modules/server/send-email';
 
-export default (options, user) => {
+export default (options) => {
   const applicationName = 'Vittle';
-  const firstName = options.profile.name.first;
+  const firstName = options.firstName;
   const emailAddress = options.email;
+  const totalMeals = options.totalMeals;
+  const address = options.address;
+  const deliveredAt = options.deliveredAt;
+
 
   return sendEmail({
     to: emailAddress,
-    from: `${applicationName} <support@application.com>`,
-    subject: `[${applicationName}] Welcome, ${firstName}!`,
+    from: `${applicationName} <support@avittle.com>`,
+    subject: 'There was an issue delivering your Vittle',
     template: 'delivery-unsuccessful',
     templateVars: {
       applicationName,
       firstName,
-      welcomeUrl: Meteor.absoluteUrl('documents'), // e.g., returns http://localhost:3000/documents
+      totalMeals,
+      address,
+      deliveredAt,
     },
   })
     .catch((error) => {

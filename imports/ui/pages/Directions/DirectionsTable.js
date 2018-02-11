@@ -30,6 +30,8 @@ import sumBy from 'lodash/sumBy';
 import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
 
+import './DirectionsTable.scss';
+
 class DirectionsTable extends React.Component {
   constructor(props) {
     super(props);
@@ -166,7 +168,22 @@ class DirectionsTable extends React.Component {
   }
 
   renderAddress(address) {
-    return address.streetAddress;
+    let toRender = '';
+    console.log(address);
+
+    if (address.type == 'apartment') {
+      toRender = `${address.apartmentName} ${address.unit} ${address.buzzer} ${address.streetAddress}`;
+    } else if (address.type == 'hotel') {
+      toRender = `${address.hotelName} ${address.roomNumber} ${address.streetAddress}`;
+    } else if (address.type == 'house') {
+      toRender = `${address.unit} ${address.streetAddress}`;
+    } else if (address.type == 'business') {
+      toRender = `${address.businessName} ${address.unit} ${address.buzzer} ${address.streetAddress}`;
+    } else if (address.type == 'dormitory') {
+      toRender = `${address.dormName} ${address.dormResidence} ${address.roomNumber} ${address.buzzer} ${address.streetAddress}`;
+    }
+
+    return toRender;
   }
 
   isCheckboxSelected(id) {
@@ -187,6 +204,40 @@ class DirectionsTable extends React.Component {
 
   updateDialogHandleRequestClose() {
     this.setState({ updateDialogOpen: false });
+  }
+
+  getStatusClass(status) {
+    let statusToReturn = '';
+    switch (status) {
+      case 'In-Transit':
+        statusToReturn = 'status status--in-transit';
+        break;
+
+      case 'Delivered':
+        statusToReturn = 'status status--delivered';
+
+        break;
+
+      case 'Not delivered':
+        statusToReturn = 'status status--not-delivered';
+
+        break;
+
+      case 'Delayed':
+        statusToReturn = 'status status--delayed';
+
+        break;
+
+      case 'Scheduled':
+        statusToReturn = 'status status--scheduled';
+
+        break;
+
+      default:
+        statusToReturn = '';
+    }
+
+    return statusToReturn;
   }
 
   render() {
@@ -217,6 +268,9 @@ class DirectionsTable extends React.Component {
                 </option>
                 <option value="Not delivered">
                   Not delivered
+                </option>
+                <option value="Delayed">
+                  Delayed
                 </option>
                 <option value="Scheduled">
                   Scheduled
@@ -256,10 +310,10 @@ class DirectionsTable extends React.Component {
               {
                 this.props.results.map((e, i) => {
                   const isSelected = this.isCheckboxSelected(e._id);
-
+                  const statusClass = this.getStatusClass(e.status);
 
                   return (
-                    <TableRow hover className={`${e._id}`} key={e._id}>
+                    <TableRow hover className={`${e._id} ${statusClass}`} key={e._id}>
                       <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
                         <Checkbox
                           className="row-checkbox"
@@ -284,14 +338,13 @@ class DirectionsTable extends React.Component {
                       <TableCell
                         style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
                         padding="none"
-                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                       >
+                        <a target="_blank" href={`https://www.google.com/maps/search/?api=1&query=${this.renderAddress(e.customer.address)}`}>
+                          <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                            {e.customer ? this.renderAddress(e.customer.address) : ''}
+                          </Typography>
+                        </a>
 
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                          {e.customer ? (
-                            this.renderAddress.bind(this, e.customer.address)
-                          ) : ''}
-                        </Typography>
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
                           {e.customer ? (
                             `${e.customer.postalCode}`
@@ -369,6 +422,9 @@ class DirectionsTable extends React.Component {
                           </option>
                           <option value="Not delivered">
                             Not delivered
+                          </option>
+                          <option value="Delayed">
+                            Delayed
                           </option>
                           <option value="Scheduled">
                             Scheduled
