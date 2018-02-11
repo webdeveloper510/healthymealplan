@@ -30,9 +30,9 @@ import sumBy from 'lodash/sumBy';
 import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
 
-import './DirectionsTable.scss';
+import './MealPlannerTable.scss';
 
-class DirectionsTable extends React.Component {
+class MealPlannerTable extends React.Component {
   constructor(props) {
     super(props);
 
@@ -162,27 +162,9 @@ class DirectionsTable extends React.Component {
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No delivery found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo; on {moment(this.props.currentSelectorDate).format('DD MMMM, YYYY')}</p>
+        <p style={{ padding: '25px' }} className="subheading">No result found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo; on {moment(this.props.currentSelectorDate).format('DD MMMM, YYYY')}</p>
       );
     }
-  }
-
-  renderAddress(address) {
-    let toRender = '';
-
-    if (address.type == 'apartment') {
-      toRender = `${address.apartmentName} ${address.unit} ${address.buzzer} ${address.streetAddress}`;
-    } else if (address.type == 'hotel') {
-      toRender = `${address.hotelName} ${address.roomNumber} ${address.streetAddress}`;
-    } else if (address.type == 'house') {
-      toRender = `${address.unit} ${address.streetAddress}`;
-    } else if (address.type == 'business') {
-      toRender = `${address.businessName} ${address.unit} ${address.buzzer} ${address.streetAddress}`;
-    } else if (address.type == 'dormitory') {
-      toRender = `${address.dormName} ${address.dormResidence} ${address.roomNumber} ${address.buzzer} ${address.streetAddress}`;
-    }
-
-    return toRender;
   }
 
   isCheckboxSelected(id) {
@@ -203,40 +185,6 @@ class DirectionsTable extends React.Component {
 
   updateDialogHandleRequestClose() {
     this.setState({ updateDialogOpen: false });
-  }
-
-  getStatusClass(status) {
-    let statusToReturn = '';
-    switch (status) {
-      case 'In-Transit':
-        statusToReturn = 'status status--in-transit';
-        break;
-
-      case 'Delivered':
-        statusToReturn = 'status status--delivered';
-
-        break;
-
-      case 'Not delivered':
-        statusToReturn = 'status status--not-delivered';
-
-        break;
-
-      case 'Delayed':
-        statusToReturn = 'status status--delayed';
-
-        break;
-
-      case 'Scheduled':
-        statusToReturn = 'status status--scheduled';
-
-        break;
-
-      default:
-        statusToReturn = '';
-    }
-
-    return statusToReturn;
   }
 
   render() {
@@ -284,21 +232,21 @@ class DirectionsTable extends React.Component {
             {this.props.count > 0 ?
               (<TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox" style={{ width: '12%' }}>
+                  {/* <TableCell padding="checkbox" style={{ width: '12%' }}>
                     <Checkbox onChange={this.selectAllRows.bind(this)} />
-                  </TableCell>
-                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                    <Typography className="body2" type="body2">Customer</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Address</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                  </TableCell> */}
+                  <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('SKU')}>
+                    <Typography className="body2" type="body2">Plan</Typography></TableCell>
+                  <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Meal type</Typography></TableCell>
+                  {/* <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
                     <Typography className="body2" type="body2">Route</Typography></TableCell>
                   <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
                     <Typography className="body2" type="body2">Delivery Type</Typography></TableCell>
                   <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Meals</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Status</Typography></TableCell>
+                    <Typography className="body2" type="body2">Meals</Typography></TableCell> */}
+                  <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Main</Typography></TableCell>
 
                 </TableRow>
               </TableHead>)
@@ -308,21 +256,19 @@ class DirectionsTable extends React.Component {
 
               {
                 this.props.results.map((e, i) => {
-                  const isSelected = this.isCheckboxSelected(e._id);
-                  const statusClass = this.getStatusClass(e.status);
 
                   return (
-                    <TableRow hover className={`${e._id} ${statusClass}`} key={e._id}>
-                      <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
+                    <TableRow hover className={`${e._id}`} key={e._id}>
+                      {/* <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
                         <Checkbox
                           className="row-checkbox"
                           id={e._id}
                           checked={isSelected}
                           onChange={this.rowSelected.bind(this, e)}
                         />
-                      </TableCell>
+                      </TableCell> */}
 
-                      <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
+                      <TableCell padding="none" style={{ width: '33.33%' }}>
                         <Typography className="subheading" type="subheading">{e.customer ? (
                           `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''} 
                           ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''}`
@@ -335,14 +281,10 @@ class DirectionsTable extends React.Component {
                       </TableCell>
 
                       <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.33%' }}
                         padding="none"
                       >
-                        <a target="_blank" href={`https://www.google.com/maps/search/?api=1&query=${this.renderAddress(e.customer.address)}`}>
-                          <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                            {e.customer ? this.renderAddress(e.customer.address) : ''}
-                          </Typography>
-                        </a>
+
 
                         <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
                           {e.customer ? (
@@ -353,9 +295,8 @@ class DirectionsTable extends React.Component {
                       </TableCell>
 
                       <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.34%' }}
                         padding="none"
-                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                       >
 
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
@@ -372,65 +313,7 @@ class DirectionsTable extends React.Component {
 
                       </TableCell>
 
-                      <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
-                        padding="none"
-                      >
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                          {e.title === 'nightBefore' ? 'Evening' : e.title === 'dayOf' ? 'Day' : ''}
-                        </Typography>
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {moment(e.onDate).format('MMMM D')}
-                        </Typography>
-                      </TableCell>
 
-                      <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
-                        padding="none"
-                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
-                      >
-
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-
-                          {sumBy(e.meals, 'total')}
-                        </Typography>
-
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>0 sides</Typography>
-
-                      </TableCell>
-
-                      <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
-                        padding="none"
-                      >
-                        <TextField
-                          fullWidth
-                          id="select-delivery-status"
-                          select
-                          SelectProps={{ native: true }}
-                          name="status"
-                          style={{ width: '90%', margin: '0 auto' }}
-                          onChange={event => this.handleStatusChange(event, e._id, false)}
-                          value={e.status}
-                        >
-                          <option value="In-Transit">
-                            In-Transit
-                          </option>
-                          <option value="Delivered">
-                            Delivered
-                          </option>
-                          <option value="Not delivered">
-                            Not delivered
-                          </option>
-                          <option value="Delayed">
-                            Delayed
-                          </option>
-                          <option value="Scheduled">
-                            Scheduled
-                          </option>
-                        </TextField>
-
-                      </TableCell>
 
 
                     </TableRow>
@@ -481,7 +364,7 @@ class DirectionsTable extends React.Component {
   }
 }
 
-DirectionsTable.propTypes = {
+MealPlannerTable.propTypes = {
   // results: PropType.isRequired,
   history: PropTypes.func.isRequired,
   hasMore: PropTypes.bool.isRequired,
@@ -496,7 +379,6 @@ export default createContainer(() => {
   const deliveryCountSub = Meteor.subscribe('deliveries-all-count');
 
   return {
-    // ingredientTypes: IngredientsWithTypes.find().fetch(),
     categoryCount: Counts.get('deliveries'),
   };
-}, DirectionsTable);
+}, MealPlannerTable);

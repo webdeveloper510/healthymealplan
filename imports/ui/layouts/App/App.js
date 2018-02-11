@@ -98,6 +98,9 @@ import NewType from '../../pages/NewType/NewType';
 // import ViewType from '../../pages/ViewType/ViewType';
 import EditType from '../../pages/EditType/EditType';
 
+import MealPlanner from '../../pages/MealPlanner/MealPlanner';
+
+
 import Meals from '../../pages/Meals/Meals';
 import NewMeal from '../../pages/NewMeal/NewMeal';
 import EditMeal from '../../pages/EditMeal/EditMeal';
@@ -618,6 +621,15 @@ class App extends React.Component {
 
                     <Authenticated
                       exact
+                      path="/meal-planner"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={MealPlanner}
+                      {...this.props}
+                    />
+
+
+                    <Authenticated
+                      exact
                       path="/meals"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Meals}
@@ -637,6 +649,8 @@ class App extends React.Component {
                       component={EditMeal}
                       {...this.props}
                     />
+
+
 
                     <Authenticated
                       exact
