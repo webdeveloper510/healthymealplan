@@ -151,14 +151,6 @@ aggregation.forEach((el, i) => {
   console.log('Secondary schedules');
   console.log(secondarySchedules);
 
-
-  // console.log(containsSecondaries);
-
-  // if(containsSecondaries){
-  //   console.log(`secondary account for profile ${i}`);
-  //   console.log(el.secondaryProfiles[0]);
-  // }
-
   const deliveries = [];
   const cooking = [];
   const daysPaired = [];
