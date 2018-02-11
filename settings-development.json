@@ -2,11 +2,13 @@
   "public": {
     "filesURL": "/Healthy Meal Plan/data",
     "apiLoginKey": "47cmd9F3DJ",
-    "clientKey": "73C59E6vwX3c5DzP8Z5M3dCbr5LrRpQV2wm93297ff4HcbPH562PtN2Aw6tkDAat"
+    "clientKey": "73C59E6vwX3c5DzP8Z5M3dCbr5LrRpQV2wm93297ff4HcbPH562PtN2Aw6tkDAat",
+    "twilioAccountSid": "AC373a0b7bd7e166370ae5d68bc612e6ef"
   },
   "private": {
+    "twilioAuthToken": "3c6f7d2d34dd42fa6ad02cc11b19bf4a",
     "transactionKey": "48CaN593a5Ece9Vq",
-    "MAIL_URL": "smtp://postmaster@sandboxf5538b27bf3f458ea825bc8f3cbe365e.mailgun.org:0884b10f11de32a9c33bc4a90fc2f9a2@smtp.mailgun.org:587",
+    "MAIL_URL": "smtp://postmaster@mg.vittle.ca:0fba0353495c1f6fb8a8a7cd830b100c@smtp.mailgun.org:587",
     "OAuth": {
       "facebook": {
         "appId": "",

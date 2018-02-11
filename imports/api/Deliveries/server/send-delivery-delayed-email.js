@@ -12,7 +12,7 @@ export default (options) => {
 
   return sendEmail({
     to: emailAddress,
-    from: `${applicationName} <support@avittle.com>`,
+    from: `${applicationName} <support@vittle.ca>`,
     subject: 'There was an issue delivering your Vittle',
     template: 'delivery-delayed',
     templateVars: {
