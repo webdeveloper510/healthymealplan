@@ -17,6 +17,7 @@ import Jobs from '../../api/Jobs/Jobs';
 import Subscriptions from '../../api/Subscriptions/Subscriptions';
 import Deliveries from '../../api/Deliveries/Deliveries';
 import sendDeliveredEmail from '../../api/Deliveries/server/send-delivered-email';
+import MealPlanner from '../../api/MealPlanner/MealPlanner';
 
 
 // Email.send({
@@ -141,15 +142,15 @@ aggregation.forEach((el, i) => {
   const secondarySchedules = containsSecondaries ? secondaryAccounts.map(e => e.schedule) : null;
   const secondaryCustomerNames = containsSecondaries ? secondaryAccounts.map(e => (e.profile.name ? `${e.profile.name.first} ${e.profile.name.last ? e.profile.name.last : ''}` : '')) : null;
 
-  console.log(`Customer ${i}`);
-  console.log(customer._id);
-  console.log('Schedule');
-  console.log(primarySchedule);
-  console.log('Secondary accounts');
-  console.log(secondaryCustomerNames);
+  // console.log(`Customer ${i}`);
+  // console.log(customer._id);
+  // console.log('Schedule');
+  // console.log(primarySchedule);
+  // console.log('Secondary accounts');
+  // console.log(secondaryCustomerNames);
 
-  console.log('Secondary schedules');
-  console.log(secondarySchedules);
+  // console.log('Secondary schedules');
+  // console.log(secondarySchedules);
 
   const deliveries = [];
   const cooking = [];
@@ -212,7 +213,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as sunday
@@ -243,7 +244,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as sunday
@@ -274,7 +275,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as sunday
@@ -300,7 +301,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as sunday
@@ -339,7 +340,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking for sunday
@@ -368,7 +369,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking for sunday
@@ -396,7 +397,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as sunday
@@ -422,7 +423,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as sunday
@@ -463,7 +464,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as monday
@@ -490,7 +491,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as monday
@@ -517,7 +518,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as monday
@@ -541,7 +542,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
           // set cooking as monday
 
@@ -576,7 +577,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as monday
@@ -604,7 +605,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as monday
@@ -632,7 +633,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as monday
@@ -658,7 +659,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
           // set cooking as monday
 
@@ -684,7 +685,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
         // set cooking as sunday
 
@@ -710,7 +711,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
 
         // set cooking as sunday
@@ -750,7 +751,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as tuesday
@@ -777,7 +778,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as tuesday
@@ -804,7 +805,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
           // set cooking as tuesday
 
@@ -827,7 +828,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
           // set cooking as tuesday
 
@@ -863,7 +864,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as tuesday
@@ -890,7 +891,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
           // set cooking as tuesday
 
@@ -916,7 +917,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as tuesday
@@ -941,7 +942,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as tuesday
@@ -968,7 +969,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
 
         // set cooking as sunday
@@ -994,7 +995,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
 
         // set cooking as sunday
@@ -1020,7 +1021,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
 
         // set cooking as monday
@@ -1046,7 +1047,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
 
         // set cooking as monday
@@ -1083,7 +1084,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // summation
@@ -1109,7 +1110,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as wednesday
@@ -1141,7 +1142,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking as wednesday
@@ -1163,7 +1164,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
           // set cooking as wednesday
 
@@ -1188,7 +1189,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
 
         // set cooking as monday
@@ -1214,7 +1215,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
 
         // set cooking as monday
@@ -1239,7 +1240,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
         // set cooking as tuesday
 
@@ -1263,7 +1264,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
 
         // set cooking as tuesday
@@ -1303,7 +1304,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
           // set cooking for fri, sat and sun to thursday
@@ -1325,7 +1326,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
         }
@@ -1357,7 +1358,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
 
         } else {
@@ -1376,7 +1377,7 @@ aggregation.forEach((el, i) => {
 
             });
 
-            console.log(delivery.meals);
+            // console.log(delivery.meals);
           }
         }
 
@@ -1401,7 +1402,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
         // set cooking as tuesday
 
@@ -1425,7 +1426,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
         // set cooking as tuesday
 
@@ -1450,7 +1451,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
 
         // set cooking as wednesday
@@ -1477,7 +1478,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
         // set cooking as wednesday
       }
@@ -1511,7 +1512,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
 
         // set cooking as thursday
@@ -1540,7 +1541,7 @@ aggregation.forEach((el, i) => {
 
           });
 
-          console.log(delivery.meals);
+          // console.log(delivery.meals);
         }
         // set cooking as thursday
       }
@@ -1557,21 +1558,21 @@ aggregation.forEach((el, i) => {
       console.log('Pushing this delivery');
       deliveries.push(delivery);
 
-      console.log('Meals inside this delivery');
-      console.log(delivery.meals);
+      // console.log('Meals inside this delivery');
+      // console.log(delivery.meals);
 
     }
 
   }
 
+  // Uncomment all of this and shift it to a job
+  // console.log('Delivery collection data');
+  // console.log(deliveries);
 
-  console.log('Delivery collection data');
-  console.log(deliveries);
-
-  deliveries.forEach((e, i) => {
-    console.log(`Delivery ${i}`);
-    console.log(e.meals);
-  });
+  // deliveries.forEach((e, i) => {
+  //   console.log(`Delivery ${i}`);
+  //   console.log(e.meals);
+  // });
 
   // if (deliveries.length > 0) {
 
@@ -1580,9 +1581,28 @@ aggregation.forEach((el, i) => {
   //   });
   // }
 
-  console.log('Delivery selections');
-  console.log(el.delivery);
-  console.log('Delivery meals actual');
+  // console.log('Delivery selections');
+  // console.log(el.delivery);
+  // console.log('Delivery meals actual');
 
 }); // aggregate loop
 
+
+// MealPlanner.insert({
+//   mealId: 'ath8QQNoaBnYqEsEB',
+//   lifestyleId: 'KzL8D4Lg9b7wcXggE',
+//   plateId: 'yCDoxCX9ZFfW4Thw8',
+//   onDate: '2018-02-13',
+// });
+
+
+// MealPlanner.insert({
+//   mealId: 'ath8QQNoaBnYqEsEB',
+//   lifestyleId: 'KzL8D4Lg9b7wcXggE',
+//   plateId: 'yCDoxCX9ZFfW4Thw8',
+//   onDate: '2018-02-14',
+// });
+
+// console.log('Meal planner');
+// console.log(MealPlanner.find().fetch());
+//

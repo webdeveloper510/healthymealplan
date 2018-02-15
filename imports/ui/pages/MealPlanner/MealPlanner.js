@@ -2,6 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
+import Containers from 'meteor/utilities:react-list-container';
 
 import $ from 'jquery';
 
@@ -18,23 +19,18 @@ import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import LeftArrow from 'material-ui-icons/ArrowBack';
 import RightArrow from 'material-ui-icons/ArrowForward';
 
-
 import moment from 'moment';
-import jsPDF from 'jspdf';
-import vittlebase64 from '../../../modules/vittlelogobase64';
 
-import MealPlannerCollection from '../../../api/MealPlanner/MealPlanner';
+import MealPlannerColl from '../../../api/MealPlanner/MealPlanner';
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
 import Meals from '../../../api/Meals/Meals';
-import Plates from '../../../api/Plates/Plates';
+import PlatesCollection from '../../../api/Plates/Plates';
 
 import Loading from '../../components/Loading/Loading';
 import MealPlannerTable from './MealPlannerTable';
 
-import Containers from 'meteor/utilities:react-list-container';
 
 const ListContainer = Containers.ListContainer;
-
 
 class MealPlanner extends React.Component {
   constructor(props) {
@@ -53,8 +49,10 @@ class MealPlanner extends React.Component {
       searchSelector: '',
       // currentTabValue: /./,
       selectedRoute: '',
-      currentSelectorDate: moment(new Date()).format('YYYY-MM-DD')
+      currentSelectorDate: moment(new Date()).format('YYYY-MM-DD'),
     };
+
+    this.sortByOption = this.sortByOption.bind(this);
   }
 
   searchByName() {
@@ -118,7 +116,6 @@ class MealPlanner extends React.Component {
     this.setState({
       options: { sort: newOptions },
     });
-
   }
 
   handleTabChange(event, value) {
@@ -126,13 +123,13 @@ class MealPlanner extends React.Component {
   }
 
   changeDate(operation) {
-    if (operation === "add") {
+    if (operation === 'add') {
       this.setState({
-        currentSelectorDate: moment(this.state.currentSelectorDate).add(1, "d").format('YYYY-MM-DD')
+        currentSelectorDate: moment(this.state.currentSelectorDate).add(1, 'd').format('YYYY-MM-DD'),
       });
     } else {
       this.setState({
-        currentSelectorDate: moment(this.state.currentSelectorDate).subtract(1, "d").format('YYYY-MM-DD')
+        currentSelectorDate: moment(this.state.currentSelectorDate).subtract(1, 'd').format('YYYY-MM-DD'),
       });
     }
   }
@@ -170,19 +167,7 @@ class MealPlanner extends React.Component {
             <Grid item xs={12} style={{ alignItems: 'center' }}>
               <Typography type="headline" gutterBottom style={{ fontWeight: 500 }}>Meal planner for {moment(this.state.currentSelectorDate).format('dddd, MMMM D')}</Typography>
             </Grid>
-
           </Grid>
-
-          {/* <div style={{ marginTop: '25px' }}>
-            <AppBar position="static" className="appbar--no-background appbar--no-shadow">
-              <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
-                <Tab label="All" value={/./} />
-                {this.props.routes && this.props.routes.map((e, i) => (
-                  <Tab key={i} label={e.title} value={e._id} />
-                ))}
-              </Tabs>
-            </AppBar>
-          </div> */}
 
           <div style={{
             width: '100%',
@@ -223,7 +208,7 @@ class MealPlanner extends React.Component {
           </div>
           <ListContainer
             limit={50}
-            collection={MealPlannerCollection}
+            collection={MealPlannerColl}
             publication="mealplanner"
             joins={[
               {
@@ -232,38 +217,33 @@ class MealPlanner extends React.Component {
                 joinAs: 'lifestyle',
               },
               {
-                localProperty: 'plateId',
-                collection: Plates,
-                joinAs: 'plate',
-              },
-              {
                 localProperty: 'mealId',
                 collection: Meals,
                 joinAs: 'meal',
               },
+              {
+                localProperty: 'plateId',
+                collection: PlatesCollection,
+                joinAs: 'plate',
+              },
             ]}
             options={this.state.options}
             selector={{
-              // onDate: this.state.currentSelectorDate,
-              // $or: [{ : { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-              // ],
+              onDate: this.state.currentSelectorDate,
             }}
           >
-
             <MealPlannerTable
               popTheSnackbar={this.props.popTheSnackbar}
               searchTerm={this.state.searchSelector}
               rowsLimit={this.state.rowsVisible}
               history={this.props.history}
-              sortByOptions={this.sortByOption.bind(this)}
+              sortByOptions={this.sortByOption}
               currentSelectorDate={this.state.currentSelectorDate}
               lifestyles={this.props.lifestyles}
               meals={this.props.meals}
+              plates={this.props.plates}
             />
-
           </ListContainer>
-
-
         </Grid>
       </div >
     ) : <Loading />);
@@ -272,22 +252,23 @@ class MealPlanner extends React.Component {
 
 MealPlanner.propTypes = {
   loading: PropTypes.bool.isRequired,
-  delvieries: PropTypes.arrayOf(PropTypes.object).isRequired,
-  match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
+  lifestyles: PropTypes.arrayOf(PropTypes.object).isRequired,
+  meals: PropTypes.arrayOf(PropTypes.object).isRequired,
+  plates: PropTypes.arrayOf(PropTypes.object).isRequired,
+
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe('lifestyles');
-  const subscription2 = Meteor.subscribe('meals');
-  const subscription5 = Meteor.subscribe('mealplanner');
-  const subscription6 = Meteor.subscribe('plates');
-
+  const subscription1 = Meteor.subscribe('lifestyles');
+  const subscription2 = Meteor.subscribe('Meals');
+  const subscription3 = Meteor.subscribe('mealplanner');
+  const subscription4 = Meteor.subscribe('plates', {}, {});
 
   return {
-    loading: !subscription.ready() && !subscription2.ready() && !subscription5.ready() && !subscription6.ready(),
+    loading: !subscription1.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready(),
     lifestyles: Lifestyles.find().fetch(),
     meals: Meals.find().fetch(),
-    plates: Plates.find().fetch(),
+    plates: PlatesCollection.find().fetch(),
   };
 }, MealPlanner);

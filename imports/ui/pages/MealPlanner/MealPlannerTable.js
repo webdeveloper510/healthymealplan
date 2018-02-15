@@ -15,6 +15,7 @@ import Dialog, {
   DialogContentText,
 } from 'material-ui/Dialog';
 
+
 import $ from 'jquery';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
@@ -22,10 +23,13 @@ import TextField from 'material-ui/TextField';
 import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
+import Input from 'material-ui/Input';
+import { MenuItem } from 'material-ui/Menu';
 
 import moment from 'moment';
 
 import sumBy from 'lodash/sumBy';
+import Autosuggest from 'react-autosuggest';
 
 import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
@@ -37,17 +41,83 @@ class MealPlannerTable extends React.Component {
     super(props);
 
     this.state = {
-      selectedCheckboxes: [],
-      selectedCheckboxesNumber: 0,
-      updateDialogOpen: false,
-      batchDeliveryStatus: '',
+      suggestions: [],
+      plates: this.props.plates ? this.props.plates : [],
+      value: '',
+      // selectedCheckboxes: [],
+      // selectedCheckboxesNumber: 0,
+      // updateDialogOpen: false,
+      selectedSugestion: null,
+
+      currentSelectorDate: this.props.currentSelectorDate,
+
+      assignDialogOpen: false,
+      assignResult: null,
+
+      mealSelected: null,
+      lifestyleSelected: null,
+
+
+      reassignDialogOpen: false,
+
+      reassignResult: null,
+      reassignPlannerId: '',
     };
 
-    this.handleStatusChange = this.handleStatusChange.bind(this);
+    this.openAssignDialog = this.openAssignDialog.bind(this);
+    this.closeAssignDialog = this.closeAssignDialog.bind(this);
+
+    this.openReassignDialog = this.openReassignDialog.bind(this);
+    this.closeReassignDialog = this.closeReassignDialog.bind(this);
+
+    this.handleMealAssignment = this.handleMealAssignment.bind(this);
+    this.handleMealReassignment = this.handleMealReassignment.bind(this);
+
+    this.renderPresentPlate = this.renderPresentPlate.bind(this);
+    this.getPlannerId = this.getPlannerId.bind(this);
   }
 
-  renderType(type) {
-    console.log(type);
+  openAssignDialog(lifestyleId, mealId) {
+
+    const lifestyle = this.props.lifestyles.find(el => el._id === lifestyleId);
+    const meal = this.props.meals.find(el => el._id === mealId);
+
+    let assignResult = {
+      lifestyle,
+      meal
+    }
+
+    this.setState({
+      assignResult,
+      assignDialogOpen: true,
+      lifestyleSelected: lifestyleId,
+      mealSelected: mealId,
+    });
+  }
+
+  closeAssignDialog() {
+    this.setState({
+      selectedLifestyle: '',
+      selectedMeal: '',
+      selectedPlate: '',
+      assignDialogOpen: false,
+    });
+  }
+
+  closeReassignDialog() {
+    this.setState({
+      reassignDialogOpen: false
+    })
+  }
+
+  openReassignDialog(lifestyleId, mealId) {
+    const assignedPlate = this.props.results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === this.props.currentSelectorDate);
+
+    this.setState({
+      reassignResult: assignedPlate,
+      reassignDialogOpen: true,
+      reassignPlannerId: assignedPlate._id,
+    });
   }
 
   rowSelected(e, event, checked) {
@@ -106,57 +176,61 @@ class MealPlannerTable extends React.Component {
     });
   }
 
-  handleBatchStatusChange() {
-    console.log('Update selected rows');
+  handleMealAssignment() {
 
-    localStorage.setItem('deliveryUpdated', this.state.selectedCheckboxesNumber);
+    localStorage.setItem('mealAssigned', this.state.selectedSugestion.title);
+    console.log(this.props.currentSelectorDate);
+    console.log(this.state.lifestyleSelected);
+    console.log(this.state.mealSelected);
+    console.log(this.state.selectedSugestion._id);
 
-    const categoryIds = this.state.selectedCheckboxes;
+    Meteor.call('mealPlanner.insert',
+      this.props.currentSelectorDate,
+      this.state.lifestyleSelected,
+      this.state.mealSelected,
+      this.state.selectedSugestion._id, (error) => {
 
-    console.log(categoryIds);
-
-    Meteor.call('deliveries.batchUpdate', this.state.selectedCheckboxes, this.state.batchDeliveryStatus, (error) => {
-      console.log('inside method');
-      if (error) {
-        this.props.popTheSnackbar({
-          message: error.reason,
-        });
-      } else {
-        this.props.popTheSnackbar({
-          message: `${localStorage.getItem('deliveryUpdated')} delivery statuses updated.`,
-        });
-      }
-    });
-
-    this.setState({
-      selectedCheckboxes: [],
-      selectedCheckboxesNumber: 0,
-      updateDialogOpen: false,
-    });
-
-    this.forceUpdate();
-  }
-
-  handleStatusChange(event, deliveryId, batchChange) {
-    if (batchChange) {
-      this.setState({
-        updateDialogOpen: true,
-        batchDeliveryStatus: event.target.value,
-      });
-    } else {
-      Meteor.call('deliveries.update', deliveryId, event.target.value, (error) => {
-        console.log('inside method');
         if (error) {
           this.props.popTheSnackbar({
             message: error.reason,
           });
         } else {
           this.props.popTheSnackbar({
-            message: 'Delivery status updated.',
+            message: `${localStorage.getItem('mealAssigned')} has been assigned.`,
           });
         }
       });
-    }
+
+    this.setState({
+      assignDialogOpen: false,
+      selectedSuggestion: null,
+      lifestyleSelected: null,
+      mealSelected: null,
+    });
+  }
+
+  handleMealReassignment() {
+
+    localStorage.setItem('mealReassigned', this.state.selectedSugestion.title);
+
+    Meteor.call('mealPlanner.update', this.props.currentSelectorDate, this.state.reassignPlannerId, this.state.selectedSugestion._id, (error) => {
+
+      if (error) {
+        this.props.popTheSnackbar({
+          message: error.reason,
+        });
+      } else {
+        this.props.popTheSnackbar({
+          message: `${localStorage.getItem('mealReassigned')} meal has been assigned.`,
+        });
+      }
+    });
+
+    this.setState({
+      reassignDialogOpen: false,
+      selectedSuggestion: null,
+      reassignPlannerId: null
+    });
   }
 
   renderNoResults(count) {
@@ -168,7 +242,6 @@ class MealPlannerTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-    // console.log(this.state.selectedCheckboxes);
 
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
@@ -179,206 +252,350 @@ class MealPlannerTable extends React.Component {
     return false;
   }
 
-  updateDialogHandleClickOpen() {
-    this.setState({ updateDialogOpen: true });
+  isPlateAssignedClass(results, lifestyleId, mealId) {
+    if (results.findIndex(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId) !== -1) {
+      return 'status--assigned';
+    }
+
+    return 'status status--not-assigned';
   }
 
-  updateDialogHandleRequestClose() {
-    this.setState({ updateDialogOpen: false });
+  isPlateAssigned(results, lifestyleId, mealId) {
+    if (results.findIndex(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId) !== -1) {
+      return true;
+    }
+
+    return false;
   }
+
+  getPlannerId(results, lifestyleId, mealId) {
+    const foundResult = results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === this.props.currentSelectorDate) !== -1;
+
+    if (foundResult) {
+      return foundResult._id;
+    }
+  }
+
+
+  renderPresentPlate(results, lifestyleId, mealId, date) {
+    const plateToReturn = results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === date);
+    return (<Typography type="subheading">{plateToReturn.plate.title}</Typography>)
+  }
+
+
+  renderInput(inputProps) {
+    const { value, ...other } = inputProps;
+
+    return (
+      <TextField
+        value={value}
+        style={{ width: '100%' }}
+        InputProps={{
+          ...other,
+        }}
+      />
+    );
+  }
+
+  onSuggestionsFetchRequested({ value }) {
+    this.setState({
+      suggestions: this.getSuggestions(value),
+    });
+  }
+
+  onSuggestionsClearRequested() {
+    this.setState({
+      suggestions: [],
+    });
+  }
+
+  getSuggestions(value) {
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+
+    return inputLength === 0
+      ? []
+      : this.props.plates.filter(
+        plate =>
+          plate.title.toLowerCase().slice(0, inputLength) === inputValue,
+      );
+  }
+
+  getSuggestionValue(suggestion) {
+    return suggestion.title;
+  }
+
+  renderSuggestion(suggestion) {
+    return (
+      <MenuItem component="div">
+        <div>{suggestion.title}</div>
+      </MenuItem>
+    );
+  }
+
+  renderSuggestionsContainer(options) {
+    const { containerProps, children } = options;
+
+    return (
+      <Paper {...containerProps} square>
+        {children}
+      </Paper>
+    );
+  }
+
+  onChange(event, { newValue }) {
+    this.setState({
+      value: newValue,
+    });
+  }
+
+  onSuggestionSelected(
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
+  ) {
+
+    this.setState({
+      selectedSugestion: suggestion
+    })
+
+  }
+
+
 
   render() {
+
     return (
       <div>
         <Paper elevation={2} className="table-container">
-          {this.state.selectedCheckboxes.length > 0 ? (
-            <div className="table-container--delete-rows-container" style={{ backgroundColor: '#607d8b' }}>
-              <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
-                {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'} selected
-              </Typography>
-              <TextField
-                fullWidth
-                id="select-delivery-status"
-                select
-                SelectProps={{ native: true }}
-                name="status"
-                style={{
-                  float: 'right', width: '200px',
-                }}
-                onChange={e => this.handleStatusChange(e, null, true)}
-              >
-                <option value="In-Transit">
-                  In-Transit
-                </option>
-                <option value="Delivered">
-                  Delivered
-                </option>
-                <option value="Not delivered">
-                  Not delivered
-                </option>
-                <option value="Delayed">
-                  Delayed
-                </option>
-                <option value="Scheduled">
-                  Scheduled
-                </option>
-              </TextField>
-            </div>
-          )
-            : ''
 
-          }
           <Table className="table-container" style={{ tableLayout: 'fixed' }}>
-            {this.props.count > 0 ?
-              (<TableHead>
-                <TableRow>
-                  {/* <TableCell padding="checkbox" style={{ width: '12%' }}>
-                    <Checkbox onChange={this.selectAllRows.bind(this)} />
-                  </TableCell> */}
-                  <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                    <Typography className="body2" type="body2">Plan</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Meal type</Typography></TableCell>
-                  {/* <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Route</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Delivery Type</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Meals</Typography></TableCell> */}
-                  <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Main</Typography></TableCell>
+            <TableHead>
+              <TableRow>
 
-                </TableRow>
-              </TableHead>)
-              : ''
-            }
+                <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('SKU')}>
+                  <Typography className="body2" type="body2">Plan</Typography>
+                </TableCell>
+
+                <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Meal type</Typography>
+                </TableCell>
+
+                <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Main</Typography>
+                </TableCell>
+
+              </TableRow>
+            </TableHead>
             <TableBody>
 
-              {
-                this.props.results.map((e, i) => {
+              {this.props.lifestyles && this.props.lifestyles.map(lifestyle => (
 
-                  return (
-                    <TableRow hover className={`${e._id}`} key={e._id}>
-                      {/* <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
-                        <Checkbox
-                          className="row-checkbox"
-                          id={e._id}
-                          checked={isSelected}
-                          onChange={this.rowSelected.bind(this, e)}
-                        />
-                      </TableCell> */}
+                this.props.meals && this.props.meals.filter(el => el.type === 'Main' || el.type === 'Main Course').map(meal => (
 
-                      <TableCell padding="none" style={{ width: '33.33%' }}>
-                        <Typography className="subheading" type="subheading">{e.customer ? (
-                          `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''} 
-                          ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''}`
-                        ) : ''}</Typography>
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {e.customer ? (
-                            `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''}${e.customer.associatedProfiles > 1 ? ' profiles' : ''}`
-                          ) : ''}
-                        </Typography>
-                      </TableCell>
+                  <TableRow hover key={`${lifestyle._id}${meal._id}`} className={`${this.isPlateAssignedClass(this.props.results, lifestyle._id, meal._id)}`}>
 
-                      <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.33%' }}
-                        padding="none"
-                      >
+                    <TableCell padding="none" style={{ width: '33.33%' }}>
+                      <Typography className="subheading" type="subheading">{lifestyle.title}</Typography>
+
+                    </TableCell>
+
+                    <TableCell
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.33%' }}
+                      padding="none"
+                    >
+
+                      <Typography className="subheading" type="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }} >
+                        {meal.title}
+                      </Typography>
 
 
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {e.customer ? (
-                            `${e.customer.postalCode}`
-                          ) : ''}
-                        </Typography>
+                    </TableCell>
 
-                      </TableCell>
+                    <TableCell
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.34%' }}
+                      padding="none"
+                    >
+                      {this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ? (
+                        <div>
+                          {this.renderPresentPlate(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate)}
+                          <Button onClick={() => this.openReassignDialog(lifestyle._id, meal._id,
+                            this.getPlannerId(this.props.results, lifestyle._id, meal._id))}>Reassign</Button>
+                        </div>
+                      ) : (
+                          <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                            <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>Assign</Button>
+                          </Typography>
+                        )
+                      }
 
-                      <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.34%' }}
-                        padding="none"
-                      >
+                    </TableCell>
 
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                          {e.route ? (
-                            `${e.route.title}`
-                          ) : ''}
-                        </Typography>
+                  </TableRow>
 
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {e.customer ? (
-                            `${e.customer.postalCode}`
-                          ) : ''}
-                        </Typography>
-
-                      </TableCell>
+                ))
 
 
+              ))}
 
 
-                    </TableRow>
-                  );
-                },
-                )
-              }
-
-              {this.renderNoResults(this.props.count)}
+              {/* {this.renderNoResults(this.props.count)} */}
 
             </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TableCell>
-                  <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                    {this.props.count} of {this.props.categoryCount} deliveries
-                  </Typography>
-                </TableCell>
-                <TableCell />
-                {
-                  this.props.hasMore ?
-                    <TableCell style={{ display: 'flex', height: '56px', alignItems: 'center', justifyContent: 'flex-end' }}>
-                      <Button onClick={this.props.loadMore}>Load More</Button>
-                    </TableCell> : ''
-                }
-              </TableRow>
-            </TableFooter>
+
           </Table>
         </Paper>
-        <Dialog open={this.state.updateDialogOpen} onRequestClose={this.updateDialogHandleRequestClose.bind(this)}>
+
+        <Dialog open={this.state.assignDialogOpen} onRequestClose={this.closeAssignDialog}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-            Update {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?
+            Assign main for {this.state.assignResult ? this.state.assignResult.lifestyle.title : ''}{' '}{this.state.assignResult ? this.state.assignResult.meal.title : ''}
           </Typography>
           <DialogContent>
-            <DialogContentText className="subheading"> Are you sure you want to update {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?</DialogContentText>
+
+            <Autosuggest
+              id="1"
+              className="autosuggest"
+              theme={{
+                container: {
+                  flexGrow: 1,
+                  position: 'relative',
+                  marginBottom: '2em',
+                },
+                suggestionsContainerOpen: {
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                },
+                suggestion: {
+                  display: 'block',
+                },
+                suggestionsList: {
+                  margin: 0,
+                  padding: 0,
+                  listStyleType: 'none',
+                },
+              }}
+              renderInputComponent={this.renderInput.bind(this)}
+              suggestions={this.state.suggestions}
+              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
+                this,
+              )}
+              onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
+                this,
+              )}
+              onSuggestionSelected={this.onSuggestionSelected.bind(this)}
+              getSuggestionValue={this.getSuggestionValue.bind(this)}
+              renderSuggestion={this.renderSuggestion.bind(this)}
+              renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                this,
+              )}
+              fullWidth
+              focusInputOnSuggestionClick={false}
+              inputProps={{
+                placeholder: 'Search',
+                value: this.state.value,
+                onChange: this.onChange.bind(this),
+                className: 'autoinput',
+              }}
+            />
           </DialogContent>
           <DialogActions>
-            <Button onClick={this.updateDialogHandleRequestClose.bind(this)} color="default">
+            <Button onClick={this.closeAssignDialog} color="default">
               Cancel
             </Button>
-            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleBatchStatusChange.bind(this)} color="accent">
-              Update
+            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleMealAssignment} color="accent">
+              Assign
             </Button>
           </DialogActions>
         </Dialog>
-      </div>
+
+        <Dialog open={this.state.reassignDialogOpen} onRequestClose={this.closeReassignDialog}>
+          <Typography
+            style={{
+              flex: '0 0 auto',
+              margin: '0',
+              padding: '24px 24px 20px 24px',
+            }}
+            className="title font-medium"
+            type="title"
+          >
+            Reassign main for {this.state.reassignResult ? this.state.reassignResult.lifestyle.title : ''}
+            {this.state.reassignResult ? this.state.reassignResult.meal.title : ''}
+          </Typography>
+
+
+          <DialogContent>
+
+            <Autosuggest
+              id="2"
+              className="autosuggest"
+              theme={{
+                container: {
+                  flexGrow: 1,
+                  position: 'relative',
+                  marginBottom: '2em',
+                },
+                suggestionsContainerOpen: {
+                  position: 'absolute',
+                  left: 0,
+                  right: 0,
+                },
+                suggestion: {
+                  display: 'block',
+                },
+                suggestionsList: {
+                  margin: 0,
+                  padding: 0,
+                  listStyleType: 'none',
+                },
+              }}
+              renderInputComponent={this.renderInput.bind(this)}
+              suggestions={this.state.suggestions}
+              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
+                this,
+              )}
+              onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
+                this,
+              )}
+              onSuggestionSelected={this.onSuggestionSelected.bind(this)}
+              getSuggestionValue={this.getSuggestionValue.bind(this)}
+              renderSuggestion={this.renderSuggestion.bind(this)}
+              renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                this,
+              )}
+              fullWidth
+              focusInputOnSuggestionClick={false}
+              inputProps={{
+                placeholder: 'Search',
+                value: this.state.value,
+                onChange: this.onChange.bind(this),
+                className: 'autoinput',
+              }}
+            />
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={this.closeReassignDialog} color="default">
+              Cancel
+            </Button>
+            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleMealReassignment} color="accent">
+              Reassign
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div >
     );
   }
 }
 
 MealPlannerTable.propTypes = {
-  // results: PropType.isRequired,
-  history: PropTypes.func.isRequired,
+  results: PropTypes.isRequired,
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,
   loadMore: PropTypes.func.isRequired,
   categoryCount: PropTypes.number.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
+  lifestyles: PropTypes.arrayOf(PropTypes.object).isRequired,
+  meals: PropTypes.arrayOf(PropTypes.object).isRequired,
+  plates: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
-
-export default createContainer(() => {
-  const deliveryCountSub = Meteor.subscribe('deliveries-all-count');
-
-  return {
-    categoryCount: Counts.get('deliveries'),
-  };
-}, MealPlannerTable);
+export default MealPlannerTable;

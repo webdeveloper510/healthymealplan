@@ -2,18 +2,10 @@
   background-color: rgba(255,255,255,1);
 }
 
-.status--in-transit{
-  background-color: rgba(33,150,243,.20);
-}
-
-.status--not-delivered{
+.status--not-assigned{
   background-color: rgba(244,67,54,.20);
 }
 
-.status--delivered{
+.status--assigned{
   background-color:  rgba(76,175,80,.20); 
-}
-
-.status--delayed{
- background-color: rgba(255,152,0,.20); 
 }

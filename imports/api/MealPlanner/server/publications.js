@@ -11,13 +11,13 @@ Meteor.publish('mealplanner', (selector, options) => {
 });
 
 // Note: IngredientTypes.view is also used when editing an existing document.
-Meteor.publish('mealplanner.view', (categoryId) => {
-  check(categoryId, String);
+Meteor.publish('mealplanner.view', (plannerId) => {
+  check(plannerId, String);
 
-  return MealPlanner.find({ _id: categoryId });
+  return MealPlanner.find({ _id: plannerId });
 });
 
-Meteor.publish('mealplanner-all-count', function categoryCount() {
+Meteor.publish('mealplanner-all-count', function mealPlannerCount() {
   Counts.publish(this, 'mealplanners', MealPlanner.find());
 });
 
