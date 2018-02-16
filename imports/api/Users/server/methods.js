@@ -3,6 +3,7 @@ import { check } from 'meteor/check';
 import { Roles } from 'meteor/alanning:roles';
 import { Random } from 'meteor/random';
 import moment from 'moment';
+import tz from 'moment-timezone';
 
 import { Accounts } from 'meteor/accounts-base';
 import editProfile from './edit-profile';
@@ -13,6 +14,9 @@ import createSubscriptionFromCustomerProfile from '../../../modules/server/autho
 import PostalCodes from '../../PostalCodes/PostalCodes';
 import Subscriptions from '../../Subscriptions/Subscriptions';
 import Jobs from '../../Jobs/Jobs';
+
+moment.tz.setDefault('America/Toronto');
+
 
 Meteor.methods({
   'users.sendVerificationEmail': function usersSendVerificationEmail() {
@@ -436,7 +440,7 @@ Meteor.methods({
 
     const lastWeeksSaturday = moment(
       customerInfo.subscriptionStartDateRaw,
-    ).subtract(2, 'd');
+    ).tz('America/Toronto').subtract(2, 'd');
 
     const job = new Job(
       Jobs,
@@ -446,8 +450,8 @@ Meteor.methods({
         customerId: customerInfo.id,
       },
     );
-    const a = moment(lastWeeksSaturday);
-    const b = moment().startOf('day');
+    const a = moment(lastWeeksSaturday).tz('America/Toronto');
+    const b = moment().tz('America/Toronto').startOf('day');
     a.diff(b);
 
     console.log(a.diff(b));
