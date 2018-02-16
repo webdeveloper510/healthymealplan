@@ -89,6 +89,9 @@ import Plates from '../../pages/Plates/Plates';
 import NewPlate from '../../pages/NewPlate/NewPlate';
 import EditPlate from '../../pages/EditPlate/EditPlate';
 
+import Plating from '../../pages/Plating/Plating';
+
+
 import Sides from '../../pages/Sides/Sides';
 import NewSide from '../../pages/NewSide/NewSide';
 import EditSide from '../../pages/EditSide/EditSide';
@@ -323,8 +326,8 @@ class App extends React.Component {
                     </Button>
                   </Link>
                 ) : (
-                    ''
-                  ),
+                  ''
+                ),
                 <IconButton
                   key="close"
                   aria-label="Close"
@@ -406,8 +409,8 @@ class App extends React.Component {
                   </Toolbar>
                 </AppBar>
               ) : (
-                  ''
-                )}
+                ''
+              )}
               {this.props.authenticated ? (
                 <div style={{ backgroundColor: '#FFFFFF' }}>
                   <Hidden mdUp>
@@ -487,8 +490,8 @@ class App extends React.Component {
                   </Hidden>
                 </div>
               ) : (
-                  ''
-                )}
+                ''
+              )}
 
               <main
                 className={
@@ -651,7 +654,6 @@ class App extends React.Component {
                     />
 
 
-
                     <Authenticated
                       exact
                       path="/plates"
@@ -694,6 +696,14 @@ class App extends React.Component {
                       path="/postal-codes/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={EditPostalCode}
+                      {...this.props}
+                    />
+
+                    <Authenticated
+                      exact
+                      path="/plating"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={Plating}
                       {...this.props}
                     />
 
@@ -851,8 +861,8 @@ class App extends React.Component {
                   </Switch>
 
                 ) : (
-                    ''
-                  )}
+                  ''
+                )}
               </main>
             </div>
           </div>

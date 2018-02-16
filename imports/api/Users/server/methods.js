@@ -137,11 +137,15 @@ Meteor.methods({
 
     // console.log(customerInfo);
 
+    const subscriptionIdToSave = Random.id();
+
+
     Meteor.users.update(
       { _id: customerInfo.id },
       {
         $set: {
           address: customerInfo.address,
+          subscriptionId: subscriptionIdToSave,
           lifestyle: customerInfo.primaryProfileBilling.lifestyle._id,
           restrictions: customerInfo.primaryProfileBilling.restrictions,
           specificRestrictions:
@@ -186,6 +190,7 @@ Meteor.methods({
             $set: {
               secondary: true,
               primaryAccount: customerInfo.id,
+              subscriptionId: subscriptionIdToSave,
               lifestyle:
                 customerInfo.secondaryProfilesBilling[index].lifestyle._id,
               restrictions:
@@ -416,6 +421,7 @@ Meteor.methods({
 
 
     const subscriptionId = Subscriptions.insert({
+      _id: subscriptionIdToSave,
       customerId: customerInfo.id,
       status: 'paused',
       paymentMethod: customerInfo.paymentMethod,
@@ -458,9 +464,12 @@ Meteor.methods({
       dataValue: String,
     });
 
+    const subscriptionIdToSave = Random.id();
+
     check(customerInfo, Object);
 
     console.log(customerInfo);
+
 
     const syncCreateCustomerProfile = Meteor.wrapAsync(createCustomerProfile);
     const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(
@@ -496,6 +505,7 @@ Meteor.methods({
       { _id: customerInfo.id },
       {
         $set: {
+          subscriptionId: subscriptionIdToSave,
           address: customerInfo.address,
           lifestyle: customerInfo.primaryProfileBilling.lifestyle._id,
           restrictions: customerInfo.primaryProfileBilling.restrictions,
@@ -541,6 +551,7 @@ Meteor.methods({
             $set: {
               secondary: true,
               primaryAccount: customerInfo.id,
+              subscriptionId: subscriptionIdToSave,
               lifestyle:
                 customerInfo.secondaryProfilesBilling[index].lifestyle._id,
               restrictions:
@@ -803,6 +814,7 @@ Meteor.methods({
     });
 
     const subscriptionId = Subscriptions.insert({
+      _id: subscriptionIdToSave,
       customerId: customerInfo.id,
       authorizeSubscriptionId:
         createSubscriptionFromCustomerProfileRes.subscriptionId,

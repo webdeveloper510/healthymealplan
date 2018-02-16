@@ -34,6 +34,8 @@ import '../../api/Plates/methods';
 import '../../api/Plates/server/publications';
 import '../../api/PlateImages/server/publications';
 
+import '../../api/Plating/methods';
+
 import '../../api/PostalCodes/methods';
 import '../../api/PostalCodes/server/publications';
 

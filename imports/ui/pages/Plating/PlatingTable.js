@@ -34,9 +34,9 @@ import Autosuggest from 'react-autosuggest';
 import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
 
-import './MealPlannerTable.scss';
+import './PlatingTable.scss';
 
-class MealPlannerTable extends React.Component {
+class PlatingTable extends React.Component {
   constructor(props) {
     super(props);
 
@@ -44,9 +44,6 @@ class MealPlannerTable extends React.Component {
       suggestions: [],
       plates: this.props.plates ? this.props.plates : [],
       value: '',
-      // selectedCheckboxes: [],
-      // selectedCheckboxesNumber: 0,
-      // updateDialogOpen: false,
       selectedSugestion: null,
 
       currentSelectorDate: this.props.currentSelectorDate,
@@ -57,11 +54,12 @@ class MealPlannerTable extends React.Component {
       mealSelected: null,
       lifestyleSelected: null,
 
-
       reassignDialogOpen: false,
-
       reassignResult: null,
       reassignPlannerId: '',
+
+      aggregateData: null,
+      aggregateDataLoading: true,
     };
 
     this.openAssignDialog = this.openAssignDialog.bind(this);
@@ -77,15 +75,46 @@ class MealPlannerTable extends React.Component {
     this.getPlannerId = this.getPlannerId.bind(this);
   }
 
-  openAssignDialog(lifestyleId, mealId) {
+  componentDidMount() {
+    Meteor.call('getPlatingAggregatedData', this.props.currentSelectorDate, (err, res) => {
+      this.setState({
+        aggregateData: res,
+      }, () => {
+        this.setState({ aggregateDataLoading: false })
+      });
 
+      console.log(res);
+    });
+  }
+
+  componentWillUpdate(nextProps, nextState) {
+    if (nextProps.currentSelectorDate != this.props.currentSelectorDate) {
+      this.setState({
+        aggregateDataLoading: true,
+      }, () => {
+
+        Meteor.call('getPlatingAggregatedData', this.props.currentSelectorDate, (err, res) => {
+          this.setState({
+            aggregateData: res,
+          }, () => {
+            this.setState({ aggregateDataLoading: false })
+          });
+
+        });
+
+      })
+
+    }
+  }
+
+  openAssignDialog(lifestyleId, mealId) {
     const lifestyle = this.props.lifestyles.find(el => el._id === lifestyleId);
     const meal = this.props.meals.find(el => el._id === mealId);
 
-    let assignResult = {
+    const assignResult = {
       lifestyle,
-      meal
-    }
+      meal,
+    };
 
     this.setState({
       assignResult,
@@ -106,8 +135,8 @@ class MealPlannerTable extends React.Component {
 
   closeReassignDialog() {
     this.setState({
-      reassignDialogOpen: false
-    })
+      reassignDialogOpen: false,
+    });
   }
 
   openReassignDialog(lifestyleId, mealId) {
@@ -177,7 +206,6 @@ class MealPlannerTable extends React.Component {
   }
 
   handleMealAssignment() {
-
     localStorage.setItem('mealAssigned', this.state.selectedSugestion.title);
     console.log(this.props.currentSelectorDate);
     console.log(this.state.lifestyleSelected);
@@ -189,7 +217,6 @@ class MealPlannerTable extends React.Component {
       this.state.lifestyleSelected,
       this.state.mealSelected,
       this.state.selectedSugestion._id, (error) => {
-
         if (error) {
           this.props.popTheSnackbar({
             message: error.reason,
@@ -210,11 +237,9 @@ class MealPlannerTable extends React.Component {
   }
 
   handleMealReassignment() {
-
     localStorage.setItem('mealReassigned', this.state.selectedSugestion.title);
 
     Meteor.call('mealPlanner.update', this.props.currentSelectorDate, this.state.reassignPlannerId, this.state.selectedSugestion._id, (error) => {
-
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
@@ -229,7 +254,7 @@ class MealPlannerTable extends React.Component {
     this.setState({
       reassignDialogOpen: false,
       selectedSuggestion: null,
-      reassignPlannerId: null
+      reassignPlannerId: null,
     });
   }
 
@@ -242,7 +267,6 @@ class MealPlannerTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -250,14 +274,6 @@ class MealPlannerTable extends React.Component {
     }
 
     return false;
-  }
-
-  isPlateAssignedClass(results, lifestyleId, mealId) {
-    if (results.findIndex(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId) !== -1) {
-      return 'status--assigned';
-    }
-
-    return 'status status--not-assigned';
   }
 
   isPlateAssigned(results, lifestyleId, mealId) {
@@ -279,7 +295,7 @@ class MealPlannerTable extends React.Component {
 
   renderPresentPlate(results, lifestyleId, mealId, date) {
     const plateToReturn = results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === date);
-    return (<Typography type="subheading">{plateToReturn.plate.title}</Typography>)
+    return (<Typography type="subheading">{plateToReturn.plate.title}</Typography>);
   }
 
 
@@ -353,89 +369,118 @@ class MealPlannerTable extends React.Component {
     event,
     { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
-
     this.setState({
-      selectedSugestion: suggestion
-    })
-
+      selectedSugestion: suggestion,
+    });
   }
 
 
-
   render() {
-
     return (
       <div>
         <Paper elevation={2} className="table-container">
 
-          <Table className="table-container meal-planner-table" style={{ tableLayout: 'fixed' }}>
+          <Table className="table-container plating-table" style={{ tableLayout: 'fixed' }}>
             <TableHead>
               <TableRow>
 
-                <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('SKU')}>
+                <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('SKU')}>
                   <Typography className="body2" type="body2">Plan</Typography>
                 </TableCell>
 
-                <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('title')}>
+                <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
                   <Typography className="body2" type="body2">Meal type</Typography>
                 </TableCell>
 
-                <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('title')}>
-                  <Typography className="body2" type="body2">Main</Typography>
+                <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Regular</Typography>
+                </TableCell>
+
+                <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Athletic</Typography>
+                </TableCell>
+
+                <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Bodybuilder</Typography>
+                </TableCell>
+
+                <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Customer</Typography>
                 </TableCell>
 
               </TableRow>
             </TableHead>
             <TableBody>
 
-              {this.props.lifestyles && this.props.lifestyles.map(lifestyle => (
+              {this.props.lifestyles && !this.aggregateDataLoading && this.props.lifestyles.map(lifestyle => {
+                const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === lifestyle._id);
 
-                this.props.meals && this.props.meals.filter(el => el.type === 'Main' || el.type === 'Main Course').map(meal => (
+                return (
+                  this.props.meals && this.props.meals.filter(el => el.type === 'Main' || el.type === 'Main Course').map(meal => (
 
-                  <TableRow hover key={`${lifestyle._id}${meal._id}`} className={`${this.isPlateAssignedClass(this.props.results, lifestyle._id, meal._id)}`}>
+                    <TableRow hover key={`${lifestyle._id}${meal._id}`}>
 
-                    <TableCell padding="none" style={{ width: '33.33%' }}>
-                      <Typography className="subheading" type="subheading">{lifestyle.title}</Typography>
+                      <TableCell padding="none" style={{ width: '16.66%' }}>
+                        <Typography className="subheading" type="subheading">{lifestyle.title}</Typography>
 
-                    </TableCell>
+                      </TableCell>
 
-                    <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.33%' }}
-                      padding="none"
-                    >
+                      <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
+                        padding="none"
+                      >
 
-                      <Typography className="subheading" type="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }} >
-                        {meal.title}
-                      </Typography>
+                        <Typography className="subheading" type="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }} >
+                          {meal.title}
+                        </Typography>
+
+                      </TableCell>
+
+                      <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                        <Typography type="subheading">
+                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()].regular}
+                        </Typography>
+                      </TableCell>
+
+                      <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                        <Typography type="subheading">
+                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()].athletic}
+
+                        </Typography>
+                      </TableCell>
+
+                      <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                        <Typography type="subheading">
+                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()].bodybuilder}
+                        </Typography>
+                      </TableCell>
+
+                      <TableCell
+                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
+                        padding="none"
+                      >
+                        {this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ? (
+                          <div>
+                            {this.renderPresentPlate(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate)}
+                            <Button onClick={() => this.openReassignDialog(lifestyle._id, meal._id,
+                              this.getPlannerId(this.props.results, lifestyle._id, meal._id))}
+                            >Reassign</Button>
+                          </div>
+                        ) : (
+                            <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                              <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>View</Button>
+                            </Typography>
+                          )
+                        }
+
+                      </TableCell>
+
+                    </TableRow>
+
+                  )))
 
 
-                    </TableCell>
-
-                    <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.34%' }}
-                      padding="none"
-                    >
-                      {this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ? (
-                        <div>
-                          {this.renderPresentPlate(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate)}
-                          <Button onClick={() => this.openReassignDialog(lifestyle._id, meal._id,
-                            this.getPlannerId(this.props.results, lifestyle._id, meal._id))}>Reassign</Button>
-                        </div>
-                      ) : (
-                          <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                            <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>Assign</Button>
-                          </Typography>
-                        )
-                      }
-
-                    </TableCell>
-
-                  </TableRow>
-
-                ))
-
-
-              ))}
+              })}
 
 
               {/* {this.renderNoResults(this.props.count)} */}
@@ -586,7 +631,7 @@ class MealPlannerTable extends React.Component {
   }
 }
 
-MealPlannerTable.propTypes = {
+PlatingTable.propTypes = {
   results: PropTypes.isRequired,
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,
@@ -598,4 +643,4 @@ MealPlannerTable.propTypes = {
   plates: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
-export default MealPlannerTable;
+export default PlatingTable;
