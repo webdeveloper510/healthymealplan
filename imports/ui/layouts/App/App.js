@@ -454,7 +454,7 @@ class App extends React.Component {
                     </Drawer>
                   </Hidden>
 
-                  <Hidden mdDown implementation="css">
+                  <Hidden smDown implementation="css">
                     <Drawer
                       type="permanent"
                       open
