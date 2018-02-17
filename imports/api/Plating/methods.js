@@ -70,6 +70,9 @@ Meteor.methods({
           delivery: 1,
           customers: {
             _id: 1,
+            profile: {
+              name: 1,
+            },
             secondary: 1,
             primaryAccount: 1,
             lifestyle: 1,

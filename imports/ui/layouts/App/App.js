@@ -326,8 +326,8 @@ class App extends React.Component {
                     </Button>
                   </Link>
                 ) : (
-                  ''
-                ),
+                    ''
+                  ),
                 <IconButton
                   key="close"
                   aria-label="Close"
@@ -409,8 +409,8 @@ class App extends React.Component {
                   </Toolbar>
                 </AppBar>
               ) : (
-                ''
-              )}
+                  ''
+                )}
               {this.props.authenticated ? (
                 <div style={{ backgroundColor: '#FFFFFF' }}>
                   <Hidden mdUp>
@@ -421,7 +421,7 @@ class App extends React.Component {
                       classes={{
                         paper: classes.drawerPaper,
                       }}
-                      onRequestClose={this.handleDrawerToggle.bind(this)}
+                      onClose={this.handleDrawerToggle.bind(this)}
                       ModalProps={{
                         keepMounted: true, // Better open performance on mobile.
                       }}
@@ -450,7 +450,7 @@ class App extends React.Component {
                         </Typography>
                       </div>
 
-                      <AuthenticatedSideNav {...this.props} />
+                      <AuthenticatedSideNav handleDrawerToggle={this.handleDrawerToggle.bind(this)} {...this.props} />
                     </Drawer>
                   </Hidden>
 
@@ -490,8 +490,8 @@ class App extends React.Component {
                   </Hidden>
                 </div>
               ) : (
-                ''
-              )}
+                  ''
+                )}
 
               <main
                 className={
@@ -861,8 +861,8 @@ class App extends React.Component {
                   </Switch>
 
                 ) : (
-                  ''
-                )}
+                    ''
+                  )}
               </main>
             </div>
           </div>

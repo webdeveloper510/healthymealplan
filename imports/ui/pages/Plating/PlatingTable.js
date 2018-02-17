@@ -54,6 +54,9 @@ class PlatingTable extends React.Component {
       mealSelected: null,
       lifestyleSelected: null,
 
+      lifestyleTitle: '',
+      mealTitle: '',
+
       reassignDialogOpen: false,
       reassignResult: null,
       reassignPlannerId: '',
@@ -121,6 +124,8 @@ class PlatingTable extends React.Component {
       assignDialogOpen: true,
       lifestyleSelected: lifestyleId,
       mealSelected: mealId,
+      lifestyleTitle: lifestyle.title,
+      mealTitle: meal.title,
     });
   }
 

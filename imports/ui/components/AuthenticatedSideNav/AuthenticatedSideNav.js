@@ -11,6 +11,8 @@ import HomeIcon from 'material-ui-icons/Home';
 import KitchenIcon from 'material-ui-icons/Kitchen';
 import OrderIcon from 'material-ui-icons/AttachMoney';
 import MealsIcon from 'material-ui-icons/LocalDining';
+import MealPlannerIcon from 'material-ui-icons/DateRange';
+
 import IngredientsIcon from 'material-ui-icons/Layers';
 import TypesIcon from 'material-ui-icons/List';
 import FolderIcon from 'material-ui-icons/Folder';
@@ -121,7 +123,7 @@ class AuthenticatedSideNav extends Component {
     return (
       <div className="page-container__side-nav">
         <List style={{ paddingTop: '0 !important' }}>
-          <NavLink exact to="/">
+          <NavLink onClick={this.props.handleDrawerToggle} exact to="/">
             <ListItem button>
               <ListItemIcon>
                 <HomeIcon className="side-nav-icon" />
@@ -144,7 +146,7 @@ class AuthenticatedSideNav extends Component {
             transitionDuration="auto"
             unmountOnExit
           >
-            <NavLink to="/lifestyles">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/lifestyles">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <LifestylesIcon className="side-nav-icon" />
@@ -153,7 +155,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/plating">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/plating">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <PlatingIcon className="side-nav-icon" />
@@ -162,7 +164,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/invoices">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/invoices">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <SubscriptionsIcon className="side-nav-icon" />
@@ -171,7 +173,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/discounts">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/discounts">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <DiscountsIcon className="side-nav-icon" />
@@ -181,7 +183,7 @@ class AuthenticatedSideNav extends Component {
             </NavLink>
           </Collapse>
 
-          <NavLink to="/customers">
+          <NavLink onClick={this.props.handleDrawerToggle} to="/customers">
             <ListItem button>
               <ListItemIcon>
                 <CustomersIcon className="side-nav-icon" />
@@ -203,14 +205,14 @@ class AuthenticatedSideNav extends Component {
             transitionDuration="auto"
             unmountOnExit
           >
-            {/* <ListItem className="padding-left-nested-item" button onClick={() => history.push('/orders')}>
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/meal-planner')}>
               <ListItemIcon>
-                <OrderIcon className="side-nav-icon" />
+                <MealPlannerIcon className="side-nav-icon" />
               </ListItemIcon>
-              <ListItemText className="subheading" primary="Orders" />
-            </ListItem> */}
+              <ListItemText className="subheading" primary="Meal Planner" />
+            </ListItem>
 
-            <NavLink to="/plates">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/plates">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <PlatesIcon className="side-nav-icon" />
@@ -219,7 +221,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/sides">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/sides">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <SidesIcon className="side-nav-icon" />
@@ -228,7 +230,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/instructions">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/instructions">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <InstructionsIcon className="side-nav-icon" />
@@ -237,7 +239,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/meals">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/meals">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <MealsIcon className="side-nav-icon" />
@@ -246,7 +248,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/ingredients">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/ingredients">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <IngredientsIcon className="side-nav-icon" />
@@ -255,7 +257,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/types">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/types">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <TypesIcon className="side-nav-icon" />
@@ -265,7 +267,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/categories">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/categories">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <FolderIcon className="side-nav-icon" />
@@ -275,7 +277,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/restrictions">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/restrictions">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <RestrictionsIcon className="side-nav-icon" />
@@ -298,7 +300,7 @@ class AuthenticatedSideNav extends Component {
             transitionDuration="auto"
             unmountOnExit
           >
-            <NavLink to="/directions">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/directions">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <DirectionsIcon className="side-nav-icon" />
@@ -307,7 +309,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/postal-codes">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/postal-codes">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <RoutesIcon className="side-nav-icon" />
@@ -316,7 +318,7 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
 
-            <NavLink to="/routes">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/routes">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <DriversIcon className="side-nav-icon" />
@@ -375,7 +377,7 @@ class AuthenticatedSideNav extends Component {
             transitionDuration="auto"
             unmountOnExit
           >
-            <NavLink to="/team">
+            <NavLink onClick={this.props.handleDrawerToggle} to="/team">
               <ListItem className="padding-left-nested-item" button>
                 <ListItemIcon>
                   <TeamIcon className="side-nav-icon" />

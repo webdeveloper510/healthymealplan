@@ -148,48 +148,12 @@ class Plating extends React.Component {
           </Grid>
 
           <Grid container className="clearfix">
-            <Grid item xs={12} style={{ alignItems: 'center' }}>
+            <Grid item xs={12} style={{ alignItems: 'center', marginBottom: '25px' }}>
               <Typography type="headline" gutterBottom style={{ fontWeight: 500 }}>Plating for for {moment(this.state.currentSelectorDate).format('dddd, MMMM D')}</Typography>
             </Grid>
           </Grid>
 
-          <div style={{
-            width: '100%',
-            background: '#FFF',
-            borderTopRightRadius: '2px',
-            borderTopLeftRadius: '2px',
-            marginTop: '3em',
-            padding: '16px 25px 1em',
-            boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
-            position: 'relative',
-          }}
-          >
 
-            <SearchIcon
-              className="autoinput-icon autoinput-icon--search"
-              style={{ display: (this.state.searchSelector.length > 0) ? 'none' : 'block', top: '33%', right: '1.8em !important' }}
-            />
-
-            <ClearIcon
-              className="autoinput-icon--clear"
-              onClick={this.clearSearchBox.bind(this)}
-              style={{
-                cursor: 'pointer',
-                display: (this.state.searchSelector.length > 0) ? 'block' : 'none',
-              }}
-            />
-
-            <Input
-              className="input-box"
-              style={{ width: '100%', position: 'relative' }}
-              placeholder="Search directions"
-              onKeyUp={this.searchByName.bind(this)}
-              inputProps={{
-                id: 'search-type-text',
-                'aria-label': 'Description',
-              }}
-            />
-          </div>
           <ListContainer
             limit={50}
             collection={MealPlannerColl}
