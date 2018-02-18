@@ -314,7 +314,7 @@ class App extends React.Component {
               anchorOrigin={{ vertical, horizontal }}
               open={this.state.snackbarOpen}
               autoHideDuration={4000}
-              onRequestClose={this.handleRequestClose.bind(this)}
+              onClose={this.handleRequestClose.bind(this)}
               action={[
                 this.state.snackbarButtonText ? (
                   <Link

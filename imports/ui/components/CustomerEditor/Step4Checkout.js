@@ -116,1045 +116,1053 @@ class Step4Checkout extends React.Component {
     * into a billing module which can be imported here instead.
     */
 
-    const primaryCustomer = {
-      lifestyle: "",
-      breakfastPrice: 0,
-      lunchPrice: 0,
-      dinnerPrice: 0,
-      breakfast: {
-        totalQty: 0,
-        regularQty: 0,
-        athleticQty: 0,
-        bodybuilderQty: 0
-      },
-      lunch: {
-        totalQty: 0,
-        regularQty: 0,
-        athleticQty: 0,
-        bodybuilderQty: 0
-      },
-      dinner: {
-        totalQty: 0,
-        regularQty: 0,
-        athleticQty: 0,
-        bodybuilderQty: 0
-      },
-      coolerBag: this.props.customerInfo.coolerBag ? 20 : 0,
-      deliveryCost: 0,
-      discount: this.props.customerInfo.discount,
-      discountActual: 0,
-      restrictions: this.props.customerInfo.restrictions,
-      restrictionsActual: [],
-      restrictionsSurcharges: [],
-      specificRestrictions: this.props.customerInfo.specificRestrictions,
-      specificRestrictionsActual: [],
-      specificRestrictionsSurcharges: [],
-      preferences: this.props.customerInfo.preferences,
-      totalAthleticSurcharge: 0,
-      totalBodybuilderSurcharge: 0,
-      deliverySurcharges: 0
-    };
+  }
 
-    const secondaryCustomers = [];
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.activeStep === 3) {
 
-    primaryCustomer.lifestyle = this.props.lifestyles.find(
-      elem => elem.title === this.props.customerInfo.lifestyle
-    );
+      const primaryCustomer = {
+        lifestyle: "",
+        breakfastPrice: 0,
+        lunchPrice: 0,
+        dinnerPrice: 0,
+        breakfast: {
+          totalQty: 0,
+          regularQty: 0,
+          athleticQty: 0,
+          bodybuilderQty: 0
+        },
+        lunch: {
+          totalQty: 0,
+          regularQty: 0,
+          athleticQty: 0,
+          bodybuilderQty: 0
+        },
+        dinner: {
+          totalQty: 0,
+          regularQty: 0,
+          athleticQty: 0,
+          bodybuilderQty: 0
+        },
+        coolerBag: this.props.customerInfo.coolerBag ? 20 : 0,
+        deliveryCost: 0,
+        discount: this.props.customerInfo.discount,
+        discountActual: 0,
+        restrictions: this.props.customerInfo.restrictions,
+        restrictionsActual: [],
+        restrictionsSurcharges: [],
+        specificRestrictions: this.props.customerInfo.specificRestrictions,
+        specificRestrictionsActual: [],
+        specificRestrictionsSurcharges: [],
+        preferences: this.props.customerInfo.preferences,
+        totalAthleticSurcharge: 0,
+        totalBodybuilderSurcharge: 0,
+        deliverySurcharges: 0
+      };
 
-    // calculating basePrices for Breakfast, lunch and dinner
+      const secondaryCustomers = [];
 
-    let metCriteria = 0;
-    const customerScheduleTotals = [];
-    const secondaryCustomerTotals = [];
+      primaryCustomer.lifestyle = this.props.lifestyles.find(
+        elem => elem.title === this.props.customerInfo.lifestyle
+      );
 
-    // calculating total quantities and extra quantities and regular quantites
-    this.props.customerInfo.scheduleReal.forEach((e, i) => {
-      let thisDaysQty = 0;
+      // calculating basePrices for Breakfast, lunch and dinner
 
-      if (e.breakfast.active) {
-        primaryCustomer.breakfast.totalQty =
-          primaryCustomer.breakfast.totalQty +
-          parseInt(e.breakfast.quantity, 10);
+      let metCriteria = 0;
+      const customerScheduleTotals = [];
+      const secondaryCustomerTotals = [];
 
-        if (e.breakfast.portions == "regular") {
-          primaryCustomer.breakfast.regularQty += parseInt(
-            e.breakfast.quantity,
-            10
-          );
-        } else if (e.breakfast.portions == "athletic") {
-          primaryCustomer.breakfast.athleticQty += parseInt(
-            e.breakfast.quantity,
-            10
-          );
-        } else if ((e.breakfast.portions = "bodybuilder")) {
-          primaryCustomer.breakfast.bodybuilderQty += parseInt(
-            e.breakfast.quantity,
-            10
-          );
-        }
+      // calculating total quantities and extra quantities and regular quantites
+      this.props.customerInfo.scheduleReal.forEach((e, i) => {
+        let thisDaysQty = 0;
 
-        thisDaysQty += parseInt(e.breakfast.quantity, 10);
-      }
+        if (e.breakfast.active) {
+          primaryCustomer.breakfast.totalQty =
+            primaryCustomer.breakfast.totalQty +
+            parseInt(e.breakfast.quantity, 10);
 
-      if (e.lunch.active) {
-        primaryCustomer.lunch.totalQty =
-          primaryCustomer.lunch.totalQty + parseInt(e.lunch.quantity, 10);
-
-        if (e.lunch.portions == "regular") {
-          primaryCustomer.lunch.regularQty += parseInt(e.lunch.quantity, 10);
-        } else if (e.lunch.portions == "athletic") {
-          primaryCustomer.lunch.athleticQty += parseInt(e.lunch.quantity, 10);
-        } else if ((e.lunch.portions = "bodybuilder")) {
-          primaryCustomer.lunch.bodybuilderQty += parseInt(
-            e.lunch.quantity,
-            10
-          );
-        }
-
-        thisDaysQty += parseInt(e.lunch.quantity, 10);
-      }
-
-      if (e.dinner.active) {
-        primaryCustomer.dinner.totalQty =
-          primaryCustomer.dinner.totalQty + parseInt(e.dinner.quantity, 10);
-
-        if (e.dinner.portions == "regular") {
-          primaryCustomer.dinner.regularQty += parseInt(e.dinner.quantity, 10);
-        } else if (e.dinner.portions == "athletic") {
-          primaryCustomer.dinner.athleticQty += parseInt(e.dinner.quantity, 10);
-        } else if ((e.dinner.portions = "bodybuilder")) {
-          primaryCustomer.dinner.bodybuilderQty += parseInt(
-            e.dinner.quantity,
-            10
-          );
-        }
-
-        thisDaysQty += parseInt(e.dinner.quantity, 10);
-      }
-
-      customerScheduleTotals.push(thisDaysQty);
-    });
-
-    console.log(customerScheduleTotals);
-
-    if (
-      customerScheduleTotals[0] >= 2 &&
-      customerScheduleTotals[1] >= 2 &&
-      customerScheduleTotals[2] >= 2 &&
-      customerScheduleTotals[3] >= 2 &&
-      customerScheduleTotals[4] >= 2
-    ) {
-      metCriteria += 1;
-    }
-
-    console.log("met criteria after primary customer");
-    console.log(metCriteria);
-
-    if (this.props.customerInfo.secondaryProfileCount > 0) {
-      this.props.customerInfo.secondaryProfiles.forEach((el, index) => {
-        let currentProfileQtys;
-
-        currentProfileQtys = el.scheduleReal.map((e, i) => {
-          let thisDaysQty = 0;
-
-          if (e.breakfast.active) {
-            thisDaysQty += parseInt(e.breakfast.quantity, 10);
+          if (e.breakfast.portions == "regular") {
+            primaryCustomer.breakfast.regularQty += parseInt(
+              e.breakfast.quantity,
+              10
+            );
+          } else if (e.breakfast.portions == "athletic") {
+            primaryCustomer.breakfast.athleticQty += parseInt(
+              e.breakfast.quantity,
+              10
+            );
+          } else if ((e.breakfast.portions = "bodybuilder")) {
+            primaryCustomer.breakfast.bodybuilderQty += parseInt(
+              e.breakfast.quantity,
+              10
+            );
           }
 
-          if (e.lunch.active) {
-            thisDaysQty += parseInt(e.lunch.quantity, 10);
+          thisDaysQty += parseInt(e.breakfast.quantity, 10);
+        }
+
+        if (e.lunch.active) {
+          primaryCustomer.lunch.totalQty =
+            primaryCustomer.lunch.totalQty + parseInt(e.lunch.quantity, 10);
+
+          if (e.lunch.portions == "regular") {
+            primaryCustomer.lunch.regularQty += parseInt(e.lunch.quantity, 10);
+          } else if (e.lunch.portions == "athletic") {
+            primaryCustomer.lunch.athleticQty += parseInt(e.lunch.quantity, 10);
+          } else if ((e.lunch.portions = "bodybuilder")) {
+            primaryCustomer.lunch.bodybuilderQty += parseInt(
+              e.lunch.quantity,
+              10
+            );
           }
 
-          if (e.dinner.active) {
-            thisDaysQty += parseInt(e.dinner.quantity, 10);
+          thisDaysQty += parseInt(e.lunch.quantity, 10);
+        }
+
+        if (e.dinner.active) {
+          primaryCustomer.dinner.totalQty =
+            primaryCustomer.dinner.totalQty + parseInt(e.dinner.quantity, 10);
+
+          if (e.dinner.portions == "regular") {
+            primaryCustomer.dinner.regularQty += parseInt(e.dinner.quantity, 10);
+          } else if (e.dinner.portions == "athletic") {
+            primaryCustomer.dinner.athleticQty += parseInt(e.dinner.quantity, 10);
+          } else if ((e.dinner.portions = "bodybuilder")) {
+            primaryCustomer.dinner.bodybuilderQty += parseInt(
+              e.dinner.quantity,
+              10
+            );
           }
 
-          return thisDaysQty;
-        });
+          thisDaysQty += parseInt(e.dinner.quantity, 10);
+        }
 
-        secondaryCustomerTotals.push(currentProfileQtys);
+        customerScheduleTotals.push(thisDaysQty);
       });
-    }
 
-    console.log("Secondary customer totals");
-    console.log(secondaryCustomerTotals);
+      console.log(customerScheduleTotals);
 
-    secondaryCustomerTotals.forEach((e, i) => {
-      if (e[0] >= 2 && e[1] >= 2 && e[2] >= 2 && e[3] >= 2 && e[4] >= 2) {
+      if (
+        customerScheduleTotals[0] >= 2 &&
+        customerScheduleTotals[1] >= 2 &&
+        customerScheduleTotals[2] >= 2 &&
+        customerScheduleTotals[3] >= 2 &&
+        customerScheduleTotals[4] >= 2
+      ) {
         metCriteria += 1;
       }
-    });
 
-    console.log("met criteria after secondary customers");
-    console.log(metCriteria);
+      console.log("met criteria after primary customer");
+      console.log(metCriteria);
 
-    const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
+      if (this.props.customerInfo.secondaryProfileCount > 0) {
+        this.props.customerInfo.secondaryProfiles.forEach((el, index) => {
+          let currentProfileQtys;
 
-    if (metCriteria > 0) {
-      metCriteria -= 1;
-    }
+          currentProfileQtys = el.scheduleReal.map((e, i) => {
+            let thisDaysQty = 0;
 
-    primaryCustomer.breakfastPrice =
-      primaryCustomer.lifestyle.prices.breakfast[metCriteria];
+            if (e.breakfast.active) {
+              thisDaysQty += parseInt(e.breakfast.quantity, 10);
+            }
 
-    primaryCustomer.lunchPrice =
-      primaryCustomer.lifestyle.prices.lunch[metCriteria];
+            if (e.lunch.active) {
+              thisDaysQty += parseInt(e.lunch.quantity, 10);
+            }
 
-    primaryCustomer.dinnerPrice =
-      primaryCustomer.lifestyle.prices.dinner[metCriteria];
+            if (e.dinner.active) {
+              thisDaysQty += parseInt(e.dinner.quantity, 10);
+            }
 
-    // total base price based on per meal type base price, (before restrictions and extras and discounts)
-    primaryCustomer.baseMealPriceTotal =
-      primaryCustomer.breakfast.totalQty * primaryCustomer.breakfastPrice +
-      primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-      primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
+            return thisDaysQty;
+          });
 
-    // discounted basePrice -- this is the actual base price to add up in the total
-
-    if (primaryCustomer.discount == "senior") {
-      let discountAmount = 0;
-
-      if (primaryCustomer.lifestyle.discountOrExtraTypeSenior == "Percentage") {
-        discountAmount =
-          primaryCustomer.lifestyle.discountSenior /
-          100 *
-          primaryCustomer.baseMealPriceTotal;
+          secondaryCustomerTotals.push(currentProfileQtys);
+        });
       }
 
-      if (
-        primaryCustomer.lifestyle.discountOrExtraTypeSenior == "Fixed amount"
-      ) {
-        discountAmount = primaryCustomer.lifestyle.discountSenior;
-      }
+      console.log("Secondary customer totals");
+      console.log(secondaryCustomerTotals);
 
-      primaryCustomer.discountActual = discountAmount;
-    }
-
-    if (primaryCustomer.discount == "student") {
-      let discountAmount = 0;
-
-      if (
-        primaryCustomer.lifestyle.discountOrExtraTypeStudent == "Percentage"
-      ) {
-        discountAmount =
-          primaryCustomer.lifestyle.discountStudent /
-          100 *
-          primaryCustomer.baseMealPriceTotal;
-      }
-
-      if (
-        primaryCustomer.lifestyle.discountOrExtraTypeStudent == "Fixed amount"
-      ) {
-        discountAmount = primaryCustomer.lifestyle.discountStudent;
-      }
-
-      primaryCustomer.discountActual = discountAmount;
-    }
-
-    // calculating restrictions and specificRestrictions surcharges
-    if (primaryCustomer.restrictions.length > 0) {
-      primaryCustomer.restrictions.forEach((e, i) => {
-        primaryCustomer.restrictionsActual.push(
-          this.props.restrictions.find(elem => elem._id === e)
-        );
-      });
-
-      primaryCustomer.restrictionsActual.forEach((e, i) => {
-        console.log(e);
-        if (e.hasOwnProperty("extra")) {
-          let totalRestrictionsSurcharge = 0;
-          console.log(e);
-
-          const totalBaseMealsCharge =
-            primaryCustomer.breakfast.totalQty *
-            primaryCustomer.breakfastPrice +
-            primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-            primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
-
-          if (e.discountOrExtraType == "Percentage") {
-            totalRestrictionsSurcharge = e.extra / 100 * totalBaseMealsCharge;
-          }
-
-          if (e.discountOrExtraType == "Fixed amount") {
-            totalRestrictionsSurcharge =
-              (primaryCustomer.breakfast.totalQty +
-                primaryCustomer.lunch.totalQty +
-                primaryCustomer.dinner.totalQty) *
-              e.extra;
-          }
-
-          primaryCustomer.restrictionsSurcharges.push(
-            totalRestrictionsSurcharge
-          );
-        } else {
-          primaryCustomer.restrictionsSurcharges.push(0);
+      secondaryCustomerTotals.forEach((e, i) => {
+        if (e[0] >= 2 && e[1] >= 2 && e[2] >= 2 && e[3] >= 2 && e[4] >= 2) {
+          metCriteria += 1;
         }
       });
-    }
 
-    if (primaryCustomer.specificRestrictions.length > 0) {
-      primaryCustomer.specificRestrictions.forEach((e, i) => {
-        console.log(e);
-        primaryCustomer.specificRestrictionsActual.push(
-          this.props.ingredients.find(elem => elem._id === e._id)
-        );
-      });
+      console.log("met criteria after secondary customers");
+      console.log(metCriteria);
 
-      // primaryCustomer.specificRestrictionsActual.forEach((e, i) => {
-      //   if (e.hasOwnProperty("extra")) {
-      //     let totalSurcharges = 0;
-      //     console.log(e);
+      const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
 
-      //     const totalBaseMealsCharge =
-      //       primaryCustomer.breakfast.totalQty *
-      //         primaryCustomer.breakfastPrice +
-      //       primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-      //       primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
+      if (metCriteria > 0) {
+        metCriteria -= 1;
+      }
 
-      //     if (e.discountOrExtraType == "Percentage") {
-      //       totalSurcharges = e.extra / 100 * totalBaseMealsCharge;
-      //     }
+      primaryCustomer.breakfastPrice =
+        primaryCustomer.lifestyle.prices.breakfast[metCriteria];
 
-      //     if (e.discountOrExtraType == "Fixed amount") {
-      //       totalSurcharges =
-      //         (primaryCustomer.breakfast.totalQty +
-      //           primaryCustomer.lunch.totalQty +
-      //           primaryCustomer.dinner.totalQty) *
-      //         e.extra;
-      //     }
+      primaryCustomer.lunchPrice =
+        primaryCustomer.lifestyle.prices.lunch[metCriteria];
 
-      //     primaryCustomer.specificRestrictionsSurcharges.push(totalSurcharges);
-      //   } else {
-      //     primaryCustomer.specificRestrictionsSurcharges.push(0);
-      //   }
-      // });
-    }
+      primaryCustomer.dinnerPrice =
+        primaryCustomer.lifestyle.prices.dinner[metCriteria];
 
-    // calculating athletic surcharge for all meals
-    if (
-      primaryCustomer.breakfast.athleticQty > 0 ||
-      primaryCustomer.lunch.athleticQty > 0 ||
-      primaryCustomer.dinner.athleticQty > 0
-    ) {
-      let totalAthleticSurcharge = 0;
+      // total base price based on per meal type base price, (before restrictions and extras and discounts)
+      primaryCustomer.baseMealPriceTotal =
+        primaryCustomer.breakfast.totalQty * primaryCustomer.breakfastPrice +
+        primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
+        primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
 
-      if (primaryCustomer.breakfast.athleticQty > 0) {
-        if (
-          primaryCustomer.lifestyle.discountOrExtraTypeAthletic == "Percentage"
-        ) {
-          const extraAthleticPerBreakfast =
-            primaryCustomer.lifestyle.extraAthletic /
+      // discounted basePrice -- this is the actual base price to add up in the total
+
+      if (primaryCustomer.discount == "senior") {
+        let discountAmount = 0;
+
+        if (primaryCustomer.lifestyle.discountOrExtraTypeSenior == "Percentage") {
+          discountAmount =
+            primaryCustomer.lifestyle.discountSenior /
             100 *
-            primaryCustomer.breakfastPrice;
-
-          totalAthleticSurcharge +=
-            primaryCustomer.breakfast.athleticQty * extraAthleticPerBreakfast;
+            primaryCustomer.baseMealPriceTotal;
         }
 
         if (
-          primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
-          "Fixed amount"
+          primaryCustomer.lifestyle.discountOrExtraTypeSenior == "Fixed amount"
         ) {
-          totalAthleticSurcharge +=
-            primaryCustomer.breakfast.athleticQty *
-            primaryCustomer.lifestyle.extraAthletic;
+          discountAmount = primaryCustomer.lifestyle.discountSenior;
         }
+
+        primaryCustomer.discountActual = discountAmount;
       }
 
-      if (primaryCustomer.lunch.athleticQty > 0) {
+      if (primaryCustomer.discount == "student") {
+        let discountAmount = 0;
+
         if (
-          primaryCustomer.lifestyle.discountOrExtraTypeAthletic == "Percentage"
+          primaryCustomer.lifestyle.discountOrExtraTypeStudent == "Percentage"
         ) {
-          const extraAthleticPerLunch =
-            primaryCustomer.lifestyle.extraAthletic /
+          discountAmount =
+            primaryCustomer.lifestyle.discountStudent /
+            100 *
+            primaryCustomer.baseMealPriceTotal;
+        }
+
+        if (
+          primaryCustomer.lifestyle.discountOrExtraTypeStudent == "Fixed amount"
+        ) {
+          discountAmount = primaryCustomer.lifestyle.discountStudent;
+        }
+
+        primaryCustomer.discountActual = discountAmount;
+      }
+
+      // calculating restrictions and specificRestrictions surcharges
+      if (primaryCustomer.restrictions.length > 0) {
+        primaryCustomer.restrictions.forEach((e, i) => {
+          primaryCustomer.restrictionsActual.push(
+            this.props.restrictions.find(elem => elem._id === e)
+          );
+        });
+
+        primaryCustomer.restrictionsActual.forEach((e, i) => {
+          console.log(e);
+          if (e.hasOwnProperty("extra")) {
+            let totalRestrictionsSurcharge = 0;
+            console.log(e);
+
+            const totalBaseMealsCharge =
+              primaryCustomer.breakfast.totalQty *
+              primaryCustomer.breakfastPrice +
+              primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
+              primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
+
+            if (e.discountOrExtraType == "Percentage") {
+              totalRestrictionsSurcharge = e.extra / 100 * totalBaseMealsCharge;
+            }
+
+            if (e.discountOrExtraType == "Fixed amount") {
+              totalRestrictionsSurcharge =
+                (primaryCustomer.breakfast.totalQty +
+                  primaryCustomer.lunch.totalQty +
+                  primaryCustomer.dinner.totalQty) *
+                e.extra;
+            }
+
+            primaryCustomer.restrictionsSurcharges.push(
+              totalRestrictionsSurcharge
+            );
+          } else {
+            primaryCustomer.restrictionsSurcharges.push(0);
+          }
+        });
+      }
+
+      if (primaryCustomer.specificRestrictions.length > 0) {
+        primaryCustomer.specificRestrictions.forEach((e, i) => {
+          console.log(e);
+          primaryCustomer.specificRestrictionsActual.push(
+            this.props.ingredients.find(elem => elem._id === e._id)
+          );
+        });
+
+        // primaryCustomer.specificRestrictionsActual.forEach((e, i) => {
+        //   if (e.hasOwnProperty("extra")) {
+        //     let totalSurcharges = 0;
+        //     console.log(e);
+
+        //     const totalBaseMealsCharge =
+        //       primaryCustomer.breakfast.totalQty *
+        //         primaryCustomer.breakfastPrice +
+        //       primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
+        //       primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
+
+        //     if (e.discountOrExtraType == "Percentage") {
+        //       totalSurcharges = e.extra / 100 * totalBaseMealsCharge;
+        //     }
+
+        //     if (e.discountOrExtraType == "Fixed amount") {
+        //       totalSurcharges =
+        //         (primaryCustomer.breakfast.totalQty +
+        //           primaryCustomer.lunch.totalQty +
+        //           primaryCustomer.dinner.totalQty) *
+        //         e.extra;
+        //     }
+
+        //     primaryCustomer.specificRestrictionsSurcharges.push(totalSurcharges);
+        //   } else {
+        //     primaryCustomer.specificRestrictionsSurcharges.push(0);
+        //   }
+        // });
+      }
+
+      // calculating athletic surcharge for all meals
+      if (
+        primaryCustomer.breakfast.athleticQty > 0 ||
+        primaryCustomer.lunch.athleticQty > 0 ||
+        primaryCustomer.dinner.athleticQty > 0
+      ) {
+        let totalAthleticSurcharge = 0;
+
+        if (primaryCustomer.breakfast.athleticQty > 0) {
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == "Percentage"
+          ) {
+            const extraAthleticPerBreakfast =
+              primaryCustomer.lifestyle.extraAthletic /
+              100 *
+              primaryCustomer.breakfastPrice;
+
+            totalAthleticSurcharge +=
+              primaryCustomer.breakfast.athleticQty * extraAthleticPerBreakfast;
+          }
+
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            "Fixed amount"
+          ) {
+            totalAthleticSurcharge +=
+              primaryCustomer.breakfast.athleticQty *
+              primaryCustomer.lifestyle.extraAthletic;
+          }
+        }
+
+        if (primaryCustomer.lunch.athleticQty > 0) {
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == "Percentage"
+          ) {
+            const extraAthleticPerLunch =
+              primaryCustomer.lifestyle.extraAthletic /
+              100 *
+              primaryCustomer.lunchPrice;
+
+            totalAthleticSurcharge +=
+              primaryCustomer.lunch.athleticQty * extraAthleticPerLunch;
+          }
+
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            "Fixed amount"
+          ) {
+            totalAthleticSurcharge +=
+              primaryCustomer.lunch.athleticQty *
+              primaryCustomer.lifestyle.extraAthletic;
+          }
+        }
+
+        if (primaryCustomer.dinner.athleticQty > 0) {
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == "Percentage"
+          ) {
+            const extraAthleticPerDinner =
+              primaryCustomer.lifestyle.extraAthletic /
+              100 *
+              primaryCustomer.dinnerPrice;
+
+            totalAthleticSurcharge +=
+              primaryCustomer.dinner.athleticQty * extraAthleticPerDinner;
+          }
+
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            "Fixed amount"
+          ) {
+            totalAthleticSurcharge +=
+              primaryCustomer.breakfast.athleticQty *
+              primaryCustomer.lifestyle.extraAthletic;
+          }
+        }
+
+        primaryCustomer.totalAthleticSurcharge = totalAthleticSurcharge;
+      }
+
+      // calculating bodybuilder surcharge for all meals
+      if (
+        primaryCustomer.breakfast.bodybuilderQty > 0 ||
+        primaryCustomer.lunch.bodybuilderQty > 0 ||
+        primaryCustomer.dinner.bodybuilderQty > 0
+      ) {
+        let totalBodybuilderSurcharge = 0;
+
+        if (primaryCustomer.breakfast.bodybuilderQty > 0) {
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
+            "Percentage"
+          ) {
+            const extraBodybuilderPerBreakfast =
+              primaryCustomer.lifestyle.extraBodybuilder /
+              100 *
+              primaryCustomer.breakfastPrice;
+
+            totalBodybuilderSurcharge +=
+              primaryCustomer.breakfast.bodybuilderQty *
+              extraBodybuilderPerBreakfast;
+          }
+
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
+            "Fixed amount"
+          ) {
+            totalBodybuilderSurcharge +=
+              primaryCustomer.breakfast.athleticQty *
+              primaryCustomer.lifestyle.extraBodybuilder;
+          }
+        }
+
+        if (primaryCustomer.lunch.bodybuilderQty > 0) {
+          const extraBodybuilderPerLunch =
+            primaryCustomer.lifestyle.extraBodybuilder /
             100 *
             primaryCustomer.lunchPrice;
 
-          totalAthleticSurcharge +=
-            primaryCustomer.lunch.athleticQty * extraAthleticPerLunch;
+          totalBodybuilderSurcharge +=
+            primaryCustomer.lunch.bodybuilderQty * extraBodybuilderPerLunch;
         }
 
-        if (
-          primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
-          "Fixed amount"
-        ) {
-          totalAthleticSurcharge +=
-            primaryCustomer.lunch.athleticQty *
-            primaryCustomer.lifestyle.extraAthletic;
-        }
-      }
-
-      if (primaryCustomer.dinner.athleticQty > 0) {
-        if (
-          primaryCustomer.lifestyle.discountOrExtraTypeAthletic == "Percentage"
-        ) {
-          const extraAthleticPerDinner =
-            primaryCustomer.lifestyle.extraAthletic /
+        if (primaryCustomer.dinner.bodybuilderQty > 0) {
+          const extraBodybuilderPerDinner =
+            primaryCustomer.lifestyle.extraBodybuilder /
             100 *
             primaryCustomer.dinnerPrice;
 
-          totalAthleticSurcharge +=
-            primaryCustomer.dinner.athleticQty * extraAthleticPerDinner;
-        }
-
-        if (
-          primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
-          "Fixed amount"
-        ) {
-          totalAthleticSurcharge +=
-            primaryCustomer.breakfast.athleticQty *
-            primaryCustomer.lifestyle.extraAthletic;
-        }
-      }
-
-      primaryCustomer.totalAthleticSurcharge = totalAthleticSurcharge;
-    }
-
-    // calculating bodybuilder surcharge for all meals
-    if (
-      primaryCustomer.breakfast.bodybuilderQty > 0 ||
-      primaryCustomer.lunch.bodybuilderQty > 0 ||
-      primaryCustomer.dinner.bodybuilderQty > 0
-    ) {
-      let totalBodybuilderSurcharge = 0;
-
-      if (primaryCustomer.breakfast.bodybuilderQty > 0) {
-        if (
-          primaryCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-          "Percentage"
-        ) {
-          const extraBodybuilderPerBreakfast =
-            primaryCustomer.lifestyle.extraBodybuilder /
-            100 *
-            primaryCustomer.breakfastPrice;
-
           totalBodybuilderSurcharge +=
-            primaryCustomer.breakfast.bodybuilderQty *
-            extraBodybuilderPerBreakfast;
+            primaryCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
         }
 
-        if (
-          primaryCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-          "Fixed amount"
-        ) {
-          totalBodybuilderSurcharge +=
-            primaryCustomer.breakfast.athleticQty *
-            primaryCustomer.lifestyle.extraBodybuilder;
-        }
+        primaryCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
       }
 
-      if (primaryCustomer.lunch.bodybuilderQty > 0) {
-        const extraBodybuilderPerLunch =
-          primaryCustomer.lifestyle.extraBodybuilder /
-          100 *
-          primaryCustomer.lunchPrice;
+      console.log(primaryCustomer);
 
-        totalBodybuilderSurcharge +=
-          primaryCustomer.lunch.bodybuilderQty * extraBodybuilderPerLunch;
-      }
+      // all of the above for all the secondary profiles
+      if (this.props.customerInfo.secondaryProfileCount > 0) {
+        this.props.customerInfo.secondaryProfiles.forEach((el, index) => {
+          const currentCustomer = {
+            lifestyle: "",
 
-      if (primaryCustomer.dinner.bodybuilderQty > 0) {
-        const extraBodybuilderPerDinner =
-          primaryCustomer.lifestyle.extraBodybuilder /
-          100 *
-          primaryCustomer.dinnerPrice;
+            breakfastPrice: 0,
+            lunchPrice: 0,
+            dinnerPrice: 0,
+            breakfast: {
+              totalQty: 0,
+              regularQty: 0,
+              athleticQty: 0,
+              bodybuilderQty: 0
+            },
+            lunch: {
+              totalQty: 0,
+              regularQty: 0,
+              athleticQty: 0,
+              bodybuilderQty: 0
+            },
+            dinner: {
+              totalQty: 0,
+              regularQty: 0,
+              athleticQty: 0,
+              bodybuilderQty: 0
+            },
+            deliveryCost: 0,
+            discount: this.props.customerInfo.secondaryProfiles[index].discount,
+            discountActual: 0,
+            restrictions: this.props.customerInfo.secondaryProfiles[index]
+              .restrictions,
+            restrictionsActual: [],
+            restrictionsSurcharges: [],
+            specificRestrictions: this.props.customerInfo.secondaryProfiles[index]
+              .specificRestrictions,
+            specificRestrictionsActual: [],
+            specificRestrictionsSurcharges: [],
+            preferences: this.props.customerInfo.secondaryProfiles[index]
+              .preferences,
+            totalAthleticSurcharge: 0,
+            totalBodybuilderSurcharge: 0
+          };
 
-        totalBodybuilderSurcharge +=
-          primaryCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
-      }
+          // the lifestyle for the current secondarycustomer
+          currentCustomer.lifestyle = this.props.lifestyles.find(
+            elem => elem.title === el.lifestyle
+          );
 
-      primaryCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
-    }
+          // calculating basePrices for Breakfast, lunch and dinner
+          // const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
 
-    console.log(primaryCustomer);
+          currentCustomer.breakfastPrice =
+            currentCustomer.lifestyle.prices.breakfast[metCriteria];
 
-    // all of the above for all the secondary profiles
-    if (this.props.customerInfo.secondaryProfileCount > 0) {
-      this.props.customerInfo.secondaryProfiles.forEach((el, index) => {
-        const currentCustomer = {
-          lifestyle: "",
+          currentCustomer.lunchPrice =
+            currentCustomer.lifestyle.prices.lunch[metCriteria];
 
-          breakfastPrice: 0,
-          lunchPrice: 0,
-          dinnerPrice: 0,
-          breakfast: {
-            totalQty: 0,
-            regularQty: 0,
-            athleticQty: 0,
-            bodybuilderQty: 0
-          },
-          lunch: {
-            totalQty: 0,
-            regularQty: 0,
-            athleticQty: 0,
-            bodybuilderQty: 0
-          },
-          dinner: {
-            totalQty: 0,
-            regularQty: 0,
-            athleticQty: 0,
-            bodybuilderQty: 0
-          },
-          deliveryCost: 0,
-          discount: this.props.customerInfo.secondaryProfiles[index].discount,
-          discountActual: 0,
-          restrictions: this.props.customerInfo.secondaryProfiles[index]
-            .restrictions,
-          restrictionsActual: [],
-          restrictionsSurcharges: [],
-          specificRestrictions: this.props.customerInfo.secondaryProfiles[index]
-            .specificRestrictions,
-          specificRestrictionsActual: [],
-          specificRestrictionsSurcharges: [],
-          preferences: this.props.customerInfo.secondaryProfiles[index]
-            .preferences,
-          totalAthleticSurcharge: 0,
-          totalBodybuilderSurcharge: 0
-        };
+          currentCustomer.dinnerPrice =
+            currentCustomer.lifestyle.prices.dinner[metCriteria];
 
-        // the lifestyle for the current secondarycustomer
-        currentCustomer.lifestyle = this.props.lifestyles.find(
-          elem => elem.title === el.lifestyle
-        );
+          el.scheduleReal.forEach((e, i) => {
+            if (e.breakfast.active) {
+              currentCustomer.breakfast.totalQty =
+                currentCustomer.breakfast.totalQty +
+                parseInt(e.breakfast.quantity, 10);
 
-        // calculating basePrices for Breakfast, lunch and dinner
-        // const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
-
-        currentCustomer.breakfastPrice =
-          currentCustomer.lifestyle.prices.breakfast[metCriteria];
-
-        currentCustomer.lunchPrice =
-          currentCustomer.lifestyle.prices.lunch[metCriteria];
-
-        currentCustomer.dinnerPrice =
-          currentCustomer.lifestyle.prices.dinner[metCriteria];
-
-        el.scheduleReal.forEach((e, i) => {
-          if (e.breakfast.active) {
-            currentCustomer.breakfast.totalQty =
-              currentCustomer.breakfast.totalQty +
-              parseInt(e.breakfast.quantity, 10);
-
-            if (e.breakfast.portions == "regular") {
-              currentCustomer.breakfast.regularQty += parseInt(
-                e.breakfast.quantity,
-                10
-              );
-            } else if (e.breakfast.portions == "athletic") {
-              currentCustomer.breakfast.athleticQty += parseInt(
-                e.breakfast.quantity,
-                10
-              );
-            } else if ((e.breakfast.portions = "bodybuilder")) {
-              currentCustomer.breakfast.bodybuilderQty += parseInt(
-                e.breakfast.quantity,
-                10
-              );
-            }
-          }
-
-          if (e.lunch.active) {
-            currentCustomer.lunch.totalQty =
-              currentCustomer.lunch.totalQty + parseInt(e.lunch.quantity, 10);
-
-            if (e.lunch.portions == "regular") {
-              currentCustomer.lunch.regularQty += parseInt(
-                e.lunch.quantity,
-                10
-              );
-            } else if (e.lunch.portions == "athletic") {
-              currentCustomer.lunch.athleticQty += parseInt(
-                e.lunch.quantity,
-                10
-              );
-            } else if ((e.lunch.portions = "bodybuilder")) {
-              currentCustomer.lunch.bodybuilderQty += parseInt(
-                e.lunch.quantity,
-                10
-              );
-            }
-          }
-
-          if (e.dinner.active) {
-            currentCustomer.dinner.totalQty =
-              currentCustomer.dinner.totalQty + parseInt(e.dinner.quantity, 10);
-
-            if (e.dinner.portions == "regular") {
-              currentCustomer.dinner.regularQty += parseInt(
-                e.dinner.quantity,
-                10
-              );
-            } else if (e.dinner.portions == "athletic") {
-              currentCustomer.dinner.athleticQty += parseInt(
-                e.dinner.quantity,
-                10
-              );
-            } else if ((e.dinner.portions = "bodybuilder")) {
-              currentCustomer.dinner.bodybuilderQty += parseInt(
-                e.dinner.quantity,
-                10
-              );
-            }
-          }
-        });
-
-        // total base price based on per meal type base price, (before restrictions and extras and discounts)
-        currentCustomer.baseMealPriceTotal =
-          currentCustomer.breakfast.totalQty * currentCustomer.breakfastPrice +
-          currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-          currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
-
-        // discounted basePrice -- this is the actual base price to add up in the total
-        if (currentCustomer.discount == "senior") {
-          let discountAmount = 0;
-
-          if (
-            currentCustomer.lifestyle.discountOrExtraTypeSenior == "Percentage"
-          ) {
-            discountAmount =
-              currentCustomer.lifestyle.discountSenior /
-              100 *
-              currentCustomer.baseMealPriceTotal;
-          }
-
-          if (
-            currentCustomer.lifestyle.discountOrExtraTypeSenior ==
-            "Fixed amount"
-          ) {
-            discountAmount = currentCustomer.lifestyle.discountSenior;
-          }
-
-          currentCustomer.discountActual = discountAmount;
-        }
-
-        if (currentCustomer.discount == "student") {
-          let discountAmount = 0;
-
-          if (
-            currentCustomer.lifestyle.discountOrExtraTypeStudent == "Percentage"
-          ) {
-            discountAmount =
-              currentCustomer.lifestyle.discountStudent /
-              100 *
-              currentCustomer.baseMealPriceTotal;
-          }
-
-          if (
-            currentCustomer.lifestyle.discountOrExtraTypeStudent ==
-            "Fixed amount"
-          ) {
-            discountAmount = currentCustomer.lifestyle.discountStudent;
-          }
-
-          currentCustomer.discountActual = discountAmount;
-        }
-
-        // calculating restrictions and specificRestrictions surcharges
-        if (currentCustomer.restrictions.length > 0) {
-          currentCustomer.restrictions.forEach((e, i) => {
-            currentCustomer.restrictionsActual.push(
-              this.props.restrictions.find(elem => elem._id === e)
-            );
-          });
-
-          currentCustomer.restrictionsActual.forEach((e, i) => {
-            if (e.hasOwnProperty("extra")) {
-              let totalRestrictionsSurcharge = 0;
-              console.log(e);
-
-              const totalBaseMealsCharge =
-                currentCustomer.breakfast.totalQty *
-                currentCustomer.breakfastPrice +
-                currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-                currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
-
-              if (e.discountOrExtraType == "Percentage") {
-                totalRestrictionsSurcharge =
-                  e.extra / 100 * totalBaseMealsCharge;
+              if (e.breakfast.portions == "regular") {
+                currentCustomer.breakfast.regularQty += parseInt(
+                  e.breakfast.quantity,
+                  10
+                );
+              } else if (e.breakfast.portions == "athletic") {
+                currentCustomer.breakfast.athleticQty += parseInt(
+                  e.breakfast.quantity,
+                  10
+                );
+              } else if ((e.breakfast.portions = "bodybuilder")) {
+                currentCustomer.breakfast.bodybuilderQty += parseInt(
+                  e.breakfast.quantity,
+                  10
+                );
               }
+            }
 
-              if (e.discountOrExtraType == "Fixed amount") {
-                totalRestrictionsSurcharge =
-                  (currentCustomer.breakfast.totalQty +
-                    currentCustomer.lunch.totalQty +
-                    currentCustomer.dinner.totalQty) *
-                  e.extra;
+            if (e.lunch.active) {
+              currentCustomer.lunch.totalQty =
+                currentCustomer.lunch.totalQty + parseInt(e.lunch.quantity, 10);
+
+              if (e.lunch.portions == "regular") {
+                currentCustomer.lunch.regularQty += parseInt(
+                  e.lunch.quantity,
+                  10
+                );
+              } else if (e.lunch.portions == "athletic") {
+                currentCustomer.lunch.athleticQty += parseInt(
+                  e.lunch.quantity,
+                  10
+                );
+              } else if ((e.lunch.portions = "bodybuilder")) {
+                currentCustomer.lunch.bodybuilderQty += parseInt(
+                  e.lunch.quantity,
+                  10
+                );
               }
+            }
 
-              console.log(totalRestrictionsSurcharge);
+            if (e.dinner.active) {
+              currentCustomer.dinner.totalQty =
+                currentCustomer.dinner.totalQty + parseInt(e.dinner.quantity, 10);
 
-              currentCustomer.restrictionsSurcharges.push(
-                totalRestrictionsSurcharge
-              );
-            } else {
-              currentCustomer.restrictionsSurcharges.push(0);
+              if (e.dinner.portions == "regular") {
+                currentCustomer.dinner.regularQty += parseInt(
+                  e.dinner.quantity,
+                  10
+                );
+              } else if (e.dinner.portions == "athletic") {
+                currentCustomer.dinner.athleticQty += parseInt(
+                  e.dinner.quantity,
+                  10
+                );
+              } else if ((e.dinner.portions = "bodybuilder")) {
+                currentCustomer.dinner.bodybuilderQty += parseInt(
+                  e.dinner.quantity,
+                  10
+                );
+              }
             }
           });
-        }
 
-        console.log(currentCustomer.restrictionsSurcharges);
+          // total base price based on per meal type base price, (before restrictions and extras and discounts)
+          currentCustomer.baseMealPriceTotal =
+            currentCustomer.breakfast.totalQty * currentCustomer.breakfastPrice +
+            currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
+            currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
 
-        if (currentCustomer.specificRestrictions.length > 0) {
-          currentCustomer.specificRestrictions.forEach((e, i) => {
-            currentCustomer.specificRestrictionsActual.push(
-              this.props.ingredients.find(elem => elem._id === e._id)
-            );
-          });
+          // discounted basePrice -- this is the actual base price to add up in the total
+          if (currentCustomer.discount == "senior") {
+            let discountAmount = 0;
 
-          // currentCustomer.specificRestrictionsActual.forEach((e, i) => {
-          //   if (e.hasOwnProperty("extra")) {
-          //     let totalRestrictionsSurcharge = 0;
-          //     console.log(e);
-
-          //     const totalBaseMealsCharge =
-          //       currentCustomer.breakfast.totalQty *
-          //         currentCustomer.breakfastPrice +
-          //       currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-          //       currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
-
-          //     if (e.discountOrExtraType == "Percentage") {
-          //       totalRestrictionsSurcharge =
-          //         e.extra / 100 * totalBaseMealsCharge;
-          //     }
-
-          //     if (e.discountOrExtraType == "Fixed amount") {
-          //       totalRestrictionsSurcharge =
-          //         (currentCustomer.breakfast.totalQty +
-          //           currentCustomer.lunch.totalQty +
-          //           currentCustomer.dinner.totalQty) *
-          //         e.extra;
-          //     }
-
-          //     console.log(totalRestrictionsSurcharge);
-
-          //     currentCustomer.specificRestrictionsSurcharges.push(
-          //       totalRestrictionsSurcharge
-          //     );
-          //   } else {
-          //     currentCustomer.specificrestrictionsSurcharges.push(0);
-          //   }
-          // });
-        }
-
-        // calculating athletic surcharge for all meals
-        if (
-          currentCustomer.breakfast.athleticQty > 0 ||
-          currentCustomer.lunch.athleticQty > 0 ||
-          currentCustomer.dinner.athleticQty > 0
-        ) {
-          let totalAthleticSurcharge = 0;
-
-          if (currentCustomer.breakfast.athleticQty > 0) {
             if (
-              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-              "Percentage"
+              currentCustomer.lifestyle.discountOrExtraTypeSenior == "Percentage"
             ) {
-              const extraAthleticPerBreakfast =
-                currentCustomer.lifestyle.extraAthletic /
+              discountAmount =
+                currentCustomer.lifestyle.discountSenior /
                 100 *
-                currentCustomer.breakfastPrice;
-
-              totalAthleticSurcharge +=
-                currentCustomer.breakfast.athleticQty *
-                extraAthleticPerBreakfast;
+                currentCustomer.baseMealPriceTotal;
             }
 
             if (
-              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+              currentCustomer.lifestyle.discountOrExtraTypeSenior ==
               "Fixed amount"
             ) {
-              totalAthleticSurcharge +=
-                currentCustomer.breakfast.athleticQty *
-                currentCustomer.lifestyle.extraAthletic;
+              discountAmount = currentCustomer.lifestyle.discountSenior;
             }
+
+            currentCustomer.discountActual = discountAmount;
           }
 
-          if (currentCustomer.lunch.athleticQty > 0) {
+          if (currentCustomer.discount == "student") {
+            let discountAmount = 0;
+
             if (
-              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-              "Percentage"
+              currentCustomer.lifestyle.discountOrExtraTypeStudent == "Percentage"
             ) {
-              const extraAthleticPerLunch =
-                currentCustomer.lifestyle.extraAthletic /
+              discountAmount =
+                currentCustomer.lifestyle.discountStudent /
+                100 *
+                currentCustomer.baseMealPriceTotal;
+            }
+
+            if (
+              currentCustomer.lifestyle.discountOrExtraTypeStudent ==
+              "Fixed amount"
+            ) {
+              discountAmount = currentCustomer.lifestyle.discountStudent;
+            }
+
+            currentCustomer.discountActual = discountAmount;
+          }
+
+          // calculating restrictions and specificRestrictions surcharges
+          if (currentCustomer.restrictions.length > 0) {
+            currentCustomer.restrictions.forEach((e, i) => {
+              currentCustomer.restrictionsActual.push(
+                this.props.restrictions.find(elem => elem._id === e)
+              );
+            });
+
+            currentCustomer.restrictionsActual.forEach((e, i) => {
+              if (e.hasOwnProperty("extra")) {
+                let totalRestrictionsSurcharge = 0;
+                console.log(e);
+
+                const totalBaseMealsCharge =
+                  currentCustomer.breakfast.totalQty *
+                  currentCustomer.breakfastPrice +
+                  currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
+                  currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
+
+                if (e.discountOrExtraType == "Percentage") {
+                  totalRestrictionsSurcharge =
+                    e.extra / 100 * totalBaseMealsCharge;
+                }
+
+                if (e.discountOrExtraType == "Fixed amount") {
+                  totalRestrictionsSurcharge =
+                    (currentCustomer.breakfast.totalQty +
+                      currentCustomer.lunch.totalQty +
+                      currentCustomer.dinner.totalQty) *
+                    e.extra;
+                }
+
+                console.log(totalRestrictionsSurcharge);
+
+                currentCustomer.restrictionsSurcharges.push(
+                  totalRestrictionsSurcharge
+                );
+              } else {
+                currentCustomer.restrictionsSurcharges.push(0);
+              }
+            });
+          }
+
+          console.log(currentCustomer.restrictionsSurcharges);
+
+          if (currentCustomer.specificRestrictions.length > 0) {
+            currentCustomer.specificRestrictions.forEach((e, i) => {
+              currentCustomer.specificRestrictionsActual.push(
+                this.props.ingredients.find(elem => elem._id === e._id)
+              );
+            });
+
+            // currentCustomer.specificRestrictionsActual.forEach((e, i) => {
+            //   if (e.hasOwnProperty("extra")) {
+            //     let totalRestrictionsSurcharge = 0;
+            //     console.log(e);
+
+            //     const totalBaseMealsCharge =
+            //       currentCustomer.breakfast.totalQty *
+            //         currentCustomer.breakfastPrice +
+            //       currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
+            //       currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
+
+            //     if (e.discountOrExtraType == "Percentage") {
+            //       totalRestrictionsSurcharge =
+            //         e.extra / 100 * totalBaseMealsCharge;
+            //     }
+
+            //     if (e.discountOrExtraType == "Fixed amount") {
+            //       totalRestrictionsSurcharge =
+            //         (currentCustomer.breakfast.totalQty +
+            //           currentCustomer.lunch.totalQty +
+            //           currentCustomer.dinner.totalQty) *
+            //         e.extra;
+            //     }
+
+            //     console.log(totalRestrictionsSurcharge);
+
+            //     currentCustomer.specificRestrictionsSurcharges.push(
+            //       totalRestrictionsSurcharge
+            //     );
+            //   } else {
+            //     currentCustomer.specificrestrictionsSurcharges.push(0);
+            //   }
+            // });
+          }
+
+          // calculating athletic surcharge for all meals
+          if (
+            currentCustomer.breakfast.athleticQty > 0 ||
+            currentCustomer.lunch.athleticQty > 0 ||
+            currentCustomer.dinner.athleticQty > 0
+          ) {
+            let totalAthleticSurcharge = 0;
+
+            if (currentCustomer.breakfast.athleticQty > 0) {
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                "Percentage"
+              ) {
+                const extraAthleticPerBreakfast =
+                  currentCustomer.lifestyle.extraAthletic /
+                  100 *
+                  currentCustomer.breakfastPrice;
+
+                totalAthleticSurcharge +=
+                  currentCustomer.breakfast.athleticQty *
+                  extraAthleticPerBreakfast;
+              }
+
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                "Fixed amount"
+              ) {
+                totalAthleticSurcharge +=
+                  currentCustomer.breakfast.athleticQty *
+                  currentCustomer.lifestyle.extraAthletic;
+              }
+            }
+
+            if (currentCustomer.lunch.athleticQty > 0) {
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                "Percentage"
+              ) {
+                const extraAthleticPerLunch =
+                  currentCustomer.lifestyle.extraAthletic /
+                  100 *
+                  currentCustomer.lunchPrice;
+
+                totalAthleticSurcharge +=
+                  currentCustomer.lunch.athleticQty * extraAthleticPerLunch;
+              }
+
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                "Fixed amount"
+              ) {
+                totalAthleticSurcharge +=
+                  currentCustomer.lunch.athleticQty *
+                  currentCustomer.lifestyle.extraAthletic;
+              }
+            }
+
+            if (currentCustomer.dinner.athleticQty > 0) {
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                "Percentage"
+              ) {
+                const extraAthleticPerDinner =
+                  currentCustomer.lifestyle.extraAthletic /
+                  100 *
+                  currentCustomer.dinnerPrice;
+
+                totalAthleticSurcharge +=
+                  currentCustomer.dinner.athleticQty * extraAthleticPerDinner;
+              }
+
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                "Fixed amount"
+              ) {
+                totalAthleticSurcharge +=
+                  currentCustomer.breakfast.athleticQty *
+                  currentCustomer.lifestyle.extraAthletic;
+              }
+            }
+
+            currentCustomer.totalAthleticSurcharge = totalAthleticSurcharge;
+          }
+
+          // calculating bodybuilder surcharge for all meals
+          if (
+            currentCustomer.breakfast.bodybuilderQty > 0 ||
+            currentCustomer.lunch.bodybuilderQty > 0 ||
+            currentCustomer.dinner.bodybuilderQty > 0
+          ) {
+            let totalBodybuilderSurcharge = 0;
+
+            if (currentCustomer.breakfast.bodybuilderQty > 0) {
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
+                "Percentage"
+              ) {
+                const extraBodybuilderPerBreakfast =
+                  currentCustomer.lifestyle.extraBodybuilder /
+                  100 *
+                  currentCustomer.breakfastPrice;
+
+                totalBodybuilderSurcharge +=
+                  currentCustomer.breakfast.bodybuilderQty *
+                  extraBodybuilderPerBreakfast;
+              }
+
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
+                "Fixed amount"
+              ) {
+                totalBodybuilderSurcharge +=
+                  currentCustomer.breakfast.athleticQty *
+                  currentCustomer.lifestyle.extraBodybuilder;
+              }
+            }
+
+            if (currentCustomer.lunch.bodybuilderQty > 0) {
+              const extraBodybuilderPerLunch =
+                currentCustomer.lifestyle.extraBodybuilder /
                 100 *
                 currentCustomer.lunchPrice;
 
-              totalAthleticSurcharge +=
-                currentCustomer.lunch.athleticQty * extraAthleticPerLunch;
+              totalBodybuilderSurcharge +=
+                currentCustomer.lunch.bodybuilderQty * extraBodybuilderPerLunch;
             }
 
-            if (
-              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-              "Fixed amount"
-            ) {
-              totalAthleticSurcharge +=
-                currentCustomer.lunch.athleticQty *
-                currentCustomer.lifestyle.extraAthletic;
-            }
-          }
-
-          if (currentCustomer.dinner.athleticQty > 0) {
-            if (
-              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-              "Percentage"
-            ) {
-              const extraAthleticPerDinner =
-                currentCustomer.lifestyle.extraAthletic /
+            if (currentCustomer.dinner.bodybuilderQty > 0) {
+              const extraBodybuilderPerDinner =
+                currentCustomer.lifestyle.extraBodybuilder /
                 100 *
                 currentCustomer.dinnerPrice;
 
-              totalAthleticSurcharge +=
-                currentCustomer.dinner.athleticQty * extraAthleticPerDinner;
-            }
-
-            if (
-              currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-              "Fixed amount"
-            ) {
-              totalAthleticSurcharge +=
-                currentCustomer.breakfast.athleticQty *
-                currentCustomer.lifestyle.extraAthletic;
-            }
-          }
-
-          currentCustomer.totalAthleticSurcharge = totalAthleticSurcharge;
-        }
-
-        // calculating bodybuilder surcharge for all meals
-        if (
-          currentCustomer.breakfast.bodybuilderQty > 0 ||
-          currentCustomer.lunch.bodybuilderQty > 0 ||
-          currentCustomer.dinner.bodybuilderQty > 0
-        ) {
-          let totalBodybuilderSurcharge = 0;
-
-          if (currentCustomer.breakfast.bodybuilderQty > 0) {
-            if (
-              currentCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-              "Percentage"
-            ) {
-              const extraBodybuilderPerBreakfast =
-                currentCustomer.lifestyle.extraBodybuilder /
-                100 *
-                currentCustomer.breakfastPrice;
-
               totalBodybuilderSurcharge +=
-                currentCustomer.breakfast.bodybuilderQty *
-                extraBodybuilderPerBreakfast;
+                currentCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
             }
 
-            if (
-              currentCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-              "Fixed amount"
-            ) {
-              totalBodybuilderSurcharge +=
-                currentCustomer.breakfast.athleticQty *
-                currentCustomer.lifestyle.extraBodybuilder;
-            }
+            currentCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
           }
 
-          if (currentCustomer.lunch.bodybuilderQty > 0) {
-            const extraBodybuilderPerLunch =
-              currentCustomer.lifestyle.extraBodybuilder /
-              100 *
-              currentCustomer.lunchPrice;
+          currentCustomer.totalCost =
+            currentCustomer.baseMealPriceTotal +
+            currentCustomer.totalAthleticSurcharge +
+            currentCustomer.totalBodybuilderSurcharge +
+            _.sum(currentCustomer.restrictionsSurcharges) +
+            _.sum(currentCustomer.specificRestrictionsSurcharges);
 
-            totalBodybuilderSurcharge +=
-              currentCustomer.lunch.bodybuilderQty * extraBodybuilderPerLunch;
-          }
+          currentCustomer.totalCost -= currentCustomer.discountActual;
 
-          if (currentCustomer.dinner.bodybuilderQty > 0) {
-            const extraBodybuilderPerDinner =
-              currentCustomer.lifestyle.extraBodybuilder /
-              100 *
-              currentCustomer.dinnerPrice;
+          console.log(currentCustomer);
 
-            totalBodybuilderSurcharge +=
-              currentCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
-          }
-
-          currentCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
-        }
-
-        currentCustomer.totalCost =
-          currentCustomer.baseMealPriceTotal +
-          currentCustomer.totalAthleticSurcharge +
-          currentCustomer.totalBodybuilderSurcharge +
-          _.sum(currentCustomer.restrictionsSurcharges) +
-          _.sum(currentCustomer.specificRestrictionsSurcharges);
-
-        currentCustomer.totalCost -= currentCustomer.discountActual;
-
-        console.log(currentCustomer);
-
-        // push
-        secondaryCustomers.push(currentCustomer);
-      });
-    }
-
-    let actualDeliveryCost = 0;
-    let surchargePerDelivery = 0;
-
-    const selectedPostalCode = this.props.postalCodes.find(
-      el => el.title === this.props.customerInfo.postalCode.substring(0, 3)
-    );
-
-    console.log(selectedPostalCode);
-
-    if (selectedPostalCode.hasOwnProperty("extraSurcharge")) {
-      surchargePerDelivery = selectedPostalCode.extraSurcharge;
-    }
-
-    console.log(surchargePerDelivery);
-
-    for (
-      let delivIndex = 0;
-      delivIndex < this.props.customerInfo.deliveryType.length;
-      delivIndex++
-    ) {
-      const daysMealSum =
-        parseInt(
-          this.props.customerInfo.completeSchedule[delivIndex].breakfast,
-          10
-        ) +
-        parseInt(
-          this.props.customerInfo.completeSchedule[delivIndex].lunch,
-          10
-        ) +
-        parseInt(
-          this.props.customerInfo.completeSchedule[delivIndex].dinner,
-          10
-        );
-
-      const deliveryTypeSelected = this.props.customerInfo.deliveryType[
-        delivIndex
-      ];
-
-      // calculate surcharges
-
-      if (deliveryTypeSelected == "") {
-        continue;
-      } else if (
-        deliveryTypeSelected == "dayOf" ||
-        deliveryTypeSelected == "nightBefore"
-      ) {
-        primaryCustomer.deliverySurcharges += surchargePerDelivery;
-      } else if (
-        //tuesday
-        deliveryTypeSelected == "sundayNight" ||
-        deliveryTypeSelected == "dayOfMonday"
-      ) {
-        primaryCustomer.deliverySurcharges += surchargePerDelivery;
-      } else if (
-        //wednesday
-        deliveryTypeSelected == "sundayNight" ||
-        deliveryTypeSelected == "dayOfMonday" ||
-        deliveryTypeSelected == "nightBeforeMonday" ||
-        deliveryTypeSelected == "dayOfTuesday"
-      ) {
-        primaryCustomer.deliverySurcharges += surchargePerDelivery;
-      } else if (
-        //thursday
-        deliveryTypeSelected == "mondayNight" ||
-        deliveryTypeSelected == "dayOfTuesday" ||
-        deliveryTypeSelected == "nightBeforeTuesday" ||
-        deliveryTypeSelected == "dayOfWednesday"
-      ) {
-        primaryCustomer.deliverySurcharges += surchargePerDelivery;
-      } else if (
-        //friday
-        deliveryTypeSelected == "tuesdayNight" ||
-        deliveryTypeSelected == "dayOfWednesday" ||
-        deliveryTypeSelected == "nightBeforeWednesday" ||
-        deliveryTypeSelected == "dayOfThursday"
-      ) {
-        primaryCustomer.deliverySurcharges += surchargePerDelivery;
+          // push
+          secondaryCustomers.push(currentCustomer);
+        });
       }
-      // calculate actual delivery cost / delivery
-      if (deliveryTypeSelected == "") {
-        continue;
-      } else if (
-        deliveryTypeSelected == "dayOf" ||
-        deliveryTypeSelected == "dayOfFriday" ||
-        deliveryTypeSelected == "dayOfThursday" ||
-        deliveryTypeSelected == "dayOfWednesday" ||
-        deliveryTypeSelected == "dayOfTuesday" ||
-        deliveryTypeSelected == "dayOfMonday"
-      ) {
-        actualDeliveryCost += 2.5;
-      } else if (
-        daysMealSum == 1 &&
-        (deliveryTypeSelected == "nightBefore" ||
-          deliveryTypeSelected == "sundayNight" ||
-          deliveryTypeSelected == "mondayNight" ||
-          deliveryTypeSelected == "tuesdayNight" ||
-          deliveryTypeSelected == "nightBeforeMonday" ||
-          deliveryTypeSelected == "nightBeforeTuesday" ||
-          deliveryTypeSelected == "nightBeforeWednesday")
-      ) {
-        actualDeliveryCost += 2.5;
-      } else if (delivIndex == 5) {
-        //these explicit conditions because they depend on friday's/thursday's selections
-        if (
-          this.props.customerInfo.deliveryType[delivIndex - 1] ==
-          "dayOfThursday"
-        ) {
-          if (deliveryTypeSelected == "nightBeforeThursday") {
-            actualDeliveryCost += 2.5;
 
-            //mixing surcharges here
-            primaryCustomer.deliverySurcharges += surchargePerDelivery;
-          }
+      let actualDeliveryCost = 0;
+      let surchargePerDelivery = 0;
+
+      const selectedPostalCode = this.props.postalCodes.find(
+        el => el.title === this.props.customerInfo.postalCode.substring(0, 3)
+      );
+
+      console.log(selectedPostalCode);
+
+      if (selectedPostalCode.hasOwnProperty("extraSurcharge")) {
+        surchargePerDelivery = selectedPostalCode.extraSurcharge;
+      }
+
+      console.log(surchargePerDelivery);
+
+      for (
+        let delivIndex = 0;
+        delivIndex < this.props.customerInfo.deliveryType.length;
+        delivIndex++
+      ) {
+        const daysMealSum =
+          parseInt(
+            this.props.customerInfo.completeSchedule[delivIndex].breakfast,
+            10
+          ) +
+          parseInt(
+            this.props.customerInfo.completeSchedule[delivIndex].lunch,
+            10
+          ) +
+          parseInt(
+            this.props.customerInfo.completeSchedule[delivIndex].dinner,
+            10
+          );
+
+        const deliveryTypeSelected = this.props.customerInfo.deliveryType[
+          delivIndex
+        ];
+
+        // calculate surcharges
+
+        if (deliveryTypeSelected == "") {
+          continue;
         } else if (
-          this.props.customerInfo.deliveryType[delivIndex - 1] ==
-          "dayOfPaired" &&
-          this.props.customerInfo.deliveryType[delivIndex - 2] == "dayOf"
+          deliveryTypeSelected == "dayOf" ||
+          deliveryTypeSelected == "nightBefore"
         ) {
-          if (deliveryTypeSelected == "nightBeforeThursday") {
-            actualDeliveryCost += 2.5;
-
-            //mixing surcharges here
-            primaryCustomer.deliverySurcharges += surchargePerDelivery;
-          }
+          primaryCustomer.deliverySurcharges += surchargePerDelivery;
+        } else if (
+          //tuesday
+          deliveryTypeSelected == "sundayNight" ||
+          deliveryTypeSelected == "dayOfMonday"
+        ) {
+          primaryCustomer.deliverySurcharges += surchargePerDelivery;
+        } else if (
+          //wednesday
+          deliveryTypeSelected == "sundayNight" ||
+          deliveryTypeSelected == "dayOfMonday" ||
+          deliveryTypeSelected == "nightBeforeMonday" ||
+          deliveryTypeSelected == "dayOfTuesday"
+        ) {
+          primaryCustomer.deliverySurcharges += surchargePerDelivery;
+        } else if (
+          //thursday
+          deliveryTypeSelected == "mondayNight" ||
+          deliveryTypeSelected == "dayOfTuesday" ||
+          deliveryTypeSelected == "nightBeforeTuesday" ||
+          deliveryTypeSelected == "dayOfWednesday"
+        ) {
+          primaryCustomer.deliverySurcharges += surchargePerDelivery;
+        } else if (
+          //friday
+          deliveryTypeSelected == "tuesdayNight" ||
+          deliveryTypeSelected == "dayOfWednesday" ||
+          deliveryTypeSelected == "nightBeforeWednesday" ||
+          deliveryTypeSelected == "dayOfThursday"
+        ) {
+          primaryCustomer.deliverySurcharges += surchargePerDelivery;
         }
-      } // else if 5
-    }
+        // calculate actual delivery cost / delivery
+        if (deliveryTypeSelected == "") {
+          continue;
+        } else if (
+          deliveryTypeSelected == "dayOf" ||
+          deliveryTypeSelected == "dayOfFriday" ||
+          deliveryTypeSelected == "dayOfThursday" ||
+          deliveryTypeSelected == "dayOfWednesday" ||
+          deliveryTypeSelected == "dayOfTuesday" ||
+          deliveryTypeSelected == "dayOfMonday"
+        ) {
+          actualDeliveryCost += 2.5;
+        } else if (
+          daysMealSum == 1 &&
+          (deliveryTypeSelected == "nightBefore" ||
+            deliveryTypeSelected == "sundayNight" ||
+            deliveryTypeSelected == "mondayNight" ||
+            deliveryTypeSelected == "tuesdayNight" ||
+            deliveryTypeSelected == "nightBeforeMonday" ||
+            deliveryTypeSelected == "nightBeforeTuesday" ||
+            deliveryTypeSelected == "nightBeforeWednesday")
+        ) {
+          actualDeliveryCost += 2.5;
+        } else if (delivIndex == 5) {
+          //these explicit conditions because they depend on friday's/thursday's selections
+          if (
+            this.props.customerInfo.deliveryType[delivIndex - 1] ==
+            "dayOfThursday"
+          ) {
+            if (deliveryTypeSelected == "nightBeforeThursday") {
+              actualDeliveryCost += 2.5;
 
-    // calculate delivery surcharges
+              //mixing surcharges here
+              primaryCustomer.deliverySurcharges += surchargePerDelivery;
+            }
+          } else if (
+            this.props.customerInfo.deliveryType[delivIndex - 1] ==
+            "dayOfPaired" &&
+            this.props.customerInfo.deliveryType[delivIndex - 2] == "dayOf"
+          ) {
+            if (deliveryTypeSelected == "nightBeforeThursday") {
+              actualDeliveryCost += 2.5;
 
-    primaryCustomer.deliveryCost = actualDeliveryCost;
+              //mixing surcharges here
+              primaryCustomer.deliverySurcharges += surchargePerDelivery;
+            }
+          }
+        } // else if 5
+      }
 
-    primaryCustomer.totalCost =
-      primaryCustomer.baseMealPriceTotal +
-      primaryCustomer.totalAthleticSurcharge +
-      primaryCustomer.totalBodybuilderSurcharge +
-      primaryCustomer.coolerBag +
-      _.sum(primaryCustomer.restrictionsSurcharges) +
-      _.sum(primaryCustomer.specificRestrictionsSurcharges) +
-      primaryCustomer.deliveryCost;
+      // calculate delivery surcharges
 
-    primaryCustomer.totalCost -= primaryCustomer.discountActual;
+      primaryCustomer.deliveryCost = actualDeliveryCost;
 
-    primaryCustomer.taxes =
-      0.13 *
-      (primaryCustomer.totalCost +
-        _.sumBy(secondaryCustomers, e => e.totalCost));
+      primaryCustomer.totalCost =
+        primaryCustomer.baseMealPriceTotal +
+        primaryCustomer.totalAthleticSurcharge +
+        primaryCustomer.totalBodybuilderSurcharge +
+        primaryCustomer.coolerBag +
+        _.sum(primaryCustomer.restrictionsSurcharges) +
+        _.sum(primaryCustomer.specificRestrictionsSurcharges) +
+        primaryCustomer.deliveryCost;
 
-    let secondaryGroupCost = 0;
+      primaryCustomer.totalCost -= primaryCustomer.discountActual;
 
-    if (this.props.customerInfo.secondaryProfileCount > 0) {
-      secondaryCustomers.forEach((e, i) => {
-        secondaryGroupCost += e.totalCost;
+      primaryCustomer.taxes =
+        0.13 *
+        (primaryCustomer.totalCost +
+          _.sumBy(secondaryCustomers, e => e.totalCost));
+
+      let secondaryGroupCost = 0;
+
+      if (this.props.customerInfo.secondaryProfileCount > 0) {
+        secondaryCustomers.forEach((e, i) => {
+          secondaryGroupCost += e.totalCost;
+        });
+      }
+
+      primaryCustomer.secondaryGroupTotal = secondaryGroupCost;
+
+      primaryCustomer.groupTotal =
+        secondaryGroupCost + primaryCustomer.totalCost + primaryCustomer.taxes;
+
+      this.setState({
+        primaryProfileBilling: primaryCustomer,
+        secondaryProfilesBilling: secondaryCustomers
       });
     }
-
-    primaryCustomer.secondaryGroupTotal = secondaryGroupCost;
-
-    primaryCustomer.groupTotal =
-      secondaryGroupCost + primaryCustomer.totalCost + primaryCustomer.taxes;
-
-    this.setState({ primaryProfileBilling: primaryCustomer });
-    this.setState({ secondaryProfilesBilling: secondaryCustomers });
   }
 
   handleSubmitStep() {

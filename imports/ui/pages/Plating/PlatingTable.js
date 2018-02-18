@@ -552,85 +552,13 @@ class PlatingTable extends React.Component {
             <Button onClick={this.closeAssignDialog} color="default">
               Cancel
             </Button>
-            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleMealAssignment} color="accent">
-              Assign
+            <Button stroked onClick={this.handleMealAssignment} color="default">
+              Print
             </Button>
           </DialogActions>
         </Dialog>
 
-        <Dialog open={this.state.reassignDialogOpen} onRequestClose={this.closeReassignDialog}>
-          <Typography
-            style={{
-              flex: '0 0 auto',
-              margin: '0',
-              padding: '24px 24px 20px 24px',
-            }}
-            className="title font-medium"
-            type="title"
-          >
-            Reassign main for {this.state.reassignResult ? this.state.reassignResult.lifestyle.title : ''}
-            {this.state.reassignResult ? this.state.reassignResult.meal.title : ''}
-          </Typography>
 
-
-          <DialogContent>
-
-            <Autosuggest
-              id="2"
-              className="autosuggest"
-              theme={{
-                container: {
-                  flexGrow: 1,
-                  position: 'relative',
-                  marginBottom: '2em',
-                },
-                suggestionsContainerOpen: {
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                },
-                suggestion: {
-                  display: 'block',
-                },
-                suggestionsList: {
-                  margin: 0,
-                  padding: 0,
-                  listStyleType: 'none',
-                },
-              }}
-              renderInputComponent={this.renderInput.bind(this)}
-              suggestions={this.state.suggestions}
-              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                this,
-              )}
-              onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                this,
-              )}
-              onSuggestionSelected={this.onSuggestionSelected.bind(this)}
-              getSuggestionValue={this.getSuggestionValue.bind(this)}
-              renderSuggestion={this.renderSuggestion.bind(this)}
-              renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                this,
-              )}
-              fullWidth
-              focusInputOnSuggestionClick={false}
-              inputProps={{
-                placeholder: 'Search',
-                value: this.state.value,
-                onChange: this.onChange.bind(this),
-                className: 'autoinput',
-              }}
-            />
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={this.closeReassignDialog} color="default">
-              Cancel
-            </Button>
-            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleMealReassignment} color="accent">
-              Reassign
-            </Button>
-          </DialogActions>
-        </Dialog>
       </div >
     );
   }

@@ -139,7 +139,7 @@ Meteor.methods({
   'customer.step5.noCreditCard': function noCreditCard(customerInfo) {
     check(customerInfo, Object);
 
-    // console.log(customerInfo);
+    console.log(customerInfo);
 
     const subscriptionIdToSave = Random.id();
 
@@ -391,14 +391,12 @@ Meteor.methods({
           customerInfo.secondaryProfilesBilling[i].restrictionsActual.length > 0
         ) {
           customerInfo.secondaryProfilesBilling[i].restrictionsActual.forEach(
-            (e, i) => {
+            (restriction, restrictionIndex) => {
               primaryProfileLineItems.restrictions.push({
-                title: e.title,
-                extra: e.extra,
-                type: e.discountOrExtraType,
-                surcharge:
-                  customerInfo.secondaryProfilesBilling[i]
-                    .restrictionsSurcharges[i],
+                title: restriction.title,
+                extra: restriction.extra,
+                type: restriction.discountOrExtraType,
+                surcharge: customerInfo.secondaryProfilesBilling[i].restrictionsSurcharges[restrictionIndex],
               });
             },
           );

@@ -96,6 +96,11 @@ const styles = theme => ({
   },
 });
 
+/* 
+  REMOVE forceUpdate() it is not good to mutate state directly.
+  shouldComponentUpdate causes problems as well. 
+*/
+
 class Step2Plan extends React.Component {
   constructor(props) {
     super(props);
@@ -290,6 +295,7 @@ class Step2Plan extends React.Component {
         : 'none',
       restrictions: [],
       activeMealScheduleStep: 0,
+      deleteDialogOpen: false,
       scheduleReal: [
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -396,6 +402,21 @@ class Step2Plan extends React.Component {
     });
   }
 
+  deleteDialogHandleRequestCloseSecondary(profileIndex) {
+    console.log(profileIndex);
+
+    this.state.secondaryProfilesData[profileIndex].deleteDialogOpen = false;
+    this.forceUpdate()
+
+  }
+
+  deleteDialogHandleOpenSecondary(profileIndex) {
+    console.log(profileIndex);
+    this.state.secondaryProfilesData[profileIndex].deleteDialogOpen = true;
+    this.forceUpdate()
+
+  }
+
   handleSubmitStep() {
     const scheduleSummation = [
       { breakfast: 0, lunch: 0, dinner: 0 },
@@ -479,7 +500,6 @@ class Step2Plan extends React.Component {
       subIngredients: this.state.subIngredients,
       specificRestrictions: this.state.specificRestrictions,
       lifestyle: this.state.lifestyle,
-      extra: this.state.extra,
       discount: this.state.discount,
       restrictions: this.state.restrictions,
       scheduleReal: this.state.scheduleReal,
@@ -899,17 +919,6 @@ class Step2Plan extends React.Component {
     });
   }
 
-  handleChangeRadioExtra(event, value) {
-    this.setState({
-      extra: value,
-    });
-  }
-
-  handleChangeRadioExtraSecondary(i, event, value) {
-    this.state.secondaryProfilesData[i].extra = value;
-    this.forceUpdate();
-  }
-
   handleChangeRadioDiscount(event, value) {
     this.setState({
       discount: value,
@@ -1026,10 +1035,12 @@ class Step2Plan extends React.Component {
     if (this.state.addRestrictionType == 'Preference') {
       this.setState({
         subIngredients: clonedSubIngredients,
+        value: '',
       });
     } else {
       this.setState({
         specificRestrictions: clonedSubIngredients,
+        value: '',
       });
     }
 
@@ -1088,7 +1099,8 @@ class Step2Plan extends React.Component {
       });
     }
 
-    this.deleteDialogHandleRequestClose();
+    this.state.secondaryProfilesData[index].deleteDialogOpen = false;
+    this.state.value = '';
 
     this.forceUpdate();
   }
@@ -2092,62 +2104,7 @@ class Step2Plan extends React.Component {
                     </RadioGroup>
                   </FormControl>
                 </Grid>
-                {/*
-                <Grid container>
-                  <Grid item xs={12}>
-                    <FormControl component="fieldset">
-                      <FormLabel component="legend"><Typography type="body1" className="text-uppercase font-medium">Extras</Typography></FormLabel>
-                      <RadioGroup
-                        aria-label="extra"
-                        name="extra"
-                        value={this.state.extra}
-                        onChange={this.handleChangeRadioExtra.bind(this)}
-                        style={{ flexDirection: 'row' }}
-                      >
-                        <FormControlLabel
-                          value="none"
-                          control={<Radio />}
-                          label="None"
-                          disabled={
-                            this.state.lifestyle &&
-                            this.props.lifestyles.find(
-                              element =>
-                                element.title == this.state.lifestyle &&
-                                !element.extraAthletic &&
-                                !element.extraBodybuilder,
-                            )
-                          }
-                        />
-                        <FormControlLabel
-                          value="athletic"
-                          control={<Radio />}
-                          label="Athletic"
-                          disabled={
-                            this.state.lifestyle &&
-                            this.props.lifestyles.find(
-                              element =>
-                                element.title == this.state.lifestyle &&
-                                !element.extraAthletic,
-                            )
-                          }
-                        />
-                        <FormControlLabel
-                          value="bodybuilder"
-                          control={<Radio />}
-                          label="Bodybuilder"
-                          disabled={
-                            this.state.lifestyle &&
-                            this.props.lifestyles.find(
-                              element =>
-                                element.title == this.state.lifestyle &&
-                                !element.extraBodybuilder,
-                            )
-                          }
-                        />
-                      </RadioGroup>
-                    </FormControl>
-                  </Grid>
-                </Grid> */}
+
 
                 <Grid item xs={12} sm={6} md={6}>
                   <FormControl component="fieldset">
@@ -2453,7 +2410,7 @@ class Step2Plan extends React.Component {
 
               <Dialog
                 open={this.state.deleteDialogOpen}
-                onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+                onClose={this.deleteDialogHandleRequestClose.bind(this)}
               >
                 <Typography
                   style={{
@@ -2540,6 +2497,9 @@ class Step2Plan extends React.Component {
                     }}
                   />
                 </DialogContent>
+                <DialogActions>
+                  <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">Close</Button>
+                </DialogActions>
               </Dialog>
 
               <Grid container>
@@ -2762,79 +2722,6 @@ class Step2Plan extends React.Component {
                             </RadioGroup>
                           </FormControl>
                         </Grid>
-
-                        {/* <Grid container>
-                        <Grid item xs={12}>
-                          <FormControl component="fieldset">
-                            <FormLabel component="legend">Extras</FormLabel>
-                            <RadioGroup
-                              aria-label="extra"
-                              name="extra"
-                              value={
-                                this.state.secondaryProfilesData[profileIndex]
-                                  .extra
-                              }
-                              onChange={this.handleChangeRadioExtraSecondary.bind(
-                                this,
-                                profileIndex,
-                              )}
-                              style={{ flexDirection: 'row' }}
-                            >
-                              <FormControlLabel
-                                value="none"
-                                control={<Radio />}
-                                label="None"
-                                selected
-                                disabled={
-                                  this.state.secondaryProfilesData[profileIndex]
-                                    .lifestyle &&
-                                  this.props.lifestyles.find(
-                                    element =>
-                                      element.title ==
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].lifestyle &&
-                                      !element.extraAthletic &&
-                                      !element.extraBodybuilder,
-                                  )
-                                }
-                              />
-                              <FormControlLabel
-                                value="athletic"
-                                control={<Radio />}
-                                label="Athletic"
-                                disabled={
-                                  this.state.secondaryProfilesData[profileIndex]
-                                    .lifestyle &&
-                                  this.props.lifestyles.find(
-                                    element =>
-                                      element.title ==
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].lifestyle && !element.extraAthletic,
-                                  )
-                                }
-                              />
-                              <FormControlLabel
-                                value="bodybuilder"
-                                control={<Radio />}
-                                label="Bodybuilder"
-                                disabled={
-                                  this.state.secondaryProfilesData[profileIndex]
-                                    .lifestyle &&
-                                  this.props.lifestyles.find(
-                                    element =>
-                                      element.title ==
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].lifestyle && !element.extraBodybuilder,
-                                  )
-                                }
-                              />
-                            </RadioGroup>
-                          </FormControl>
-                        </Grid>
-                      </Grid> */}
 
                         <Grid item xs={12} sm={6}>
                           <FormControl component="fieldset">
@@ -3172,9 +3059,10 @@ class Step2Plan extends React.Component {
                       </Grid>
 
                       <Dialog
-                        open={this.state.deleteDialogOpen}
-                        onRequestClose={this.deleteDialogHandleRequestClose.bind(
+                        open={this.state.secondaryProfilesData[profileIndex].deleteDialogOpen}
+                        onClose={this.deleteDialogHandleRequestCloseSecondary.bind(
                           this,
+                          profileIndex
                         )}
                       >
                         <Typography
@@ -3269,6 +3157,9 @@ class Step2Plan extends React.Component {
                             }}
                           />
                         </DialogContent>
+                        <DialogActions>
+                          <Button onClick={this.deleteDialogHandleRequestClose.bind(this, profileIndex)} color="default">Close</Button>
+                        </DialogActions>
                       </Dialog>
 
                       <Grid container>
@@ -3384,213 +3275,12 @@ class Step2Plan extends React.Component {
                         <Grid item xs={12}>
                           <Button
                             color="primary"
-                            onClick={this.deleteDialogHandleOpen.bind(this)}
+                            onClick={this.deleteDialogHandleOpenSecondary.bind(this, profileIndex)}
                           >
                             Add a restriction
                           </Button>
                         </Grid>
                       </Grid>
-
-                      {/* <Grid container style={{ marginTop: '50px' }}>
-                        <Grid item xs={12}>
-                        <Typography type="body1" className="text-uppercase font-medium">Schedule</Typography>
-
-                        </Grid>
-
-                        <Grid item xs={12}>
-                          <FormControl component="fieldset">
-                            <RadioGroup
-                              aria-label="scheduleType"
-                              name="scheduleType"
-                              value={
-                                this.state.secondaryProfilesData[profileIndex]
-                                  .scheduleType
-                              }
-                              onChange={this.handleChangeRadioscheduleTypeSecondary.bind(
-                                this,
-                                profileIndex,
-                              )}
-                              style={{ flexDirection: 'row' }}
-                            >
-                              <FormControlLabel
-                                value={'weekdays'}
-                                control={<Radio />}
-                                label={'Weekdays'}
-                                selected
-                              />
-
-                              <FormControlLabel
-                                value={'weekends'}
-                                control={<Radio />}
-                                label={'Weekends'}
-                                selected
-                              />
-
-                              <FormControlLabel
-                                value={'custom'}
-                                control={<Radio />}
-                                label={'Custom'}
-                                selected
-                              />
-                            </RadioGroup>
-                          </FormControl>
-                        </Grid>
-                      </Grid>
-
-                      <Grid container style={{ marginTop: '20px' }}>
-                        <Table className="table-lifestyles">
-                          <TableHead>
-                            <TableRow>
-                              <TableCell />
-
-                              <TableCell style={{ textAlign: 'center' }}>
-                                <Typography
-                                  type="subheading"
-                                  className="font-medium font-uppercase"
-                                >
-                                  Breakfast
-                                </Typography>
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: 'center' }}>
-                                <Typography
-                                  type="subheading"
-                                  className="font-medium font-uppercase"
-                                >
-                                  Lunch
-                                </Typography>
-                              </TableCell>
-
-                              <TableCell style={{ textAlign: 'center' }}>
-                                <Typography
-                                  type="subheading"
-                                  className="font-medium font-uppercase"
-                                >
-                                  Dinner
-                                </Typography>
-                              </TableCell>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody>
-                            {this.state.schedule.map((e, i) => {
-                              const days = [
-                                'Monday',
-                                'Tuesday',
-                                'Wednesday',
-                                'Thursday',
-                                'Friday',
-                                'Saturday',
-                                'Sunday',
-                              ];
-                              return (
-                                <TableRow key={i}>
-                                  <TableCell>
-                                    <Typography
-                                      type="subheading"
-                                      style={{ marginTop: '10px' }}
-                                    >
-                                      {days[i]}
-                                    </Typography>
-                                  </TableCell>
-
-                                  <TableCell style={{ textAlign: 'center' }}>
-                                    <TextField
-                                      fullWidth
-                                      margin="normal"
-                                      style={{
-                                        fontSize: '1rem',
-                                        maxWidth: '100px',
-                                        minWidth: '100px',
-                                      }}
-                                      value={
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].schedule[i].breakfast
-                                      }
-                                      onChange={(event) => {
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].schedule[i].breakfast =
-                                          event.target.value;
-                                        this.forceUpdate();
-                                        this.handleSubscriptionScheduleChange();
-                                      }}
-                                      inputProps={{
-                                        type: 'number',
-                                        min: '0',
-                                        max: '3',
-                                      }}
-                                      name={`${profileIndex}_breakfast_${i}`}
-                                    />
-                                  </TableCell>
-
-                                  <TableCell style={{ textAlign: 'center' }}>
-                                    <TextField
-                                      fullWidth
-                                      margin="normal"
-                                      style={{
-                                        fontSize: '1rem',
-                                        maxWidth: '100px',
-                                        minWidth: '100px',
-                                      }}
-                                      onChange={(event) => {
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].schedule[i].lunch =
-                                          event.target.value;
-                                        this.forceUpdate();
-                                        this.handleSubscriptionScheduleChange();
-                                      }}
-                                      value={
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].schedule[i].lunch
-                                      }
-                                      inputProps={{
-                                        type: 'number',
-                                        min: '0',
-                                        max: '3',
-                                      }}
-                                      name={`${profileIndex}_lunch_${i}`}
-                                    />
-                                  </TableCell>
-
-                                  <TableCell style={{ textAlign: 'center' }}>
-                                    <TextField
-                                      fullWidth
-                                      margin="normal"
-                                      style={{
-                                        fontSize: '1rem',
-                                        maxWidth: '100px',
-                                        minWidth: '100px',
-                                      }}
-                                      onChange={(event) => {
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].schedule[i].dinner =
-                                          event.target.value;
-                                        this.forceUpdate();
-                                        this.handleSubscriptionScheduleChange();
-                                      }}
-                                      value={
-                                        this.state.secondaryProfilesData[
-                                          profileIndex
-                                        ].schedule[i].dinner
-                                      }
-                                      inputProps={{
-                                        type: 'number',
-                                        min: '0',
-                                        max: '3',
-                                      }}
-                                      name={`${profileIndex}_dinner_${i}`}
-                                    />
-                                  </TableCell>
-                                </TableRow>
-                              );
-                            })}
-                          </TableBody>
-                        </Table>
-                      </Grid> */}
 
                       <Button
                         raised

@@ -101,24 +101,23 @@ class Step3Delivery extends React.Component {
       postalCode: this.props.customerInfo.postalCode,
       notes: '',
 
-
       coolerBag: false,
       activeDeliveryScheduleStep: 0,
 
-
-      subscriptionSchedule: [
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-      ],
       completeSchedule: this.props.customerInfo.completeSchedule,
       deliveryType: ['', '', '', '', '', '', ''],
 
     };
+  }
+
+  componentWillReceiveProps(nextProps) {
+    console.log(nextProps);
+    if (nextProps.activeStep == 2) {
+      this.setState({
+        completeSchedule: nextProps.customerInfo.completeSchedule,
+        postalCode: nextProps.customerInfo.postalCode
+      })
+    }
   }
 
   componentDidMount() {
@@ -4805,7 +4804,7 @@ class Step3Delivery extends React.Component {
                         label="Postal Code"
                         id="postalCode"
                         name="postalCode"
-                        defaultValue={this.props.customerInfo.postalCode}
+                        value={this.state.postalCode}
                         fullWidth
                         readonly
                         disabled
