@@ -1486,7 +1486,7 @@ aggregation.forEach((el, i) => {
 
     if (index === 5) {
 
-      if (e === 'nightBeforeThursday') {
+      if (e === 'nightBeforeThursday' && previousDay != 'nightBefore') {
 
         // set delivery for saturday-sunday as thursday night
 
@@ -1517,7 +1517,7 @@ aggregation.forEach((el, i) => {
 
         // set cooking as thursday
 
-      } else if (e === 'dayOfFriday') {
+      } else if ((e === 'dayOfFriday' || e === 'dayOf') && previousDay != 'dayOf') {
         // set delivery for saturday-sunday as friday day
 
         delivery.title = 'dayOf';

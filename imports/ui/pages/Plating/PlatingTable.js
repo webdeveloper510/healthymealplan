@@ -1,6 +1,8 @@
 import { Meteor } from 'meteor/meteor';
 import React from 'react';
 import PropTypes from 'prop-types';
+import { withStyles } from 'material-ui/styles';
+
 import Table, {
   TableBody,
   TableCell,
@@ -15,8 +17,15 @@ import Dialog, {
   DialogContentText,
 } from 'material-ui/Dialog';
 
+import List, { ListItem, ListItemText } from 'material-ui/List';
+import Divider from 'material-ui/Divider';
+import AppBar from 'material-ui/AppBar';
+import Toolbar from 'material-ui/Toolbar';
+import IconButton from 'material-ui/IconButton';
+import CloseIcon from 'material-ui-icons/Close';
 
 import $ from 'jquery';
+
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 
@@ -29,27 +38,41 @@ import { MenuItem } from 'material-ui/Menu';
 import moment from 'moment';
 
 import sumBy from 'lodash/sumBy';
-import Autosuggest from 'react-autosuggest';
 
 import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
+import Slide from 'material-ui/transitions/Slide';
 
 import './PlatingTable.scss';
+
+const styles = {
+  appBar: {
+    position: 'relative',
+  },
+  flex: {
+    flex: 1,
+  },
+  root: {
+    width: '100%',
+    overflowX: 'auto',
+  },
+
+};
+
+function Transition(props) {
+  return <Slide direction="up" {...props} />;
+}
 
 class PlatingTable extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      suggestions: [],
       plates: this.props.plates ? this.props.plates : [],
-      value: '',
-      selectedSugestion: null,
 
       currentSelectorDate: this.props.currentSelectorDate,
 
       assignDialogOpen: false,
-      assignResult: null,
 
       mealSelected: null,
       lifestyleSelected: null,
@@ -57,9 +80,6 @@ class PlatingTable extends React.Component {
       lifestyleTitle: '',
       mealTitle: '',
 
-      reassignDialogOpen: false,
-      reassignResult: null,
-      reassignPlannerId: '',
 
       aggregateData: null,
       aggregateDataLoading: true,
@@ -67,9 +87,6 @@ class PlatingTable extends React.Component {
 
     this.openAssignDialog = this.openAssignDialog.bind(this);
     this.closeAssignDialog = this.closeAssignDialog.bind(this);
-
-    this.openReassignDialog = this.openReassignDialog.bind(this);
-    this.closeReassignDialog = this.closeReassignDialog.bind(this);
 
     this.handleMealAssignment = this.handleMealAssignment.bind(this);
     this.handleMealReassignment = this.handleMealReassignment.bind(this);
@@ -83,7 +100,7 @@ class PlatingTable extends React.Component {
       this.setState({
         aggregateData: res,
       }, () => {
-        this.setState({ aggregateDataLoading: false })
+        this.setState({ aggregateDataLoading: false });
       });
 
       console.log(res);
@@ -95,18 +112,14 @@ class PlatingTable extends React.Component {
       this.setState({
         aggregateDataLoading: true,
       }, () => {
-
         Meteor.call('getPlatingAggregatedData', this.props.currentSelectorDate, (err, res) => {
           this.setState({
             aggregateData: res,
           }, () => {
-            this.setState({ aggregateDataLoading: false })
+            this.setState({ aggregateDataLoading: false });
           });
-
         });
-
-      })
-
+      });
     }
   }
 
@@ -114,13 +127,7 @@ class PlatingTable extends React.Component {
     const lifestyle = this.props.lifestyles.find(el => el._id === lifestyleId);
     const meal = this.props.meals.find(el => el._id === mealId);
 
-    const assignResult = {
-      lifestyle,
-      meal,
-    };
-
     this.setState({
-      assignResult,
       assignDialogOpen: true,
       lifestyleSelected: lifestyleId,
       mealSelected: mealId,
@@ -135,22 +142,6 @@ class PlatingTable extends React.Component {
       selectedMeal: '',
       selectedPlate: '',
       assignDialogOpen: false,
-    });
-  }
-
-  closeReassignDialog() {
-    this.setState({
-      reassignDialogOpen: false,
-    });
-  }
-
-  openReassignDialog(lifestyleId, mealId) {
-    const assignedPlate = this.props.results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === this.props.currentSelectorDate);
-
-    this.setState({
-      reassignResult: assignedPlate,
-      reassignDialogOpen: true,
-      reassignPlannerId: assignedPlate._id,
     });
   }
 
@@ -297,86 +288,9 @@ class PlatingTable extends React.Component {
     }
   }
 
-
   renderPresentPlate(results, lifestyleId, mealId, date) {
     const plateToReturn = results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === date);
     return (<Typography type="subheading">{plateToReturn.plate.title}</Typography>);
-  }
-
-
-  renderInput(inputProps) {
-    const { value, ...other } = inputProps;
-
-    return (
-      <TextField
-        value={value}
-        style={{ width: '100%' }}
-        InputProps={{
-          ...other,
-        }}
-      />
-    );
-  }
-
-  onSuggestionsFetchRequested({ value }) {
-    this.setState({
-      suggestions: this.getSuggestions(value),
-    });
-  }
-
-  onSuggestionsClearRequested() {
-    this.setState({
-      suggestions: [],
-    });
-  }
-
-  getSuggestions(value) {
-    const inputValue = value.trim().toLowerCase();
-    const inputLength = inputValue.length;
-
-    return inputLength === 0
-      ? []
-      : this.props.plates.filter(
-        plate =>
-          plate.title.toLowerCase().slice(0, inputLength) === inputValue,
-      );
-  }
-
-  getSuggestionValue(suggestion) {
-    return suggestion.title;
-  }
-
-  renderSuggestion(suggestion) {
-    return (
-      <MenuItem component="div">
-        <div>{suggestion.title}</div>
-      </MenuItem>
-    );
-  }
-
-  renderSuggestionsContainer(options) {
-    const { containerProps, children } = options;
-
-    return (
-      <Paper {...containerProps} square>
-        {children}
-      </Paper>
-    );
-  }
-
-  onChange(event, { newValue }) {
-    this.setState({
-      value: newValue,
-    });
-  }
-
-  onSuggestionSelected(
-    event,
-    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
-  ) {
-    this.setState({
-      selectedSugestion: suggestion,
-    });
   }
 
 
@@ -417,7 +331,7 @@ class PlatingTable extends React.Component {
             </TableHead>
             <TableBody>
 
-              {this.props.lifestyles && !this.aggregateDataLoading && this.props.lifestyles.map(lifestyle => {
+              {this.props.lifestyles && !this.aggregateDataLoading && this.props.lifestyles.map((lifestyle) => {
                 const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === lifestyle._id);
 
                 return (
@@ -467,7 +381,7 @@ class PlatingTable extends React.Component {
                         {this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ? (
                           <div>
                             {this.renderPresentPlate(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate)}
-                            <Button onClick={() => this.openReassignDialog(lifestyle._id, meal._id,
+                            <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id,
                               this.getPlannerId(this.props.results, lifestyle._id, meal._id))}
                             >Reassign</Button>
                           </div>
@@ -482,9 +396,7 @@ class PlatingTable extends React.Component {
 
                     </TableRow>
 
-                  )))
-
-
+                  )));
               })}
 
 
@@ -495,67 +407,76 @@ class PlatingTable extends React.Component {
           </Table>
         </Paper>
 
-        <Dialog open={this.state.assignDialogOpen} onRequestClose={this.closeAssignDialog}>
-          <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-            Assign main for {this.state.assignResult ? this.state.assignResult.lifestyle.title : ''}{' '}{this.state.assignResult ? this.state.assignResult.meal.title : ''}
-          </Typography>
-          <DialogContent>
+        <Dialog fullscreen={true} fullWidth={true} maxWidth={false} style={{ maxHeight: '100% !important', margin: '0', height: '100%' }}
+          open={this.state.assignDialogOpen} onClose={this.closeAssignDialog} transition={Transition}>
+          <AppBar className={this.props.classes.appBar}>
+            <Toolbar>
+              <Typography variant="title" type="title" color="inherit" className={this.props.classes.flex}>
+                Customers - {this.state.lifestyleTitle} {this.state.mealTitle.toLowerCase()}
+              </Typography>
+              <Button color="inherit">
+                Print
+              </Button>
+              <IconButton color="inherit" onClick={this.closeAssignDialog} aria-label="Close">
+                <CloseIcon />
+              </IconButton>
+            </Toolbar>
+          </AppBar>
 
-            <Autosuggest
-              id="1"
-              className="autosuggest"
-              theme={{
-                container: {
-                  flexGrow: 1,
-                  position: 'relative',
-                  marginBottom: '2em',
-                },
-                suggestionsContainerOpen: {
-                  position: 'absolute',
-                  left: 0,
-                  right: 0,
-                },
-                suggestion: {
-                  display: 'block',
-                },
-                suggestionsList: {
-                  margin: 0,
-                  padding: 0,
-                  listStyleType: 'none',
-                },
-              }}
-              renderInputComponent={this.renderInput.bind(this)}
-              suggestions={this.state.suggestions}
-              onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                this,
-              )}
-              onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                this,
-              )}
-              onSuggestionSelected={this.onSuggestionSelected.bind(this)}
-              getSuggestionValue={this.getSuggestionValue.bind(this)}
-              renderSuggestion={this.renderSuggestion.bind(this)}
-              renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                this,
-              )}
-              fullWidth
-              focusInputOnSuggestionClick={false}
-              inputProps={{
-                placeholder: 'Search',
-                value: this.state.value,
-                onChange: this.onChange.bind(this),
-                className: 'autoinput',
-              }}
-            />
-          </DialogContent>
-          <DialogActions>
+          <Paper className={this.props.classes.root}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Name</TableCell>
+                  <TableCell>Lifestyle</TableCell>
+                  <TableCell>Portion</TableCell>
+                  <TableCell>Specific Restrictions</TableCell>
+                  <TableCell>Allergies</TableCell>
+                  <TableCell>Dietary</TableCell>
+                  <TableCell>Religious</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {!this.state.aggregateDataLoading &&
+                  this.state.aggregateData.userData.
+                    filter(user => user.lifestyleId == this.state.lifestyleSelected &&
+                      (user[`${this.state.mealTitle.toLowerCase()}`] > 0 ||
+                        user[`athletic${this.state.mealTitle}`] > 0 ||
+                        user[`bodybuilder${this.state.mealTitle}`] > 0)).map(n => {
+
+                          const mealType = this.state.mealTitle.toLowerCase();
+                          const mealTypeNormal = this.state.mealTitle;
+
+                          return (
+                            <TableRow>
+                              <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
+                              <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
+                              <TableCell>
+                                <Typography type="subheading">
+                                  {n[`${mealType}`] > 0 ? `Regular x${n[`${mealType}`]}` : ''}
+                                  {n[`athletic${mealTypeNormal}`] > 0 ? `Athletic x${n[`athletic${mealTypeNormal}`]}` : ''}
+                                  {n[`bodybuilder${mealTypeNormal}`] > 0 ? `Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}` : ''}
+                                </Typography>
+                              </TableCell>
+                              <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => { restriction.title }) : ''}</Typography></TableCell>
+                              <TableCell><Typography type="subheading">{n.restrictions ? n.restrictions.filter(e => e.type === "allergy").map(restriction => { restriction.title }) : ''}</Typography></TableCell>
+                              <TableCell><Typography type="subheading">{n.restrictions ? n.restrictions.filter(e => e.type === "dietary").map(restriction => { restriction.title }) : ''}</Typography></TableCell>
+                              <TableCell><Typography type="subheading">{n.restrictions ? n.restrictions.filter(e => e.type === "religious").map(restriction => { restriction.title }) : ''}</Typography></TableCell>
+                            </TableRow>
+                          );
+                        })}
+              </TableBody>
+            </Table>
+          </Paper>
+
+          {/* <DialogActions>
             <Button onClick={this.closeAssignDialog} color="default">
               Cancel
             </Button>
             <Button stroked onClick={this.handleMealAssignment} color="default">
               Print
             </Button>
-          </DialogActions>
+          </DialogActions> */}
         </Dialog>
 
 
@@ -576,4 +497,4 @@ PlatingTable.propTypes = {
   plates: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
-export default PlatingTable;
+export default withStyles(styles)(PlatingTable);

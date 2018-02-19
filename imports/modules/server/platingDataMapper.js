@@ -133,31 +133,31 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
     scheduleDays.forEach((e) => {
 
       if (e.breakfast.active) {
-        if (e.breakfast.portions === 'athletic') {
-          customerToAdd.breakfast += parseInt(e.breakfast.quantity, 10);
-        } else if (e.breakfast.portions === 'bodybuilder') {
+        if (e.breakfast.portions == 'athletic') {
+          customerToAdd.athleticBreakfast += parseInt(e.breakfast.quantity, 10);
+        } else if (e.breakfast.portions == 'bodybuilder') {
           customerToAdd.bodybuilderBreakfast += parseInt(e.breakfast.quantity, 10);
-        } else {
+        } else if (e.breakfast.portions == 'regular') {
           customerToAdd.breakfast += parseInt(e.breakfast.quantity, 10);
         }
       }
 
       if (e.lunch.active) {
-        if (e.lunch.portions === 'athletic') {
+        if (e.lunch.portions == 'athletic') {
           customerToAdd.athleticLunch += parseInt(e.lunch.quantity, 10);
-        } else if (e.lunch.portions === 'bodybuilder') {
+        } else if (e.lunch.portions == 'bodybuilder') {
           customerToAdd.bodybuilderLunch += parseInt(e.lunch.quantity, 10);
-        } else {
+        } else if (e.lunch.portions == 'regular') {
           customerToAdd.lunch += parseInt(e.lunch.quantity, 10);
         }
       }
 
       if (e.dinner.active) {
-        if (e.dinner.portions === 'athletic') {
+        if (e.dinner.portions == 'athletic') {
           customerToAdd.athleticDinner += parseInt(e.dinner.quantity, 10);
-        } else if (e.dinner.portions === 'bodybuilder') {
+        } else if (e.dinner.portions == 'bodybuilder') {
           customerToAdd.bodybuilderDinner += parseInt(e.dinner.quantity, 10);
-        } else {
+        } else if (e.dinner.portions == 'regular') {
           customerToAdd.dinner += parseInt(e.dinner.quantity, 10);
         }
       }
@@ -229,8 +229,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
     //     }
     //   ]);
     // }
-
-
 
     this.dataByCustomer.push(customerToAdd);
   };
@@ -668,7 +666,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
         } // friday
 
         if (index === 5) {
-          if (e === 'nightBeforeThursday') {
+          if (e === 'nightBeforeThursday' && previousDay != 'nightBefore') {
             // set delivery for saturday-sunday as thursday night
 
             if (this.platingDay == 4) {
@@ -676,7 +674,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               this.appendDataToCustomers([customerSchedule[5], customerSchedule[6]], customer, delivery);
             }
             // set cooking as thursday
-          } else if (e === 'dayOfFriday') {
+          } else if ((e === 'dayOfFriday' || e === 'dayOf') && previousDay != 'dayOf') {
             // set delivery for saturday-sunday as friday day
 
             if (this.platingDay == 4) {
