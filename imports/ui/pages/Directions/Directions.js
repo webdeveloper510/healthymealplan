@@ -149,68 +149,70 @@ class Directions extends React.Component {
 
   printLabels(type) {
 
-    const sweetType = type == 'dayOf' ? 'Morning' : type == 'nightBefore' ? 'Evening' : '';
-    const formalType = type == 'dayOf' ? 'Day of' : type == 'nightBefore' ? 'Evening' : '';
+    const sweetType = type == 'dayOf' ? 'morning' : type == 'nightBefore' ? 'evening' : '';
+    const formalType = type == 'dayOf' ? 'day of' : type == 'nightBefore' ? 'evening' : '';
 
 
     const currentDate = this.state.currentSelectorDate;
 
     const deliveries = this.props.deliveries.filter(e => e.onDate == currentDate && e.title == type);
 
-    if (deliveries.length) {
-
-      let doc = new jsPDF({
-        orientation: 'landscape',
-        unit: 'in',
-        format: [4, 3]
-      });
-
-      deliveries.forEach((e, i) => {
-
-        if (i > 0) {
-          doc.addPage();
-          doc.setPage(i + 1)
-        }
-
-        doc.addImage(vittlebase64, "PNG", 1.78, 0.15, 0.4, 0.4);
-
-        doc.setFontSize(14.5); // name
-
-        let names = [];
-
-        e.meals.forEach((meal) => {
-          if (meal.total > 0) {
-            names.push(`${meal.name} (${meal.total})`)
-          }
-        });
-
-        doc.text(names, 1, 1.15);
-
-        doc.setFontSize(48); // Route
-        doc.setFontStyle("bold"); // Route
-
-        const route = this.props.routes.find(rt => rt._id == e.routeId);
-        const postalCode = this.props.postalCodes.find(pc => pc._id == e.postalCode);
-
-
-        doc.text(route.title === "Downtown" ? "DT" : route.title.slice(0, 1), 0.3, 2.75);
-
-        doc.setFontSize(12); // day postalcode
-        doc.setFontStyle("normal"); // Route
-
-        let info = [`${formalType} ${moment(e.onDate).format("MMMM D")}`, `${postalCode.title}`];
-
-        doc.text(info, 1.5, 2.4);
-
-      });
-
-      doc.save(`Delivery_${this.state.currentSelectorDate}.pdf`);
-
-    } else {
+    if (deliveries.length == 0) {
       this.props.popTheSnackbar({
         message: 'There are no ' + sweetType + ' labels to print for this day'
       });
+
+      return;
     }
+
+    let doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'in',
+      format: [4, 3]
+    });
+
+    deliveries.forEach((e, i) => {
+
+      if (i > 0) {
+        doc.addPage();
+        doc.setPage(i + 1)
+      }
+
+      doc.addImage(vittlebase64, "PNG", 1.78, 0.15, 0.4, 0.4);
+
+      doc.setFontSize(14.5); // name
+
+      let names = [];
+
+      e.meals.forEach((meal) => {
+        if (meal.total > 0) {
+          names.push(`${meal.name} (${meal.total})`)
+        }
+      });
+
+      doc.text(names, 1, 1.15);
+
+      doc.setFontSize(48); // Route
+      doc.setFontStyle("bold"); // Route
+
+      const route = this.props.routes.find(rt => rt._id == e.routeId);
+      const postalCode = this.props.postalCodes.find(pc => pc._id == e.postalCode);
+
+
+      doc.text(route.title === "Downtown" ? "DT" : route.title.slice(0, 1), 0.3, 2.75);
+
+      doc.setFontSize(12); // day postalcode
+      doc.setFontStyle("normal"); // Route
+
+      let info = [`${formalType} ${moment(e.onDate).format("MMMM D")}`, `${postalCode.title}`];
+
+      doc.text(info, 1.5, 2.4);
+
+    });
+
+    doc.save(`Delivery_${this.state.currentSelectorDate}.pdf`);
+
+
 
   }
 

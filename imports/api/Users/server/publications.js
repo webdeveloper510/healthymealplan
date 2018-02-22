@@ -35,6 +35,13 @@ Meteor.publish('users.customers', (query, selector) => {
 });
 
 
+
+Meteor.publish('user.customer.single', (customerId) => {
+
+  return Meteor.users.find({ _id: customerId, roles: ['customer'] });
+});
+
+
 // Meteor.publish('users.activeCustomers.mealTypeAggregate', (query, selector) => {
 
 //   const userAggregate = Subscriptions.aggregate([

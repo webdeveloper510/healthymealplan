@@ -1,12 +1,12 @@
 import { Meteor } from 'meteor/meteor';
 import React from 'react';
+import { Random } from 'meteor/random';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
 
 import Table, {
   TableBody,
   TableCell,
-  TableFooter,
   TableHead,
   TableRow,
 } from 'material-ui/Table';
@@ -17,8 +17,6 @@ import Dialog, {
   DialogContentText,
 } from 'material-ui/Dialog';
 
-import List, { ListItem, ListItemText } from 'material-ui/List';
-import Divider from 'material-ui/Divider';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
@@ -30,18 +28,18 @@ import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 
 import Typography from 'material-ui/Typography';
-import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
 import Input from 'material-ui/Input';
-import { MenuItem } from 'material-ui/Menu';
 
 import moment from 'moment';
 
 import sumBy from 'lodash/sumBy';
 
-import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
 import Slide from 'material-ui/transitions/Slide';
+import jsPDF from 'jspdf';
+import vittlebase64 from '../../../modules/vittlelogobase64';
+
 
 import './PlatingTable.scss';
 
@@ -63,6 +61,78 @@ function Transition(props) {
   return <Slide direction="up" {...props} />;
 }
 
+function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPortion) {
+  doc.addPage();
+
+  doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+
+  // name
+  doc.setFontStyle('bold');
+  doc.setFontSize(10);
+  doc.text(`Made for ${userData.name}`, 0.25, 0.8);
+
+  // plan name
+  doc.setFontStyle('normal');
+  doc.setFontSize(10);
+  doc.text(`${userData.lifestyleName} ${mealType}`, 0.25, 1);
+
+  // dish title
+  doc.setFontStyle('bold');
+  doc.setFontSize(12);
+  doc.text(doc.splitTextToSize(currentPlate.plate.title, 3.25), 0.25, 1.2);
+
+  // dish subtitle
+  doc.setFontStyle('normal');
+  doc.setFontSize(12);
+  doc.text(doc.splitTextToSize(currentPlate.plate.subtitle, 3.25), 0.25, 1.4);
+
+  // dish ingredients
+  if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
+    doc.setFontSize(9);
+    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.75), 0.25, 1.65);
+  }
+
+  // instructions
+  if (currentPlate.hasOwnProperty('instructions')) {
+    doc.setFontStyle('normal');
+    doc.setFontSize(9);
+    doc.text(doc.splitTextToSize(currentPlate.instructions, 3.25), 0.25, 2);
+  }
+
+  // restrictions
+  if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
+    doc.setFontStyle('bold');
+    doc.setFontSize(9);
+    doc.text(doc.splitTextToSize(`Restrictions: ${userData.restrictions.map(rest => rest.title).join(', ')}`, 3.25), 0.25, 2.2);
+  }
+
+  console.log(currentPlate.plate.nutritional);
+  console.log(currentPlate.plate.nutritional[mealPortion]);
+
+  if (typeof currentPlate.plate.nutritional === "object" && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
+    //calories
+    doc.setFontStyle("normal");
+    doc.setFontSize(9);
+    const calories = [currentPlate.plate.nutritional[mealPortion].calories, "calories"];
+    doc.text(calories, 2, 2.65);
+
+    //protein
+    doc.setFontSize(9);
+    const protein = [currentPlate.plate.nutritional[mealPortion].proteins, "protein"];
+    doc.text(protein, 2.6, 2.65);
+
+    //carbs
+    doc.setFontSize(9);
+    const carbs = [currentPlate.plate.nutritional[mealPortion].carbs, "carbs"];
+    doc.text(carbs, 3.1, 2.65);
+
+    //fats
+    doc.setFontSize(9);
+    const fats = [currentPlate.plate.nutritional[mealPortion].fat, "fats"];
+    doc.text(fats, 3.55, 2.65);
+  }
+}
+
 class PlatingTable extends React.Component {
   constructor(props) {
     super(props);
@@ -80,7 +150,6 @@ class PlatingTable extends React.Component {
       lifestyleTitle: '',
       mealTitle: '',
 
-
       aggregateData: null,
       aggregateDataLoading: true,
     };
@@ -88,11 +157,7 @@ class PlatingTable extends React.Component {
     this.openAssignDialog = this.openAssignDialog.bind(this);
     this.closeAssignDialog = this.closeAssignDialog.bind(this);
 
-    this.handleMealAssignment = this.handleMealAssignment.bind(this);
-    this.handleMealReassignment = this.handleMealReassignment.bind(this);
-
-    this.renderPresentPlate = this.renderPresentPlate.bind(this);
-    this.getPlannerId = this.getPlannerId.bind(this);
+    this.printLabels = this.printLabels.bind(this);
   }
 
   componentDidMount() {
@@ -136,6 +201,117 @@ class PlatingTable extends React.Component {
     });
   }
 
+  printLabels() {
+    // console.log(this.props.currentSelectorDate);
+    // console.log(this.state.lifestyleSelected);
+    // console.log(this.state.mealSelected);
+
+
+
+    if (this.state.aggregateDataLoading) {
+      return;
+    }
+
+    const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
+    const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
+
+    console.log(currentPlate);
+
+    if (lifestylePlates.length === 0 || !currentPlate) {
+      this.props.popTheSnackbar({
+        message: `Could not find a dish for ${this.state.lifestyleTitle} ${this.state.mealTitle}.Please assign a dish.`,
+      });
+
+      return;
+    }
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'in',
+      format: [4, 3],
+    });
+
+    const aggregatedUsers = this.state.aggregateData.userData;
+
+    aggregatedUsers.filter(user => user.lifestyleId == this.state.lifestyleSelected &&
+      user[this.state.mealTitle.toLowerCase()] > 0 ||
+      user[`athletic${this.state.mealTitle}`] > 0 ||
+      user[`bodybuilder${this.state.mealTitle}`] > 0).forEach((userData, index) => {
+
+
+        if (this.state.mealTitle === 'Breakfast') {
+          if (userData.breakfast > 0) {
+            for (let i = 1; i <= userData.breakfast; i++) {
+
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast', 'regular');
+            }
+          }
+
+          if (userData.athleticBreakfast > 0) {
+            for (let i = 1; i <= userData.athleticBreakfast; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Athletic)', 'athletic');
+            }
+          }
+
+          if (userData.bodybuilderBreakfast > 0) {
+            for (let i = 1; i <= userData.bodybuilderBreakfast; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Bodybuilder)', 'bodybuilder');
+            }
+          }
+        }// Breakfast
+
+        if (this.state.mealTitle === 'Dinner') {
+          if (userData.dinner > 0) {
+            for (let i = 1; i <= userData.dinner; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner', 'regular');
+
+            }
+          }
+
+          if (userData.athleticDinner > 0) {
+            for (let i = 1; i <= userData.athleticDinner; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Athletic)', 'athletic');
+
+            }
+          }
+
+          if (userData.bodybuilderDinner > 0) {
+            for (let i = 1; i <= userData.bodybuilderDinner; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Bodybuilder)', 'bodybuilder');
+            }
+          }
+        } // Dinner
+
+        if (this.state.mealTitle === 'Lunch') {
+          if (userData.lunch > 0) {
+            for (let i = 1; i <= userData.lunch; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch', 'regular');
+            }
+          }
+
+          if (userData.athleticLunch > 0) {
+            for (let i = 1; i <= userData.athleticLunch; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Athletic)', 'athletic');
+
+            }
+          }
+
+          if (userData.bodybuilderLunch > 0) {
+            for (let i = 1; i <= userData.bodybuilderLunch; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Bodybuilder)', 'bodybuilder');
+
+            }
+          }
+        } // Lunch
+
+        // console.log(userData);
+      }); // map
+
+    doc.deletePage(1);
+
+    doc.save(`Plating_${this.state.lifestyleTitle} _${this.state.mealTitle} _${new Date().toDateString()} `);
+  }
+
   closeAssignDialog() {
     this.setState({
       selectedLifestyle: '',
@@ -144,155 +320,6 @@ class PlatingTable extends React.Component {
       assignDialogOpen: false,
     });
   }
-
-  rowSelected(e, event, checked) {
-    console.log(checked);
-
-    const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
-    $(`.${selectedRowId}`).toggleClass('row-selected');
-    let currentlySelectedCheckboxes;
-
-    const clonedSelectedCheckboxes = this.state.selectedCheckboxes ? this.state.selectedCheckboxes.slice() : [];
-
-    if ($(event.target).prop('checked')) {
-      currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber + 1;
-      clonedSelectedCheckboxes.push(e._id);
-    } else {
-      currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber - 1;
-      clonedSelectedCheckboxes.splice(clonedSelectedCheckboxes.indexOf(e._id), 1);
-    }
-
-    this.setState({
-      selectedCheckboxesNumber: currentlySelectedCheckboxes,
-      selectedCheckboxes: clonedSelectedCheckboxes,
-    });
-  }
-
-  selectAllRows(event) {
-    let allCheckboxIds = [];
-    console.log(event.target);
-
-    if ($(event.target).prop('checked')) {
-      $('.row-checkbox').each((index, el) => {
-        // make the row selected
-        $(`.${el.getAttribute('id')}`).addClass('row-selected');
-
-        // push the ids to a array
-        allCheckboxIds.push(el.getAttribute('id'));
-
-        // set each checkbox checked
-        $(el).children().find('input[type="checkbox"]').prop('checked', true);
-      });
-    } else {
-      allCheckboxIds = [];
-
-      $('.row-checkbox').each((index, el) => {
-        // // make the row selected
-        $(`.${el.getAttribute('id')}`).removeClass('row-selected');
-
-        // set each checkbox checked
-        $(el).children().find('input[type="checkbox"]').prop('checked', false);
-      });
-    }
-
-    this.setState({
-      selectedCheckboxesNumber: allCheckboxIds.length,
-      selectedCheckboxes: allCheckboxIds,
-    });
-  }
-
-  handleMealAssignment() {
-    localStorage.setItem('mealAssigned', this.state.selectedSugestion.title);
-    console.log(this.props.currentSelectorDate);
-    console.log(this.state.lifestyleSelected);
-    console.log(this.state.mealSelected);
-    console.log(this.state.selectedSugestion._id);
-
-    Meteor.call('mealPlanner.insert',
-      this.props.currentSelectorDate,
-      this.state.lifestyleSelected,
-      this.state.mealSelected,
-      this.state.selectedSugestion._id, (error) => {
-        if (error) {
-          this.props.popTheSnackbar({
-            message: error.reason,
-          });
-        } else {
-          this.props.popTheSnackbar({
-            message: `${localStorage.getItem('mealAssigned')} has been assigned.`,
-          });
-        }
-      });
-
-    this.setState({
-      assignDialogOpen: false,
-      selectedSuggestion: null,
-      lifestyleSelected: null,
-      mealSelected: null,
-    });
-  }
-
-  handleMealReassignment() {
-    localStorage.setItem('mealReassigned', this.state.selectedSugestion.title);
-
-    Meteor.call('mealPlanner.update', this.props.currentSelectorDate, this.state.reassignPlannerId, this.state.selectedSugestion._id, (error) => {
-      if (error) {
-        this.props.popTheSnackbar({
-          message: error.reason,
-        });
-      } else {
-        this.props.popTheSnackbar({
-          message: `${localStorage.getItem('mealReassigned')} meal has been assigned.`,
-        });
-      }
-    });
-
-    this.setState({
-      reassignDialogOpen: false,
-      selectedSuggestion: null,
-      reassignPlannerId: null,
-    });
-  }
-
-  renderNoResults(count) {
-    if (count == 0) {
-      return (
-        <p style={{ padding: '25px' }} className="subheading">No result found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo; on {moment(this.props.currentSelectorDate).format('DD MMMM, YYYY')}</p>
-      );
-    }
-  }
-
-  isCheckboxSelected(id) {
-    if (this.state.selectedCheckboxes.length) {
-      if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
-  isPlateAssigned(results, lifestyleId, mealId) {
-    if (results.findIndex(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId) !== -1) {
-      return true;
-    }
-
-    return false;
-  }
-
-  getPlannerId(results, lifestyleId, mealId) {
-    const foundResult = results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === this.props.currentSelectorDate) !== -1;
-
-    if (foundResult) {
-      return foundResult._id;
-    }
-  }
-
-  renderPresentPlate(results, lifestyleId, mealId, date) {
-    const plateToReturn = results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === date);
-    return (<Typography type="subheading">{plateToReturn.plate.title}</Typography>);
-  }
-
 
   render() {
     return (
@@ -337,7 +364,7 @@ class PlatingTable extends React.Component {
                 return (
                   this.props.meals && this.props.meals.filter(el => el.type === 'Main' || el.type === 'Main Course').map(meal => (
 
-                    <TableRow hover key={`${lifestyle._id}${meal._id}`}>
+                    <TableRow hover key={`${lifestyle._id} ${meal._id} `}>
 
                       <TableCell padding="none" style={{ width: '16.66%' }}>
                         <Typography className="subheading" type="subheading">{lifestyle.title}</Typography>
@@ -378,19 +405,10 @@ class PlatingTable extends React.Component {
                         style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
                         padding="none"
                       >
-                        {this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ? (
-                          <div>
-                            {this.renderPresentPlate(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate)}
-                            <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id,
-                              this.getPlannerId(this.props.results, lifestyle._id, meal._id))}
-                            >Reassign</Button>
-                          </div>
-                        ) : (
-                            <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                              <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>View</Button>
-                            </Typography>
-                          )
-                        }
+
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>View</Button>
+                        </Typography>
 
                       </TableCell>
 
@@ -407,14 +425,20 @@ class PlatingTable extends React.Component {
           </Table>
         </Paper>
 
-        <Dialog fullscreen={true} fullWidth={true} maxWidth={false} style={{ maxHeight: '100% !important', margin: '0', height: '100%' }}
-          open={this.state.assignDialogOpen} onClose={this.closeAssignDialog} transition={Transition}>
+        <Dialog
+          fullWidth
+          maxWidth={false}
+          style={{ maxHeight: '100% !important', margin: '0', height: '100%' }}
+          open={this.state.assignDialogOpen}
+          onClose={this.closeAssignDialog}
+          transition={Transition}
+        >
           <AppBar className={this.props.classes.appBar}>
             <Toolbar>
-              <Typography variant="title" type="title" color="inherit" className={this.props.classes.flex}>
+              <Typography type="title" color="inherit" className={this.props.classes.flex}>
                 Customers - {this.state.lifestyleTitle} {this.state.mealTitle.toLowerCase()}
               </Typography>
-              <Button color="inherit">
+              <Button color="inherit" onClick={this.printLabels}>
                 Print
               </Button>
               <IconButton color="inherit" onClick={this.closeAssignDialog} aria-label="Close">
@@ -438,59 +462,46 @@ class PlatingTable extends React.Component {
               </TableHead>
               <TableBody>
                 {!this.state.aggregateDataLoading &&
-                  this.state.aggregateData.userData.
-                    filter(user => user.lifestyleId == this.state.lifestyleSelected &&
-                      (user[`${this.state.mealTitle.toLowerCase()}`] > 0 ||
-                        user[`athletic${this.state.mealTitle}`] > 0 ||
-                        user[`bodybuilder${this.state.mealTitle}`] > 0)).map(n => {
+                  this.state.aggregateData.userData.filter(user => user.lifestyleId == this.state.lifestyleSelected &&
+                    (user[this.state.mealTitle.toLowerCase()] > 0 ||
+                      user[`athletic${this.state.mealTitle}`] > 0 ||
+                      user[`bodybuilder${this.state.mealTitle}`] > 0)).map((n) => {
+                        const mealType = this.state.mealTitle.toLowerCase();
+                        const mealTypeNormal = this.state.mealTitle;
 
-                          const mealType = this.state.mealTitle.toLowerCase();
-                          const mealTypeNormal = this.state.mealTitle;
+                        console.log(n);
 
-                          return (
-                            <TableRow>
-                              <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
-                              <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
-                              <TableCell>
-                                <Typography type="subheading">
-                                  {n[`${mealType}`] > 0 ? `Regular x${n[`${mealType}`]}` : ''}
-                                  {n[`athletic${mealTypeNormal}`] > 0 ? `Athletic x${n[`athletic${mealTypeNormal}`]}` : ''}
-                                  {n[`bodybuilder${mealTypeNormal}`] > 0 ? `Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}` : ''}
-                                </Typography>
-                              </TableCell>
-                              <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => { restriction.title }) : ''}</Typography></TableCell>
-                              <TableCell><Typography type="subheading">{n.restrictions ? n.restrictions.filter(e => e.type === "allergy").map(restriction => { restriction.title }) : ''}</Typography></TableCell>
-                              <TableCell><Typography type="subheading">{n.restrictions ? n.restrictions.filter(e => e.type === "dietary").map(restriction => { restriction.title }) : ''}</Typography></TableCell>
-                              <TableCell><Typography type="subheading">{n.restrictions ? n.restrictions.filter(e => e.type === "religious").map(restriction => { restriction.title }) : ''}</Typography></TableCell>
-                            </TableRow>
-                          );
-                        })}
+                        return (
+                          <TableRow key={Random.id()}>
+                            <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
+                            <TableCell>
+                              <Typography type="subheading">
+                                {n[mealType] > 0 ? `Regular x${n[`${mealType}`]}` : ''}
+                                {n[`athletic${mealTypeNormal}`] > 0 ? `Athletic x${n[`athletic${mealTypeNormal}`]}` : ''}
+                                {n[`bodybuilder${mealTypeNormal}`] > 0 ? `Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}` : ''}
+                              </Typography>
+                            </TableCell>
+                            <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title) : ''}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title) : ''}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title) : ''}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title) : ''}</Typography></TableCell>
+                          </TableRow>
+                        );
+                      })}
               </TableBody>
             </Table>
           </Paper>
-
-          {/* <DialogActions>
-            <Button onClick={this.closeAssignDialog} color="default">
-              Cancel
-            </Button>
-            <Button stroked onClick={this.handleMealAssignment} color="default">
-              Print
-            </Button>
-          </DialogActions> */}
         </Dialog>
 
-
-      </div >
+      </div>
     );
   }
 }
 
 PlatingTable.propTypes = {
-  results: PropTypes.isRequired,
+  results: PropTypes.array.isRequired,
   hasMore: PropTypes.bool.isRequired,
-  count: PropTypes.number.isRequired,
-  loadMore: PropTypes.func.isRequired,
-  categoryCount: PropTypes.number.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
   lifestyles: PropTypes.arrayOf(PropTypes.object).isRequired,
   meals: PropTypes.arrayOf(PropTypes.object).isRequired,

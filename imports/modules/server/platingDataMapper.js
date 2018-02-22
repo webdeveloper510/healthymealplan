@@ -41,30 +41,88 @@ function setUpLifestyles() {
 
   return dataByLifestyle;
 }
+
+function setUpPlates(lifestyles, nextDay) {
+  const lifestylePlates = [];
+  console.log('Inside setup PLATEs');
+
+  console.log(lifestyles);
+  console.log(nextDay);
+
+  lifestyles.forEach((e) => {
+    const currentLifestylePlates = {
+      _id: e.id,
+      plates: [],
+    };
+
+    const plates = MealPlanner.aggregate([
+      {
+        $match: { lifestyleId: e.id, onDate: nextDay },
+      },
+      {
+        $lookup: { from: 'Plates', localField: 'plateId', foreignField: '_id', as: 'plate' },
+      },
+      {
+        $lookup: { from: 'Instructions', localField: 'plate.instructionId', foreignField: '_id', as: 'instruction' },
+      },
+      { $unwind: '$plate' },
+      { $unwind: { path: '$instruction', preserveNullAndEmptyArrays: true } },
+      {
+        $project: {
+          mealId: 1,
+          plate: {
+            _id: 1,
+            title: 1,
+            subtitle: 1,
+            mealType: 1,
+            nutritional: 1,
+            ingredients: {
+              title: 1,
+            },
+          },
+          instruction: {
+            title: 1,
+            description: 1,
+          },
+        },
+      },
+    ]);
+
+    // console.log('plates for this lifestyle');
+    // console.log(plates);
+
+    currentLifestylePlates.plates.push(plates);
+
+    lifestylePlates.push(currentLifestylePlates);
+  });
+
+  return lifestylePlates;
+}
+
 /**
  *
  * @param {SubscriptionsAggregation} aggregatedSubs
  * @param {Moment Date} currentDay
  */
 export default function platingDataMapper(aggregatedSubs, currentDay) {
-  const allSubs = [];
   this.dataByLifestyle = setUpLifestyles();
   this.dataByCustomer = [];
   this.dataLabels = [];
   this.platingDate = currentDay;
+  this.dataPlatesPerLifestyle = setUpPlates(this.dataByLifestyle, moment(currentDay).add(1, 'd').format('YYYY-MM-DD'));
   // this.platingDay with 0 = sunday & 6 = saturday
   this.platingDay = moment(currentDay).day();
 
-  console.log(this.dataByLifestyle);
+  // console.log(this.dataByLifestyle);
 
-  console.log(currentDay);
-  console.log(`Plating day${this.platingDay}`);
+  // console.log(currentDay);
+  // console.log(`Plating day${this.platingDay}`);
 
   this.appendDataToLifestyle = function (scheduleDays, lifestyleIndex) {
-    console.log("INSIDE APPEND DATA TO LIFESTYLE")
-    console.log(lifestyleIndex)
-    console.log(this.dataByLifestyle[lifestyleIndex]);
-    console.log('Schedule array');
+    // console.log('INSIDE APPEND DATA TO LIFESTYLE');
+    // console.log(lifestyleIndex);
+    // console.log(this.dataByLifestyle[lifestyleIndex]);
+    // console.log('Schedule array');
 
     scheduleDays.forEach((e) => {
       console.log(e);
@@ -83,21 +141,8 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
     });
   };
 
-  this.gatherLabelData = (customer, schedule, lifestyle) => {
-
-  };
-
   this.appendDataToCustomers = function (scheduleDays, customer, delivery) {
-    console.log("INSIDE APPEND DATA TO CUSTOMERS")
-
-    console.log(customer);
     const lifestyleActual = Lifestyles.findOne({ _id: customer.lifestyle });
-    const mealTypes = Meals.find({ title: { $in: ['Breakfast', 'Lunch', 'Dinner'] } }).fetch();
-
-    console.log("MEALS FOR CURRENT DAY " + this.platingDate);
-    const mealsPlannedForCurrentDay = MealPlanner.find({ lifestyleId: customer.lifestyle, onDate: this.platingDate }).fetch();
-
-    console.log(mealsPlannedForCurrentDay);
 
     const customerToAdd = {
       _id: customer._id,
@@ -131,7 +176,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
     };
 
     scheduleDays.forEach((e) => {
-
       if (e.breakfast.active) {
         if (e.breakfast.portions == 'athletic') {
           customerToAdd.athleticBreakfast += parseInt(e.breakfast.quantity, 10);
@@ -164,71 +208,13 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
     });
 
     if (customer.restrictions.length > 0) {
-      customerToAdd.restrictions = Restrictions.find({ _id: { $in: customer.restrictions } }, { fields: { _id: 1, title: 1, type: 1 } }).fetch();
+      customerToAdd.restrictions = Restrictions.find({ _id: { $in: customer.restrictions } }).fetch();
     }
 
     if (lifestyleActual.restrictions.length > 0) {
-      customerToAdd.lifestyleRestrictions = Restrictions.find({ _id: { $in: lifestyleActual.restrictions } }, { fields: { _id: 1, title: 1, type: 1 } }).fetch();
+      customerToAdd.lifestyleRestrictions = Restrictions.find({ _id: { $in: lifestyleActual.restrictions } }).fetch();
     }
 
-
-    // if (customerToAdd.breakfast > 0 || customerToAdd.athleticBreakfast > 0 || customerToAdd.bodybuilderBreakfast > 0) {
-    //   const breakfastType = mealTypes.find(el => el.title === "Breakfast");
-    //   console.log("Breakfast Type")
-    //   console.log(breakfastType);
-
-    //   const breakfastMeals = mealsPlannedForCurrentDay.find(el => el.mealId === breakfastType._id);
-    //   console.log("Breakfast Meals")
-    //   console.log(breakfastMeals);
-
-    //   customerToAdd.breakfastPlate = Plates.aggregate([
-    //     {
-    //       $match: { _id: breakfastMeals.plateId, }
-    //     },
-    //     {
-    //       $lookup: { from: 'Instructions', localField: 'instructionId', foreignField: '_id', as: 'instruction' }
-    //     },
-    //     {
-    //       $project: { title: 1, subtitle: 1, mealType: 1, ingredients: 1, instructionId: 1, nutritional: 1, instruction: 1 }
-    //     }
-    //   ]);
-    // }
-
-    // if (customerToAdd.lunch > 0 || customerToAdd.athleticLunch > 0 || customerToAdd.bodybuilderLunch > 0) {
-    //   const lunchType = mealTypes.find(el => el.title === "Lunch");
-
-    //   const lunchMeals = mealsPlannedForCurrentDay.find(el => el.mealId === lunchType._id);
-
-    //   customerToAdd.lunchPlate = Plates.aggregate([
-    //     {
-    //       $match: { _id: lunchMeals.plateId, }
-    //     },
-    //     {
-    //       $lookup: { from: 'Instructions', localField: 'instructionId', foreignField: '_id', as: 'instruction' }
-    //     },
-    //     {
-    //       $project: { title: 1, subtitle: 1, mealType: 1, ingredients: 1, instructionId: 1, nutritional: 1, instruction: 1 }
-    //     }
-    //   ]);
-    // }
-
-    // if (customerToAdd.dinner > 0 || customerToAdd.athleticDinner > 0 || customerToAdd.bodybuilderDinner > 0) {
-    //   const dinnerType = mealTypes.find(el => el.title === "Dinner");
-
-    //   const dinnerMeals = mealsPlannedForCurrentDay.find(el => el.mealId === dinnerType._id);
-
-    //   customerToAdd.dinnerPlate = Plates.aggregate([
-    //     {
-    //       $match: { _id: dinnerhMeals.plateId, }
-    //     },
-    //     {
-    //       $lookup: { from: 'Instructions', localField: 'instructionId', foreignField: '_id', as: 'instruction' }
-    //     },
-    //     {
-    //       $project: { title: 1, subtitle: 1, mealType: 1, ingredients: 1, instructionId: 1, nutritional: 1, instruction: 1 }
-    //     }
-    //   ]);
-    // }
 
     this.dataByCustomer.push(customerToAdd);
   };
@@ -237,14 +223,19 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
     const subscription = aggregatedSubs[i];
     const delivery = subscription.delivery;
 
+    console.log(`Subscription ID: ${subscription._id}`);
+    console.log('Complete Schedule');
+    console.log(subscription.completeSchedule);
+
+
     subscription.customers.forEach((customer) => {
       console.log('Customer from sub');
-      console.log(customer);
+      console.log(customer.specifcRestrictions);
       const customerId = customer._id;
       const customerSchedule = customer.schedule;
       const customerLifestyleId = customer.lifestyle;
       const lifestyleIndex = this.dataByLifestyle.findIndex(e => e.id === customerLifestyleId);
-      console.log("Lifestyle Index" + lifestyleIndex)
+      // console.log(`Lifestyle Index${lifestyleIndex}`);
 
       for (let index = 0; index < delivery.length; index++) {
         const e = delivery[index];
@@ -286,7 +277,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[0]], customer, delivery);
-
               }
               // set cooking as sunday
             }
@@ -295,7 +285,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0], customerSchedule[1], customerSchedule[2]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[0], customerSchedule[1], customerSchedule[2]], customer, delivery);
-
               }
               // set cooking for sunday
             } else if (nextDay === '' && dayAfterTomorrow === 'dayOfPaired') {
@@ -304,7 +293,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0], customerSchedule[2]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[0], customerSchedule[2]], customer, delivery);
-
               }
               // summation of monday and wednesday meals
               // set cooking for sunday
@@ -312,7 +300,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0], customerSchedule[1]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[0], customerSchedule[1]], customer, delivery);
-
               }
               // set cooking as sunday
             } else {
@@ -321,7 +308,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[0]], customer, delivery);
-
               }
               // sumation of monday meals
               // set cooking as sunday
@@ -333,10 +319,8 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
           if (e === 'nightBefore') {
             if (nextDay === 'nightBeforePaired' && dayAfterTomorrow === 'nightBeforePaired') {
               if (this.platingDay == 1) {
-
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[2], customerSchedule[3]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[1], customerSchedule[2], customerSchedule[3]], customer, delivery);
-
               }
               // set cooking as monday
             } else if (nextDay === '' && dayAfterTomorrow === 'nightBeforePaired') {
@@ -344,7 +328,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[3]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[1], customerSchedule[3]], customer, delivery);
-
               }
               // summation of tuesday and thursday mealss
               // set cooking as monday
@@ -353,7 +336,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[2]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[1], customerSchedule[2]], customer, delivery);
-
               }
               // summation of tuesday and wednesday meals
               // set cooking as monday
@@ -362,7 +344,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[1]], customer, delivery);
-
               }
               // summation of tuesday meals
               // set cooking as monday
@@ -380,7 +361,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[3]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[1], customerSchedule[3]], customer, delivery);
-
               }
               // set cooking as monday
             } else if (nextDay === 'dayOfPaired') {
@@ -388,7 +368,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[2]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[1], customerSchedule[2]], customer, delivery);
-
               }
               // summation of tuesday and wednesday meals
               // set cooking as monday
@@ -397,7 +376,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[1]], customer, delivery);
-
               }
               // set cooking as monday
             }
@@ -406,7 +384,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
             if (this.platingDay == 0) {
               this.appendDataToLifestyle([customerSchedule[1]], lifestyleIndex);
               this.appendDataToCustomers([customerSchedule[1]], customer, delivery);
-
             }
             // set cooking as sunday
           } else if (e === 'dayOfMonday') {
@@ -414,7 +391,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
             if (this.platingDay == 0) {
               this.appendDataToLifestyle([customerSchedule[1]], lifestyleIndex);
               this.appendDataToCustomers([customerSchedule[1]], customer, delivery);
-
             }
             // set cooking as sunday
           }
@@ -428,7 +404,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2], customerSchedule[3], customerSchedule[4]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[2], customerSchedule[3], customerSchedule[4]], customer, delivery);
-
               }
               // set cooking as tuesday
             } else if (nextDay === '' && dayAfterTomorrow === 'nightBeforePaired') {
@@ -437,7 +412,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2], customerSchedule[4]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[2], customerSchedule[4]], customer, delivery);
-
               }
 
               // set cooking as tuesday
@@ -447,7 +421,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2], customerSchedule[3]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[2], customerSchedule[3]], customer, delivery);
-
               }
               // set cooking as tuesday
             } else {
@@ -456,7 +429,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[2]], customer, delivery);
-
               }
               // set cooking as tuesday
             }
@@ -483,7 +455,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2], customerSchedule[3]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[2], customerSchedule[3]], customer, delivery);
-
               }
               // set cooking as tuesday
             } else {
@@ -492,7 +463,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[2]], customer, delivery);
-
               }
               // set cooking as tuesday
             }
@@ -510,7 +480,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
             if (this.platingDay == 0) {
               this.appendDataToLifestyle([customerSchedule[2]], lifestyleIndex);
               this.appendDataToCustomers([customerSchedule[2]], customer, delivery);
-
             }
             // set cooking as sunday
           } else if (e === 'nightBeforeMonday') {
@@ -527,7 +496,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
             if (this.platingDay == 1) {
               this.appendDataToLifestyle([customerSchedule[2]], lifestyleIndex);
               this.appendDataToCustomers([customerSchedule[2]], customer, delivery);
-
             }
             // set cooking as monday
           }
@@ -542,7 +510,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 3) {
                 this.appendDataToLifestyle([customerSchedule[3], customerSchedule[4]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[3], customerSchedule[4]], customer, delivery);
-
               }
             } else {
               // set delivery for thursday as wednesday night
@@ -614,19 +581,16 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               if (this.platingDay == 4) {
                 this.appendDataToLifestyle([customerSchedule[4], customerSchedule[5], customerSchedule[6]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[4], customerSchedule[5], customerSchedule[6]], customer, delivery);
-
               }
             } else if (this.platingDay == 4) {
               this.appendDataToLifestyle([customerSchedule[4]], lifestyleIndex);
               this.appendDataToCustomers([customerSchedule[4]], customer, delivery);
-
             }
           } else if (e === 'dayOf') {
             if (nextDay == 'dayOfFriday' || nextDay == 'dayOf') {
               if (this.platingDay == 4) {
                 this.appendDataToLifestyle([customerSchedule[4], customerSchedule[5], customerSchedule[6]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[4], customerSchedule[5], customerSchedule[6]], customer, delivery);
-
               }
             } else if (this.platingDay == 4) {
               this.appendDataToLifestyle([customerSchedule[4]], lifestyleIndex);
@@ -695,5 +659,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
   return {
     tableData: this.dataByLifestyle,
     userData: this.dataByCustomer,
+    plates: this.dataPlatesPerLifestyle,
   };
 }

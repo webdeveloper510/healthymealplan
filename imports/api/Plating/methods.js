@@ -66,7 +66,7 @@ Meteor.methods({
       {
         $project: {
           _id: 1,
-          // completeSchedule: 1,
+          completeSchedule: 1,
           delivery: 1,
           customers: {
             _id: 1,

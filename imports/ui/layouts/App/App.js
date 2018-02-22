@@ -54,7 +54,7 @@ import EditCategory from '../../pages/EditCategory/EditCategory';
 
 import Customers from '../../pages/Customers/Customers';
 import NewCustomer from '../../pages/NewCustomer/NewCustomer';
-// import EditCategory from '../../pages/EditCategory/EditCategory';
+import EditCustomer from '../../pages/EditCustomer/EditCustomer';
 
 import Directions from '../../pages/Directions/Directions';
 
@@ -536,6 +536,14 @@ class App extends React.Component {
                       path="/customers/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewCustomer}
+                      {...this.props}
+                    />
+
+                    <Authenticated
+                      exact
+                      path="/customers/:_id/edit"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={EditCustomer}
                       {...this.props}
                     />
 
