@@ -13,6 +13,7 @@ import moment from 'moment';
  * Iterates all the lifestyles and fills up the array with objects for table values for each of the meal types.
  *
  */
+
 function setUpLifestyles() {
   const dataByLifestyle = [];
 

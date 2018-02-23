@@ -1,9 +1,7 @@
-// import { Email } from 'meteor/email';
 import moment from 'moment';
 
 import './accounts';
 import './api';
-// import './fixtures';
 import './email';
 
 import './jobs';
@@ -18,15 +16,6 @@ import Subscriptions from '../../api/Subscriptions/Subscriptions';
 import Deliveries from '../../api/Deliveries/Deliveries';
 import sendDeliveredEmail from '../../api/Deliveries/server/send-delivered-email';
 import MealPlanner from '../../api/MealPlanner/MealPlanner';
-
-
-// Email.send({
-//   from: 'mailgun@sandboxf5538b27bf3f458ea825bc8f3cbe365e.mailgun.org',
-//   to: 'jivanyesh@gmail.com',
-//   subject: 'Test',
-//   text: 'This is a test',
-// });
-
 
 const job = new Job(Jobs, 'createInvoices', {});
 
