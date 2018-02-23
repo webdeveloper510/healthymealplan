@@ -358,7 +358,7 @@ class PlatingTable extends React.Component {
             </TableHead>
             <TableBody>
 
-              {this.props.lifestyles && !this.aggregateDataLoading && this.props.lifestyles.map((lifestyle) => {
+              {this.props.lifestyles && !this.state.aggregateDataLoading && this.props.lifestyles.map((lifestyle) => {
                 const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === lifestyle._id);
 
                 return (
