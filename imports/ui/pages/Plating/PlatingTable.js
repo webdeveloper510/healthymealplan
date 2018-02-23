@@ -384,20 +384,20 @@ class PlatingTable extends React.Component {
 
                       <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
                         <Typography type="subheading">
-                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()].regular}
+                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].regular}
                         </Typography>
                       </TableCell>
 
                       <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
                         <Typography type="subheading">
-                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()].athletic}
+                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].athletic}
 
                         </Typography>
                       </TableCell>
 
                       <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
                         <Typography type="subheading">
-                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()].bodybuilder}
+                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].bodybuilder}
                         </Typography>
                       </TableCell>
 
