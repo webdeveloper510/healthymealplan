@@ -328,8 +328,8 @@ class CustomerEditor extends React.Component {
     // to and overriding keys in `fieldValues` with the `fields` using Object.assign
     // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/assign
     const clonedCustomerInfo = this.state.customerInfo;
-    const newCustomerInfo =  assign({}, clonedCustomerInfo, fields);
-    
+    const newCustomerInfo = assign({}, clonedCustomerInfo, fields);
+
     this.setState({
       customerInfo: newCustomerInfo
     });

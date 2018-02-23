@@ -17,6 +17,12 @@ Meteor.publish('subscriptions.view', (subId) => {
   return Subscriptions.find({ _id: subId });
 });
 
+Meteor.publish('subscriptions.single', (cusId) => {
+  check(cusId, String);
+
+  return Subscriptions.find({ customerId: cusId });
+});
+
 Meteor.publish('subscriptions-all-count', function categoryCount() {
   Counts.publish(this, 'subscriptions', Subscriptions.find());
 });

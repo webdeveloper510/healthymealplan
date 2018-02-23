@@ -326,8 +326,8 @@ class App extends React.Component {
                     </Button>
                   </Link>
                 ) : (
-                    ''
-                  ),
+                  ''
+                ),
                 <IconButton
                   key="close"
                   aria-label="Close"
@@ -409,8 +409,8 @@ class App extends React.Component {
                   </Toolbar>
                 </AppBar>
               ) : (
-                  ''
-                )}
+                ''
+              )}
               {this.props.authenticated ? (
                 <div style={{ backgroundColor: '#FFFFFF' }}>
                   <Hidden mdUp>
@@ -490,8 +490,8 @@ class App extends React.Component {
                   </Hidden>
                 </div>
               ) : (
-                  ''
-                )}
+                ''
+              )}
 
               <main
                 className={
@@ -869,8 +869,8 @@ class App extends React.Component {
                   </Switch>
 
                 ) : (
-                    ''
-                  )}
+                  ''
+                )}
               </main>
             </div>
           </div>

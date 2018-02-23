@@ -4,8 +4,6 @@ import { Mongo } from 'meteor/mongo';
 import { Match } from 'meteor/check';
 import { check } from 'meteor/check';
 
-import Subscriptions from '../../Subscriptions/Subscriptions';
-
 Meteor.publish('users.editProfile', function usersProfile() {
   return Meteor.users.find(this.userId, {
     fields: {
@@ -37,39 +35,17 @@ Meteor.publish('users.customers', (query, selector) => {
 
 
 Meteor.publish('user.customer.single', (customerId) => {
+  check(customerId, String);
 
   return Meteor.users.find({ _id: customerId, roles: ['customer'] });
 });
 
+Meteor.publish('user.secondaryAccounts', (customerId) => {
+  check(customerId, String);
 
-// Meteor.publish('users.activeCustomers.mealTypeAggregate', (query, selector) => {
+  return Meteor.users.find({ priamryAccount: customerId, roles: ['customer'] });
+});
 
-//   const userAggregate = Subscriptions.aggregate([
-//     {
-//       $match: {
-//         status: 'active',
-//       }
-//     },
-//     {
-//       $lookup: {
-//         from: 'users',
-//         localField: 'customerId',
-//         foreignField: '_id',
-//         as: 'customer',
-//       },
-//     },
-//     {
-//       $unwind: '$customer',
-//     },
-//     {
-
-//     }
-//   ]);
-
-//   return userAggregate;
-
-
-// });
 
 Meteor.publish('customers-all-count', function customersCount() {
   Counts.publish(

@@ -171,10 +171,29 @@ class Step3Delivery extends React.Component {
   }
 
   handleSubmitStep() {
+
+    const check = this.state.completeSchedule.map(day => (day.breakfast + day.lunch + day.dinner) > 0);
+
+    console.log(check);
+
+    for (let index = 0; index < this.state.deliveryType.length; index++) {
+      const element = this.state.deliveryType[index];
+
+      if (((element == "" || element == "false") && check[index] > 0 && index != 6)) {
+        this.props.popTheSnackbar({
+          message: "Please select all the delivery options in the schedule."
+        });
+
+        return;
+      }
+    }
+
+    
     this.setState({
       submitSuccess: true,
       submitLoading: false,
     });
+
 
     const address = {
       type: this.state.addressType,

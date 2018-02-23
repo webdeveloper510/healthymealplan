@@ -143,7 +143,6 @@ Meteor.methods({
 
     const subscriptionIdToSave = Random.id();
 
-
     Meteor.users.update(
       { _id: customerInfo.id },
       {
@@ -151,6 +150,7 @@ Meteor.methods({
           address: customerInfo.address,
           subscriptionId: subscriptionIdToSave,
           lifestyle: customerInfo.primaryProfileBilling.lifestyle._id,
+          discount: customerInfo.primaryProfileBilling.discount,
           restrictions: customerInfo.primaryProfileBilling.restrictions,
           specificRestrictions:
             customerInfo.primaryProfileBilling.specificRestrictions,
@@ -197,6 +197,7 @@ Meteor.methods({
               subscriptionId: subscriptionIdToSave,
               lifestyle:
                 customerInfo.secondaryProfilesBilling[index].lifestyle._id,
+              discount: customerInfo.secondaryProfilesBilling[index].discount,
               restrictions:
                 customerInfo.secondaryProfilesBilling[index].restrictions,
               specificRestrictions:
