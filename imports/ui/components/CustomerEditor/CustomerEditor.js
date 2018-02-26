@@ -147,6 +147,8 @@ class CustomerEditor extends React.Component {
           },
         ],
 
+        activeImmediate: false,
+
         secondaryProfileCount: 0,
         secondaryProfiles: [],
 

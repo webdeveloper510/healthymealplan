@@ -9,14 +9,15 @@ import NotFound from '../NotFound/NotFound';
 import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
 import Restrictions from '../../../api/Restrictions/Restrictions';
+import Ingredients from '../../../api/Ingredients/Ingredients';
 
-const EditCustomer = ({ customer, history, subscription, secondaryAccounts, popTheSnackbar, lifestyles, restrictions }) => (customer ? (
+const EditCustomer = ({ customer, history, subscription, secondaryAccounts, popTheSnackbar, lifestyles, restrictions, potentialSubIngredients }) => (customer ? (
   <div className="EditCurrentCustomer">
     <Grid container className="EditCategory SideContent SideContent--spacer-2x--horizontal">
       <CurrentCustomerEditor
         lifestyles={lifestyles}
         restrictions={restrictions}
-
+        potentialSubIngredients={potentialSubIngredients}
         popTheSnackbar={popTheSnackbar}
         secondaryAccounts={secondaryAccounts}
         subscription={subscription}
@@ -45,14 +46,16 @@ export default createContainer(({ match }) => {
   const subscription3 = Meteor.subscribe('user.secondaryAccounts', customerId);
   const subscription4 = Meteor.subscribe('lifestyles');
   const subscription5 = Meteor.subscribe('restrictions');
+  const subscription6 = Meteor.subscribe('ingredients');
 
   return {
-    loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready(),
+    loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready() && !subscription6.ready(),
     customer: Meteor.users.findOne(customerId),
     subscription: Subscriptions.findOne(customerId),
     secondaryAccounts: Meteor.users.find({ primaryAccount: customerId }).fetch(),
     lifestyles: Lifestyles.find().fetch(),
-    restrictions: Restrictions.find().fetch()
+    restrictions: Restrictions.find().fetch(),
+    potentialSubIngredients: Ingredients.find().fetch(),
 
   };
 }, EditCustomer);

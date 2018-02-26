@@ -55,6 +55,30 @@ Meteor.methods({
     return empId;
   },
 
+  'customers.delete': function deleteCustomer(id) {
+
+    check(id, String);
+
+
+    try {
+      const toDelete = Meteor.users.findOne({ _id: id });
+
+      Subscriptions.remove({ customerId: id });
+
+      if (toDelete.associatedProfiles > 0) {
+        Meteor.users.remove({ _id: { $in: [id, ...toDelete.secondaryAccounts] } });
+      } else {
+        Meteor.users.remove({ _id: id });
+      }
+
+      return true;
+
+    } catch (error) {
+      console.log(error);
+      throw new Meteor.Error('problem-deleteing-profile', "There was a problem deleting the profile");
+    }
+  },
+
   'customers.step1': function customerStep1(data) {
     check(data, {
       email: String,
@@ -65,7 +89,7 @@ Meteor.methods({
     });
 
     const postalCodeExists = PostalCodes.find({
-      title: data.postalCode.substr(0, 3),
+      title: data.postalCode.substr(0, 3).toUpperCase(),
     }).fetch();
 
     console.log(postalCodeExists);
@@ -92,7 +116,7 @@ Meteor.methods({
       { _id: userId },
       {
         $set: {
-          postalCode: data.postalCode,
+          postalCode: data.postalCode.toUpperCase(),
           postalCodeId: postalCodeExists.length ? postalCodeExists[0]._id : null,
           status: 'abandoned',
           phone: data.phoneNumber,
@@ -157,8 +181,8 @@ Meteor.methods({
           preferences: customerInfo.primaryProfileBilling.preferences,
           schedule: customerInfo.scheduleReal,
 
-          subscriptionStartDate: customerInfo.subscriptionStartDate,
-          subscriptionStartDateRaw: customerInfo.subscriptionStartDateRaw,
+          subscriptionStartDate: customerInfo.activeImmediate ? new Date() : customerInfo.subscriptionStartDate,
+          subscriptionStartDateRaw: customerInfo.activeImmediate ? new Date() : customerInfo.subscriptionStartDateRaw,
           associatedProfiles: customerInfo.secondaryProfileCount,
         },
       },
@@ -426,7 +450,7 @@ Meteor.methods({
     const subscriptionId = Subscriptions.insert({
       _id: subscriptionIdToSave,
       customerId: customerInfo.id,
-      status: 'paused',
+      status: customerInfo.activeImmediate ? 'active' : 'paused',
       paymentMethod: customerInfo.paymentMethod,
       amount: actualTotal,
       taxExempt: customerInfo.taxExempt,
@@ -437,28 +461,32 @@ Meteor.methods({
 
     console.log(subscriptionId);
 
-    const lastWeeksSaturday = moment(
-      customerInfo.subscriptionStartDateRaw,
-    ).tz('America/Toronto').subtract(2, 'd');
+    if (customerInfo.activeImmediate == false) {
 
-    const job = new Job(
-      Jobs,
-      'setSubscriptionActive', // type of job
-      {
-        subscriptionId,
-        customerId: customerInfo.id,
-      },
-    );
-    const a = moment(lastWeeksSaturday).tz('America/Toronto');
-    const b = moment().tz('America/Toronto').startOf('day');
-    a.diff(b);
+      const lastWeeksSaturday = moment(
+        customerInfo.subscriptionStartDateRaw,
+      ).tz('America/Toronto').subtract(2, 'd');
 
-    console.log(a.diff(b));
+      const job = new Job(
+        Jobs,
+        'setSubscriptionActive', // type of job
+        {
+          subscriptionId,
+          customerId: customerInfo.id,
+        },
+      );
+      const a = moment(lastWeeksSaturday).tz('America/Toronto');
+      const b = moment().tz('America/Toronto').startOf('day');
+      a.diff(b);
 
-    job
-      .priority('normal')
-      .delay(Math.abs(a.diff(b))) // Wait an hour before first try
-      .save(); // Commit it to the server
+      console.log(a.diff(b));
+
+      job
+        .priority('normal')
+        .delay(Math.abs(a.diff(b))) // Wait an hour before first try
+        .save(); // Commit it to the server
+
+    }
   },
 
   'customers.step5': function customerStep5(opaqueData, customerInfo) {

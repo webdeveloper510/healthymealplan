@@ -31,6 +31,8 @@ class CustomersTable extends React.Component {
 
     this.state = {
       selectedCheckboxes: [],
+      selectedCustomerName: '',
+      selectedCustomerId: '',
       selectedCheckboxesNumber: 0,
       deleteDialogOpen: false,
     };
@@ -154,7 +156,7 @@ class CustomersTable extends React.Component {
           No customers found{' '}
           {this.props.searchTerm
             ? `for &lsquo;<span className="font-medium">${
-              this.props.searchTerm
+            this.props.searchTerm
             }</span>&rsquo;`
             : ''}
         </p>
@@ -174,12 +176,39 @@ class CustomersTable extends React.Component {
     return false;
   }
 
-  deleteDialogHandleClickOpen() {
-    this.setState({ deleteDialogOpen: true });
+  deleteDialogHandleClickOpen(id, name) {
+    this.setState({
+      deleteDialogOpen: true,
+      selectedCustomerName: name,
+      selectedCustomerId: id,
+    });
   }
 
   deleteDialogHandleRequestClose() {
     this.setState({ deleteDialogOpen: false });
+  }
+
+  handleDeleteCustomer(customerId) {
+
+    console.log(customerId);
+
+    this.deleteDialogHandleRequestClose();
+
+    Meteor.call('customers.delete', customerId, (err, res) => {
+
+      if (!err) {
+        this.props.popTheSnackbar({
+          message: `${this.state.selectedCustomerName} successfully removed.`
+        })
+      } else {
+        console.log(err);
+        this.props.popTheSnackbar({
+          message: 'There was a problem deleting this user'
+        })
+      }
+
+    });
+
   }
 
   render() {
@@ -208,28 +237,24 @@ class CustomersTable extends React.Component {
               </Button>
             </div>
           ) : (
-            ''
-          )}
+              ''
+            )}
           <Table className="table-container" style={{ tableLayout: 'fixed' }}>
             {this.props.count > 0 ? (
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox" style={{ width: '7%' }}>
-                    <Checkbox onChange={this.selectAllRows.bind(this)} />
-                  </TableCell>
+
                   <TableCell
-                    padding="none"
-                    style={{ width: '20%' }}
-                    onClick={() => this.props.sortByOptions('SKU')}
+                    style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                    onClick={() => this.props.sortByOptions('_id')}
                   >
                     <Typography className="body2" type="body2">
                       ID
                     </Typography>
                   </TableCell>
                   <TableCell
-                    padding="none"
-                    style={{ width: '20%' }}
-                    onClick={() => this.props.sortByOptions('SKU')}
+                    style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                    onClick={() => this.props.sortByOptions('profile.name.first')}
                   >
                     <Typography className="body2" type="body2">
                       Name
@@ -237,8 +262,7 @@ class CustomersTable extends React.Component {
                   </TableCell>
 
                   <TableCell
-                    padding="none"
-                    style={{ width: '20%' }}
+                    style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
                     onClick={() => this.props.sortByOptions('SKU')}
                   >
                     <Typography className="body2" type="body2">
@@ -246,27 +270,44 @@ class CustomersTable extends React.Component {
                     </Typography>
                   </TableCell>
                   <TableCell
-                    padding="none"
-                    style={{ width: '20%' }}
-                    onClick={() => this.props.sortByOptions('SKU')}
+                    style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                    onClick={() => this.props.sortByOptions('subscription.status')}
                   >
                     <Typography className="body2" type="body2">
                       Status
                     </Typography>
                   </TableCell>
+                  <TableCell
+                    style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                  >
+
+                  </TableCell>
                 </TableRow>
               </TableHead>
             ) : (
-              ''
-            )}
+                ''
+              )}
             <TableBody>
               {this.props.results.map((e, i) => {
-                const subscription = e.subscription.fetch()[0];
-                const isSelected = this.isCheckboxSelected(e._id);
+                // const subscription = e.subscription.fetch()[0];
+                // const isSelected = this.isCheckboxSelected(e._id);
+
+                // console.log(e.subscription);
+
+                let name = "";
+
+                if (e.profile && e.profile.name) {
+                  name = e.profile.name.first;
+                }
+
+                if (e.profile && e.profile.name && e.profile.name.last) {
+                  name += " " + e.profile.name.last;
+                }
+
 
                 return (
                   <TableRow hover className={e._id} key={e._id}>
-                    <TableCell
+                    {/* <TableCell
                       style={{
                         paddingTop: '10px',
                         paddingBottom: '10px',
@@ -280,11 +321,13 @@ class CustomersTable extends React.Component {
                         checked={isSelected}
                         onChange={this.rowSelected.bind(this, e)}
                       />
-                    </TableCell>
+                    </TableCell> */}
+
+
 
                     <TableCell
-                      padding="none"
-                      style={{ width: '20%' }}
+
+                      style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
                       onClick={() =>
                         this.props.history.push(`/customers/${e._id}/edit`)
                       }
@@ -295,19 +338,20 @@ class CustomersTable extends React.Component {
                     </TableCell>
 
                     <TableCell
-                      padding="none"
-                      style={{ width: '20%' }}
+
+                      style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
                       onClick={() =>
                         this.props.history.push(`/customers/${e._id}/edit`)
                       }
                     >
                       <Typography className="subheading" type="subheading">
-                        {e.profile && e.profile.name
+                        {/* {e.profile && e.profile.name
                           ? `${e.profile.name.first}`
                           : ''}{' '}
                         {e.profile && e.profile.name && e.profile.name.last
                           ? `${e.profile.name.last}`
-                          : ''}
+                          : ''} */}
+                        {name}
                       </Typography>
                       <Typography className="body2" type="body2">
                         {e.associatedProfiles
@@ -320,8 +364,8 @@ class CustomersTable extends React.Component {
                     </TableCell>
 
                     <TableCell
-                      padding="none"
-                      style={{ width: '20%' }}
+
+                      style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
                       onClick={() =>
                         this.props.history.push(`/customers/${e._id}/edit`)
                       }
@@ -331,15 +375,22 @@ class CustomersTable extends React.Component {
                       </Typography>
                     </TableCell>
                     <TableCell
-                      padding="none"
-                      style={{ width: '20%' }}
+
+                      style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
                       onClick={() =>
                         this.props.history.push(`/customers/${e._id}/edit`)
                       }
                     >
                       <Typography className="subheading" type="subheading">
-                        {subscription ? subscription.status.toUpperCase() : '-'}
+                        {e.subscription ? e.subscription.status : ''}
                       </Typography>
+                    </TableCell>
+
+                    <TableCell
+
+                      style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                    >
+                      <Button color="secondary" onClick={this.deleteDialogHandleClickOpen.bind(this, e._id, name)}>Delete</Button>
                     </TableCell>
                   </TableRow>
                 );
@@ -374,15 +425,15 @@ class CustomersTable extends React.Component {
                     <Button onClick={this.props.loadMore}>Load More</Button>
                   </TableCell>
                 ) : (
-                  ''
-                )}
+                    ''
+                  )}
               </TableRow>
             </TableFooter>
           </Table>
         </Paper>
         <Dialog
           open={this.state.deleteDialogOpen}
-          onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+          onClose={this.deleteDialogHandleRequestClose.bind(this)}
         >
           <Typography
             style={{
@@ -393,16 +444,12 @@ class CustomersTable extends React.Component {
             className="title font-medium"
             type="title"
           >
-            Delete {this.state.selectedCheckboxesNumber} lifestyle{this.state
-              .selectedCheckboxes.length > 1
-              ? 's'
-              : ''}?
+            Delete {this.state.selectedCustomerName}?
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading">
-              {' '}
-              Are you sure you want to delete{' '}
-              {this.state.selectedCheckboxesNumber} lifestyles?
+              Are you sure you want to delete {this.state.selectedCustomerName}?
+              This will delete all the secondary profiles associated with this customer.
             </DialogContentText>
           </DialogContent>
           <DialogActions>
@@ -415,7 +462,7 @@ class CustomersTable extends React.Component {
             <Button
               stroked
               className="button--bordered button--bordered--accent"
-              onClick={this.deleteSelectedRows.bind(this)}
+              onClick={this.handleDeleteCustomer.bind(this, this.state.selectedCustomerId)}
               color="accent"
             >
               Delete

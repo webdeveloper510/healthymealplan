@@ -33,9 +33,9 @@ class Customers extends React.Component {
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      options: {},
+      options: { sort: { 'profile.name.first': 1 } },
       searchSelector: '',
-      currentTabValue: 0,
+      currentTabValue: /./,
     };
   }
 
@@ -154,11 +154,11 @@ class Customers extends React.Component {
                 value={this.state.currentTabValue}
                 onChange={this.handleTabChange.bind(this)}
               >
-                <Tab label="All" />
-                <Tab label="Active" />
-                <Tab label="Paused" />
+                <Tab label="All" value={/./} />
+                <Tab label="Active" value={'active'} />
+                <Tab label="Paused" value={'paused'} />
                 <Tab label="Abandoned" />
-                <Tab label="Cancelled" />
+                <Tab label="Cancelled" value={'cancelled'} />
               </Tabs>
             </AppBar>
           </div>
@@ -214,15 +214,29 @@ class Customers extends React.Component {
               {
                 foreignProperty: 'customerId',
                 collection: SubscriptionsColl,
-                joinAs: 'subscription',
+                joinAs: 'joinedSubscription',
               },
               {
                 localProperty: 'lifestyle',
                 collection: LifestylesColl,
                 joinAs: 'joinedLifestyle',
               },
+              {
+                localProperty: 'secondaryAccounts',
+                collection: Meteor.users,
+                joinAs: 'secondaryProfiles',
+              }
             ]}
-            selector={{ roles: ['customer'] }}
+            selector={{
+              roles: ['customer'],
+              associatedProfiles: { $exists: true },
+              $or: [
+                { 'profile.name.first': { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+                { 'profile.name.last': { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+                { 'subscription.status': { $regex: new RegExp(this.state.currentTabValue), $options: 'i' } },
+              ],
+            }}
+            options={this.state.options}
           >
             <CustomersTable
               popTheSnackbar={this.props.popTheSnackbar}
@@ -230,25 +244,18 @@ class Customers extends React.Component {
               rowsLimit={this.state.rowsVisible}
               history={this.props.history}
               sortByOptions={this.sortByOption.bind(this)}
-              selector={{
-                $or: [
-                  { 'profile.name.first': { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-                  { 'profile.name.last': { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-                ],
-              }}
             />
           </ListContainer>
         </Grid>
       </div>
     ) : (
-      <Loading />
-    );
+        <Loading />
+      );
   }
 }
 
 Customers.propTypes = {
   loading: PropTypes.bool.isRequired,
-  // lifestyles: PropTypes.arrayOf(PropTypes.object).isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.isRequired,
 };

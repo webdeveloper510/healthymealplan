@@ -8,6 +8,7 @@ import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
 import Paper from 'material-ui/Paper';
+import Switch from 'material-ui/Switch';
 
 import Input from 'material-ui/Input';
 import Typography from 'material-ui/Typography';
@@ -114,8 +115,8 @@ class Step2Plan extends React.Component {
       specificRestrictions: [],
       deleteDialogOpen: false,
       addRestrictionType: 'Restriction',
-      lifestyle: this.props.customerInfo.adultOrChild
-        ? this.props.customerInfo.adultOrChild
+      lifestyle: this.props.customerInfo.lifestyle
+        ? this.props.customerInfo.lifestyle
         : 'traditional',
       isLifestyleCustom: false,
 
@@ -170,10 +171,13 @@ class Step2Plan extends React.Component {
       subscriptionStartDateRaw: this.renderStartDays()[0],
 
       // collapse
+      activeImmediate: false,
       secondaryCollapses: [false, false, false, false, false, false],
       secondaryProfileCount: 0,
       secondaryProfilesData: [],
     };
+
+    this.handleActiveImmediate = this.handleActiveImmediate.bind(this);
   }
 
   componentDidMount() {
@@ -244,6 +248,15 @@ class Step2Plan extends React.Component {
     });
   }
 
+  handleActiveImmediate(event) {
+
+    console.log(event.target.checked);
+
+    this.setState({
+      activeImmediate: event.target.checked
+    })
+  }
+
   handleSubscriptionScheduleChange() {
     const finalSchedule = _.cloneDeep(this.state.schedule);
     const secondarySchedules = [];
@@ -286,8 +299,8 @@ class Step2Plan extends React.Component {
       last_name: '',
       subIngredients: [],
       specificRestrictions: [],
-      lifestyle: this.props.customerInfo.adultOrChild
-        ? this.props.customerInfo.adultOrChild
+      lifestyle: this.props.customerInfo.lifestyle
+        ? this.props.customerInfo.lifestyle
         : 'traditional',
       isLifestyleCustom: false,
       discount: this.props.customerInfo.discount
@@ -497,6 +510,7 @@ class Step2Plan extends React.Component {
     });
 
     this.props.saveValues({
+      activeImmediate: this.state.activeImmediate,
       subIngredients: this.state.subIngredients,
       specificRestrictions: this.state.specificRestrictions,
       lifestyle: this.state.lifestyle,
@@ -2242,39 +2256,15 @@ class Step2Plan extends React.Component {
                   </TextField>
                 </Grid>
 
-                {/* <Grid item sm={6} xs={12}>
-                    <Typography type="body1" className="text-uppercase font-medium">Frequency</Typography>
-                    <FormControl component="fieldset">
-                      <RadioGroup
-                        aria-label="frequencyType"
-                        name="frequencyType"
-                        value={this.state.frequencyType}
-                        onChange={this.handleChangeRadioFrequencyType.bind(this)}
-                        style={{ flexDirection: 'row' }}
-                      >
-                        <FormControlLabel
-                          value={'weekdays'}
-                          control={<Radio />}
-                          label={'Weekdays'}
-                          selected
-                        />
-
-                        <FormControlLabel
-                          value={'everyday'}
-                          control={<Radio />}
-                          label={'Everyday'}
-                          selected
-                        />
-
-                        <FormControlLabel
-                          value={'custom'}
-                          control={<Radio />}
-                          label={'Custom'}
-                          selected
-                        />
-                      </RadioGroup>
-                    </FormControl>
-                  </Grid> */}
+                <Grid item sm={6} xs={12}>
+                  <Typography type="body1" className="text-uppercase font-medium">Activate the customer immediately?</Typography>
+                  <FormControl component="fieldset">
+                    <Switch
+                      checked={this.state.activeImmediate}
+                      onChange={this.handleActiveImmediate}
+                    />
+                  </FormControl>
+                </Grid>
               </Grid>
 
               <Stepper

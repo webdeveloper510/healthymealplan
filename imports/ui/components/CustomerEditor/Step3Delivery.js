@@ -188,7 +188,7 @@ class Step3Delivery extends React.Component {
       }
     }
 
-    
+
     this.setState({
       submitSuccess: true,
       submitLoading: false,
@@ -4359,7 +4359,6 @@ class Step3Delivery extends React.Component {
       hotelFrontDesk: checked,
     });
   }
-
 
   render() {
     const buttonClassname = classNames({
