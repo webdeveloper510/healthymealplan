@@ -214,7 +214,7 @@ class Customers extends React.Component {
               {
                 foreignProperty: 'customerId',
                 collection: SubscriptionsColl,
-                joinAs: 'joinedSubscription',
+                joinAs: 'subscription',
               },
               {
                 localProperty: 'lifestyle',
@@ -229,8 +229,9 @@ class Customers extends React.Component {
             ]}
             selector={{
               roles: ['customer'],
-              associatedProfiles: { $exists: true },
               $or: [
+                { associatedProfiles: { $exists: true } },
+                { 'status': 'abandoned' },
                 { 'profile.name.first': { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
                 { 'profile.name.last': { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
                 { 'subscription.status': { $regex: new RegExp(this.state.currentTabValue), $options: 'i' } },

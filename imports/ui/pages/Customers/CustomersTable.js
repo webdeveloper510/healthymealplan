@@ -290,9 +290,8 @@ class CustomersTable extends React.Component {
             <TableBody>
               {this.props.results.map((e, i) => {
                 // const subscription = e.subscription.fetch()[0];
-                // const isSelected = this.isCheckboxSelected(e._id);
 
-                // console.log(e.subscription);
+                // console.log(e.subscription.fetch());
 
                 let name = "";
 
@@ -307,23 +306,6 @@ class CustomersTable extends React.Component {
 
                 return (
                   <TableRow hover className={e._id} key={e._id}>
-                    {/* <TableCell
-                      style={{
-                        paddingTop: '10px',
-                        paddingBottom: '10px',
-                        width: '7%',
-                      }}
-                      padding="checkbox"
-                    >
-                      <Checkbox
-                        className="row-checkbox"
-                        id={e._id}
-                        checked={isSelected}
-                        onChange={this.rowSelected.bind(this, e)}
-                      />
-                    </TableCell> */}
-
-
 
                     <TableCell
 
@@ -382,7 +364,8 @@ class CustomersTable extends React.Component {
                       }
                     >
                       <Typography className="subheading" type="subheading">
-                        {e.subscription ? e.subscription.status : ''}
+                        {/* {subscription ? subscription.status.toUpperCase() : "-"} */}
+                        {/* {e.status === 'abandoned' ? 'abandoned' : ''} */}
                       </Typography>
                     </TableCell>
 
