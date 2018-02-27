@@ -97,9 +97,9 @@ const styles = theme => ({
   },
 });
 
-/* 
+/*
   REMOVE forceUpdate() it is not good to mutate state directly.
-  shouldComponentUpdate causes problems as well. 
+  shouldComponentUpdate causes problems as well.
 */
 
 class Step2Plan extends React.Component {
@@ -253,8 +253,8 @@ class Step2Plan extends React.Component {
     console.log(event.target.checked);
 
     this.setState({
-      activeImmediate: event.target.checked
-    })
+      activeImmediate: event.target.checked,
+    });
   }
 
   handleSubscriptionScheduleChange() {
@@ -419,14 +419,14 @@ class Step2Plan extends React.Component {
     console.log(profileIndex);
 
     this.state.secondaryProfilesData[profileIndex].deleteDialogOpen = false;
-    this.forceUpdate()
+    this.forceUpdate();
 
   }
 
   deleteDialogHandleOpenSecondary(profileIndex) {
     console.log(profileIndex);
     this.state.secondaryProfilesData[profileIndex].deleteDialogOpen = true;
-    this.forceUpdate()
+    this.forceUpdate();
 
   }
 
@@ -1291,7 +1291,8 @@ class Step2Plan extends React.Component {
           <FormControl component="fieldset">
             {/* {this.state.isLifestyleCustom ? ( */}
 
-            <TextField disabled={!this.state.scheduleReal[index].breakfast.active}
+            <TextField
+              disabled={!this.state.scheduleReal[index].breakfast.active}
               value={this.state.scheduleReal[index].breakfast.quantity}
               onChange={this.handleChangeRadioScheduleQuantity.bind(
                 this,
@@ -1681,11 +1682,12 @@ class Step2Plan extends React.Component {
           </Typography>
           <FormControl component="fieldset">
             {/* {this.state.secondaryProfilesData[profileIndex].isLifestyleCustom ? ( */}
-            <TextField disabled={
-              !this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                stepIndex
-              ].breakfast.active
-            }
+            <TextField
+              disabled={
+                !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].breakfast.active
+              }
               value={
                 this.state.secondaryProfilesData[profileIndex].scheduleReal[
                   stepIndex
@@ -2257,7 +2259,7 @@ class Step2Plan extends React.Component {
                 </Grid>
 
                 <Grid item sm={6} xs={12}>
-                  <Typography type="body1" className="text-uppercase font-medium">Activate the customer immediately?</Typography>
+                  <Typography type="body1" className="text-uppercase font-medium">Activate the subscription effective immediately?</Typography>
                   <FormControl component="fieldset">
                     <Switch
                       checked={this.state.activeImmediate}
@@ -2557,7 +2559,7 @@ class Step2Plan extends React.Component {
                           }}
                           label={this.getSubIngredientTitle(subIngredient)}
                           key={i}
-                          onRequestDelete={this.handleSubIngredientChipDelete.bind(
+                          onDelete={this.handleSubIngredientChipDelete.bind(
                             this,
                             subIngredient,
                           )}
@@ -2603,7 +2605,7 @@ class Step2Plan extends React.Component {
                             }}
                             label={this.getSubIngredientTitle(subIngredient)}
                             key={i}
-                            onRequestDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                            onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
                               this,
                               subIngredient,
                             )}
@@ -3085,7 +3087,7 @@ class Step2Plan extends React.Component {
                         open={this.state.secondaryProfilesData[profileIndex].deleteDialogOpen}
                         onClose={this.deleteDialogHandleRequestCloseSecondary.bind(
                           this,
-                          profileIndex
+                          profileIndex,
                         )}
                       >
                         <Typography
@@ -3225,7 +3227,7 @@ class Step2Plan extends React.Component {
                                       subIngredient,
                                     )}
                                     key={i}
-                                    onRequestDelete={this.handleSubIngredientChipDelete.bind(
+                                    onDelete={this.handleSubIngredientChipDelete.bind(
                                       this,
                                       subIngredient,
                                     )}
@@ -3278,7 +3280,7 @@ class Step2Plan extends React.Component {
                                       subIngredient,
                                     )}
                                     key={i}
-                                    onRequestDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                                    onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
                                       this,
                                       subIngredient,
                                     )}

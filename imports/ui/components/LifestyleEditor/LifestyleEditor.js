@@ -70,9 +70,9 @@ class LifestyleEditor extends React.Component {
 
       valueDiscountOrExtraAthletic:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        (this.props.lifestyle.hasOwnProperty("discountAthletic") ||
-          this.props.lifestyle.hasOwnProperty("extraAthletic"))
+          this.props.lifestyle &&
+          (this.props.lifestyle.hasOwnProperty("discountAthletic") ||
+            this.props.lifestyle.hasOwnProperty("extraAthletic"))
           ? this.props.lifestyle.hasOwnProperty("discountAthletic")
             ? "discount"
             : "extra"
@@ -80,9 +80,9 @@ class LifestyleEditor extends React.Component {
 
       valueDiscountOrExtraBodybuilder:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        (this.props.lifestyle.hasOwnProperty("discountBodybuilder") ||
-          this.props.lifestyle.hasOwnProperty("extraBodybuilder"))
+          this.props.lifestyle &&
+          (this.props.lifestyle.hasOwnProperty("discountBodybuilder") ||
+            this.props.lifestyle.hasOwnProperty("extraBodybuilder"))
           ? this.props.lifestyle.hasOwnProperty("discountBodybuilder")
             ? "discount"
             : "extra"
@@ -90,9 +90,9 @@ class LifestyleEditor extends React.Component {
 
       valueDiscountOrExtraStudent:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        (this.props.lifestyle.hasOwnProperty("discountStudent") ||
-          this.props.lifestyle.hasOwnProperty("extraStudent"))
+          this.props.lifestyle &&
+          (this.props.lifestyle.hasOwnProperty("discountStudent") ||
+            this.props.lifestyle.hasOwnProperty("extraStudent"))
           ? this.props.lifestyle.hasOwnProperty("discountStudent")
             ? "discount"
             : "extra"
@@ -100,9 +100,9 @@ class LifestyleEditor extends React.Component {
 
       valueDiscountOrExtraSenior:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        (this.props.lifestyle.hasOwnProperty("discountSenior") ||
-          this.props.lifestyle.hasOwnProperty("extraSenior"))
+          this.props.lifestyle &&
+          (this.props.lifestyle.hasOwnProperty("discountSenior") ||
+            this.props.lifestyle.hasOwnProperty("extraSenior"))
           ? this.props.lifestyle.hasOwnProperty("discountSenior")
             ? "discount"
             : "extra"
@@ -112,15 +112,15 @@ class LifestyleEditor extends React.Component {
       suggestionsTypes: [],
       restrictions:
         this.props.lifestyle &&
-        this.props.restrictions &&
-        !this.props.newLifestyle
+          this.props.restrictions &&
+          !this.props.newLifestyle
           ? _.sortBy(
-              this.props.restrictions.filter(
-                (e, i) =>
-                  this.props.lifestyle.restrictions.indexOf(e._id) !== -1
-              ),
-              "title"
-            )
+            this.props.restrictions.filter(
+              (e, i) =>
+                this.props.lifestyle.restrictions.indexOf(e._id) !== -1
+            ),
+            "title"
+          )
           : [],
       deleteDialogOpen: false,
       hasFormChanged: false,
@@ -168,40 +168,40 @@ class LifestyleEditor extends React.Component {
       // discountTypeAthletic: 'Percentage',
       discountTypeAthletic:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        this.props.lifestyle.discountOrExtraTypeAthletic
+          this.props.lifestyle &&
+          this.props.lifestyle.discountOrExtraTypeAthletic
           ? this.props.lifestyle.discountOrExtraTypeAthletic
           : "Percentage",
 
       discountTypeBodybuilder:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        this.props.lifestyle.discountOrExtraTypeBodybuilder
+          this.props.lifestyle &&
+          this.props.lifestyle.discountOrExtraTypeBodybuilder
           ? this.props.lifestyle.discountOrExtraTypeBodybuilder
           : "Percentage",
 
       // discountTypeStudent: 'Percentage',
       discountTypeStudent:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        this.props.lifestyle.discountOrExtraTypeStudent
+          this.props.lifestyle &&
+          this.props.lifestyle.discountOrExtraTypeStudent
           ? this.props.lifestyle.discountOrExtraTypeStudent
           : "Percentage",
 
       // discountTypeSenior: 'Percentage',
       discountTypeSenior:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        this.props.lifestyle.discountOrExtraTypeSenior
+          this.props.lifestyle &&
+          this.props.lifestyle.discountOrExtraTypeSenior
           ? this.props.lifestyle.discountOrExtraTypeSenior
           : "Percentage",
 
       // discountOrExtraAmountAthletic: '',
       discountOrExtraAmountAthletic:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        (this.props.lifestyle.hasOwnProperty("discountAthletic") ||
-          this.props.lifestyle.hasOwnProperty("extraAthletic"))
+          this.props.lifestyle &&
+          (this.props.lifestyle.hasOwnProperty("discountAthletic") ||
+            this.props.lifestyle.hasOwnProperty("extraAthletic"))
           ? this.props.lifestyle.hasOwnProperty("discountAthletic")
             ? this.props.lifestyle.discountAthletic
             : this.props.lifestyle.extraAthletic
@@ -209,9 +209,9 @@ class LifestyleEditor extends React.Component {
 
       discountOrExtraAmountBodybuilder:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        (this.props.lifestyle.hasOwnProperty("discountBodybuilder") ||
-          this.props.lifestyle.hasOwnProperty("extraBodybuilder"))
+          this.props.lifestyle &&
+          (this.props.lifestyle.hasOwnProperty("discountBodybuilder") ||
+            this.props.lifestyle.hasOwnProperty("extraBodybuilder"))
           ? this.props.lifestyle.hasOwnProperty("discountBodybuilder")
             ? this.props.lifestyle.discountBodybuilder
             : this.props.lifestyle.extraBodybuilder
@@ -220,9 +220,9 @@ class LifestyleEditor extends React.Component {
       // discountOrExtraAmountStudent: '',
       discountOrExtraAmountStudent:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        (this.props.lifestyle.hasOwnProperty("discountStudent") ||
-          this.props.lifestyle.hasOwnProperty("extraStudent"))
+          this.props.lifestyle &&
+          (this.props.lifestyle.hasOwnProperty("discountStudent") ||
+            this.props.lifestyle.hasOwnProperty("extraStudent"))
           ? this.props.lifestyle.hasOwnProperty("discountStudent")
             ? this.props.lifestyle.discountStudent
             : this.props.lifestyle.extraStudent
@@ -231,9 +231,9 @@ class LifestyleEditor extends React.Component {
       // discountOrExtraAmountSenior: '',
       discountOrExtraAmountSenior:
         !this.props.newLifestyle &&
-        this.props.lifestyle &&
-        (this.props.lifestyle.hasOwnProperty("discountSenior") ||
-          this.props.lifestyle.hasOwnProperty("extraSenior"))
+          this.props.lifestyle &&
+          (this.props.lifestyle.hasOwnProperty("discountSenior") ||
+            this.props.lifestyle.hasOwnProperty("extraSenior"))
           ? this.props.lifestyle.hasOwnProperty("discountSenior")
             ? this.props.lifestyle.discountSenior
             : this.props.lifestyle.extraSenior
@@ -341,8 +341,8 @@ class LifestyleEditor extends React.Component {
     return inputLength === 0
       ? []
       : this.props.restrictions.filter(
-          type => type.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        type => type.title.toLowerCase().slice(0, inputLength) === inputValue
+      );
   }
 
   // When suggestion is clicked, Autosuggest needs to populate the input
@@ -529,7 +529,7 @@ class LifestyleEditor extends React.Component {
     if (this.state.discountOrExtraSelectedAthletic) {
       const discountOrExtraAthletic = `${
         this.state.valueDiscountOrExtraAthletic
-      }Athletic`;
+        }Athletic`;
 
       lifestyle[discountOrExtraAthletic] = parseFloat(
         this.state.discountOrExtraAmountAthletic
@@ -540,7 +540,7 @@ class LifestyleEditor extends React.Component {
     if (this.state.discountOrExtraSelectedBodybuilder) {
       const discountOrExtraBodybuilder = `${
         this.state.valueDiscountOrExtraBodybuilder
-      }Bodybuilder`;
+        }Bodybuilder`;
 
       lifestyle[discountOrExtraBodybuilder] = parseFloat(
         this.state.discountOrExtraAmountBodybuilder
@@ -551,7 +551,7 @@ class LifestyleEditor extends React.Component {
     if (this.state.discountOrExtraSelectedStudent) {
       const discountOrExtraStudent = `${
         this.state.valueDiscountOrExtraStudent
-      }Student`;
+        }Student`;
 
       lifestyle[discountOrExtraStudent] = parseFloat(
         this.state.discountOrExtraAmountStudent
@@ -562,7 +562,7 @@ class LifestyleEditor extends React.Component {
     if (this.state.discountOrExtraSelectedSenior) {
       const discountOrExtraSenior = `${
         this.state.valueDiscountOrExtraSenior
-      }Senior`;
+        }Senior`;
       lifestyle[discountOrExtraSenior] = parseFloat(
         this.state.discountOrExtraAmountSenior
       );
@@ -643,7 +643,7 @@ class LifestyleEditor extends React.Component {
     return (
       <Dialog
         open={this.state.deleteDialogOpen}
-        onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+        onClose={this.deleteDialogHandleRequestClose.bind(this)}
       >
         <Typography
           style={{
@@ -865,8 +865,8 @@ class LifestyleEditor extends React.Component {
                 {lifestyle.SKU ? lifestyle.SKU : ""}{" "}
               </Typography>
             ) : (
-              ""
-            )}
+                ""
+              )}
           </Grid>
           <Grid item xs={8}>
             <div
@@ -1039,15 +1039,15 @@ class LifestyleEditor extends React.Component {
                           style={{ marginRight: "8px", marginBottom: "8px" }}
                           label={e.title}
                           key={i}
-                          onRequestDelete={this.handleRestrictionChipDelete.bind(
+                          onDelete={this.handleRestrictionChipDelete.bind(
                             this,
                             e
                           )}
                         />
                       ))
                     ) : (
-                      <Chip className="chip--bordered" label="Restriction" />
-                    )}
+                        <Chip className="chip--bordered" label="Restriction" />
+                      )}
                   </div>
                 </Paper>
               </Grid>
@@ -2068,20 +2068,20 @@ class LifestyleEditor extends React.Component {
             <Grid container>
               <Grid item xs={4}>
                 {//                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
-                this.props.newLifestyle ? (
-                  ""
-                ) : (
-                  <Button
-                    raised
-                    onClick={
-                      lifestyle && lifestyle._id
-                        ? this.handleRemove.bind(this)
-                        : () => this.props.history.push("/lifestyles")
-                    }
-                  >
-                    Delete
+                  this.props.newLifestyle ? (
+                    ""
+                  ) : (
+                      <Button
+                        raised
+                        onClick={
+                          lifestyle && lifestyle._id
+                            ? this.handleRemove.bind(this)
+                            : () => this.props.history.push("/lifestyles")
+                        }
+                      >
+                        Delete
                   </Button>
-                )}
+                    )}
               </Grid>
 
               <Grid item xs={8}>

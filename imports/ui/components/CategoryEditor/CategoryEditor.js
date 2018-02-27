@@ -56,14 +56,14 @@ class CategoryEditor extends React.Component {
       suggestionsTypes: [],
       types:
         this.props.category &&
-        this.props.ingredientTypes &&
-        !this.props.newCategory
+          this.props.ingredientTypes &&
+          !this.props.newCategory
           ? _.sortBy(
-              this.props.ingredientTypes.filter(
-                (e, i) => this.props.category.types.indexOf(e._id) !== -1
-              ),
-              "title"
-            )
+            this.props.ingredientTypes.filter(
+              (e, i) => this.props.category.types.indexOf(e._id) !== -1
+            ),
+            "title"
+          )
           : [],
       // subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
       // selectedType: this.props.ingredient.typeId,
@@ -210,9 +210,9 @@ class CategoryEditor extends React.Component {
     return inputLength === 0
       ? []
       : this.props.potentialSubIngredients.filter(
-          ingredient =>
-            ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        ingredient =>
+          ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
+      );
   }
 
   getSuggestionsTypes(value) {
@@ -222,8 +222,8 @@ class CategoryEditor extends React.Component {
     return inputLength === 0
       ? []
       : this.props.ingredientTypes.filter(
-          type => type.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        type => type.title.toLowerCase().slice(0, inputLength) === inputValue
+      );
   }
 
   // When suggestion is clicked, Autosuggest needs to populate the input
@@ -326,7 +326,7 @@ class CategoryEditor extends React.Component {
     return (
       <Dialog
         open={this.state.deleteDialogOpen}
-        onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+        onClose={this.deleteDialogHandleRequestClose.bind(this)}
       >
         <Typography
           style={{
@@ -585,8 +585,8 @@ class CategoryEditor extends React.Component {
                 {category.SKU ? category.SKU : ""}{" "}
               </Typography>
             ) : (
-              ""
-            )}
+                ""
+              )}
           </Grid>
           <Grid item xs={8}>
             <div
@@ -722,15 +722,15 @@ class CategoryEditor extends React.Component {
                           style={{ marginRight: "8px", marginBottom: "8px" }}
                           label={type.title}
                           key={i}
-                          onRequestDelete={this.handleTypeChipDelete.bind(
+                          onDelete={this.handleTypeChipDelete.bind(
                             this,
                             type
                           )}
                         />
                       ))
                     ) : (
-                      <Chip className="chip--bordered" label="Type" />
-                    )}
+                        <Chip className="chip--bordered" label="Type" />
+                      )}
                   </div>
                 </Paper>
               </Grid>
@@ -801,7 +801,7 @@ class CategoryEditor extends React.Component {
                         style={{ marginRight: '8px', marginBottom: '8px' }}
                         label={this.getSubIngredientTitle(subIngredient)}
                         key={i}
-                        onRequestDelete={this.handleSubIngredientChipDelete.bind(this, subIngredient)}
+                        onDelete={this.handleSubIngredientChipDelete.bind(this, subIngredient)}
                       />)) : <Chip className="chip--bordered" label="Sub-ingredient" />}
                   </div>
 
@@ -819,18 +819,18 @@ class CategoryEditor extends React.Component {
                 {this.props.newCategory ? (
                   ""
                 ) : (
-                  <Button
-                    style={{ backgroundColor: danger, color: "#FFFFFF" }}
-                    raised
-                    onClick={
-                      category && category._id
-                        ? this.handleRemove.bind(this)
-                        : () => this.props.history.push("/categories")
-                    }
-                  >
-                    Delete
+                    <Button
+                      style={{ backgroundColor: danger, color: "#FFFFFF" }}
+                      raised
+                      onClick={
+                        category && category._id
+                          ? this.handleRemove.bind(this)
+                          : () => this.props.history.push("/categories")
+                      }
+                    >
+                      Delete
                   </Button>
-                )}
+                  )}
               </Grid>
 
               <Grid item xs={8}>

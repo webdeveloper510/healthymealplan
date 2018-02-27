@@ -211,11 +211,11 @@ class InstructionEditor extends React.Component {
 
         const confirmation = existingInstruction
           ? `${localStorage.getItem(
-              "instructionForSnackbar"
-            )} instruction updated.`
+            "instructionForSnackbar"
+          )} instruction updated.`
           : `${localStorage.getItem(
-              "instructionForSnackbar"
-            )} instruction added.`;
+            "instructionForSnackbar"
+          )} instruction added.`;
         // this.form.reset();
 
         popTheSnackbar({
@@ -233,7 +233,7 @@ class InstructionEditor extends React.Component {
     return (
       <Dialog
         open={this.state.deleteDialogOpen}
-        onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+        onClose={this.deleteDialogHandleRequestClose.bind(this)}
       >
         <Typography
           style={{
@@ -441,18 +441,18 @@ class InstructionEditor extends React.Component {
                 {this.props.newInstruction ? (
                   ""
                 ) : (
-                  <Button
-                    style={{ backgroundColor: danger, color: "#FFFFFF" }}
-                    raised
-                    onClick={
-                      instruction && instruction._id
-                        ? this.handleRemove.bind(this)
-                        : () => this.props.history.push("/instructions")
-                    }
-                  >
-                    Delete
+                    <Button
+                      style={{ backgroundColor: danger, color: "#FFFFFF" }}
+                      raised
+                      onClick={
+                        instruction && instruction._id
+                          ? this.handleRemove.bind(this)
+                          : () => this.props.history.push("/instructions")
+                      }
+                    >
+                      Delete
                   </Button>
-                )}
+                  )}
               </Grid>
 
               <Grid item xs={8}>

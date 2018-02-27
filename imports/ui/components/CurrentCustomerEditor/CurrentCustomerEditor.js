@@ -1212,8 +1212,8 @@ class CurrentCustomerEditor extends React.Component {
                     Back
                   </Button>
                 ) : (
-                  ''
-                )}
+                    ''
+                  )}
 
                 {activeMealScheduleStep < 6 ? (
                   <Button
@@ -1223,8 +1223,8 @@ class CurrentCustomerEditor extends React.Component {
                     Next
                   </Button>
                 ) : (
-                  ''
-                )}
+                    ''
+                  )}
               </div>
               <Grid container>
                 <Grid item xs={12} style={{ marginTop: '25px' }}>
@@ -1466,15 +1466,15 @@ class CurrentCustomerEditor extends React.Component {
                           }}
                           label={this.getSubIngredientTitle(subIngredient)}
                           key={i}
-                          onRequestDelete={this.handleSubIngredientChipDelete.bind(
+                          onDelete={this.handleSubIngredientChipDelete.bind(
                             this,
                             subIngredient,
                           )}
                         />
                       ))
                     ) : (
-                      <Chip className="chip--bordered" label="Ingredient" />
-                    )}
+                        <Chip className="chip--bordered" label="Ingredient" />
+                      )}
                   </div>
                 </Grid>
 
@@ -1512,7 +1512,7 @@ class CurrentCustomerEditor extends React.Component {
                             }}
                             label={this.getSubIngredientTitle(subIngredient)}
                             key={i}
-                            onRequestDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                            onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
                               this,
                               subIngredient,
                             )}
@@ -1520,8 +1520,8 @@ class CurrentCustomerEditor extends React.Component {
                         ),
                       )
                     ) : (
-                      <Chip className="chip--bordered" label="Ingredient" />
-                    )}
+                        <Chip className="chip--bordered" label="Ingredient" />
+                      )}
                   </div>
                 </Grid>
               </Grid>
@@ -1651,8 +1651,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {this.state.addressType == 'business' ? (
                     <div>
@@ -1712,8 +1712,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {this.state.addressType == 'dormitory' ? (
                     <div>
@@ -1892,8 +1892,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {this.state.addressType && this.state.addressType === 'hotel' ? (
                     <Grid container>
@@ -1940,8 +1940,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </Grid>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {this.state.addressType && this.state.addressType === 'house' ? (
                     <div>
@@ -1967,8 +1967,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {this.state.addressType ? (
                     <div>
@@ -2179,10 +2179,10 @@ class CurrentCustomerEditor extends React.Component {
                                 )
                                   .add(index, 'd')
                                   .format('DD')} & ${label.split('/')[1]} ${moment(
-                                  new Date(this.props.customerInfo.subscriptionStartDateRaw),
-                                )
-                                  .add(index + 1, 'd')
-                                  .format('DD')}`;
+                                    new Date(this.props.customerInfo.subscriptionStartDateRaw),
+                                  )
+                                    .add(index + 1, 'd')
+                                    .format('DD')}`;
                               }
 
                               return (
@@ -2210,8 +2210,8 @@ class CurrentCustomerEditor extends React.Component {
                               Back
                             </Button>
                           ) : (
-                            ''
-                          )}
+                              ''
+                            )}
 
                           {activeDeliveryScheduleStep < 5 ? (
                             <Button
@@ -2220,14 +2220,14 @@ class CurrentCustomerEditor extends React.Component {
                               Next
                             </Button>
                           ) : (
-                            ''
-                          )}
+                              ''
+                            )}
                         </Grid>
                       </Grid>
                     </div>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
                 </Paper>
               </Grid>
             </Grid>

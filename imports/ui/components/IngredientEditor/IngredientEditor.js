@@ -105,15 +105,15 @@ class IngredientEditor extends React.Component {
       types: this.props.ingredientTypes ? this.props.ingredientTypes : [],
       subIngredients:
         this.props.ingredient &&
-        !this.props.newIngredient &&
-        this.props.ingredient.subIngredients
+          !this.props.newIngredient &&
+          this.props.ingredient.subIngredients
           ? _.sortBy(
-              this.props.potentialSubIngredients.filter(
-                (e, i) =>
-                  this.props.ingredient.subIngredients.indexOf(e._id) !== -1
-              ),
-              "title"
-            )
+            this.props.potentialSubIngredients.filter(
+              (e, i) =>
+                this.props.ingredient.subIngredients.indexOf(e._id) !== -1
+            ),
+            "title"
+          )
           : [],
       selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
@@ -122,9 +122,9 @@ class IngredientEditor extends React.Component {
       submitSuccess: false,
       valueDiscountOrExtra:
         !this.props.newIngredient &&
-        this.props.ingredient &&
-        (this.props.ingredient.hasOwnProperty("discount") ||
-          this.props.ingredient.hasOwnProperty("extra"))
+          this.props.ingredient &&
+          (this.props.ingredient.hasOwnProperty("discount") ||
+            this.props.ingredient.hasOwnProperty("extra"))
           ? this.props.ingredient.hasOwnProperty("discount")
             ? "discount"
             : "extra"
@@ -139,16 +139,16 @@ class IngredientEditor extends React.Component {
 
       discountType:
         !this.props.newIngredient &&
-        this.props.ingredient &&
-        this.props.ingredient.discountOrExtraType
+          this.props.ingredient &&
+          this.props.ingredient.discountOrExtraType
           ? this.props.ingredient.discountOrExtraType
           : "Percentage",
 
       discountOrExtraAmount:
         !this.props.newIngredient &&
-        this.props.ingredient &&
-        (this.props.ingredient.hasOwnProperty("discount") ||
-          this.props.ingredient.hasOwnProperty("extra"))
+          this.props.ingredient &&
+          (this.props.ingredient.hasOwnProperty("discount") ||
+            this.props.ingredient.hasOwnProperty("extra"))
           ? this.props.ingredient.hasOwnProperty("discount")
             ? this.props.ingredient.discount
             : this.props.ingredient.extra
@@ -291,9 +291,9 @@ class IngredientEditor extends React.Component {
     return inputLength === 0
       ? []
       : this.props.potentialSubIngredients.filter(
-          ingredient =>
-            ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        ingredient =>
+          ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
+      );
   }
 
   getSuggestionsTypes(value) {
@@ -303,8 +303,8 @@ class IngredientEditor extends React.Component {
     return inputLength === 0
       ? []
       : this.props.ingredientTypes.filter(
-          type => type.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        type => type.title.toLowerCase().slice(0, inputLength) === inputValue
+      );
   }
 
   // When suggestion is clicked, Autosuggest needs to populate the input
@@ -421,11 +421,11 @@ class IngredientEditor extends React.Component {
 
         const confirmation = existingIngredient
           ? `${localStorage.getItem(
-              "ingredientForSnackbar"
-            )} ingredient updated.`
+            "ingredientForSnackbar"
+          )} ingredient updated.`
           : `${localStorage.getItem(
-              "ingredientForSnackbar"
-            )} ingredient added.`;
+            "ingredientForSnackbar"
+          )} ingredient added.`;
         // this.form.reset();
 
         popTheSnackbar({
@@ -443,7 +443,7 @@ class IngredientEditor extends React.Component {
     return (
       <Dialog
         open={this.state.deleteDialogOpen}
-        onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+        onClose={this.deleteDialogHandleRequestClose.bind(this)}
       >
         <Typography
           style={{
@@ -726,8 +726,8 @@ class IngredientEditor extends React.Component {
                 SKU {ingredient.SKU ? ingredient.SKU : ""}{" "}
               </Typography>
             ) : (
-              ""
-            )}
+                ""
+              )}
           </Grid>
           <Grid item xs={8}>
             <div
@@ -1058,15 +1058,15 @@ class IngredientEditor extends React.Component {
                           style={{ marginRight: "8px", marginBottom: "8px" }}
                           label={this.getSubIngredientTitle(subIngredient)}
                           key={i}
-                          onRequestDelete={this.handleSubIngredientChipDelete.bind(
+                          onDelete={this.handleSubIngredientChipDelete.bind(
                             this,
                             subIngredient
                           )}
                         />
                       ))
                     ) : (
-                      <Chip className="chip--bordered" label="Sub-ingredient" />
-                    )}
+                        <Chip className="chip--bordered" label="Sub-ingredient" />
+                      )}
                   </div>
                 </Paper>
               </Grid>
@@ -1081,18 +1081,18 @@ class IngredientEditor extends React.Component {
                 {this.props.newIngredient ? (
                   ""
                 ) : (
-                  <Button
-                    style={{ backgroundColor: danger, color: "#FFFFFF" }}
-                    raised
-                    onClick={
-                      ingredient && ingredient._id
-                        ? this.handleRemove.bind(this)
-                        : () => this.props.history.push("/ingredients")
-                    }
-                  >
-                    Delete
+                    <Button
+                      style={{ backgroundColor: danger, color: "#FFFFFF" }}
+                      raised
+                      onClick={
+                        ingredient && ingredient._id
+                          ? this.handleRemove.bind(this)
+                          : () => this.props.history.push("/ingredients")
+                      }
+                    >
+                      Delete
                   </Button>
-                )}
+                  )}
               </Grid>
 
               <Grid item xs={8}>

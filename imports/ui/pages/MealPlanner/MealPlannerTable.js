@@ -445,7 +445,7 @@ class MealPlannerTable extends React.Component {
           </Table>
         </Paper>
 
-        <Dialog open={this.state.assignDialogOpen} onRequestClose={this.closeAssignDialog}>
+        <Dialog open={this.state.assignDialogOpen} onClose={this.closeAssignDialog}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
             Assign main for {this.state.assignResult ? this.state.assignResult.lifestyle.title : ''}{' '}{this.state.assignResult ? this.state.assignResult.meal.title : ''}
           </Typography>
@@ -508,7 +508,7 @@ class MealPlannerTable extends React.Component {
           </DialogActions>
         </Dialog>
 
-        <Dialog open={this.state.reassignDialogOpen} onRequestClose={this.closeReassignDialog}>
+        <Dialog open={this.state.reassignDialogOpen} onClose={this.closeReassignDialog}>
           <Typography
             style={{
               flex: '0 0 auto',

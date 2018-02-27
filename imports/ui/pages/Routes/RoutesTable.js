@@ -324,7 +324,7 @@ class RoutesTable extends React.Component {
         </Paper>
         <Dialog
           open={this.state.deleteDialogOpen}
-          onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+          onClose={this.deleteDialogHandleRequestClose.bind(this)}
         >
           <Typography
             style={{

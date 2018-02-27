@@ -460,7 +460,7 @@ class DirectionsTable extends React.Component {
             </TableFooter>
           </Table>
         </Paper>
-        <Dialog open={this.state.updateDialogOpen} onRequestClose={this.updateDialogHandleRequestClose.bind(this)}>
+        <Dialog open={this.state.updateDialogOpen} onClose={this.updateDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
             Update {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?
           </Typography>

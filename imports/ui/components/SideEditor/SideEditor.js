@@ -63,8 +63,8 @@ class SideEditor extends React.Component {
     this.state = {
       plateImageSrc:
         this.props.newPlate == false &&
-        this.props.document &&
-        this.props.document.image
+          this.props.document &&
+          this.props.document.image
           ? this.props.document.image.link()
           : "",
       value: "", // Autosuggest
@@ -206,9 +206,9 @@ class SideEditor extends React.Component {
     return inputLength === 0
       ? []
       : this.props.potentialSubIngredients.filter(
-          ingredient =>
-            ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        ingredient =>
+          ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
+      );
   }
 
   // When suggestion is clicked, Autosuggest needs to populate the input
@@ -398,7 +398,7 @@ class SideEditor extends React.Component {
     return (
       <Dialog
         open={this.state.deleteDialogOpen}
-        onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+        onClose={this.deleteDialogHandleRequestClose.bind(this)}
       >
         <Typography
           style={{
@@ -591,8 +591,8 @@ class SideEditor extends React.Component {
                 SKU {plate.SKU ? plate.SKU : ""}{" "}
               </Typography>
             ) : (
-              ""
-            )}
+                ""
+              )}
           </Grid>
           <Grid item xs={8}>
             <div
@@ -830,15 +830,15 @@ class SideEditor extends React.Component {
                           style={{ marginRight: "8px", marginBottom: "8px" }}
                           label={this.getSubIngredientTitle(subIngredient)}
                           key={i}
-                          onRequestDelete={this.handleSubIngredientChipDelete.bind(
+                          onDelete={this.handleSubIngredientChipDelete.bind(
                             this,
                             subIngredient
                           )}
                         />
                       ))
                     ) : (
-                      <Chip className="chip--bordered" label="Sub-ingredient" />
-                    )}
+                        <Chip className="chip--bordered" label="Sub-ingredient" />
+                      )}
                   </div>
                 </Paper>
               </Grid>
@@ -976,8 +976,8 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.regular.calories
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.regular.calories
                                 ? this.props.plate.nutritional.regular.calories
                                 : "0"
                             }
@@ -999,8 +999,8 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.regular.proteins
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.regular.proteins
                                 ? this.props.plate.nutritional.regular.proteins
                                 : "0"
                             }
@@ -1022,8 +1022,8 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.regular.carbs
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.regular.carbs
                                 ? this.props.plate.nutritional.regular.carbs
                                 : "0"
                             }
@@ -1045,8 +1045,8 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.regular.fat
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.regular.fat
                                 ? this.props.plate.nutritional.regular.fat
                                 : "0"
                             }
@@ -1078,8 +1078,8 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.athletic.calories
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.athletic.calories
                                 ? this.props.plate.nutritional.athletic.calories
                                 : "0"
                             }
@@ -1101,8 +1101,8 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.athletic.proteins
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.athletic.proteins
                                 ? this.props.plate.nutritional.athletic.proteins
                                 : "0"
                             }
@@ -1124,8 +1124,8 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.athletic.carbs
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.athletic.carbs
                                 ? this.props.plate.nutritional.athletic.carbs
                                 : "0"
                             }
@@ -1147,8 +1147,8 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.athletic.fat
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.athletic.fat
                                 ? this.props.plate.nutritional.athletic.fat
                                 : "0"
                             }
@@ -1180,10 +1180,10 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.bodybuilder.calories
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.bodybuilder.calories
                                 ? this.props.plate.nutritional.bodybuilder
-                                    .calories
+                                  .calories
                                 : "0"
                             }
                             name="bodybuilder_calories"
@@ -1204,10 +1204,10 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.bodybuilder.proteins
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.bodybuilder.proteins
                                 ? this.props.plate.nutritional.bodybuilder
-                                    .proteins
+                                  .proteins
                                 : "0"
                             }
                             name="bodybuilder_proteins"
@@ -1228,8 +1228,8 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.bodybuilder.carbs
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.bodybuilder.carbs
                                 ? this.props.plate.nutritional.bodybuilder.carbs
                                 : "0"
                             }
@@ -1251,8 +1251,8 @@ class SideEditor extends React.Component {
                             inputProps={{ type: "number" }}
                             defaultValue={
                               this.props.plate &&
-                              this.props.plate.nutritional &&
-                              this.props.plate.nutritional.bodybuilder.fat
+                                this.props.plate.nutritional &&
+                                this.props.plate.nutritional.bodybuilder.fat
                                 ? this.props.plate.nutritional.bodybuilder.fat
                                 : "0"
                             }
@@ -1276,18 +1276,18 @@ class SideEditor extends React.Component {
                 {this.props.newPlate ? (
                   ""
                 ) : (
-                  <Button
-                    style={{ backgroundColor: danger, color: "#FFFFFF" }}
-                    raised
-                    onClick={
-                      plate && plate._id
-                        ? this.handleRemove.bind(this)
-                        : () => this.props.history.push("/sides")
-                    }
-                  >
-                    Delete
+                    <Button
+                      style={{ backgroundColor: danger, color: "#FFFFFF" }}
+                      raised
+                      onClick={
+                        plate && plate._id
+                          ? this.handleRemove.bind(this)
+                          : () => this.props.history.push("/sides")
+                      }
+                    >
+                      Delete
                   </Button>
-                )}
+                  )}
               </Grid>
 
               <Grid item xs={8}>
@@ -1322,8 +1322,8 @@ class SideEditor extends React.Component {
         {this.renderDeleteDialog()}
       </form>
     ) : (
-      <Loading />
-    );
+        <Loading />
+      );
   }
 }
 

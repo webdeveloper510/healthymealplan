@@ -431,7 +431,7 @@ class Profile extends React.Component {
 
         <Dialog
           open={this.state.formDialogOpen}
-          onRequestClose={() => this.dialogHandleRequestClose()}
+          onClose={() => this.dialogHandleRequestClose()}
         >
           <DialogTitle>Change your password</DialogTitle>
           <DialogContent>

@@ -416,7 +416,7 @@ class RouteEditor extends React.Component {
         {route ? (
           <Dialog
             open={this.state.deleteDialogOpen}
-            onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+            onClose={this.deleteDialogHandleRequestClose.bind(this)}
           >
             <Typography
               style={{

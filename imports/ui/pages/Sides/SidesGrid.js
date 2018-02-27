@@ -226,7 +226,7 @@ class SidesGrid extends React.Component {
 
         { this.props.hasMore ? <Button onClick={this.props.loadMore}>Load More</Button> : '' }
 
-        <Dialog open={this.state.deleteDialogOpen} onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}>
+        <Dialog open={this.state.deleteDialogOpen} onClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
               Delete {this.state.selectedCheckboxesNumber} ingredients?
           </Typography>

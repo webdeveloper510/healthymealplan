@@ -575,7 +575,7 @@ class PostalCodeEditor extends React.Component {
         {postalCode ? (
           <Dialog
             open={this.state.deleteDialogOpen}
-            onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+            onClose={this.deleteDialogHandleRequestClose.bind(this)}
           >
             <Typography
               style={{

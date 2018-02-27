@@ -80,22 +80,22 @@ class RestrictionEditor extends React.Component {
 
       ingredients:
         this.props.restriction &&
-        !this.props.newRestriction &&
-        this.props.ingredients
+          !this.props.newRestriction &&
+          this.props.ingredients
           ? this.props.restriction.ingredients
           : [],
 
       types:
         !this.props.newRestriction &&
-        this.props.restriction &&
-        this.props.ingredientTypes
+          this.props.restriction &&
+          this.props.ingredientTypes
           ? this.props.restriction.types
           : [],
 
       categories:
         !this.props.newRestriction &&
-        this.props.restriction &&
-        this.props.categories
+          this.props.restriction &&
+          this.props.categories
           ? this.props.restriction.categories
           : [],
 
@@ -104,9 +104,9 @@ class RestrictionEditor extends React.Component {
 
       valueDiscountOrExtra:
         !this.props.newRestriction &&
-        this.props.restriction &&
-        (this.props.restriction.hasOwnProperty("discount") ||
-          this.props.restriction.hasOwnProperty("extra"))
+          this.props.restriction &&
+          (this.props.restriction.hasOwnProperty("discount") ||
+            this.props.restriction.hasOwnProperty("extra"))
           ? this.props.restriction.hasOwnProperty("discount")
             ? "discount"
             : "extra"
@@ -121,16 +121,16 @@ class RestrictionEditor extends React.Component {
 
       discountType:
         !this.props.newRestriction &&
-        this.props.restriction &&
-        this.props.restriction.discountOrExtraType
+          this.props.restriction &&
+          this.props.restriction.discountOrExtraType
           ? this.props.restriction.discountOrExtraType
           : "Percentage",
 
       discountOrExtraAmount:
         !this.props.newRestriction &&
-        this.props.restriction &&
-        (this.props.restriction.hasOwnProperty("discount") ||
-          this.props.restriction.hasOwnProperty("extra"))
+          this.props.restriction &&
+          (this.props.restriction.hasOwnProperty("discount") ||
+            this.props.restriction.hasOwnProperty("extra"))
           ? this.props.restriction.hasOwnProperty("discount")
             ? this.props.restriction.discount
             : this.props.restriction.extra
@@ -369,9 +369,9 @@ class RestrictionEditor extends React.Component {
     return inputLength === 0
       ? []
       : this.props.ingredients.filter(
-          ingredient =>
-            ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        ingredient =>
+          ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
+      );
   }
 
   // Teach Autosuggest how to calculate suggestions for any given input value.
@@ -382,8 +382,8 @@ class RestrictionEditor extends React.Component {
     return inputLength === 0
       ? []
       : this.props.ingredientTypes.filter(
-          type => type.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        type => type.title.toLowerCase().slice(0, inputLength) === inputValue
+      );
   }
 
   getSuggestionsCategories(value) {
@@ -394,9 +394,9 @@ class RestrictionEditor extends React.Component {
     return inputLength === 0
       ? []
       : this.props.categories.filter(
-          category =>
-            category.title.toLowerCase().slice(0, inputLength) === inputValue
-        );
+        category =>
+          category.title.toLowerCase().slice(0, inputLength) === inputValue
+      );
   }
 
   getSuggestionValue(suggestion) {
@@ -493,11 +493,11 @@ class RestrictionEditor extends React.Component {
 
         const confirmation = existingRestriction
           ? `${localStorage.getItem(
-              "restrictionForSnackbar"
-            )} restriction updated.`
+            "restrictionForSnackbar"
+          )} restriction updated.`
           : `${localStorage.getItem(
-              "restrictionForSnackbar"
-            )} restriction added.`;
+            "restrictionForSnackbar"
+          )} restriction added.`;
 
         popTheSnackbar({
           message: confirmation,
@@ -514,7 +514,7 @@ class RestrictionEditor extends React.Component {
     return this.props.restriction ? (
       <Dialog
         open={this.state.deleteDialogOpen}
-        onRequestClose={this.deleteDialogHandleRequestClose.bind(this)}
+        onClose={this.deleteDialogHandleRequestClose.bind(this)}
       >
         <Typography
           style={{
@@ -556,8 +556,8 @@ class RestrictionEditor extends React.Component {
         </DialogActions>
       </Dialog>
     ) : (
-      ""
-    );
+        ""
+      );
   }
 
   renderSuggestion(suggestion) {
@@ -766,8 +766,8 @@ class RestrictionEditor extends React.Component {
                 {restriction.SKU ? restriction.SKU : ""}{" "}
               </Typography>
             ) : (
-              ""
-            )}
+                ""
+              )}
           </Grid>
           <Grid item xs={8}>
             <div
@@ -1072,15 +1072,15 @@ class RestrictionEditor extends React.Component {
                             }}
                             label={e.title}
                             key={i}
-                            onRequestDelete={this.handleIngredientsChipDelete.bind(
+                            onDelete={this.handleIngredientsChipDelete.bind(
                               this,
                               e
                             )}
                           />
                         ))
                     ) : (
-                      <Chip className="chip--bordered" label="Ingredient" />
-                    )}
+                        <Chip className="chip--bordered" label="Ingredient" />
+                      )}
                   </div>
                 </Paper>
               </Grid>
@@ -1175,15 +1175,15 @@ class RestrictionEditor extends React.Component {
                             }}
                             label={e.title}
                             key={i}
-                            onRequestDelete={this.handleTypeChipDelete.bind(
+                            onDelete={this.handleTypeChipDelete.bind(
                               this,
                               e
                             )}
                           />
                         ))
                     ) : (
-                      <Chip className="chip--bordered" label="Type" />
-                    )}
+                        <Chip className="chip--bordered" label="Type" />
+                      )}
                   </div>
                 </Paper>
               </Grid>
@@ -1278,15 +1278,15 @@ class RestrictionEditor extends React.Component {
                             }}
                             label={e.title}
                             key={i}
-                            onRequestDelete={this.handleCategoryChipDelete.bind(
+                            onDelete={this.handleCategoryChipDelete.bind(
                               this,
                               e
                             )}
                           />
                         ))
                     ) : (
-                      <Chip className="chip--bordered" label="Category" />
-                    )}
+                        <Chip className="chip--bordered" label="Category" />
+                      )}
                   </div>
                 </Paper>
               </Grid>
@@ -1301,18 +1301,18 @@ class RestrictionEditor extends React.Component {
                 {this.props.newRestriction ? (
                   ""
                 ) : (
-                  <Button
-                    style={{ backgroundColor: danger, color: "#FFFFFF" }}
-                    raised
-                    onClick={
-                      restriction && restriction._id
-                        ? this.handleRemove.bind(this)
-                        : () => this.props.history.push("/restrictions")
-                    }
-                  >
-                    Delete
+                    <Button
+                      style={{ backgroundColor: danger, color: "#FFFFFF" }}
+                      raised
+                      onClick={
+                        restriction && restriction._id
+                          ? this.handleRemove.bind(this)
+                          : () => this.props.history.push("/restrictions")
+                      }
+                    >
+                      Delete
                   </Button>
-                )}
+                  )}
               </Grid>
 
               <Grid item xs={8}>
@@ -1347,8 +1347,8 @@ class RestrictionEditor extends React.Component {
         {this.renderDeleteDialog()}
       </form>
     ) : (
-      <Loading />
-    );
+        <Loading />
+      );
   }
 }
 

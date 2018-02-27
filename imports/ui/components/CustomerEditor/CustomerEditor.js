@@ -91,7 +91,7 @@ class CustomerEditor extends React.Component {
       // selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
       hasFormChanged: false,
-      activeStep: 0,
+      activeStep: 1,
       customerInfo: {
         id: '',
         firstName: '',
@@ -333,7 +333,7 @@ class CustomerEditor extends React.Component {
     const newCustomerInfo = assign({}, clonedCustomerInfo, fields);
 
     this.setState({
-      customerInfo: newCustomerInfo
+      customerInfo: newCustomerInfo,
     });
   }
 
