@@ -147,7 +147,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
 
     const customerToAdd = {
       _id: customer._id,
-      name: customer.profile.name.first,
+      name: `${customer.profile.name.first} ${customer.profile.name.last ? customer.profile.name.last : ''}`,
 
       restrictions: null,
       specifcRestrictions: customer.specifcRestrictions,

@@ -39,6 +39,7 @@ import Loading from '../../components/Loading/Loading';
 import Slide from 'material-ui/transitions/Slide';
 import jsPDF from 'jspdf';
 import vittlebase64 from '../../../modules/vittlelogobase64';
+import hmpbase64 from '../../../modules/hmplogobase64';
 
 
 import './PlatingTable.scss';
@@ -64,7 +65,11 @@ function Transition(props) {
 function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPortion) {
   doc.addPage();
 
-  doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+  // VITTLE LOGO
+  // doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+
+  // HMP LOGO
+  doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
 
   // name
   doc.setFontStyle('bold');
@@ -109,26 +114,26 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   console.log(currentPlate.plate.nutritional);
   console.log(currentPlate.plate.nutritional[mealPortion]);
 
-  if (typeof currentPlate.plate.nutritional === "object" && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
-    //calories
-    doc.setFontStyle("normal");
+  if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
+    // calories
+    doc.setFontStyle('normal');
     doc.setFontSize(9);
-    const calories = [currentPlate.plate.nutritional[mealPortion].calories, "calories"];
+    const calories = [currentPlate.plate.nutritional[mealPortion].calories, 'calories'];
     doc.text(calories, 2, 2.65);
 
-    //protein
+    // protein
     doc.setFontSize(9);
-    const protein = [currentPlate.plate.nutritional[mealPortion].proteins, "protein"];
+    const protein = [currentPlate.plate.nutritional[mealPortion].proteins, 'protein'];
     doc.text(protein, 2.6, 2.65);
 
-    //carbs
+    // carbs
     doc.setFontSize(9);
-    const carbs = [currentPlate.plate.nutritional[mealPortion].carbs, "carbs"];
+    const carbs = [currentPlate.plate.nutritional[mealPortion].carbs, 'carbs'];
     doc.text(carbs, 3.1, 2.65);
 
-    //fats
+    // fats
     doc.setFontSize(9);
-    const fats = [currentPlate.plate.nutritional[mealPortion].fat, "fats"];
+    const fats = [currentPlate.plate.nutritional[mealPortion].fat, 'fats'];
     doc.text(fats, 3.55, 2.65);
   }
 }
@@ -207,7 +212,6 @@ class PlatingTable extends React.Component {
     // console.log(this.state.mealSelected);
 
 
-
     if (this.state.aggregateDataLoading) {
       return;
     }
@@ -237,12 +241,9 @@ class PlatingTable extends React.Component {
       user[this.state.mealTitle.toLowerCase()] > 0 ||
       user[`athletic${this.state.mealTitle}`] > 0 ||
       user[`bodybuilder${this.state.mealTitle}`] > 0).forEach((userData, index) => {
-
-
         if (this.state.mealTitle === 'Breakfast') {
           if (userData.breakfast > 0) {
             for (let i = 1; i <= userData.breakfast; i++) {
-
               renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast', 'regular');
             }
           }
@@ -264,14 +265,12 @@ class PlatingTable extends React.Component {
           if (userData.dinner > 0) {
             for (let i = 1; i <= userData.dinner; i++) {
               renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner', 'regular');
-
             }
           }
 
           if (userData.athleticDinner > 0) {
             for (let i = 1; i <= userData.athleticDinner; i++) {
               renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Athletic)', 'athletic');
-
             }
           }
 
@@ -292,14 +291,12 @@ class PlatingTable extends React.Component {
           if (userData.athleticLunch > 0) {
             for (let i = 1; i <= userData.athleticLunch; i++) {
               renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Athletic)', 'athletic');
-
             }
           }
 
           if (userData.bodybuilderLunch > 0) {
             for (let i = 1; i <= userData.bodybuilderLunch; i++) {
               renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Bodybuilder)', 'bodybuilder');
-
             }
           }
         } // Lunch
