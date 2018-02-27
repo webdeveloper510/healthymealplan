@@ -30,6 +30,7 @@ import TextField from 'material-ui/TextField';
 import Typography from 'material-ui/Typography';
 import Button from 'material-ui/Button';
 import Input from 'material-ui/Input';
+import { CircularProgress } from 'material-ui/Progress';
 
 import moment from 'moment';
 
@@ -62,7 +63,7 @@ function Transition(props) {
   return <Slide direction="up" {...props} />;
 }
 
-function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPortion) {
+function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPortion, currentSelectorDate) {
   doc.addPage();
 
   // VITTLE LOGO
@@ -70,6 +71,28 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
 
   // HMP LOGO
   doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
+
+  // plating day + 1
+  doc.setFontStyle('normal');
+  doc.setFontSize(9);
+  const day = moment(currentSelectorDate).add(1, 'd').format('dddd');
+  doc.text(day, 3.2, 0.55);
+
+
+  // total meals for this customer
+  doc.setFontStyle('normal');
+  doc.setFontSize(9);
+  const totalMeals = userData.breakfast +
+    userData.athleticBreakfast +
+    userData.bodybuilderBreakfast +
+    userData.lunch +
+    userData.athleticLunch +
+    userData.bodybuilderLunch +
+    userData.dinner +
+    userData.athleticDinner +
+    userData.bodybuilderDinner;
+
+  doc.text(`${totalMeals}`, 0.25, 0.55);
 
   // name
   doc.setFontStyle('bold');
@@ -241,68 +264,68 @@ class PlatingTable extends React.Component {
       user[this.state.mealTitle.toLowerCase()] > 0 ||
       user[`athletic${this.state.mealTitle}`] > 0 ||
       user[`bodybuilder${this.state.mealTitle}`] > 0).forEach((userData, index) => {
-        if (this.state.mealTitle === 'Breakfast') {
-          if (userData.breakfast > 0) {
-            for (let i = 1; i <= userData.breakfast; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast', 'regular');
-            }
+      if (this.state.mealTitle === 'Breakfast') {
+        if (userData.breakfast > 0) {
+          for (let i = 1; i <= userData.breakfast; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast', 'regular', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.athleticBreakfast > 0) {
-            for (let i = 1; i <= userData.athleticBreakfast; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Athletic)', 'athletic');
-            }
+        if (userData.athleticBreakfast > 0) {
+          for (let i = 1; i <= userData.athleticBreakfast; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Athletic)', 'athletic', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.bodybuilderBreakfast > 0) {
-            for (let i = 1; i <= userData.bodybuilderBreakfast; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Bodybuilder)', 'bodybuilder');
-            }
+        if (userData.bodybuilderBreakfast > 0) {
+          for (let i = 1; i <= userData.bodybuilderBreakfast; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
           }
-        }// Breakfast
+        }
+      }// Breakfast
 
-        if (this.state.mealTitle === 'Dinner') {
-          if (userData.dinner > 0) {
-            for (let i = 1; i <= userData.dinner; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner', 'regular');
-            }
+      if (this.state.mealTitle === 'Dinner') {
+        if (userData.dinner > 0) {
+          for (let i = 1; i <= userData.dinner; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner', 'regular', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.athleticDinner > 0) {
-            for (let i = 1; i <= userData.athleticDinner; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Athletic)', 'athletic');
-            }
+        if (userData.athleticDinner > 0) {
+          for (let i = 1; i <= userData.athleticDinner; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Athletic)', 'athletic', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.bodybuilderDinner > 0) {
-            for (let i = 1; i <= userData.bodybuilderDinner; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Bodybuilder)', 'bodybuilder');
-            }
+        if (userData.bodybuilderDinner > 0) {
+          for (let i = 1; i <= userData.bodybuilderDinner; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
           }
-        } // Dinner
+        }
+      } // Dinner
 
-        if (this.state.mealTitle === 'Lunch') {
-          if (userData.lunch > 0) {
-            for (let i = 1; i <= userData.lunch; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch', 'regular');
-            }
+      if (this.state.mealTitle === 'Lunch') {
+        if (userData.lunch > 0) {
+          for (let i = 1; i <= userData.lunch; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch', 'regular', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.athleticLunch > 0) {
-            for (let i = 1; i <= userData.athleticLunch; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Athletic)', 'athletic');
-            }
+        if (userData.athleticLunch > 0) {
+          for (let i = 1; i <= userData.athleticLunch; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Athletic)', 'athletic', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.bodybuilderLunch > 0) {
-            for (let i = 1; i <= userData.bodybuilderLunch; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Bodybuilder)', 'bodybuilder');
-            }
+        if (userData.bodybuilderLunch > 0) {
+          for (let i = 1; i <= userData.bodybuilderLunch; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
           }
-        } // Lunch
+        }
+      } // Lunch
 
-        // console.log(userData);
-      }); // map
+      // console.log(userData);
+    }); // map
 
     doc.deletePage(1);
 
@@ -321,8 +344,9 @@ class PlatingTable extends React.Component {
   render() {
     return (
       <div>
-        <Paper elevation={2} className="table-container">
 
+
+        <Paper elevation={2} className="table-container">
           <Table className="table-container plating-table" style={{ tableLayout: 'fixed' }}>
             <TableHead>
               <TableRow>
@@ -355,72 +379,75 @@ class PlatingTable extends React.Component {
             </TableHead>
             <TableBody>
 
-              {this.props.lifestyles && !this.state.aggregateDataLoading && this.props.lifestyles.map((lifestyle) => {
-                const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === lifestyle._id);
+              {!this.state.aggregateDataLoading ? (
 
-                return (
-                  this.props.meals && this.props.meals.filter(el => el.type === 'Main' || el.type === 'Main Course').map(meal => (
+                this.props.lifestyles && !this.state.aggregateDataLoading && this.props.lifestyles.map((lifestyle) => {
+                  const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === lifestyle._id);
 
-                    <TableRow hover key={`${lifestyle._id} ${meal._id} `}>
+                  return (
+                    this.props.meals && this.props.meals.filter(el => el.type === 'Main' || el.type === 'Main Course').map(meal => (
 
-                      <TableCell padding="none" style={{ width: '16.66%' }}>
-                        <Typography className="subheading" type="subheading">{lifestyle.title}</Typography>
+                      <TableRow hover key={`${lifestyle._id} ${meal._id} `}>
 
-                      </TableCell>
+                        <TableCell padding="none" style={{ width: '16.66%' }}>
+                          <Typography className="subheading" type="subheading">{lifestyle.title}</Typography>
 
-                      <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
-                        padding="none"
-                      >
+                        </TableCell>
 
-                        <Typography className="subheading" type="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }} >
-                          {meal.title}
-                        </Typography>
+                        <TableCell
+                          style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
+                          padding="none"
+                        >
 
-                      </TableCell>
+                          <Typography className="subheading" type="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }} >
+                            {meal.title}
+                          </Typography>
 
-                      <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                        <Typography type="subheading">
-                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].regular}
-                        </Typography>
-                      </TableCell>
+                        </TableCell>
 
-                      <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                        <Typography type="subheading">
-                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].athletic}
+                        <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                          <Typography type="subheading">
+                            {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].regular}
+                          </Typography>
+                        </TableCell>
 
-                        </Typography>
-                      </TableCell>
+                        <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                          <Typography type="subheading">
+                            {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].athletic}
 
-                      <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                        <Typography type="subheading">
-                          {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].bodybuilder}
-                        </Typography>
-                      </TableCell>
+                          </Typography>
+                        </TableCell>
 
-                      <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
-                        padding="none"
-                      >
+                        <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                          <Typography type="subheading">
+                            {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].bodybuilder}
+                          </Typography>
+                        </TableCell>
 
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                          <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>View</Button>
-                        </Typography>
+                        <TableCell
+                          style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
+                          padding="none"
+                        >
 
-                      </TableCell>
+                          <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                            <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>View</Button>
+                          </Typography>
 
-                    </TableRow>
+                        </TableCell>
 
-                  )));
-              })}
+                      </TableRow>
 
-
-              {/* {this.renderNoResults(this.props.count)} */}
+                    )));
+                })
+              ) : (
+                <CircularProgress />
+              )}
 
             </TableBody>
 
           </Table>
         </Paper>
+
 
         <Dialog
           fullWidth
@@ -463,29 +490,29 @@ class PlatingTable extends React.Component {
                     (user[this.state.mealTitle.toLowerCase()] > 0 ||
                       user[`athletic${this.state.mealTitle}`] > 0 ||
                       user[`bodybuilder${this.state.mealTitle}`] > 0)).map((n) => {
-                        const mealType = this.state.mealTitle.toLowerCase();
-                        const mealTypeNormal = this.state.mealTitle;
+                    const mealType = this.state.mealTitle.toLowerCase();
+                    const mealTypeNormal = this.state.mealTitle;
 
-                        console.log(n);
+                    console.log(n);
 
-                        return (
-                          <TableRow key={Random.id()}>
-                            <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
-                            <TableCell>
-                              <Typography type="subheading">
-                                {n[mealType] > 0 ? `Regular x${n[`${mealType}`]}` : ''}
-                                {n[`athletic${mealTypeNormal}`] > 0 ? `Athletic x${n[`athletic${mealTypeNormal}`]}` : ''}
-                                {n[`bodybuilder${mealTypeNormal}`] > 0 ? `Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}` : ''}
-                              </Typography>
-                            </TableCell>
-                            <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title) : ''}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title) : ''}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title) : ''}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title) : ''}</Typography></TableCell>
-                          </TableRow>
-                        );
-                      })}
+                    return (
+                      <TableRow key={Random.id()}>
+                        <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
+                        <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
+                        <TableCell>
+                          <Typography type="subheading">
+                            {n[mealType] > 0 ? `Regular x${n[`${mealType}`]}` : ''}
+                            {n[`athletic${mealTypeNormal}`] > 0 ? `Athletic x${n[`athletic${mealTypeNormal}`]}` : ''}
+                            {n[`bodybuilder${mealTypeNormal}`] > 0 ? `Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}` : ''}
+                          </Typography>
+                        </TableCell>
+                        <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title) : ''}</Typography></TableCell>
+                        <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title) : ''}</Typography></TableCell>
+                        <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title) : ''}</Typography></TableCell>
+                        <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title) : ''}</Typography></TableCell>
+                      </TableRow>
+                    );
+                  })}
               </TableBody>
             </Table>
           </Paper>
