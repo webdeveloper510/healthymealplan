@@ -75,7 +75,7 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   // plating day + 1
   doc.setFontStyle('normal');
   doc.setFontSize(9);
-  const day = moment(currentSelectorDate).add(1, 'd').format('dddd');
+  const day = moment(currentSelectorDate).add(1, 'd').format('M/D/YYYY');
   doc.text(day, 3.2, 0.55);
 
 
