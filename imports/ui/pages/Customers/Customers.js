@@ -14,10 +14,9 @@ import ClearIcon from 'material-ui-icons/Clear';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 
-import SubscriptionsColl from '../../../api/Subscriptions/Subscriptions';
-import LifestylesColl from '../../../api/Lifestyles/Lifestyles';
 
-// import RestrictionsCollection from '../../../api/Restrictions/Restrictions';
+import Subscriptions from '../../../api/Subscriptions/Subscriptions';
+import LifestylesColl from '../../../api/Lifestyles/Lifestyles';
 
 import Loading from '../../components/Loading/Loading';
 import CustomersTable from './CustomersTable';
@@ -209,32 +208,32 @@ class Customers extends React.Component {
           <ListContainer
             limit={50}
             collection={Meteor.users}
-            publication="users.customers"
+            // publication="users.customers"
             joins={[
               {
-                foreignProperty: 'customerId',
-                collection: SubscriptionsColl,
-                joinAs: 'subscription',
+                localProperty: 'subscriptionId',
+                collection: Subscriptions,
+                joinAs: 'joinedSubscription',
               },
               {
                 localProperty: 'lifestyle',
                 collection: LifestylesColl,
                 joinAs: 'joinedLifestyle',
               },
-              {
-                localProperty: 'secondaryAccounts',
-                collection: Meteor.users,
-                joinAs: 'secondaryProfiles',
-              }
+              // {
+              //   localProperty: 'secondaryAccounts',
+              //   collection: Meteor.users,
+              //   joinAs: 'secondaryProfiles',
+              // }
             ]}
             selector={{
               roles: ['customer'],
               $or: [
                 { associatedProfiles: { $exists: true } },
-                { 'status': 'abandoned' },
+                { status: 'abandoned' },
                 { 'profile.name.first': { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
                 { 'profile.name.last': { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-                { 'subscription.status': { $regex: new RegExp(this.state.currentTabValue), $options: 'i' } },
+                // { 'subscription.status': { $regex: new RegExp(this.state.currentTabValue), $options: 'i' } },
               ],
             }}
             options={this.state.options}
@@ -262,9 +261,11 @@ Customers.propTypes = {
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe('users.customers');
-  const subscription2 = Meteor.subscribe('subscriptions');
+  const subscription = Meteor.subscribe('users.customers', {}, {});
+  const subscription2 = Meteor.subscribe('subscriptions', {}, {});
   const subscription3 = Meteor.subscribe('lifestyles');
+
+  console.log(Subscriptions);
 
   return {
     loading:

@@ -289,9 +289,6 @@ class CustomersTable extends React.Component {
               )}
             <TableBody>
               {this.props.results.map((e, i) => {
-                // const subscription = e.subscription.fetch()[0];
-
-                // console.log(e.subscription.fetch());
 
                 let name = "";
 
@@ -327,12 +324,7 @@ class CustomersTable extends React.Component {
                       }
                     >
                       <Typography className="subheading" type="subheading">
-                        {/* {e.profile && e.profile.name
-                          ? `${e.profile.name.first}`
-                          : ''}{' '}
-                        {e.profile && e.profile.name && e.profile.name.last
-                          ? `${e.profile.name.last}`
-                          : ''} */}
+
                         {name}
                       </Typography>
                       <Typography className="body2" type="body2">
@@ -364,8 +356,8 @@ class CustomersTable extends React.Component {
                       }
                     >
                       <Typography className="subheading" type="subheading">
-                        {/* {subscription ? subscription.status.toUpperCase() : "-"} */}
-                        {/* {e.status === 'abandoned' ? 'abandoned' : ''} */}
+                        {e.joinedSubscription ? e.joinedSubscription.status.toUpperCase() : ""}
+                        {e.joinedSubscription === undefined && e.status === 'abandoned' ? 'Abandoned' : ''}
                       </Typography>
                     </TableCell>
 
@@ -471,7 +463,6 @@ export default createContainer(() => {
   const customerCountSub = Meteor.subscribe('customers-all-count');
 
   return {
-    // ingredientTypes: IngredientsWithTypes.find().fetch(),
     customerCount: Counts.get('customers-count'),
   };
 }, CustomersTable);

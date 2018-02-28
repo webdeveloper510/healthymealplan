@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
+import { Match } from 'meteor/check';
 import { Roles } from 'meteor/alanning:roles';
 import { Random } from 'meteor/random';
 import moment from 'moment';
@@ -75,8 +76,62 @@ Meteor.methods({
 
     } catch (error) {
       console.log(error);
-      throw new Meteor.Error('problem-deleteing-profile', "There was a problem deleting the profile");
+      throw new Meteor.Error('problem-deleteing-profile', 'There was a problem deleting the profile');
     }
+  },
+
+  'edit.customer.step1': function editStep1(data) {
+    check(data, {
+      id: String,
+      firstName: String,
+      lastName: String,
+      postalCode: String,
+      email: String,
+      phoneNumber: String,
+      username: Match.Optional(String),
+    });
+
+    const postalCodeExists = PostalCodes.findOne({
+      title: data.postalCode.substr(0, 3).toUpperCase(),
+    });
+
+    console.log(postalCodeExists);
+
+    if (!postalCodeExists) {
+      console.log(postalCodeExists);
+      throw new Meteor.Error(400, 'Delivery not available in that area.');
+    }
+
+    const detailsToUpdate = {
+      firstName: data.firstName,
+      lastName: data.lastName,
+      postalCode: data.postalCode,
+      email: data.email,
+      phoneNumber: data.phoneNumber,
+    };
+
+    Meteor.users.update({
+      _id: data.id,
+    }, {
+      $set: {
+        'profile.name.first': data.firstName,
+        'profile.name.last': data.lastName,
+        postalCode: data.postalCode,
+        postalCodeId: postalCodeExists._id,
+        'emails.0.address': data.email,
+        phone: data.phoneNumber,
+      },
+    });
+
+
+    console.log(data);
+
+  },
+
+  'edit.customer.step2': function editStep2(data) {
+
+    console.log(data);
+
   },
 
   'customers.step1': function customerStep1(data) {

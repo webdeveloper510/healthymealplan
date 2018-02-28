@@ -137,12 +137,12 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   }
 
   if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
-    restrictionsLine += ` Specific: ${userData.specificRestrictions.map(rest => rest.title).join(', ')}`;
+    restrictionsLine += `${userData.specificRestrictions.map(rest => rest.title).join(', ')}`;
     restrictionsPresent = true;
   }
 
   if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
-    restrictionsLine += ` Pref: ${userData.preferences.map(rest => rest.title).join(', ')}`;
+    restrictionsLine += `${userData.preferences.map(rest => rest.title).join(', ')}`;
     restrictionsPresent = true;
   }
 

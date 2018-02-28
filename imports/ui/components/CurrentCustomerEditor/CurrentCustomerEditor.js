@@ -45,12 +45,17 @@ import Tabs, { Tab } from 'material-ui/Tabs';
 import Chip from 'material-ui/Chip';
 import Paper from 'material-ui/Paper';
 
+import green from 'material-ui/colors/green';
+import { red } from 'material-ui/colors';
+import { CircularProgress } from 'material-ui/Progress';
+import classNames from 'classnames';
+import { withStyles } from 'material-ui/styles';
+
 import Grid from 'material-ui/Grid';
 import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 import Avatar from 'material-ui/Avatar';
 
-import { red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
 import Search from 'material-ui-icons/Search';
 
@@ -59,7 +64,38 @@ import validate from '../../../modules/validate';
 // const primary = teal[500];
 const danger = red[700];
 
-const styles = theme => ({});
+const styles = theme => ({
+  root: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  wrapper: {
+    margin: theme.spacing.unit,
+    position: 'relative',
+  },
+  buttonSuccess: {
+    backgroundColor: green[500],
+    '&:hover': {
+      backgroundColor: green[700],
+    },
+  },
+  fabProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: -6,
+    left: -6,
+    zIndex: 1,
+  },
+  buttonProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  },
+});
+
 
 class CurrentCustomerEditor extends React.Component {
   constructor(props) {
@@ -134,9 +170,13 @@ class CurrentCustomerEditor extends React.Component {
         },
       ],
 
+      submitLoading: false,
+      submitSuccess: false,
     };
 
     this.handleTabChange = this.handleTabChange.bind(this);
+
+    this.saveFirstStep = this.saveFirstStep.bind(this);
   }
 
   componentDidMount() {
@@ -183,8 +223,51 @@ class CurrentCustomerEditor extends React.Component {
         },
       },
       submitHandler() {
-        component.handleSubmitStep();
+        component.saveFirstStep();
       },
+    });
+  }
+
+  saveFirstStep() {
+    this.setState({
+      submitSuccess: false,
+      submitLoading: true,
+    });
+
+    const step1Data = {
+      id: this.props.customer._id,
+      firstName: $('[name="first_name"]').val().trim(),
+      lastName: $('[name="last_name"]').val().trim(),
+      postalCode: $('[name="postal_code"]').val().trim(),
+      email: $('[name="email"]').val().trim(),
+      phoneNumber: $('[name="phoneNumber"]').val().trim(),
+    };
+
+    if (this.props.customer.secondary) {
+      step1Data.username = $('[name="username"]').val().trim();
+    }
+
+
+    Meteor.call('edit.customer.step1', step1Data, (err, res) => {
+      if (err) {
+        this.setState({
+          submitSuccess: false,
+          submitLoading: false,
+        }, () => {
+          this.props.popTheSnackbar({
+            message: err.reason,
+          });
+        });
+      } else {
+        this.setState({
+          submitSuccess: true,
+          submitLoading: false,
+        }, () => {
+          this.props.popTheSnackbar({
+            message: 'Customer details updated successfully.',
+          });
+        });
+      }
     });
   }
 
@@ -889,16 +972,16 @@ class CurrentCustomerEditor extends React.Component {
   }
 
   render() {
+    const buttonClassname = classNames({
+      [this.props.classes.buttonSuccess]: this.state.submitSuccess,
+    });
+
     const { customer, history } = this.props;
     const { activeMealScheduleStep } = this.state;
     const mealSteps = this.getMealSteps();
 
     return (
-      <form
-        style={{ width: '100%' }}
-        ref={form => (this.form = form)}
-        onSubmit={event => event.preventDefault()}
-      >
+      <div style={{ width: '100%' }}>
         <Grid container justify="center">
           <Grid item xs={12}>
             <Button
@@ -928,7 +1011,7 @@ class CurrentCustomerEditor extends React.Component {
               style={{ fontWeight: 500, alignItems: 'center', display: 'flex' }}
             >
               {customer.profile ? `${customer.profile.name.first} ${customer.profile.name.last}` : ''}
-              {customer.secondary && <Chip style={{ marginLeft: "20px" }} label="Secondary" />}
+              {customer.secondary && <Chip style={{ marginLeft: '20px' }} label="Secondary" />}
             </Typography>
 
           </Grid>
@@ -946,7 +1029,7 @@ class CurrentCustomerEditor extends React.Component {
               >
                 Cancel
               </Button>
-              <Button
+              {/* <Button
                 // disabled={!this.state.hasFormChanged}
                 className="btn btn-primary"
                 raised
@@ -954,7 +1037,7 @@ class CurrentCustomerEditor extends React.Component {
                 color="contrast"
               >
                 Save
-              </Button>
+              </Button> */}
             </div>
           </Grid>
         </Grid>
@@ -972,80 +1055,105 @@ class CurrentCustomerEditor extends React.Component {
           </Grid>
 
           {this.state.currentTab === 0 && (
-            <Paper elevation={2} style={{ width: '100%' }} className="paper-for-fields">
-              <Grid container>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    margin="normal"
-                    id="first_name"
-                    label="First name"
-                    name="first_name"
-                    fullWidth
-                    defaultValue={customer.profile.name.first}
-                    inputProps={{}}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    margin="normal"
-                    id="last_name"
-                    label="Last name"
-                    name="last_name"
-                    fullWidth
-                    defaultValue={customer.profile.name.last ? customer.profile.name.last : ''}
-                    inputProps={{}}
-                  />
-                </Grid>
-              </Grid>
+            <div>
+              <form
+id="step1"
+                ref={form => (this.form = form)}
+                onSubmit={event => event.preventDefault()}
+              >
+                <Paper elevation={2} style={{ width: '100%' }} className="paper-for-fields">
+                  <Grid container>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        id="first_name"
+                        label="First name"
+                        name="first_name"
+                        fullWidth
+                        defaultValue={customer.profile.name.first}
+                        inputProps={{}}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        id="last_name"
+                        label="Last name"
+                        name="last_name"
+                        fullWidth
+                        defaultValue={customer.profile.name.last ? customer.profile.name.last : ''}
+                        inputProps={{}}
+                      />
+                    </Grid>
+                  </Grid>
 
-              {customer.secondary ? (
+                  {customer.secondary ? (
 
-                <TextField
-                  margin="normal"
-                  id="username"
-                  label="Username"
-                  name="username"
-                  fullWidth
-                  defaultValue={customer.username}
-                  readOnly
-                />
+                    <TextField
+                      margin="normal"
+                      id="username"
+                      label="Username"
+                      name="username"
+                      fullWidth
+                      defaultValue={customer.username}
+                      readOnly
+                      disabled
+                    />
 
-              ) : (
-                  <TextField
-                    margin="normal"
-                    id="email"
-                    label="Email"
-                    name="email"
-                    fullWidth
-                    defaultValue={customer.emails[0].address}
-                    readOnly
-                  />
-                )}
-              <Grid container>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    margin="normal"
-                    id="phoneNumber"
-                    label="Phone number"
-                    name="phoneNumber"
-                    fullWidth
-                    defaultValue={customer.phone ? customer.phone : ''}
-                    inputProps={{}}
-                  />
-                </Grid>
-                <Grid item xs={12} sm={6}>
-                  <TextField
-                    margin="normal"
-                    id="postalCode"
-                    label="Postal code"
-                    name="postal_code"
-                    fullWidth
-                    defaultValue={customer.postalCode}
-                    inputProps={{}}
-                  />
-                </Grid>
-              </Grid>
-            </Paper>
+                  ) : (
+                    <TextField
+                      margin="normal"
+                      id="email"
+                      label="Email"
+                      name="email"
+                      fullWidth
+                      defaultValue={customer.emails[0].address}
+                    />
+                  )}
+                  <Grid container>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        id="phoneNumber"
+                        label="Phone number"
+                        name="phoneNumber"
+                        fullWidth
+                        defaultValue={customer.phone ? customer.phone : ''}
+                        inputProps={{}}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        id="postalCode"
+                        label="Postal code"
+                        name="postal_code"
+                        fullWidth
+                        defaultValue={customer.postalCode}
+                        inputProps={{}}
+                      />
+                    </Grid>
+                  </Grid>
+                </Paper>
+
+                <Button
+                  style={{ marginTop: '25px' }}
+                  disabled={this.state.submitLoading}
+                  raised
+                  className={`${buttonClassname}`}
+                  color="primary"
+                  type="submit"
+                >
+                  Update
+                  {this.state.submitLoading && (
+                    <CircularProgress
+                      size={24}
+                      className={this.props.classes.buttonProgress}
+                    />
+                  )}
+                </Button>
+              </form>
+            </div>
           )}
 
           {this.state.currentTab === 1 && (
@@ -1227,8 +1335,8 @@ class CurrentCustomerEditor extends React.Component {
                     Back
                   </Button>
                 ) : (
-                    ''
-                  )}
+                  ''
+                )}
 
                 {activeMealScheduleStep < 6 ? (
                   <Button
@@ -1238,8 +1346,8 @@ class CurrentCustomerEditor extends React.Component {
                     Next
                   </Button>
                 ) : (
-                    ''
-                  )}
+                  ''
+                )}
               </div>
               <Grid container>
                 <Grid item xs={12} style={{ marginTop: '25px' }}>
@@ -1488,8 +1596,8 @@ class CurrentCustomerEditor extends React.Component {
                         />
                       ))
                     ) : (
-                        <Chip className="chip--bordered" label="Ingredient" />
-                      )}
+                      <Chip className="chip--bordered" label="Ingredient" />
+                    )}
                   </div>
                 </Grid>
 
@@ -1535,8 +1643,8 @@ class CurrentCustomerEditor extends React.Component {
                         ),
                       )
                     ) : (
-                        <Chip className="chip--bordered" label="Ingredient" />
-                      )}
+                      <Chip className="chip--bordered" label="Ingredient" />
+                    )}
                   </div>
                 </Grid>
               </Grid>
@@ -1666,8 +1774,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                   {this.state.addressType == 'business' ? (
                     <div>
@@ -1727,8 +1835,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                   {this.state.addressType == 'dormitory' ? (
                     <div>
@@ -1907,8 +2015,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                   {this.state.addressType && this.state.addressType === 'hotel' ? (
                     <Grid container>
@@ -1955,8 +2063,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </Grid>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                   {this.state.addressType && this.state.addressType === 'house' ? (
                     <div>
@@ -1982,8 +2090,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                   {this.state.addressType ? (
                     <div>
@@ -2194,10 +2302,10 @@ class CurrentCustomerEditor extends React.Component {
                                 )
                                   .add(index, 'd')
                                   .format('DD')} & ${label.split('/')[1]} ${moment(
-                                    new Date(this.props.customerInfo.subscriptionStartDateRaw),
-                                  )
-                                    .add(index + 1, 'd')
-                                    .format('DD')}`;
+                                  new Date(this.props.customerInfo.subscriptionStartDateRaw),
+                                )
+                                  .add(index + 1, 'd')
+                                  .format('DD')}`;
                               }
 
                               return (
@@ -2225,8 +2333,8 @@ class CurrentCustomerEditor extends React.Component {
                               Back
                             </Button>
                           ) : (
-                              ''
-                            )}
+                            ''
+                          )}
 
                           {activeDeliveryScheduleStep < 5 ? (
                             <Button
@@ -2235,21 +2343,21 @@ class CurrentCustomerEditor extends React.Component {
                               Next
                             </Button>
                           ) : (
-                              ''
-                            )}
+                            ''
+                          )}
                         </Grid>
                       </Grid>
                     </div>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
                 </Paper>
               </Grid>
             </Grid>
           )}
 
         </Grid>
-      </form >
+      </div>
     );
   }
 }
@@ -2262,4 +2370,4 @@ CurrentCustomerEditor.propTypes = {
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
-export default CurrentCustomerEditor;
+export default withStyles(styles)(CurrentCustomerEditor);
