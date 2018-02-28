@@ -175,6 +175,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       schedule: customer.schedule,
       delivery,
       scheduleDays,
+      platingNotes: customer.platingNotes != undefined ? customer.platingNotes : '',
     };
 
     scheduleDays.forEach((e) => {
@@ -223,7 +224,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       }
     }
 
-
     this.dataByCustomer.push(customerToAdd);
   };
 
@@ -238,7 +238,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
 
     subscription.customers.forEach((customer) => {
       console.log('Customer from sub');
-      console.log(customer.specificRestrictions);
+      console.log(customer.platingNotes);
       const customerId = customer._id;
       const customerSchedule = customer.schedule;
       const customerLifestyleId = customer.lifestyle;

@@ -113,7 +113,7 @@ class CurrentCustomerEditor extends React.Component {
       suggestions: [],
       submitLoading: false,
       submitSuccess: false,
-      subIngredients: this.props.customer && this.props.customer.prefernces && this.props.customer.preferences.length > 0 ? this.props.customer.preferences : [],
+      subIngredients: this.props.customer && this.props.customer.preferences && this.props.customer.preferences.length > 0 ? this.props.customer.preferences : [],
       specificRestrictions: this.props.customer && this.props.customer.specificRestrictions && this.props.customer.specificRestrictions.length > 0 ? this.props.customer.specificRestrictions : [],
       deleteDialogOpen: false,
       addRestrictionType: 'Restriction',
@@ -169,14 +169,18 @@ class CurrentCustomerEditor extends React.Component {
           dinner: { active: false, portions: 'regular', quantity: '1' },
         },
       ],
+      platingNotes: '',
+      deliveryNotes: this.props.customer.secondary === undefined && this.props.customer.address.notes ? this.props.customer.address.notes : '',
+
 
       submitLoading: false,
       submitSuccess: false,
     };
 
     this.handleTabChange = this.handleTabChange.bind(this);
-
     this.saveFirstStep = this.saveFirstStep.bind(this);
+    this.saveSecondStep = this.saveSecondStep.bind(this);
+
   }
 
   componentDidMount() {
@@ -197,33 +201,58 @@ class CurrentCustomerEditor extends React.Component {
         },
 
         last_name: {
-          required: true,
+          required: this.props.customer.secondary === undefined ? true : false,
         },
 
         email: {
           required: true,
-          email: true,
+          email: this.props.customer.secondary === undefined ? true : false,
         },
 
         phoneNumber: {
           minlength: 10,
           maxlength: 10,
-          number: true,
-        },
-
-        type: {
-          required: true,
+          number: this.props.customer.secondary === undefined ? true : false,
         },
 
         postal_code: {
           minlength: 6,
           maxlength: 6,
           cdnPostal: true,
-          required: true,
+          required: this.props.customer.secondary === undefined ? true : false,
         },
       },
       submitHandler() {
         component.saveFirstStep();
+      },
+    });
+
+
+    validate(component.form2, {
+      errorPlacement(error, element) {
+        error.insertAfter(
+          $(element)
+            .parent()
+            .parent(),
+        );
+      },
+
+      rules: {
+        first_name: { required: true },
+
+        last_name: { required: this.props.customer.secondary === undefined ? true : false },
+
+        lifestyle: { required: true },
+
+        discount: { required: true },
+
+        // type: {
+        //   required: true,
+        // },
+      },
+
+      submitHandler() {
+        component.saveSecondStep();
       },
     });
   }
@@ -239,16 +268,80 @@ class CurrentCustomerEditor extends React.Component {
       firstName: $('[name="first_name"]').val().trim(),
       lastName: $('[name="last_name"]').val().trim(),
       postalCode: $('[name="postal_code"]').val().trim(),
-      email: $('[name="email"]').val().trim(),
       phoneNumber: $('[name="phoneNumber"]').val().trim(),
     };
 
     if (this.props.customer.secondary) {
       step1Data.username = $('[name="username"]').val().trim();
+      step1Data.secondary = true;
+    } else {
+      step1Data.email = $('[name="email"]').val().trim();
     }
+
+    console.log(step1Data);
 
 
     Meteor.call('edit.customer.step1', step1Data, (err, res) => {
+      if (err) {
+        this.setState({
+          submitSuccess: false,
+          submitLoading: false,
+        }, () => {
+          this.props.popTheSnackbar({
+            message: err.reason,
+          });
+        });
+      } else {
+        this.setState({
+          submitSuccess: true,
+          submitLoading: false,
+        }, () => {
+          this.props.popTheSnackbar({
+            message: 'Customer details updated successfully.',
+          });
+        });
+      }
+    });
+  }
+
+  saveSecondStep() {
+
+    if (!$('#step2').valid()) {
+      return;
+    }
+
+    if (
+      this.state.scheduleReal.find(
+        el => el.breakfast.active || el.lunch.active || el.dinner.active,
+      ) === undefined
+    ) {
+      this.props.popTheSnackbar({
+        message:
+          'There should be at least one meal type selected in the primary profile.',
+      });
+
+      return;
+    }
+
+    this.setState({
+      submitSuccess: false,
+      submitLoading: true,
+    });
+
+    const step2Data = {
+      id: this.props.customer._id,
+      subIngredients: this.state.subIngredients,
+      specificRestrictions: this.state.specificRestrictions,
+      // lifestyle: this.props.lifestyles.find(e => e.title === this.state.lifestyle),
+      // discount: this.state.discount,
+      restrictions: this.state.restrictions,
+      // scheduleReal: this.state.scheduleReal,
+      platingNotes: this.state.platingNotes,
+      deliveryNotes: this.state.deliveryNotes,
+      secondary: this.props.customer.secondary == undefined ? false : true
+    };
+
+    Meteor.call('edit.customer.step2', step2Data, (err, res) => {
       if (err) {
         this.setState({
           submitSuccess: false,
@@ -662,8 +755,6 @@ class CurrentCustomerEditor extends React.Component {
             Quantity
           </Typography>
           <FormControl component="fieldset">
-            {/* {this.state.isLifestyleCustom ? ( */}
-
             <TextField
               disabled={!this.state.scheduleReal[index].breakfast.active}
               value={this.state.scheduleReal[index].breakfast.quantity}
@@ -677,41 +768,6 @@ class CurrentCustomerEditor extends React.Component {
                 min: 1,
               }}
             />
-
-            {/* ) : (
-                <RadioGroup
-                  aria-label=""
-                  name=""
-                  disabled={!this.state.scheduleReal[index].breakfast.active}
-                  value={this.state.scheduleReal[index].breakfast.quantity}
-                  onChange={this.handleChangeRadioScheduleQuantity.bind(
-                    this,
-                    index,
-                    'breakfast',
-                  )}
-                  style={{ flexDirection: 'row' }}
-                >
-                  <FormControlLabel
-                    value={'1'}
-                    control={<Radio />}
-                    label={'1'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].breakfast.active}
-                  />
-
-                  <FormControlLabel
-                    value={'2'}
-                    control={<Radio />}
-                    label={'2'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].breakfast.active}
-                  />
-                </RadioGroup>
-
-              )} */}
-
           </FormControl>
         </Grid>
 
@@ -782,8 +838,6 @@ class CurrentCustomerEditor extends React.Component {
           </Typography>
           <FormControl component="fieldset">
 
-            {/* {this.state.isLifestyleCustom ? ( */}
-
             <TextField
               disabled={!this.state.scheduleReal[index].lunch.active}
               value={this.state.scheduleReal[index].lunch.quantity}
@@ -798,41 +852,6 @@ class CurrentCustomerEditor extends React.Component {
               }}
 
             />
-
-            {/* ) : ( */}
-
-            {/* <RadioGroup
-                  aria-label=""
-                  name=""
-                  disabled={!this.state.scheduleReal[index].lunch.active}
-                  value={this.state.scheduleReal[index].lunch.quantity}
-                  onChange={this.handleChangeRadioScheduleQuantity.bind(
-                    this,
-                    index,
-                    'lunch',
-                  )}
-                  style={{ flexDirection: 'row' }}
-                >
-                  <FormControlLabel
-                    value={'1'}
-                    control={<Radio />}
-                    label={'1'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].lunch.active}
-                  />
-
-                  <FormControlLabel
-                    value={'2'}
-                    control={<Radio />}
-                    label={'2'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].lunch.active}
-                  />
-                </RadioGroup>
-              )} */}
-
 
           </FormControl>
         </Grid>
@@ -902,7 +921,6 @@ class CurrentCustomerEditor extends React.Component {
             Quantity
           </Typography>
           <FormControl component="fieldset">
-            {/* {this.state.isLifestyleCustom ? ( */}
             <TextField
               name=""
               disabled={!this.state.scheduleReal[index].dinner.active}
@@ -919,39 +937,6 @@ class CurrentCustomerEditor extends React.Component {
               }}
 
             />
-            {/* ) : (
-
-                <RadioGroup
-                  aria-label=""
-                  name=""
-                  disabled={!this.state.scheduleReal[index].dinner.active}
-                  value={this.state.scheduleReal[index].dinner.quantity}
-                  onChange={this.handleChangeRadioScheduleQuantity.bind(
-                    this,
-                    index,
-                    'dinner',
-                  )}
-                  style={{ flexDirection: 'row' }}
-                >
-                  <FormControlLabel
-                    value={'1'}
-                    control={<Radio />}
-                    label={'1'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].dinner.active}
-                  />
-
-                  <FormControlLabel
-                    value={'2'}
-                    control={<Radio />}
-                    label={'2'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].dinner.active}
-                  />
-                </RadioGroup>
-              )} */}
 
           </FormControl>
         </Grid>
@@ -1029,15 +1014,7 @@ class CurrentCustomerEditor extends React.Component {
               >
                 Cancel
               </Button>
-              {/* <Button
-                // disabled={!this.state.hasFormChanged}
-                className="btn btn-primary"
-                raised
-                type="submit"
-                color="contrast"
-              >
-                Save
-              </Button> */}
+
             </div>
           </Grid>
         </Grid>
@@ -1057,7 +1034,7 @@ class CurrentCustomerEditor extends React.Component {
           {this.state.currentTab === 0 && (
             <div>
               <form
-id="step1"
+                id="step1"
                 ref={form => (this.form = form)}
                 onSubmit={event => event.preventDefault()}
               >
@@ -1101,15 +1078,15 @@ id="step1"
                     />
 
                   ) : (
-                    <TextField
-                      margin="normal"
-                      id="email"
-                      label="Email"
-                      name="email"
-                      fullWidth
-                      defaultValue={customer.emails[0].address}
-                    />
-                  )}
+                      <TextField
+                        margin="normal"
+                        id="email"
+                        label="Email"
+                        name="email"
+                        fullWidth
+                        defaultValue={customer.emails[0].address}
+                      />
+                    )}
                   <Grid container>
                     <Grid item xs={12} sm={6}>
                       <TextField
@@ -1157,109 +1134,111 @@ id="step1"
           )}
 
           {this.state.currentTab === 1 && (
-            <Paper elevation={2} style={{ width: '100%' }} className="paper-for-fields">
-              <Typography type="headline" style={{ marginBottom: '25px' }}>
-                {`${customer.profile.name.first}'s profile`}
-              </Typography>
+            <div>
+              <form id="step2" ref={form2 => (this.form2 = form2)} onSubmit={event => event.preventDefault()}>
+                <Paper elevation={2} style={{ width: '100%' }} className="paper-for-fields">
+                  <Typography type="headline" style={{ marginBottom: '25px' }}>
+                    {`${customer.profile.name.first}'s profile`}
+                  </Typography>
 
-              <Grid container>
-                <Grid item xs={12} sm={6} md={6}>
-                  <FormControl component="fieldset">
-                    <FormLabel component="legend">
-                      <Typography
-                        type="body1"
-                        className="text-uppercase font-medium"
-                      >
-                        Plan
+                  <Grid container>
+                    <Grid item xs={12} sm={6} md={6}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">
+                          <Typography
+                            type="body1"
+                            className="text-uppercase font-medium"
+                          >
+                            Plan
                       </Typography>
-                    </FormLabel>
-                    <RadioGroup
-                      aria-label="lifestyle"
-                      name="lifestyle"
-                      value={this.state.lifestyle}
-                      onChange={this.handleChangeRadioLifestyle.bind(this)}
-                      style={{ flexDirection: 'row' }}
-                    >
-                      {this.props.lifestyles.map((e, i) => (
-                        <FormControlLabel
-                          value={e.title}
-                          control={<Radio />}
-                          label={e.title}
-                          selected
-                          key={i}
-                        />
-                      ))}
-                    </RadioGroup>
-                  </FormControl>
-                </Grid>
+                        </FormLabel>
+                        <RadioGroup
+                          aria-label="lifestyle"
+                          name="lifestyle"
+                          value={this.state.lifestyle}
+                          onChange={this.handleChangeRadioLifestyle.bind(this)}
+                          style={{ flexDirection: 'row' }}
+                        >
+                          {this.props.lifestyles.map((e, i) => (
+                            <FormControlLabel
+                              value={e.title}
+                              control={<Radio />}
+                              label={e.title}
+                              selected
+                              key={i}
+                            />
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
+                    </Grid>
 
 
-                <Grid item xs={12} sm={6} md={6}>
-                  <FormControl component="fieldset">
-                    <FormLabel component="legend">
-                      <Typography
-                        type="body1"
-                        className="text-uppercase font-medium"
-                      >
-                        Discount
+                    <Grid item xs={12} sm={6} md={6}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">
+                          <Typography
+                            type="body1"
+                            className="text-uppercase font-medium"
+                          >
+                            Discount
                       </Typography>
-                    </FormLabel>
-                    <RadioGroup
-                      aria-label="discount"
-                      name="discount"
-                      value={this.state.discount}
-                      onChange={this.handleChangeRadioDiscount.bind(this)}
-                      style={{ flexDirection: 'row' }}
-                    >
-                      <FormControlLabel
-                        value="none"
-                        control={<Radio />}
-                        label="None"
-                        selected
-                        disabled={
-                          this.state.lifestyle &&
-                          this.props.lifestyles.find(
-                            element =>
-                              element.title == this.state.lifestyle &&
-                              !element.discountStudent &&
-                              !element.discountSenior,
-                          )
-                        }
-                      />
-                      <FormControlLabel
-                        value="student"
-                        control={<Radio />}
-                        label={'Student'}
-                        disabled={
-                          this.state.lifestyle &&
-                          this.props.lifestyles.find(
-                            element =>
-                              element.title == this.state.lifestyle &&
-                              !element.discountStudent,
-                          )
-                        }
-                      />
-                      {this.renderDiscountValue.bind(this, 'student')}
-                      <FormControlLabel
-                        value="senior"
-                        control={<Radio />}
-                        label={'Senior'}
-                        disabled={
-                          this.state.lifestyle &&
-                          this.props.lifestyles.find(
-                            element =>
-                              element.title == this.state.lifestyle &&
-                              !element.discountSenior,
-                          )
-                        }
-                      />
-                      {this.renderDiscountValue.bind(this, 'senior')}
-                    </RadioGroup>
-                  </FormControl>
-                </Grid>
-              </Grid>
+                        </FormLabel>
+                        <RadioGroup
+                          aria-label="discount"
+                          name="discount"
+                          value={this.state.discount}
+                          onChange={this.handleChangeRadioDiscount.bind(this)}
+                          style={{ flexDirection: 'row' }}
+                        >
+                          <FormControlLabel
+                            value="none"
+                            control={<Radio />}
+                            label="None"
+                            selected
+                            disabled={
+                              this.state.lifestyle &&
+                              this.props.lifestyles.find(
+                                element =>
+                                  element.title == this.state.lifestyle &&
+                                  !element.discountStudent &&
+                                  !element.discountSenior,
+                              )
+                            }
+                          />
+                          <FormControlLabel
+                            value="student"
+                            control={<Radio />}
+                            label={'Student'}
+                            disabled={
+                              this.state.lifestyle &&
+                              this.props.lifestyles.find(
+                                element =>
+                                  element.title == this.state.lifestyle &&
+                                  !element.discountStudent,
+                              )
+                            }
+                          />
+                          {this.renderDiscountValue.bind(this, 'student')}
+                          <FormControlLabel
+                            value="senior"
+                            control={<Radio />}
+                            label={'Senior'}
+                            disabled={
+                              this.state.lifestyle &&
+                              this.props.lifestyles.find(
+                                element =>
+                                  element.title == this.state.lifestyle &&
+                                  !element.discountSenior,
+                              )
+                            }
+                          />
+                          {this.renderDiscountValue.bind(this, 'senior')}
+                        </RadioGroup>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
 
-              {/* <Grid container style={{ marginTop: '25px' }}>
+                  {/* <Grid container style={{ marginTop: '25px' }}>
                 <Grid item xs={12} sm={6}>
                   <Typography
                     type="body1"
@@ -1298,368 +1277,416 @@ id="step1"
                 </Grid>
               </Grid> */}
 
-              <Stepper
-                activeStep={activeMealScheduleStep}
-                style={{
-                  marginTop: '40px',
-                  marginBottom: '20px',
-                  background: 'none !important',
-                }}
-              >
-                {mealSteps.map((label, index) => {
-                  const props = {};
-
-                  const momentDateObj = moment();
-
-                  const stepLabel = `${label} ${moment(
-                    this.state.subscriptionStartDateRaw,
-                  )
-                    .add(index, 'd')
-                    .format('DD')}`;
-
-                  return (
-                    <Step key={index} {...props}>
-                      <StepLabel>{stepLabel}</StepLabel>
-                    </Step>
-                  );
-                })}
-              </Stepper>
-              <div style={{ marginBottom: '30px' }}>
-                {this.renderMealStepsContent(this.state.activeMealScheduleStep)}
-
-                {activeMealScheduleStep >= 1 ? (
-                  <Button
-                    onClick={this.handleBackMealSchedule.bind(this)}
-                    style={{ marginTop: '20px' }}
+                  <Stepper
+                    activeStep={activeMealScheduleStep}
+                    style={{
+                      marginTop: '40px',
+                      marginBottom: '20px',
+                      background: 'none !important',
+                    }}
                   >
-                    Back
+                    {mealSteps.map((label, index) => {
+                      const props = {};
+
+                      const momentDateObj = moment();
+
+                      const stepLabel = `${label} ${moment(
+                        this.state.subscriptionStartDateRaw,
+                      )
+                        .add(index, 'd')
+                        .format('DD')}`;
+
+                      return (
+                        <Step key={index} {...props}>
+                          <StepLabel>{stepLabel}</StepLabel>
+                        </Step>
+                      );
+                    })}
+                  </Stepper>
+                  <div style={{ marginBottom: '30px' }}>
+                    {this.renderMealStepsContent(this.state.activeMealScheduleStep)}
+
+                    {activeMealScheduleStep >= 1 ? (
+                      <Button
+                        onClick={this.handleBackMealSchedule.bind(this)}
+                        style={{ marginTop: '20px' }}
+                      >
+                        Back
                   </Button>
-                ) : (
-                  ''
-                )}
+                    ) : (
+                        ''
+                      )}
 
-                {activeMealScheduleStep < 6 ? (
-                  <Button
-                    onClick={this.handleNextMealSchedule.bind(this)}
-                    style={{ marginTop: '20px' }}
-                  >
-                    Next
+                    {activeMealScheduleStep < 6 ? (
+                      <Button
+                        onClick={this.handleNextMealSchedule.bind(this)}
+                        style={{ marginTop: '20px' }}
+                      >
+                        Next
                   </Button>
-                ) : (
-                  ''
-                )}
-              </div>
-              <Grid container>
-                <Grid item xs={12} style={{ marginTop: '25px' }}>
-                  <Typography
-                    type="body1"
-                    className="text-uppercase font-medium"
-                  >
-                    Restrictions
+                    ) : (
+                        ''
+                      )}
+                  </div>
+                  <Grid container>
+                    <Grid item xs={12} style={{ marginTop: '25px' }}>
+                      <Typography
+                        type="body1"
+                        className="text-uppercase font-medium"
+                      >
+                        Restrictions
                   </Typography>
-                </Grid>
-                <Grid item xs={4}>
-                  <FormControl component="fieldset">
-                    <FormLabel component="legend">Allergies</FormLabel>
-                    <FormGroup>
-                      {this.props.restrictions
-                        .filter(e => e.restrictionType === 'allergy')
-                        .map((e, i) => {
-                          const isSelected = this.state.restrictions.length
-                            ? this.state.restrictions.indexOf(e._id) != -1
-                            : false;
+                    </Grid>
+                    <Grid item xs={4}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">Allergies</FormLabel>
+                        <FormGroup>
+                          {this.props.restrictions
+                            .filter(e => e.restrictionType === 'allergy')
+                            .map((e, i) => {
+                              const isSelected = this.state.restrictions.length
+                                ? this.state.restrictions.indexOf(e._id) != -1
+                                : false;
 
-                          const isAlreadyChecked = this.state
-                            .lifestyleRestrictions
-                            ? this.state.lifestyleRestrictions.indexOf(e._id) !=
-                            -1
-                            : false;
-                          return (
-                            <FormControlLabel
-                              key={i}
-                              disabled={isAlreadyChecked}
-                              control={
-                                <Checkbox
-                                  checked={isSelected || isAlreadyChecked}
-                                  onChange={this.handleChange.bind(this, e._id)}
-                                  value={e.title.toLowerCase()}
+                              const isAlreadyChecked = this.state
+                                .lifestyleRestrictions
+                                ? this.state.lifestyleRestrictions.indexOf(e._id) !=
+                                -1
+                                : false;
+                              return (
+                                <FormControlLabel
+                                  key={i}
+                                  disabled={isAlreadyChecked}
+                                  control={
+                                    <Checkbox
+                                      checked={isSelected || isAlreadyChecked}
+                                      onChange={this.handleChange.bind(this, e._id)}
+                                      value={e.title.toLowerCase()}
+                                    />
+                                  }
+                                  label={e.title}
                                 />
-                              }
-                              label={e.title}
-                            />
-                          );
-                        })}
-                    </FormGroup>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={4}>
-                  <FormControl component="fieldset">
-                    <FormLabel component="legend">Dietary</FormLabel>
-                    <FormGroup>
-                      {this.props.restrictions
-                        .filter(e => e.restrictionType === 'dietary')
-                        .map((e, i) => {
-                          const isSelected = this.state.restrictions.length
-                            ? this.state.restrictions.indexOf(e._id) != -1
-                            : false;
+                              );
+                            })}
+                        </FormGroup>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">Dietary</FormLabel>
+                        <FormGroup>
+                          {this.props.restrictions
+                            .filter(e => e.restrictionType === 'dietary')
+                            .map((e, i) => {
+                              const isSelected = this.state.restrictions.length
+                                ? this.state.restrictions.indexOf(e._id) != -1
+                                : false;
 
-                          const isAlreadyChecked = this.state
-                            .lifestyleRestrictions
-                            ? this.state.lifestyleRestrictions.indexOf(e._id) !=
-                            -1
-                            : false;
-                          return (
-                            <FormControlLabel
-                              key={i}
-                              disabled={isAlreadyChecked}
-                              control={
-                                <Checkbox
-                                  checked={isSelected || isAlreadyChecked}
-                                  onChange={this.handleChange.bind(this, e._id)}
-                                  value={e.title.toLowerCase()}
+                              const isAlreadyChecked = this.state
+                                .lifestyleRestrictions
+                                ? this.state.lifestyleRestrictions.indexOf(e._id) !=
+                                -1
+                                : false;
+                              return (
+                                <FormControlLabel
+                                  key={i}
+                                  disabled={isAlreadyChecked}
+                                  control={
+                                    <Checkbox
+                                      checked={isSelected || isAlreadyChecked}
+                                      onChange={this.handleChange.bind(this, e._id)}
+                                      value={e.title.toLowerCase()}
+                                    />
+                                  }
+                                  label={e.title}
                                 />
-                              }
-                              label={e.title}
-                            />
-                          );
-                        })}
-                    </FormGroup>
-                  </FormControl>
-                </Grid>
-                <Grid item xs={4}>
-                  <FormControl component="fieldset">
-                    <FormLabel component="legend">Religious</FormLabel>
-                    <FormGroup>
-                      {this.props.restrictions
-                        .filter(e => e.restrictionType === 'religious')
-                        .map((e, i) => {
-                          const isSelected = this.state.restrictions.length
-                            ? this.state.restrictions.indexOf(e._id) != -1
-                            : false;
+                              );
+                            })}
+                        </FormGroup>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">Religious</FormLabel>
+                        <FormGroup>
+                          {this.props.restrictions
+                            .filter(e => e.restrictionType === 'religious')
+                            .map((e, i) => {
+                              const isSelected = this.state.restrictions.length
+                                ? this.state.restrictions.indexOf(e._id) != -1
+                                : false;
 
-                          const isAlreadyChecked = this.state
-                            .lifestyleRestrictions
-                            ? this.state.lifestyleRestrictions.indexOf(e._id) !=
-                            -1
-                            : false;
-                          return (
-                            <FormControlLabel
-                              key={i}
-                              disabled={isAlreadyChecked}
-                              control={
-                                <Checkbox
-                                  checked={isSelected || isAlreadyChecked}
-                                  onChange={this.handleChange.bind(this, e._id)}
-                                  value={e.title.toLowerCase()}
+                              const isAlreadyChecked = this.state
+                                .lifestyleRestrictions
+                                ? this.state.lifestyleRestrictions.indexOf(e._id) !=
+                                -1
+                                : false;
+                              return (
+                                <FormControlLabel
+                                  key={i}
+                                  disabled={isAlreadyChecked}
+                                  control={
+                                    <Checkbox
+                                      checked={isSelected || isAlreadyChecked}
+                                      onChange={this.handleChange.bind(this, e._id)}
+                                      value={e.title.toLowerCase()}
+                                    />
+                                  }
+                                  label={e.title}
                                 />
-                              }
-                              label={e.title}
-                            />
-                          );
-                        })}
-                    </FormGroup>
-                  </FormControl>
-                </Grid>
-              </Grid>
+                              );
+                            })}
+                        </FormGroup>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
 
-              <Dialog
-                maxWidth={false}
-                open={this.state.deleteDialogOpen}
-                onClose={this.deleteDialogHandleRequestClose.bind(this)}
-              >
-                <Typography
-                  style={{
-                    flex: '0 0 auto',
-                    margin: '0',
-                    padding: '24px 24px 20px 24px',
-                  }}
-                  className="title font-medium"
-                  type="title"
-                >
-                  Add a restriction
+                  <Dialog
+                    maxWidth={false}
+                    open={this.state.deleteDialogOpen}
+                    onClose={this.deleteDialogHandleRequestClose.bind(this)}
+                  >
+                    <Typography
+                      style={{
+                        flex: '0 0 auto',
+                        margin: '0',
+                        padding: '24px 24px 20px 24px',
+                      }}
+                      className="title font-medium"
+                      type="title"
+                    >
+                      Add a restriction
                 </Typography>
 
-                <DialogContent>
-                  <DialogContentText>
-                    Select if it's a preference or if it's a restriction
+                    <DialogContent>
+                      <DialogContentText>
+                        Select if it's a preference or if it's a restriction
                   </DialogContentText>
-                  <FormControl component="fieldset">
-                    <RadioGroup
-                      aria-label="restritionOrPref"
-                      name="restritionOrPref"
-                      value={this.state.addRestrictionType}
-                      onChange={this.handleChangeRadioRestriction.bind(this)}
-                      style={{ flexDirection: 'row' }}
-                    >
-                      <FormControlLabel
-                        value="Restriction"
-                        control={<Radio selected />}
-                        label="Restriction"
-                      />
-                      <FormControlLabel
-                        value="Preference"
-                        control={<Radio />}
-                        label="Preference"
-                        selected
-                      />
-                    </RadioGroup>
-                  </FormControl>
-
-                  <Autosuggest
-                    id="2"
-                    className="autosuggest"
-                    theme={{
-                      container: {
-                        flexGrow: 1,
-                        position: 'relative',
-                        marginBottom: '2em',
-                      },
-                      suggestionsContainerOpen: {
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                      },
-                      suggestion: {
-                        display: 'block',
-                      },
-                      suggestionsList: {
-                        margin: 0,
-                        padding: 0,
-                        listStyleType: 'none',
-                      },
-                    }}
-                    renderInputComponent={this.renderInput.bind(this)}
-                    suggestions={this.state.suggestions}
-                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                      this,
-                    )}
-                    onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                      this,
-                    )}
-                    onSuggestionSelected={this.onSuggestionSelected.bind(this)}
-                    getSuggestionValue={this.getSuggestionValue.bind(this)}
-                    renderSuggestion={this.renderSuggestion.bind(this)}
-                    renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                      this,
-                    )}
-                    fullWidth
-                    focusInputOnSuggestionClick={false}
-                    inputProps={{
-                      placeholder: 'Search',
-                      value: this.state.value,
-                      onChange: this.onChange.bind(this),
-                      className: 'autoinput',
-                    }}
-                  />
-                </DialogContent>
-                <DialogActions>
-                  <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">Close</Button>
-                </DialogActions>
-              </Dialog>
-
-              <Grid container>
-                <Grid item xs={12} sm={6}>
-                  <Typography
-                    type="subheading"
-                    className="text-uppercase font-medium"
-                  >
-                    Preferences
-                  </Typography>
-
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                      marginTop: '25px',
-                    }}
-                  >
-                    {this.state.subIngredients.length ? (
-                      this.state.subIngredients.map((subIngredient, i) => (
-                        <Chip
-                          avatar={
-                            <Avatar>
-                              {' '}
-                              {this.getSubIngredientAvatar(subIngredient)}{' '}
-                            </Avatar>
-                          }
-                          style={{
-                            marginRight: '8px',
-                            marginBottom: '8px',
-                          }}
-                          label={this.getSubIngredientTitle(subIngredient)}
-                          key={i}
-                          onDelete={this.handleSubIngredientChipDelete.bind(
-                            this,
-                            subIngredient,
-                          )}
-                        />
-                      ))
-                    ) : (
-                      <Chip className="chip--bordered" label="Ingredient" />
-                    )}
-                  </div>
-                </Grid>
-
-                <Grid item xs={12} sm={6}>
-                  <Typography
-                    type="subheading"
-                    className="text-uppercase font-medium"
-                  >
-                    Restrictions
-                  </Typography>
-
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                      marginTop: '25px',
-                    }}
-                  >
-                    {this.state.specificRestrictions.length ? (
-                      this.state.specificRestrictions.map(
-                        (subIngredient, i) => (
-                          <Chip
-                            avatar={
-                              <Avatar>
-                                {' '}
-                                {this.getSubIngredientAvatar(
-                                  subIngredient,
-                                )}{' '}
-                              </Avatar>
-                            }
-                            style={{
-                              marginRight: '8px',
-                              marginBottom: '8px',
-                            }}
-                            label={this.getSubIngredientTitle(subIngredient)}
-                            key={i}
-                            onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
-                              this,
-                              subIngredient,
-                            )}
+                      <FormControl component="fieldset">
+                        <RadioGroup
+                          aria-label="restritionOrPref"
+                          name="restritionOrPref"
+                          value={this.state.addRestrictionType}
+                          onChange={this.handleChangeRadioRestriction.bind(this)}
+                          style={{ flexDirection: 'row' }}
+                        >
+                          <FormControlLabel
+                            value="Restriction"
+                            control={<Radio selected />}
+                            label="Restriction"
                           />
-                        ),
-                      )
-                    ) : (
-                      <Chip className="chip--bordered" label="Ingredient" />
-                    )}
-                  </div>
-                </Grid>
-              </Grid>
-              <Grid container>
-                <Grid item xs={12}>
-                  <Button
-                    style={{ marginTop: '25px' }}
-                    color="primary"
-                    onClick={this.deleteDialogHandleOpen.bind(this)}
-                  >
-                    Add a restriction
+                          <FormControlLabel
+                            value="Preference"
+                            control={<Radio />}
+                            label="Preference"
+                            selected
+                          />
+                        </RadioGroup>
+                      </FormControl>
+
+                      <Autosuggest
+                        id="2"
+                        className="autosuggest"
+                        theme={{
+                          container: {
+                            flexGrow: 1,
+                            position: 'relative',
+                            marginBottom: '2em',
+                          },
+                          suggestionsContainerOpen: {
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                          },
+                          suggestion: {
+                            display: 'block',
+                          },
+                          suggestionsList: {
+                            margin: 0,
+                            padding: 0,
+                            listStyleType: 'none',
+                          },
+                        }}
+                        renderInputComponent={this.renderInput.bind(this)}
+                        suggestions={this.state.suggestions}
+                        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
+                          this,
+                        )}
+                        onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
+                          this,
+                        )}
+                        onSuggestionSelected={this.onSuggestionSelected.bind(this)}
+                        getSuggestionValue={this.getSuggestionValue.bind(this)}
+                        renderSuggestion={this.renderSuggestion.bind(this)}
+                        renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                          this,
+                        )}
+                        fullWidth
+                        focusInputOnSuggestionClick={false}
+                        inputProps={{
+                          placeholder: 'Search',
+                          value: this.state.value,
+                          onChange: this.onChange.bind(this),
+                          className: 'autoinput',
+                        }}
+                      />
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">Close</Button>
+                    </DialogActions>
+                  </Dialog>
+
+                  <Grid container>
+                    <Grid item xs={12} sm={6}>
+                      <Typography
+                        type="subheading"
+                        className="text-uppercase font-medium"
+                      >
+                        Preferences
+                  </Typography>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          marginTop: '25px',
+                        }}
+                      >
+                        {this.state.subIngredients.length ? (
+                          this.state.subIngredients.map((subIngredient, i) => (
+                            <Chip
+                              avatar={
+                                <Avatar>
+                                  {' '}
+                                  {this.getSubIngredientAvatar(subIngredient)}{' '}
+                                </Avatar>
+                              }
+                              style={{
+                                marginRight: '8px',
+                                marginBottom: '8px',
+                              }}
+                              label={this.getSubIngredientTitle(subIngredient)}
+                              key={i}
+                              onDelete={this.handleSubIngredientChipDelete.bind(
+                                this,
+                                subIngredient,
+                              )}
+                            />
+                          ))
+                        ) : (
+                            <Chip className="chip--bordered" label="Ingredient" />
+                          )}
+                      </div>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Typography
+                        type="subheading"
+                        className="text-uppercase font-medium"
+                      >
+                        Restrictions
+                  </Typography>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          marginTop: '25px',
+                        }}
+                      >
+                        {this.state.specificRestrictions.length ? (
+                          this.state.specificRestrictions.map(
+                            (subIngredient, i) => (
+                              <Chip
+                                avatar={
+                                  <Avatar>
+                                    {' '}
+                                    {this.getSubIngredientAvatar(
+                                      subIngredient,
+                                    )}{' '}
+                                  </Avatar>
+                                }
+                                style={{
+                                  marginRight: '8px',
+                                  marginBottom: '8px',
+                                }}
+                                label={this.getSubIngredientTitle(subIngredient)}
+                                key={i}
+                                onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                                  this,
+                                  subIngredient,
+                                )}
+                              />
+                            ),
+                          )
+                        ) : (
+                            <Chip className="chip--bordered" label="Ingredient" />
+                          )}
+                      </div>
+                    </Grid>
+                  </Grid>
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <Button
+                        style={{ marginTop: '25px' }}
+                        color="primary"
+                        onClick={this.deleteDialogHandleOpen.bind(this)}
+                      >
+                        Add a restriction
                   </Button>
-                </Grid>
-              </Grid>
-            </Paper>
+                    </Grid>
+                  </Grid>
+
+                  <Grid container style={{ marginTop: "25px" }}>
+                    <Grid item xs={12} sm={12}>
+                      <TextField
+                        label="Plating notes"
+                        id="platingNotes"
+                        name="platingNotes"
+                        value={this.state.platingNotes}
+                        fullWidth
+                        multiline
+                        onChange={(event) => { this.setState({ platingNotes: event.target.value }); }}
+                      />
+                    </Grid>
+                  </Grid>
+                  {this.props.customer.secondary == undefined && (
+                    <Grid container style={{ marginTop: "25px" }}>
+                      <Grid item xs={12} sm={12}>
+                        <TextField
+                          label="Delivery notes"
+                          id="deliveryNotes"
+                          name="deliveryNotes"
+                          value={this.state.deliveryNotes}
+                          fullWidth
+                          multiline
+                          onChange={(event) => { this.setState({ deliveryNotes: event.target.value }); }}
+                        />
+                      </Grid>
+                    </Grid>
+                  )}
+                </Paper>
+                <Button
+                  style={{ marginTop: '25px' }}
+                  disabled={this.state.submitLoading}
+                  raised
+                  className={`${buttonClassname}`}
+                  color="primary"
+                  type="submit"
+                  onClick={() => this.saveSecondStep()}
+                >
+                  Update
+                 {this.state.submitLoading && (
+                    <CircularProgress
+                      size={24}
+                      className={this.props.classes.buttonProgress}
+                    />
+                  )}
+                </Button>
+              </form>
+            </div>
           )}
 
           {this.state.currentTab === 2 && (
@@ -1774,8 +1801,8 @@ id="step1"
                       </Grid>
                     </div>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {this.state.addressType == 'business' ? (
                     <div>
@@ -1835,8 +1862,8 @@ id="step1"
                       </Grid>
                     </div>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {this.state.addressType == 'dormitory' ? (
                     <div>
@@ -2015,8 +2042,8 @@ id="step1"
                       </Grid>
                     </div>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {this.state.addressType && this.state.addressType === 'hotel' ? (
                     <Grid container>
@@ -2063,8 +2090,8 @@ id="step1"
                       </Grid>
                     </Grid>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {this.state.addressType && this.state.addressType === 'house' ? (
                     <div>
@@ -2090,8 +2117,8 @@ id="step1"
                       </Grid>
                     </div>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {this.state.addressType ? (
                     <div>
@@ -2302,10 +2329,10 @@ id="step1"
                                 )
                                   .add(index, 'd')
                                   .format('DD')} & ${label.split('/')[1]} ${moment(
-                                  new Date(this.props.customerInfo.subscriptionStartDateRaw),
-                                )
-                                  .add(index + 1, 'd')
-                                  .format('DD')}`;
+                                    new Date(this.props.customerInfo.subscriptionStartDateRaw),
+                                  )
+                                    .add(index + 1, 'd')
+                                    .format('DD')}`;
                               }
 
                               return (
@@ -2333,8 +2360,8 @@ id="step1"
                               Back
                             </Button>
                           ) : (
-                            ''
-                          )}
+                              ''
+                            )}
 
                           {activeDeliveryScheduleStep < 5 ? (
                             <Button
@@ -2343,14 +2370,14 @@ id="step1"
                               Next
                             </Button>
                           ) : (
-                            ''
-                          )}
+                              ''
+                            )}
                         </Grid>
                       </Grid>
                     </div>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
                 </Paper>
               </Grid>
             </Grid>

@@ -86,41 +86,45 @@ Meteor.methods({
       firstName: String,
       lastName: String,
       postalCode: String,
-      email: String,
+      email: Match.Optional(String),
+      secondary: Match.Optional(Boolean),
       phoneNumber: String,
       username: Match.Optional(String),
     });
 
-    const postalCodeExists = PostalCodes.findOne({
-      title: data.postalCode.substr(0, 3).toUpperCase(),
-    });
-
-    console.log(postalCodeExists);
-
-    if (!postalCodeExists) {
-      console.log(postalCodeExists);
-      throw new Meteor.Error(400, 'Delivery not available in that area.');
+    let toUpdate = {
+      'profile.name.first': data.firstName,
+      'profile.name.last': data.lastName || '',
     }
 
-    const detailsToUpdate = {
-      firstName: data.firstName,
-      lastName: data.lastName,
-      postalCode: data.postalCode,
-      email: data.email,
-      phoneNumber: data.phoneNumber,
-    };
+    if(data.secondary){
+
+      toUpdate.username = data.username;
+      
+    }else{
+
+      const postalCodeExists = PostalCodes.findOne({
+        title: data.postalCode.substr(0, 3).toUpperCase(),
+      });
+  
+      console.log(postalCodeExists);
+
+      if (!postalCodeExists) {
+        console.log(postalCodeExists);
+        throw new Meteor.Error(400, 'Delivery not available in that area.');
+      }
+      
+      toUpdate.postalCode = data.postalCode;
+      toUpdate.postalCodeId = postalCodeExists._id;
+      toUpdate['emails.0.address'] = data.email;
+      toUpdate.phone = data.phoneNumber;
+    }
+    
 
     Meteor.users.update({
       _id: data.id,
     }, {
-      $set: {
-        'profile.name.first': data.firstName,
-        'profile.name.last': data.lastName,
-        postalCode: data.postalCode,
-        postalCodeId: postalCodeExists._id,
-        'emails.0.address': data.email,
-        phone: data.phoneNumber,
-      },
+      $set: toUpdate,
     });
 
 
@@ -130,7 +134,25 @@ Meteor.methods({
 
   'edit.customer.step2': function editStep2(data) {
 
-    console.log(data);
+    check(data, {
+      id: String,
+      restrictions: Array,
+      specificRestrictions: Array,
+      subIngredients: Array,
+      platingNotes: String,
+      deliveryNotes: String,
+      secondary: Match.Optional(Boolean)
+    });
+
+    Meteor.users.update({ _id: data.id },{ 
+      $set: {
+        restrictions: data.restrictions,
+        specificRestrictions: data.specificRestrictions,
+        preferences: data.subIngredients,
+        platingNotes: data.platingNotes,
+        'address.notes': data.deliveryNotes
+      }
+    });
 
   },
 

@@ -137,12 +137,12 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   }
 
   if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
-    restrictionsLine += `${userData.specificRestrictions.map(rest => rest.title).join(', ')}`;
+    restrictionsLine += `${restrictionsPresent ? ` ` : `Restrictions: `}${userData.specificRestrictions.map(rest => rest.title).join(', ')}`;
     restrictionsPresent = true;
   }
 
   if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
-    restrictionsLine += `${userData.preferences.map(rest => rest.title).join(', ')}`;
+    restrictionsLine += `${restrictionsPresent ? ` ` : `Restrictions: `}${userData.preferences.map(rest => rest.title).join(', ')}`;
     restrictionsPresent = true;
   }
 
@@ -495,6 +495,7 @@ class PlatingTable extends React.Component {
                 <TableRow>
                   <TableCell>Name</TableCell>
                   <TableCell>Lifestyle</TableCell>
+                  <TableCell>Notes</TableCell>
                   <TableCell>Portion</TableCell>
                   <TableCell>Specific Restrictions</TableCell>
                   <TableCell>Preferences</TableCell>
@@ -518,6 +519,7 @@ class PlatingTable extends React.Component {
                           <TableRow key={Random.id()}>
                             <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
                             <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.platingNotes ? n.platingNotes : '-'}</Typography></TableCell>
                             <TableCell>
                               <Typography type="subheading">
                                 {n[mealType] > 0 ? `Regular x${n[`${mealType}`]}` : ''}
