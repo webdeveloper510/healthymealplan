@@ -121,17 +121,35 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   }
 
   // instructions
-  if (currentPlate.hasOwnProperty('instructions')) {
+  if (currentPlate.hasOwnProperty('instruction')) {
     doc.setFontStyle('normal');
     doc.setFontSize(9);
-    doc.text(doc.splitTextToSize(currentPlate.instructions, 3.25), 0.25, 2);
+    doc.text(doc.splitTextToSize(currentPlate.instruction.description, 3.25), 0.25, 2);
   }
+
+  let restrictionsLine = "";
+  let restrictionsPresent = false;
 
   // restrictions
   if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
+    restrictionsLine += `Restrictions: ${userData.restrictions.map(rest => rest.title).join(', ')}`;
+    restrictionsPresent = true;
+  }
+
+  if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
+    restrictionsLine += ` Specific: ${userData.specificRestrictions.map(rest => rest.title).join(', ')}`;
+    restrictionsPresent = true;
+  }
+
+  if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
+    restrictionsLine += ` Pref: ${userData.preferences.map(rest => rest.title).join(', ')}`;
+    restrictionsPresent = true;
+  }
+
+  if (restrictionsPresent) {
     doc.setFontStyle('bold');
     doc.setFontSize(9);
-    doc.text(doc.splitTextToSize(`Restrictions: ${userData.restrictions.map(rest => rest.title).join(', ')}`, 3.25), 0.25, 2.2);
+    doc.text(doc.splitTextToSize(restrictionsLine, 3.25), 0.25, 2.2);
   }
 
   console.log(currentPlate.plate.nutritional);
@@ -246,7 +264,7 @@ class PlatingTable extends React.Component {
 
     if (lifestylePlates.length === 0 || !currentPlate) {
       this.props.popTheSnackbar({
-        message: `Could not find a dish for ${this.state.lifestyleTitle} ${this.state.mealTitle}.Please assign a dish.`,
+        message: `Could not find a dish for ${this.state.lifestyleTitle} ${this.state.mealTitle}. Please assign a dish.`,
       });
 
       return;
@@ -264,68 +282,68 @@ class PlatingTable extends React.Component {
       user[this.state.mealTitle.toLowerCase()] > 0 ||
       user[`athletic${this.state.mealTitle}`] > 0 ||
       user[`bodybuilder${this.state.mealTitle}`] > 0).forEach((userData, index) => {
-      if (this.state.mealTitle === 'Breakfast') {
-        if (userData.breakfast > 0) {
-          for (let i = 1; i <= userData.breakfast; i++) {
-            renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast', 'regular', this.props.currentSelectorDate);
+        if (this.state.mealTitle === 'Breakfast') {
+          if (userData.breakfast > 0) {
+            for (let i = 1; i <= userData.breakfast; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast', 'regular', this.props.currentSelectorDate);
+            }
           }
-        }
 
-        if (userData.athleticBreakfast > 0) {
-          for (let i = 1; i <= userData.athleticBreakfast; i++) {
-            renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Athletic)', 'athletic', this.props.currentSelectorDate);
+          if (userData.athleticBreakfast > 0) {
+            for (let i = 1; i <= userData.athleticBreakfast; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Athletic)', 'athletic', this.props.currentSelectorDate);
+            }
           }
-        }
 
-        if (userData.bodybuilderBreakfast > 0) {
-          for (let i = 1; i <= userData.bodybuilderBreakfast; i++) {
-            renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+          if (userData.bodybuilderBreakfast > 0) {
+            for (let i = 1; i <= userData.bodybuilderBreakfast; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+            }
           }
-        }
-      }// Breakfast
+        }// Breakfast
 
-      if (this.state.mealTitle === 'Dinner') {
-        if (userData.dinner > 0) {
-          for (let i = 1; i <= userData.dinner; i++) {
-            renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner', 'regular', this.props.currentSelectorDate);
+        if (this.state.mealTitle === 'Dinner') {
+          if (userData.dinner > 0) {
+            for (let i = 1; i <= userData.dinner; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner', 'regular', this.props.currentSelectorDate);
+            }
           }
-        }
 
-        if (userData.athleticDinner > 0) {
-          for (let i = 1; i <= userData.athleticDinner; i++) {
-            renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Athletic)', 'athletic', this.props.currentSelectorDate);
+          if (userData.athleticDinner > 0) {
+            for (let i = 1; i <= userData.athleticDinner; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Athletic)', 'athletic', this.props.currentSelectorDate);
+            }
           }
-        }
 
-        if (userData.bodybuilderDinner > 0) {
-          for (let i = 1; i <= userData.bodybuilderDinner; i++) {
-            renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+          if (userData.bodybuilderDinner > 0) {
+            for (let i = 1; i <= userData.bodybuilderDinner; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+            }
           }
-        }
-      } // Dinner
+        } // Dinner
 
-      if (this.state.mealTitle === 'Lunch') {
-        if (userData.lunch > 0) {
-          for (let i = 1; i <= userData.lunch; i++) {
-            renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch', 'regular', this.props.currentSelectorDate);
+        if (this.state.mealTitle === 'Lunch') {
+          if (userData.lunch > 0) {
+            for (let i = 1; i <= userData.lunch; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch', 'regular', this.props.currentSelectorDate);
+            }
           }
-        }
 
-        if (userData.athleticLunch > 0) {
-          for (let i = 1; i <= userData.athleticLunch; i++) {
-            renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Athletic)', 'athletic', this.props.currentSelectorDate);
+          if (userData.athleticLunch > 0) {
+            for (let i = 1; i <= userData.athleticLunch; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Athletic)', 'athletic', this.props.currentSelectorDate);
+            }
           }
-        }
 
-        if (userData.bodybuilderLunch > 0) {
-          for (let i = 1; i <= userData.bodybuilderLunch; i++) {
-            renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+          if (userData.bodybuilderLunch > 0) {
+            for (let i = 1; i <= userData.bodybuilderLunch; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+            }
           }
-        }
-      } // Lunch
+        } // Lunch
 
-      // console.log(userData);
-    }); // map
+        // console.log(userData);
+      }); // map
 
     doc.deletePage(1);
 
@@ -440,8 +458,8 @@ class PlatingTable extends React.Component {
                     )));
                 })
               ) : (
-                <CircularProgress />
-              )}
+                  <CircularProgress />
+                )}
 
             </TableBody>
 
@@ -479,6 +497,7 @@ class PlatingTable extends React.Component {
                   <TableCell>Lifestyle</TableCell>
                   <TableCell>Portion</TableCell>
                   <TableCell>Specific Restrictions</TableCell>
+                  <TableCell>Preferences</TableCell>
                   <TableCell>Allergies</TableCell>
                   <TableCell>Dietary</TableCell>
                   <TableCell>Religious</TableCell>
@@ -490,29 +509,30 @@ class PlatingTable extends React.Component {
                     (user[this.state.mealTitle.toLowerCase()] > 0 ||
                       user[`athletic${this.state.mealTitle}`] > 0 ||
                       user[`bodybuilder${this.state.mealTitle}`] > 0)).map((n) => {
-                    const mealType = this.state.mealTitle.toLowerCase();
-                    const mealTypeNormal = this.state.mealTitle;
+                        const mealType = this.state.mealTitle.toLowerCase();
+                        const mealTypeNormal = this.state.mealTitle;
 
-                    console.log(n);
+                        console.log(n);
 
-                    return (
-                      <TableRow key={Random.id()}>
-                        <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
-                        <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
-                        <TableCell>
-                          <Typography type="subheading">
-                            {n[mealType] > 0 ? `Regular x${n[`${mealType}`]}` : ''}
-                            {n[`athletic${mealTypeNormal}`] > 0 ? `Athletic x${n[`athletic${mealTypeNormal}`]}` : ''}
-                            {n[`bodybuilder${mealTypeNormal}`] > 0 ? `Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}` : ''}
-                          </Typography>
-                        </TableCell>
-                        <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title) : ''}</Typography></TableCell>
-                        <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title) : ''}</Typography></TableCell>
-                        <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title) : ''}</Typography></TableCell>
-                        <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title) : ''}</Typography></TableCell>
-                      </TableRow>
-                    );
-                  })}
+                        return (
+                          <TableRow key={Random.id()}>
+                            <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
+                            <TableCell>
+                              <Typography type="subheading">
+                                {n[mealType] > 0 ? `Regular x${n[`${mealType}`]}` : ''}
+                                {n[`athletic${mealTypeNormal}`] > 0 ? `Athletic x${n[`athletic${mealTypeNormal}`]}` : ''}
+                                {n[`bodybuilder${mealTypeNormal}`] > 0 ? `Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}` : ''}
+                              </Typography>
+                            </TableCell>
+                            <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.preferences ? n.preferences.map(pref => pref.title).join(', ') : ''}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
+                          </TableRow>
+                        );
+                      })}
               </TableBody>
             </Table>
           </Paper>

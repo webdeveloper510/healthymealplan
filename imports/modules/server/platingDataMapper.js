@@ -150,7 +150,8 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       name: `${customer.profile.name.first} ${customer.profile.name.last ? customer.profile.name.last : ''}`,
 
       restrictions: null,
-      specifcRestrictions: customer.specifcRestrictions,
+      specificRestrictions: customer.specificRestrictions,
+      preferences: [],
 
       lifestyleId: customer.lifestyle,
       lifestyleName: lifestyleActual.title,
@@ -216,6 +217,12 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       customerToAdd.lifestyleRestrictions = Restrictions.find({ _id: { $in: lifestyleActual.restrictions } }).fetch();
     }
 
+    if (customer.hasOwnProperty('preferences') && customer.preferences != null) {
+      if (customer.preferences.length > 0) {
+        customerToAdd.preferences = customer.preferences.map((e) => { return { _id: e._id, title: e.title } });
+      }
+    }
+
 
     this.dataByCustomer.push(customerToAdd);
   };
@@ -231,7 +238,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
 
     subscription.customers.forEach((customer) => {
       console.log('Customer from sub');
-      console.log(customer.specifcRestrictions);
+      console.log(customer.specificRestrictions);
       const customerId = customer._id;
       const customerSchedule = customer.schedule;
       const customerLifestyleId = customer.lifestyle;

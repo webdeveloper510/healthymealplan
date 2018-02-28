@@ -91,7 +91,7 @@ class CustomerEditor extends React.Component {
       // selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
       hasFormChanged: false,
-      activeStep: 1,
+      activeStep: 0,
       customerInfo: {
         id: '',
         firstName: '',

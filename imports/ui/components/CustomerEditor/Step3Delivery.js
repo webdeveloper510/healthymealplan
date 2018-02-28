@@ -4833,7 +4833,7 @@ class Step3Delivery extends React.Component {
                   <Grid container>
                     <Grid item xs={12} sm={12}>
                       <TextField
-                        label="Notes"
+                        label="Delivery notes"
                         id="notes"
                         name="notes"
                         value={this.state.notes}

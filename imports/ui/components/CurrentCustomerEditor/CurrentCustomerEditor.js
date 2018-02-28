@@ -1014,7 +1014,7 @@ class CurrentCustomerEditor extends React.Component {
                     label="Phone number"
                     name="phoneNumber"
                     fullWidth
-                    defaultValue={customer.profile.phone ? customer.profile.phone : ''}
+                    defaultValue={customer.phone ? customer.phone : ''}
                     inputProps={{}}
                   />
                 </Grid>

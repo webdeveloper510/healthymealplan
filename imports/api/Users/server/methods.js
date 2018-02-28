@@ -180,7 +180,7 @@ Meteor.methods({
             customerInfo.primaryProfileBilling.specificRestrictions,
           preferences: customerInfo.primaryProfileBilling.preferences,
           schedule: customerInfo.scheduleReal,
-
+          platingNotes: customerInfo.platingNotes,
           subscriptionStartDate: customerInfo.activeImmediate ? new Date() : customerInfo.subscriptionStartDate,
           subscriptionStartDateRaw: customerInfo.activeImmediate ? new Date() : customerInfo.subscriptionStartDateRaw,
           associatedProfiles: customerInfo.secondaryProfileCount,
@@ -230,6 +230,7 @@ Meteor.methods({
               preferences:
                 customerInfo.secondaryProfilesBilling[index].preferences,
               schedule: element.scheduleReal,
+              platingNotes: element.platingNotes,
               adultOrChild: element.adultOrChild,
             },
           },

@@ -154,7 +154,7 @@ class Step4Checkout extends React.Component {
         specificRestrictions: this.props.customerInfo.specificRestrictions,
         specificRestrictionsActual: [],
         specificRestrictionsSurcharges: [],
-        preferences: this.props.customerInfo.preferences,
+        preferences: this.props.customerInfo.subIngredients,
         totalAthleticSurcharge: 0,
         totalBodybuilderSurcharge: 0,
         deliverySurcharges: 0
@@ -612,7 +612,7 @@ class Step4Checkout extends React.Component {
             specificRestrictionsActual: [],
             specificRestrictionsSurcharges: [],
             preferences: this.props.customerInfo.secondaryProfiles[index]
-              .preferences,
+              .subIngredients,
             totalAthleticSurcharge: 0,
             totalBodybuilderSurcharge: 0
           };

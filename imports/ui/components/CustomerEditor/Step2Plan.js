@@ -163,6 +163,7 @@ class Step2Plan extends React.Component {
           dinner: { active: false, portions: 'regular', quantity: '1' },
         },
       ],
+      platingNotes: '',
 
       activeMealScheduleStep: 0,
       subscriptionStartDate: moment(this.renderStartDays()[0]).format(
@@ -346,6 +347,7 @@ class Step2Plan extends React.Component {
           dinner: { active: false, portions: 'regular', quantity: '1' },
         },
       ],
+      platingNotes: '',
       adultOrChild: 'adult',
     });
 
@@ -517,6 +519,7 @@ class Step2Plan extends React.Component {
       discount: this.state.discount,
       restrictions: this.state.restrictions,
       scheduleReal: this.state.scheduleReal,
+      platingNotes: this.state.platingNotes,
       adultOrChild: this.state.adultOrChildValue,
       secondaryProfileCount: this.state.secondaryProfileCount,
       secondaryProfiles: this.state.secondaryProfilesData,
@@ -1198,6 +1201,18 @@ class Step2Plan extends React.Component {
         }}
       />
     );
+  }
+
+  handlePlatingNotesChangeSecondary(profileIndex, event) {
+
+    const secondaryProfilesDataCopy = this.state.secondaryProfilesData.slice();
+
+    secondaryProfilesDataCopy[profileIndex].platingNotes = event.target.value;
+
+    this.setState({
+      secondaryProfilesData: secondaryProfilesDataCopy,
+    });
+
   }
 
   renderDiscountValue(discountType) {
@@ -2259,7 +2274,7 @@ class Step2Plan extends React.Component {
                 </Grid>
 
                 <Grid item sm={6} xs={12}>
-                  <Typography type="body1" className="text-uppercase font-medium">Activate the subscription effective immediately?</Typography>
+                  <Typography type="body1" className="text-uppercase font-medium">Activate subscription effective immediately?</Typography>
                   <FormControl component="fieldset">
                     <Switch
                       checked={this.state.activeImmediate}
@@ -2630,6 +2645,19 @@ class Step2Plan extends React.Component {
                 </Grid>
               </Grid>
 
+              <Grid container style={{ marginTop: "25px" }}>
+                <Grid item xs={12} sm={12}>
+                  <TextField
+                    label="Plating notes"
+                    id="platingNotes"
+                    name="platingNotes"
+                    value={this.state.platingNotes}
+                    fullWidth
+                    multiline
+                    onChange={(event) => { this.setState({ platingNotes: event.target.value }); }}
+                  />
+                </Grid>
+              </Grid>
               {this.state.secondaryProfilesData.map((e, profileIndex) => (
                 <div key={profileIndex}>
                   <ListItem
@@ -3304,6 +3332,20 @@ class Step2Plan extends React.Component {
                           >
                             Add a restriction
                           </Button>
+                        </Grid>
+                      </Grid>
+
+                      <Grid container style={{ marginTop: "25px" }}>
+                        <Grid item xs={12} sm={12}>
+                          <TextField
+                            label="Plating notes"
+                            id="platingNotes"
+                            name="platingNotes"
+                            value={this.state.secondaryProfilesData[profileIndex].platingNotes}
+                            fullWidth
+                            multiline
+                            onChange={this.handlePlatingNotesChangeSecondary.bind(this, profileIndex)}
+                          />
                         </Grid>
                       </Grid>
 
