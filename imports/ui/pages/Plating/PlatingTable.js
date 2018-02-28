@@ -116,14 +116,14 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
 
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
-    doc.setFontSize(9);
+    doc.setFontSize(7);
     doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.75), 0.25, 1.65);
   }
 
   // instructions
   if (currentPlate.hasOwnProperty('instruction')) {
     doc.setFontStyle('normal');
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     doc.text(doc.splitTextToSize(currentPlate.instruction.description, 3.25), 0.25, 2);
   }
 
@@ -148,7 +148,7 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
 
   if (restrictionsPresent) {
     doc.setFontStyle('bold');
-    doc.setFontSize(9);
+    doc.setFontSize(7);
     doc.text(doc.splitTextToSize(restrictionsLine, 3.25), 0.25, 2.2);
   }
 
@@ -158,24 +158,24 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
     // calories
     doc.setFontStyle('normal');
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     const calories = [currentPlate.plate.nutritional[mealPortion].calories, 'calories'];
-    doc.text(calories, 2, 2.65);
+    doc.text(calories, 2, 2.7);
 
     // protein
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     const protein = [currentPlate.plate.nutritional[mealPortion].proteins, 'protein'];
-    doc.text(protein, 2.6, 2.65);
+    doc.text(protein, 2.6, 2.7);
 
     // carbs
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     const carbs = [currentPlate.plate.nutritional[mealPortion].carbs, 'carbs'];
-    doc.text(carbs, 3.1, 2.65);
+    doc.text(carbs, 3.1, 2.7);
 
     // fats
-    doc.setFontSize(9);
+    doc.setFontSize(8);
     const fats = [currentPlate.plate.nutritional[mealPortion].fat, 'fats'];
-    doc.text(fats, 3.55, 2.65);
+    doc.text(fats, 3.55, 2.7);
   }
 }
 

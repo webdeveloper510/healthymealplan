@@ -925,9 +925,10 @@ class CurrentCustomerEditor extends React.Component {
             <Typography
               type="headline"
               className="headline"
-              style={{ fontWeight: 500 }}
+              style={{ fontWeight: 500, alignItems: 'center', display: 'flex' }}
             >
               {customer.profile ? `${customer.profile.name.first} ${customer.profile.name.last}` : ''}
+              {customer.secondary && <Chip style={{ marginLeft: "20px" }} label="Secondary" />}
             </Typography>
 
           </Grid>
@@ -997,15 +998,29 @@ class CurrentCustomerEditor extends React.Component {
                 </Grid>
               </Grid>
 
-              <TextField
-                margin="normal"
-                id="email"
-                label="Email"
-                name="email"
-                fullWidth
-                defaultValue={customer.emails[0].address}
-                inputProps={{}}
-              />
+              {customer.secondary ? (
+
+                <TextField
+                  margin="normal"
+                  id="username"
+                  label="Username"
+                  name="username"
+                  fullWidth
+                  defaultValue={customer.username}
+                  readOnly
+                />
+
+              ) : (
+                  <TextField
+                    margin="normal"
+                    id="email"
+                    label="Email"
+                    name="email"
+                    fullWidth
+                    defaultValue={customer.emails[0].address}
+                    readOnly
+                  />
+                )}
               <Grid container>
                 <Grid item xs={12} sm={6}>
                   <TextField
