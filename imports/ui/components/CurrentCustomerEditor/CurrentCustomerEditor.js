@@ -169,7 +169,7 @@ class CurrentCustomerEditor extends React.Component {
           dinner: { active: false, portions: 'regular', quantity: '1' },
         },
       ],
-      platingNotes: '',
+      platingNotes: this.props.customer.platingNotes ? this.props.customer.platingNotes : '',
       deliveryNotes: this.props.customer.secondary === undefined && this.props.customer.address.notes ? this.props.customer.address.notes : '',
 
 
