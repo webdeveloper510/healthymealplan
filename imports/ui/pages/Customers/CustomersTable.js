@@ -153,12 +153,9 @@ class CustomersTable extends React.Component {
     if (count == 0) {
       return (
         <p style={{ padding: '25px' }} className="subheading">
-          No customers found{' '}
-          {this.props.searchTerm
-            ? `for &lsquo;<span className="font-medium">${
-            this.props.searchTerm
-            }</span>&rsquo;`
-            : ''}
+          No customers found &lsquo;<span className="font-medium">
+            {this.props.searchTerm}
+          </span>&rsquo;
         </p>
       );
     }
@@ -189,26 +186,22 @@ class CustomersTable extends React.Component {
   }
 
   handleDeleteCustomer(customerId) {
-
     console.log(customerId);
 
     this.deleteDialogHandleRequestClose();
 
     Meteor.call('customers.delete', customerId, (err, res) => {
-
       if (!err) {
         this.props.popTheSnackbar({
-          message: `${this.state.selectedCustomerName} successfully removed.`
-        })
+          message: `${this.state.selectedCustomerName} successfully removed.`,
+        });
       } else {
         console.log(err);
         this.props.popTheSnackbar({
-          message: 'There was a problem deleting this user'
-        })
+          message: 'There was a problem deleting this user',
+        });
       }
-
     });
-
   }
 
   render() {
@@ -237,15 +230,15 @@ class CustomersTable extends React.Component {
               </Button>
             </div>
           ) : (
-              ''
-            )}
+            ''
+          )}
           <Table className="table-container" style={{ tableLayout: 'fixed' }}>
             {this.props.count > 0 ? (
               <TableHead>
                 <TableRow>
 
                   <TableCell
-                    style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                    style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
                     onClick={() => this.props.sortByOptions('_id')}
                   >
                     <Typography className="body2" type="body2">
@@ -253,7 +246,7 @@ class CustomersTable extends React.Component {
                     </Typography>
                   </TableCell>
                   <TableCell
-                    style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                    style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
                     onClick={() => this.props.sortByOptions('profile.name.first')}
                   >
                     <Typography className="body2" type="body2">
@@ -262,7 +255,7 @@ class CustomersTable extends React.Component {
                   </TableCell>
 
                   <TableCell
-                    style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                    style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
                     onClick={() => this.props.sortByOptions('SKU')}
                   >
                     <Typography className="body2" type="body2">
@@ -270,7 +263,7 @@ class CustomersTable extends React.Component {
                     </Typography>
                   </TableCell>
                   <TableCell
-                    style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                    style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
                     onClick={() => this.props.sortByOptions('subscription.status')}
                   >
                     <Typography className="body2" type="body2">
@@ -278,26 +271,23 @@ class CustomersTable extends React.Component {
                     </Typography>
                   </TableCell>
                   <TableCell
-                    style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
-                  >
-
-                  </TableCell>
+                    style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
+                  />
                 </TableRow>
               </TableHead>
             ) : (
-                ''
-              )}
+              ''
+            )}
             <TableBody>
               {this.props.results.map((e, i) => {
-
-                let name = "";
+                let name = '';
 
                 if (e.profile && e.profile.name) {
                   name = e.profile.name.first;
                 }
 
                 if (e.profile && e.profile.name && e.profile.name.last) {
-                  name += " " + e.profile.name.last;
+                  name += ` ${e.profile.name.last}`;
                 }
 
 
@@ -306,7 +296,7 @@ class CustomersTable extends React.Component {
 
                     <TableCell
 
-                      style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
                       onClick={() =>
                         this.props.history.push(`/customers/${e._id}/edit`)
                       }
@@ -318,7 +308,7 @@ class CustomersTable extends React.Component {
 
                     <TableCell
 
-                      style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
                       onClick={() =>
                         this.props.history.push(`/customers/${e._id}/edit`)
                       }
@@ -339,7 +329,7 @@ class CustomersTable extends React.Component {
 
                     <TableCell
 
-                      style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
                       onClick={() =>
                         this.props.history.push(`/customers/${e._id}/edit`)
                       }
@@ -350,20 +340,20 @@ class CustomersTable extends React.Component {
                     </TableCell>
                     <TableCell
 
-                      style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
                       onClick={() =>
                         this.props.history.push(`/customers/${e._id}/edit`)
                       }
                     >
                       <Typography className="subheading" type="subheading">
-                        {e.joinedSubscription ? e.joinedSubscription.status.toUpperCase() : ""}
+                        {e.joinedSubscription ? e.joinedSubscription.status.toUpperCase() : ''}
                         {e.joinedSubscription === undefined && e.status === 'abandoned' ? 'Abandoned' : ''}
                       </Typography>
                     </TableCell>
 
                     <TableCell
 
-                      style={{ paddingTop: "10px", paddingBottom: "10px", width: '20%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
                     >
                       <Button color="secondary" onClick={this.deleteDialogHandleClickOpen.bind(this, e._id, name)}>Delete</Button>
                     </TableCell>
@@ -400,8 +390,8 @@ class CustomersTable extends React.Component {
                     <Button onClick={this.props.loadMore}>Load More</Button>
                   </TableCell>
                 ) : (
-                    ''
-                  )}
+                  ''
+                )}
               </TableRow>
             </TableFooter>
           </Table>

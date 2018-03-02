@@ -208,7 +208,7 @@ class Customers extends React.Component {
           <ListContainer
             limit={50}
             collection={Meteor.users}
-            // publication="users.customers"
+            increment={30}
             joins={[
               {
                 localProperty: 'subscriptionId',
@@ -227,13 +227,11 @@ class Customers extends React.Component {
               // }
             ]}
             selector={{
+              // 'joinedSubscription.status': { $regex: new RegExp(this.state.currentTabValue), $options: 'i' },
               roles: ['customer'],
               $or: [
-                { associatedProfiles: { $exists: true } },
-                { status: 'abandoned' },
                 { 'profile.name.first': { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
                 { 'profile.name.last': { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-                // { 'subscription.status': { $regex: new RegExp(this.state.currentTabValue), $options: 'i' } },
               ],
             }}
             options={this.state.options}

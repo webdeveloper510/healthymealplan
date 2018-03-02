@@ -170,7 +170,8 @@ class CurrentCustomerEditor extends React.Component {
         },
       ],
       platingNotes: this.props.customer.platingNotes ? this.props.customer.platingNotes : '',
-      deliveryNotes: this.props.customer.secondary === undefined && this.props.customer.address.notes ? this.props.customer.address.notes : '',
+      deliveryNotes: this.props.customer.secondary === undefined && this.props.customer.address && this.props.customer.address.notes ?
+        this.props.customer.address.notes : '',
 
 
       submitLoading: false,
@@ -180,7 +181,6 @@ class CurrentCustomerEditor extends React.Component {
     this.handleTabChange = this.handleTabChange.bind(this);
     this.saveFirstStep = this.saveFirstStep.bind(this);
     this.saveSecondStep = this.saveSecondStep.bind(this);
-
   }
 
   componentDidMount() {
@@ -201,25 +201,25 @@ class CurrentCustomerEditor extends React.Component {
         },
 
         last_name: {
-          required: this.props.customer.secondary === undefined ? true : false,
+          required: this.props.customer.secondary === undefined,
         },
 
         email: {
           required: true,
-          email: this.props.customer.secondary === undefined ? true : false,
+          email: this.props.customer.secondary === undefined,
         },
 
         phoneNumber: {
           minlength: 10,
           maxlength: 10,
-          number: this.props.customer.secondary === undefined ? true : false,
+          number: this.props.customer.secondary === undefined,
         },
 
         postal_code: {
           minlength: 6,
           maxlength: 6,
           cdnPostal: true,
-          required: this.props.customer.secondary === undefined ? true : false,
+          required: this.props.customer.secondary === undefined,
         },
       },
       submitHandler() {
@@ -240,7 +240,7 @@ class CurrentCustomerEditor extends React.Component {
       rules: {
         first_name: { required: true },
 
-        last_name: { required: this.props.customer.secondary === undefined ? true : false },
+        last_name: { required: this.props.customer.secondary === undefined },
 
         lifestyle: { required: true },
 
@@ -305,7 +305,6 @@ class CurrentCustomerEditor extends React.Component {
   }
 
   saveSecondStep() {
-
     if (!$('#step2').valid()) {
       return;
     }
@@ -338,7 +337,7 @@ class CurrentCustomerEditor extends React.Component {
       // scheduleReal: this.state.scheduleReal,
       platingNotes: this.state.platingNotes,
       deliveryNotes: this.state.deliveryNotes,
-      secondary: this.props.customer.secondary == undefined ? false : true
+      secondary: this.props.customer.secondary != undefined,
     };
 
     Meteor.call('edit.customer.step2', step2Data, (err, res) => {
@@ -393,16 +392,16 @@ class CurrentCustomerEditor extends React.Component {
 
   // Step 2 Methods
   handleChangeRadioLifestyle(event, value) {
-    const getLifestyleRestrictions = this.props.lifestyles.find(
+    const getLifestyle = this.props.lifestyles.find(
       el => el.title === value,
     );
 
     const currentRestrictionsIds = [];
 
-    currentRestrictionsIds.push(...getLifestyleRestrictions.restrictions);
+    currentRestrictionsIds.push(...getLifestyle.restrictions);
 
     this.setState({
-      isLifestyleCustom: getLifestyleRestrictions.custom,
+      isLifestyleCustom: getLifestyle.custom,
       lifestyle: value,
       lifestyleRestrictions: currentRestrictionsIds,
     });
@@ -1150,7 +1149,7 @@ class CurrentCustomerEditor extends React.Component {
                             className="text-uppercase font-medium"
                           >
                             Plan
-                      </Typography>
+                          </Typography>
                         </FormLabel>
                         <RadioGroup
                           aria-label="lifestyle"
@@ -1181,7 +1180,7 @@ class CurrentCustomerEditor extends React.Component {
                             className="text-uppercase font-medium"
                           >
                             Discount
-                      </Typography>
+                          </Typography>
                         </FormLabel>
                         <RadioGroup
                           aria-label="discount"
@@ -1312,7 +1311,7 @@ class CurrentCustomerEditor extends React.Component {
                         style={{ marginTop: '20px' }}
                       >
                         Back
-                  </Button>
+                      </Button>
                     ) : (
                         ''
                       )}
@@ -1323,7 +1322,7 @@ class CurrentCustomerEditor extends React.Component {
                         style={{ marginTop: '20px' }}
                       >
                         Next
-                  </Button>
+                      </Button>
                     ) : (
                         ''
                       )}
@@ -1335,7 +1334,7 @@ class CurrentCustomerEditor extends React.Component {
                         className="text-uppercase font-medium"
                       >
                         Restrictions
-                  </Typography>
+                      </Typography>
                     </Grid>
                     <Grid item xs={4}>
                       <FormControl component="fieldset">
@@ -1456,12 +1455,12 @@ class CurrentCustomerEditor extends React.Component {
                       type="title"
                     >
                       Add a restriction
-                </Typography>
+                    </Typography>
 
                     <DialogContent>
                       <DialogContentText>
                         Select if it's a preference or if it's a restriction
-                  </DialogContentText>
+                      </DialogContentText>
                       <FormControl component="fieldset">
                         <RadioGroup
                           aria-label="restritionOrPref"
@@ -1543,7 +1542,7 @@ class CurrentCustomerEditor extends React.Component {
                         className="text-uppercase font-medium"
                       >
                         Preferences
-                  </Typography>
+                      </Typography>
 
                       <div
                         style={{
@@ -1586,7 +1585,7 @@ class CurrentCustomerEditor extends React.Component {
                         className="text-uppercase font-medium"
                       >
                         Restrictions
-                  </Typography>
+                      </Typography>
 
                       <div
                         style={{
@@ -1635,11 +1634,11 @@ class CurrentCustomerEditor extends React.Component {
                         onClick={this.deleteDialogHandleOpen.bind(this)}
                       >
                         Add a restriction
-                  </Button>
+                      </Button>
                     </Grid>
                   </Grid>
 
-                  <Grid container style={{ marginTop: "25px" }}>
+                  <Grid container style={{ marginTop: '25px' }}>
                     <Grid item xs={12} sm={12}>
                       <TextField
                         label="Plating notes"
@@ -1653,7 +1652,7 @@ class CurrentCustomerEditor extends React.Component {
                     </Grid>
                   </Grid>
                   {this.props.customer.secondary == undefined && (
-                    <Grid container style={{ marginTop: "25px" }}>
+                    <Grid container style={{ marginTop: '25px' }}>
                       <Grid item xs={12} sm={12}>
                         <TextField
                           label="Delivery notes"
@@ -1678,7 +1677,7 @@ class CurrentCustomerEditor extends React.Component {
                   onClick={() => this.saveSecondStep()}
                 >
                   Update
-                 {this.state.submitLoading && (
+                  {this.state.submitLoading && (
                     <CircularProgress
                       size={24}
                       className={this.props.classes.buttonProgress}

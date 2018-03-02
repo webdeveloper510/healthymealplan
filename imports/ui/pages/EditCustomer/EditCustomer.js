@@ -52,7 +52,7 @@ export default createContainer(({ match }) => {
     loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready() && !subscription6.ready(),
     customer: Meteor.users.findOne(customerId),
     subscription: Subscriptions.findOne(customerId),
-    secondaryAccounts: Meteor.users.find({ primaryAccount: customerId }).fetch(),
+    secondaryAccounts: Meteor.users.find({ secondary: true }).fetch(),
     lifestyles: Lifestyles.find().fetch(),
     restrictions: Restrictions.find().fetch(),
     potentialSubIngredients: Ingredients.find().fetch(),

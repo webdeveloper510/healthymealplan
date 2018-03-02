@@ -535,16 +535,16 @@ class Step2Plan extends React.Component {
 
   // remove lifestyles that may have been already checked but get disabled when you select a lifestyle.
   handleChangeRadioLifestyle(event, value) {
-    const getLifestyleRestrictions = this.props.lifestyles.find(
+    const getLifestyle = this.props.lifestyles.find(
       el => el.title === value,
     );
 
     const currentRestrictionsIds = [];
 
-    currentRestrictionsIds.push(...getLifestyleRestrictions.restrictions);
+    currentRestrictionsIds.push(...getLifestyle.restrictions);
 
     this.setState({
-      isLifestyleCustom: getLifestyleRestrictions.custom,
+      isLifestyleCustom: getLifestyle.custom,
       lifestyle: value,
       lifestyleRestrictions: currentRestrictionsIds,
     });

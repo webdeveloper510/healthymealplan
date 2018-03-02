@@ -43,7 +43,7 @@ Meteor.publish('user.customer.single', (customerId) => {
 Meteor.publish('user.secondaryAccounts', (customerId) => {
   check(customerId, String);
 
-  return Meteor.users.find({ priamryAccount: customerId, roles: ['customer'] });
+  return Meteor.users.find({ primaryAccount: customerId });
 });
 
 
