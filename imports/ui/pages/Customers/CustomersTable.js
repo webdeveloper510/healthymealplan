@@ -355,7 +355,11 @@ class CustomersTable extends React.Component {
 
                       style={{ paddingTop: '10px', paddingBottom: '10px', width: '20%' }}
                     >
-                      <Button color="secondary" onClick={this.deleteDialogHandleClickOpen.bind(this, e._id, name)}>Delete</Button>
+                      {e.secondary === undefined && (
+                        <div>
+                          <Button color="secondary" onClick={this.deleteDialogHandleClickOpen.bind(this, e._id, name)}>Delete</Button>
+                        </div>
+                      )}
                     </TableCell>
                   </TableRow>
                 );

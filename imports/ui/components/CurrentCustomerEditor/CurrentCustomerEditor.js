@@ -1,8 +1,7 @@
 /* eslint-disable max-len, no-return-assign */
 
 /*
-  Refactor the autocomplete tabs into their own components
-  not a priority for now, but this is an itch that we should really scratch.
+  THIS COMPONENT RIGHT NOW IS ONE BIG MESS, IT'S JUST ALL THE STEPS CLUBBED INTO ONE
 */
 
 import React from 'react';
@@ -31,6 +30,10 @@ import Dialog, {
 
 import moment from 'moment';
 
+import Geosuggest from 'react-geosuggest';
+import '../CustomerEditor/GeoSuggest.scss';
+
+
 import {
   FormLabel,
   FormControl,
@@ -38,6 +41,19 @@ import {
   FormHelperText,
   FormGroup,
 } from 'material-ui/Form';
+
+import Table, {
+  TableBody,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableRow,
+} from 'material-ui/Table';
+
+import List, { ListItem, ListItemText } from 'material-ui/List';
+import Collapse from 'material-ui/transitions/Collapse';
+import ExpandLess from 'material-ui-icons/ExpandLess';
+import ExpandMore from 'material-ui-icons/ExpandMore';
 
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
@@ -108,11 +124,9 @@ class CurrentCustomerEditor extends React.Component {
       activeMealScheduleStep: 0,
 
 
-      // customer - step 2
+      // Step 2 - Plan
       value: '',
       suggestions: [],
-      submitLoading: false,
-      submitSuccess: false,
       subIngredients: this.props.customer && this.props.customer.preferences && this.props.customer.preferences.length > 0 ? this.props.customer.preferences : [],
       specificRestrictions: this.props.customer && this.props.customer.specificRestrictions && this.props.customer.specificRestrictions.length > 0 ? this.props.customer.specificRestrictions : [],
       deleteDialogOpen: false,
@@ -131,7 +145,6 @@ class CurrentCustomerEditor extends React.Component {
         : 'none',
       restrictions: this.props.customer && this.props.customer.restrictions && this.props.customer.restrictions.length > 0 ?
         this.props.customer.restrictions : [],
-      completeSchedule: [],
       scheduleReal: this.props.customer && this.props.customer.schedule ? this.props.customer.schedule : [
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -170,10 +183,67 @@ class CurrentCustomerEditor extends React.Component {
         },
       ],
       platingNotes: this.props.customer.platingNotes ? this.props.customer.platingNotes : '',
-      deliveryNotes: this.props.customer.secondary === undefined && this.props.customer.address && this.props.customer.address.notes ?
+      // deliveryNotes: this.props.customer.secondary === undefined && this.props.customer.address && this.props.customer.address.notes ?
+      //   this.props.customer.address.notes : '',
+
+      secondaryCollapses: [false, false, false, false, false, false],
+      secondaryProfileCount: this.props.customer && this.props.customer.associatedProfiles > 0 ? this.props.customer.associatedProfiles : 0,
+      secondaryProfilesData: this.props.customer && this.props.lifestyles 
+      && this.props.secondaryAccounts ? this.props.secondaryAccounts.map((e) => {
+          return {
+            _id: e._id,
+            first_name: e.profile.name.first,
+            last_name: e.profile.name.last ? e.profile.name.last : '',
+            subIngredients: e.preferences,
+            specificRestrictions: e.specificRestrictions,
+            lifestyle: this.props.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
+            isLifestyleCustom: this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom,
+            discount: e.discount,
+            restrictions: [],
+            activeMealScheduleStep: 0,
+            deleteDialogOpen: false,
+            scheduleReal: e.schedule,
+            platingNotes: e.platingNotes ? e.platingNotes : '',
+            adultOrChild: e.adultOrChild,
+          }
+        }) : [],
+
+
+      // Step 3: Delivery
+
+      addressType: this.props.customer.address.type,
+
+      apartmentName: this.props.customer.address.apartmentName ? this.props.customer.address.apartmentName : '',
+      unit: this.props.customer.address.unit ? this.props.customer.address.unit : '',
+      buzzer: this.props.customer.address.buzzer ? this.props.customer.address.buzzer : '',
+
+      businessName: this.props.customer.address.businessName ? this.props.customer.address.businessName : '',
+
+      roomNumber: this.props.customer.address.roomNumber ? this.props.customer.address.roomNumber : '',
+
+      hotelName: this.props.customer.address.hotelName ? this.props.customer.address.hotelName : '',
+      hotelFrontDesk: this.props.customer.address.leaveAtFrontDesk ? this.props.customer.address.leaveAtFrontDesk : '',
+
+      dormName: this.props.customer.address.dormName ? this.props.customer.address.dormName : 'Algonquin College',
+      dormResidence: this.props.customer.address.dormResidence ? this.props.customer.address.dormResidence : 'Student Residence',
+
+      streetAddress: this.props.customer.address.streetAddress ? this.props.customer.address.streetAddress : '',
+      postalCode: this.props.customer.postalCode,
+
+      notes: this.props.customer.secondary === undefined && this.props.customer.address && this.props.customer.address.notes ?
         this.props.customer.address.notes : '',
 
+      coolerBag: false,
+      activeDeliveryScheduleStep: 0,
 
+      completeSchedule: this.props.subscription ? this.props.subscription.completeSchedule : [],
+      deliveryType: this.props.subscription ? this.props.subscription.delivery : [],
+
+      subscriptionStartDate: moment(this.renderStartDays()[0]).format(
+        'dddd MMMM Do YYYY',
+      ),
+      subscriptionStartDateRaw: this.renderStartDays()[0],
+        
       submitLoading: false,
       submitSuccess: false,
     };
@@ -181,6 +251,8 @@ class CurrentCustomerEditor extends React.Component {
     this.handleTabChange = this.handleTabChange.bind(this);
     this.saveFirstStep = this.saveFirstStep.bind(this);
     this.saveSecondStep = this.saveSecondStep.bind(this);
+    this.saveThirdStep = this.saveThirdStep.bind(this);
+    this.saveFourthStep = this.saveFourthStep.bind(this);
   }
 
   componentDidMount() {
@@ -226,35 +298,92 @@ class CurrentCustomerEditor extends React.Component {
         component.saveFirstStep();
       },
     });
+  }
 
+  componentWillUpdate(nextProps, nextState) {
+    if (nextState.currentTab == 1) {
+      validate(this.secondForm, {
+        errorPlacement(error, element) {
+          error.insertAfter(
+            $(element)
+              .parent()
+              .parent(),
+          );
+        },
 
-    validate(component.form2, {
-      errorPlacement(error, element) {
-        error.insertAfter(
-          $(element)
-            .parent()
-            .parent(),
-        );
-      },
+        rules: {
+          first_name: { required: true },
 
-      rules: {
-        first_name: { required: true },
+          last_name: { required: this.props.customer.secondary === undefined },
 
-        last_name: { required: this.props.customer.secondary === undefined },
+          lifestyle: { required: true },
 
-        lifestyle: { required: true },
+          discount: { required: true },
 
-        discount: { required: true },
+          first_name1: { required: true },
+          first_name2: { required: true },
+          first_name3: { required: true },
+          first_name4: { required: true },
+          first_name5: { required: true },
+          first_name6: { required: true },
+          first_name7: { required: true },
 
-        // type: {
-        //   required: true,
-        // },
-      },
+          // last_name1: { required: true },
+          // last_name2: { required: true },
+          // last_name3: { required: true },
+          // last_name4: { required: true },
+          // last_name5: { required: true },
+          // last_name6: { required: true },
+          // last_name7: { required: true },
 
-      submitHandler() {
-        component.saveSecondStep();
-      },
-    });
+          lifestyle1: { required: true },
+          lifestyle2: { required: true },
+          lifestyle3: { required: true },
+          lifestyle4: { required: true },
+          lifestyle5: { required: true },
+          lifestyle6: { required: true },
+          lifestyle7: { required: true },
+
+          discount1: { required: true },
+          discount2: { required: true },
+          discount3: { required: true },
+          discount4: { required: true },
+          discount5: { required: true },
+          discount6: { required: true },
+          discount7: { required: true },
+
+          adultOrChild1: { required: true },
+          adultOrChild2: { required: true },
+          adultOrChild3: { required: true },
+          adultOrChild4: { required: true },
+          adultOrChild5: { required: true },
+          adultOrChild6: { required: true },
+          adultOrChild7: { required: true },
+
+          //delivery
+          addressType: {
+            required: true,
+          },
+          apartmentUnit: {
+            required: true,
+          },
+          business_name: {
+            required: true,
+          },
+          hotelName: {
+            required: true,
+          },
+          streetAddress: {
+            required: true,
+          },
+        },
+
+        submitHandler() {
+          this.saveSecondStep();
+        },
+      });
+    }
+
   }
 
   saveFirstStep() {
@@ -305,6 +434,9 @@ class CurrentCustomerEditor extends React.Component {
   }
 
   saveSecondStep() {
+    console.log($('#step2').valid());
+
+
     if (!$('#step2').valid()) {
       return;
     }
@@ -322,6 +454,116 @@ class CurrentCustomerEditor extends React.Component {
       return;
     }
 
+    if (this.state.secondaryProfileCount > 0) {
+      for (
+        let index = 0;
+        index < this.state.secondaryProfilesData.length;
+        index++
+      ) {
+        const element = this.state.secondaryProfilesData[index];
+        if (
+          element.scheduleReal.find(
+            el => el.breakfast.active || el.lunch.active || el.dinner.active,
+          ) === undefined
+        ) {
+          this.props.popTheSnackbar({
+            message: `There should be at least one meal type selected in one of the secondary profile ${index +
+              1}.`,
+          });
+
+          return;
+        }
+      }
+    }
+
+    const scheduleSummation = [
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+    ];
+
+
+    this.state.scheduleReal.forEach((e, i) => {
+      if (e.breakfast.active) {
+        scheduleSummation[i].breakfast += parseInt(e.breakfast.quantity, 10);
+      }
+
+      if (e.lunch.active) {
+        scheduleSummation[i].lunch += parseInt(e.lunch.quantity, 10);
+      }
+
+      if (e.dinner.active) {
+        scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+      }
+    });
+
+    this.state.secondaryProfilesData.forEach((e, i) => {
+      e.scheduleReal.forEach((el, index) => {
+        if (el.breakfast.active) {
+          scheduleSummation[index].breakfast += parseInt(
+            el.breakfast.quantity,
+            10,
+          );
+        }
+
+        if (el.lunch.active) {
+          scheduleSummation[index].lunch += parseInt(el.lunch.quantity, 10);
+        }
+
+        if (el.dinner.active) {
+          scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+        }
+      });
+    });
+
+    const check = this.state.completeSchedule.map(day => (day.breakfast + day.lunch + day.dinner) > 0);
+
+    console.log(check);
+
+    for (let index = 0; index < this.state.deliveryType.length; index++) {
+      const element = this.state.deliveryType[index];
+
+      if (((element == "" || element == "false") && check[index] > 0 && index != 6)) {
+        this.props.popTheSnackbar({
+          message: "Please select all the delivery options in the schedule."
+        });
+
+        return;
+      }
+    }
+
+    const address = {
+      type: this.state.addressType,
+      streetAddress: this.state.streetAddress,
+      postalCode: this.state.postalCode,
+      notes: this.state.notes,
+    };
+
+    if (this.state.addressType == 'apartment') {
+      address.apartmentName = this.state.apartmentName;
+      address.unit = this.state.unit;
+      address.buzzer = this.state.buzzer;
+    } else if (this.state.addressType == 'hotel') {
+      address.hotelName = this.state.hotelName;
+      address.roomNumber = this.state.roomNumber;
+      address.leaveAtFrontDesk = true;
+    } else if (this.state.addressType == 'house') {
+      address.unit = this.state.unit;
+    } else if (this.state.addressType == 'business') {
+      address.businessName = this.state.businessName;
+      address.unit = this.state.unit;
+      address.buzzer = this.state.buzzer;
+    } else if (this.state.addressType == 'dormitory') {
+      address.dormName = this.state.dormName;
+      address.dormResidence = this.state.dormResidence;
+      address.roomNumber = this.state.roomNumber;
+      address.buzzer = this.state.buzzer;
+    }
+
     this.setState({
       submitSuccess: false,
       submitLoading: true,
@@ -329,15 +571,19 @@ class CurrentCustomerEditor extends React.Component {
 
     const step2Data = {
       id: this.props.customer._id,
+      address,
+      subscriptionId: this.props.subscription ? this.props.subscription._id : '',
       subIngredients: this.state.subIngredients,
       specificRestrictions: this.state.specificRestrictions,
-      // lifestyle: this.props.lifestyles.find(e => e.title === this.state.lifestyle),
-      // discount: this.state.discount,
+      lifestyle: this.props.lifestyles.find(e => e.title === this.state.lifestyle)._id,
+      discount: this.state.discount,
       restrictions: this.state.restrictions,
-      // scheduleReal: this.state.scheduleReal,
+      scheduleReal: this.state.scheduleReal,
       platingNotes: this.state.platingNotes,
-      deliveryNotes: this.state.deliveryNotes,
       secondary: this.props.customer.secondary != undefined,
+      secondaryProfiles: this.state.secondaryProfilesData,
+      completeSchedule: this.state.completeSchedule,
+      delivery: this.state.deliveryType,
     };
 
     Meteor.call('edit.customer.step2', step2Data, (err, res) => {
@@ -362,6 +608,64 @@ class CurrentCustomerEditor extends React.Component {
       }
     });
   }
+
+  saveThirdStep() {
+    const check = this.state.completeSchedule.map(day => (day.breakfast + day.lunch + day.dinner) > 0);
+
+    console.log(check);
+
+    for (let index = 0; index < this.state.deliveryType.length; index++) {
+      const element = this.state.deliveryType[index];
+
+      if (((element == '' || element == 'false') && check[index] > 0 && index != 6)) {
+        this.props.popTheSnackbar({
+          message: 'Please select all the delivery options in the schedule.',
+        });
+
+        return;
+      }
+    }
+
+
+    this.setState({
+      submitSuccess: true,
+      submitLoading: false,
+    });
+
+
+    const address = {
+      type: this.state.addressType,
+      streetAddress: this.state.streetAddress,
+      postalCode: this.state.postalCode,
+      notes: this.state.notes,
+    };
+
+    if (this.state.addressType == 'apartment') {
+      address.apartmentName = this.state.apartmentName;
+      address.unit = this.state.unit;
+      address.buzzer = this.state.buzzer;
+    } else if (this.state.addressType == 'hotel') {
+      address.hotelName = this.state.hotelName;
+      address.roomNumber = this.state.roomNumber;
+      address.leaveAtFrontDesk = true;
+    } else if (this.state.addressType == 'house') {
+      address.unit = this.state.unit;
+    } else if (this.state.addressType == 'business') {
+      address.businessName = this.state.businessName;
+      address.unit = this.state.unit;
+      address.buzzer = this.state.buzzer;
+    } else if (this.state.addressType == 'dormitory') {
+      address.dormName = this.state.dormName;
+      address.dormResidence = this.state.dormResidence;
+      address.roomNumber = this.state.roomNumber;
+      address.buzzer = this.state.buzzer;
+    }
+  }
+
+  saveFourthStep() {
+
+  }
+
 
   renderStartDays() {
     const allDates = [];
@@ -464,8 +768,52 @@ class CurrentCustomerEditor extends React.Component {
 
     scheduleRealCopy[index][mealType].quantity = event.target.value;
 
+    const scheduleSummation = [
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0 },
+    ];
+
+    this.state.scheduleReal.forEach((e, i) => {
+      if (e.breakfast.active) {
+        scheduleSummation[i].breakfast += parseInt(e.breakfast.quantity, 10);
+      }
+
+      if (e.lunch.active) {
+        scheduleSummation[i].lunch += parseInt(e.lunch.quantity, 10);
+      }
+
+      if (e.dinner.active) {
+        scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+      }
+    });
+
+    this.state.secondaryProfilesData.forEach((e, i) => {
+      e.scheduleReal.forEach((el, index) => {
+        if (el.breakfast.active) {
+          scheduleSummation[index].breakfast += parseInt(
+            el.breakfast.quantity,
+            10,
+          );
+        }
+
+        if (el.lunch.active) {
+          scheduleSummation[index].lunch += parseInt(el.lunch.quantity, 10);
+        }
+
+        if (el.dinner.active) {
+          scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+        }
+      });
+    });
+
     this.setState({
       scheduleReal: scheduleRealCopy,
+      completeSchedule: scheduleSummation
     });
   }
 
@@ -489,8 +837,58 @@ class CurrentCustomerEditor extends React.Component {
       mealType
     ].active;
 
+
+
     this.setState({
       scheduleReal: scheduleRealCopy,
+    }, () => {
+      const scheduleSummation = [
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+      ];
+
+      this.state.scheduleReal.forEach((e, i) => {
+        if (e.breakfast.active) {
+          scheduleSummation[i].breakfast += parseInt(e.breakfast.quantity, 10);
+        }
+
+        if (e.lunch.active) {
+          scheduleSummation[i].lunch += parseInt(e.lunch.quantity, 10);
+        }
+
+        if (e.dinner.active) {
+          scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+        }
+      });
+
+      this.state.secondaryProfilesData.forEach((e, i) => {
+        e.scheduleReal.forEach((el, index) => {
+          if (el.breakfast.active) {
+            scheduleSummation[index].breakfast += parseInt(
+              el.breakfast.quantity,
+              10,
+            );
+          }
+
+          if (el.lunch.active) {
+            scheduleSummation[index].lunch += parseInt(el.lunch.quantity, 10);
+          }
+
+          if (el.dinner.active) {
+            scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+          }
+        });
+      });
+
+      this.setState({
+        completeSchedule: scheduleSummation,
+        deliveryType: ['', '', '', '', '', '', ''],
+      });
     });
   }
 
@@ -527,6 +925,7 @@ class CurrentCustomerEditor extends React.Component {
       value: newValue,
     });
   }
+
   renderInput(inputProps) {
     const { value, ...other } = inputProps;
 
@@ -955,14 +1354,4920 @@ class CurrentCustomerEditor extends React.Component {
     ];
   }
 
+  // STEP 2: Secondary Profiles
+
+  increaseProfileCount() {
+    if (this.state.secondaryProfileCount === 7) {
+      this.props.popTheSnackbar({
+        message: 'Cannot add more than 7 profiles',
+      });
+
+      return;
+    }
+
+    const increasedProfileCount = this.state.secondaryProfileCount + 1;
+
+    const currentSecondaryProfiles = this.state.secondaryProfilesData.slice();
+
+    currentSecondaryProfiles.push({
+      first_name: '',
+      last_name: '',
+      subIngredients: [],
+      specificRestrictions: [],
+      lifestyle: 'Traditional',
+      isLifestyleCustom: false,
+      discount: 'none',
+      restrictions: [],
+      activeMealScheduleStep: 0,
+      deleteDialogOpen: false,
+      scheduleReal: [
+        {
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
+        },
+        {
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
+        },
+        {
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
+        },
+        {
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
+        },
+        {
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
+        },
+        {
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
+        },
+        {
+          breakfast: { active: false, portions: 'regular', quantity: '1' },
+          lunch: { active: false, portions: 'regular', quantity: '1' },
+          dinner: { active: false, portions: 'regular', quantity: '1' },
+        },
+      ],
+      platingNotes: '',
+      adultOrChild: 'adult',
+    });
+
+    this.setState({
+      secondaryProfileCount: increasedProfileCount,
+      secondaryProfilesData: currentSecondaryProfiles,
+    });
+  }
+
+  removeProfile(index) {
+    if (this.secondaryProfileCount < 1) {
+      return;
+    }
+
+
+    // if(){
+
+    // }
+
+    const decreasedProfileCount = this.state.secondaryProfileCount - 1;
+    const profileToRemove = this.state.secondaryProfilesData.slice();
+
+    const toBeRemoved = profileToRemove.splice(profileToRemove.indexOf(index), 1);
+
+    console.log(toBeRemoved);
+
+    this.setState({
+      secondaryProfileCount: decreasedProfileCount,
+      secondaryProfilesData: profileToRemove,
+    });
+
+
+  }
+
+  handleProfileOpen(primary, index) {
+    const currentCollapseArr = this.state.secondaryCollapses.slice();
+
+    currentCollapseArr[index] = !currentCollapseArr[index];
+
+    this.setState({
+      secondaryCollapses: currentCollapseArr,
+    });
+  }
+
+  handleChangeRadioScheduleQuantitySecondary(
+    profileIndex,
+    index,
+    mealType,
+    event,
+    value,
+  ) {
+    console.log(mealType);
+    console.log(event.target.value);
+
+    const secondaryProfilesDataCopy = this.state.secondaryProfilesData.slice();
+
+    secondaryProfilesDataCopy[profileIndex].scheduleReal[index][
+      mealType
+    ].quantity =
+      event.target.value;
+
+    this.setState({
+      secondaryProfilesData: secondaryProfilesDataCopy,
+    }, () => {
+
+      const scheduleSummation = [
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+      ];
+
+      this.state.scheduleReal.forEach((e, i) => {
+        if (e.breakfast.active) {
+          scheduleSummation[i].breakfast += parseInt(e.breakfast.quantity, 10);
+        }
+
+        if (e.lunch.active) {
+          scheduleSummation[i].lunch += parseInt(e.lunch.quantity, 10);
+        }
+
+        if (e.dinner.active) {
+          scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+        }
+      });
+
+      this.state.secondaryProfilesData.forEach((e, i) => {
+        e.scheduleReal.forEach((el, index) => {
+          if (el.breakfast.active) {
+            scheduleSummation[index].breakfast += parseInt(
+              el.breakfast.quantity,
+              10,
+            );
+          }
+
+          if (el.lunch.active) {
+            scheduleSummation[index].lunch += parseInt(el.lunch.quantity, 10);
+          }
+
+          if (el.dinner.active) {
+            scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+          }
+        });
+      });
+
+      this.setState({
+        completeSchedule: scheduleSummation
+      })
+
+    });
+  }
+  handleChangeRadioSchedulePortionSecondary(
+    profileIndex,
+    index,
+    mealType,
+    event,
+    value,
+  ) {
+    const secondaryProfilesDataCopy = this.state.secondaryProfilesData.slice();
+
+    secondaryProfilesDataCopy[profileIndex].scheduleReal[index][
+      mealType
+    ].portions =
+      event.target.value;
+
+    this.setState({
+      secondaryProfilesData: secondaryProfilesDataCopy,
+    });
+
+  }
+  handleScheduleMealTypeCheckSecondary(profileIndex, index, mealType, event) {
+    const secondaryProfilesDataCopy = this.state.secondaryProfilesData.slice();
+
+    secondaryProfilesDataCopy[profileIndex].scheduleReal[index][
+      mealType
+    ].active = !secondaryProfilesDataCopy[profileIndex].scheduleReal[index][
+      mealType
+    ].active;
+
+    this.setState({
+      secondaryProfilesData: secondaryProfilesDataCopy,
+    }, () => {
+      const scheduleSummation = [
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0 },
+      ];
+
+      this.state.scheduleReal.forEach((e, i) => {
+        if (e.breakfast.active) {
+          scheduleSummation[i].breakfast += parseInt(e.breakfast.quantity, 10);
+        }
+
+        if (e.lunch.active) {
+          scheduleSummation[i].lunch += parseInt(e.lunch.quantity, 10);
+        }
+
+        if (e.dinner.active) {
+          scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+        }
+      });
+
+      this.state.secondaryProfilesData.forEach((e, i) => {
+        e.scheduleReal.forEach((el, index) => {
+          if (el.breakfast.active) {
+            scheduleSummation[index].breakfast += parseInt(
+              el.breakfast.quantity,
+              10,
+            );
+          }
+
+          if (el.lunch.active) {
+            scheduleSummation[index].lunch += parseInt(el.lunch.quantity, 10);
+          }
+
+          if (el.dinner.active) {
+            scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+          }
+        });
+      });
+
+      this.setState({
+        completeSchedule: scheduleSummation,
+        deliveryType: ['', '', '', '', '', '', ''],
+      });
+    });
+  }
+  handleNextMealScheduleSecondary(profileIndex) {
+    const secondaryProfilesDataCopy = this.state.secondaryProfilesData.slice();
+
+    secondaryProfilesDataCopy[profileIndex].activeMealScheduleStep =
+      secondaryProfilesDataCopy[profileIndex].activeMealScheduleStep + 1;
+
+    this.setState({
+      secondaryProfilesData: secondaryProfilesDataCopy,
+    });
+  }
+  handleBackMealScheduleSecondary(profileIndex) {
+    const secondaryProfilesDataCopy = this.state.secondaryProfilesData.slice();
+
+    secondaryProfilesDataCopy[profileIndex].activeMealScheduleStep =
+      secondaryProfilesDataCopy[profileIndex].activeMealScheduleStep - 1;
+
+    this.setState({
+      secondaryProfilesData: secondaryProfilesDataCopy,
+    });
+  }
+  handleChangeRadioLifestyleSecondary(i, event, value) {
+    this.state.secondaryProfilesData[i].lifestyle = value;
+
+    const getLifestyleRestrictions = this.props.lifestyles.find(
+      el => el.title === value,
+    );
+
+    // const currentRestrictionsIds = [this.state.secondaryProfilesData[i]
+    //   .restrictions.length
+    //   ? this.state.secondaryProfilesData[i].restrictions.slice()
+    //   : [];]
+    const currentRestrictionsIds = [];
+    currentRestrictionsIds.push(...getLifestyleRestrictions.restrictions);
+
+    this.state.secondaryProfilesData[
+      i
+    ].lifestyleRestrictions = currentRestrictionsIds;
+
+    this.state.secondaryProfilesData[i].isLifestyleCustom = getLifestyleRestrictions.custom;
+
+    this.forceUpdate();
+  }
+  handleChangeRadioDiscountSecondary(i, event, value) {
+    this.state.secondaryProfilesData[i].discount = value;
+    this.forceUpdate();
+  }
+  handleChangeSecondary(index, id, event, checked) {
+    const clonedRestrictionIds = this.state.secondaryProfilesData[index]
+      .restrictions
+      ? this.state.secondaryProfilesData[index].restrictions.slice()
+      : [];
+
+    if (clonedRestrictionIds.indexOf(id) != -1) {
+      clonedRestrictionIds.splice(clonedRestrictionIds.indexOf(id), 1);
+    } else {
+      clonedRestrictionIds.push(id);
+    }
+
+    this.state.secondaryProfilesData[index].restrictions = clonedRestrictionIds;
+
+    this.forceUpdate();
+  }
+  onSuggestionSelectedSecondary(
+    index,
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
+  ) {
+    let clonedSubIngredients;
+
+    console.log(index);
+
+    if (this.state.addRestrictionType == 'Preference') {
+      // subingredients
+      let isThere = false;
+
+      if (this.state.secondaryProfilesData[index].subIngredients.length > 0) {
+        isThere = this.state.secondaryProfilesData[index].subIngredients.filter(
+          present => suggestion._id === present._id,
+        );
+      }
+
+      if (isThere != false) {
+        return;
+      }
+
+      this.state.secondaryProfilesData[index].subIngredients.push({
+        _id: suggestion._id,
+        title: suggestion.title,
+      });
+    } else {
+      // specificRestrictions
+
+      let isThere = false;
+
+      if (
+        this.state.secondaryProfilesData[index].specificRestrictions.length > 0
+      ) {
+        isThere = this.state.secondaryProfilesData[
+          index
+        ].specificRestrictions.filter(
+          present => suggestion._id === present._id,
+        );
+      }
+
+      if (isThere != false) {
+        return;
+      }
+
+      this.state.secondaryProfilesData[index].specificRestrictions.push({
+        _id: suggestion._id,
+        title: suggestion.title,
+      });
+    }
+
+    this.state.secondaryProfilesData[index].deleteDialogOpen = false;
+    this.state.value = '';
+
+    this.forceUpdate();
+  }
+
+  handlePlatingNotesChangeSecondary(profileIndex, event) {
+    const secondaryProfilesDataCopy = this.state.secondaryProfilesData.slice();
+
+    secondaryProfilesDataCopy[profileIndex].platingNotes = event.target.value;
+
+    this.setState({
+      secondaryProfilesData: secondaryProfilesDataCopy,
+    });
+  }
+
+  renderMealStepsContentSecondary(profileIndex, stepIndex) {
+    return (
+      <Grid container>
+        <Grid item xs={12} sm={4}>
+          <Typography type="body1" className="text-uppercase">
+            Breakfast
+          </Typography>
+          <FormControl component="fieldset">
+            <FormGroup>
+              <FormControlLabel
+                key={stepIndex}
+                checked={
+                  this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].breakfast.active
+                }
+                onChange={this.handleScheduleMealTypeCheckSecondary.bind(
+                  this,
+                  profileIndex,
+                  stepIndex,
+                  'breakfast',
+                )}
+                control={<Checkbox value={'breakfast'} />}
+                label={'Breakfast'}
+              />
+            </FormGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">
+            Portion
+          </Typography>
+          <FormControl component="fieldset">
+            <RadioGroup
+              aria-label=""
+              name=""
+              disabled={
+                !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].breakfast.active
+              }
+              value={
+                this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].breakfast.portions
+              }
+              onChange={this.handleChangeRadioSchedulePortionSecondary.bind(
+                this,
+                profileIndex,
+                stepIndex,
+                'breakfast',
+              )}
+              style={{ flexDirection: 'row' }}
+            >
+              <FormControlLabel
+                key={stepIndex}
+                value={'regular'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].breakfast.active
+                }
+                control={<Radio />}
+                label={'Regular'}
+              />
+
+              <FormControlLabel
+                key={stepIndex}
+                value={'athletic'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].breakfast.active
+                }
+                control={<Radio />}
+                label={'Athletic'}
+              />
+
+              <FormControlLabel
+                key={stepIndex}
+                value={'bodybuilder'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].breakfast.active
+                }
+                control={<Radio />}
+                label={'Bodybuilder'}
+              />
+            </RadioGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">
+            Quantity
+          </Typography>
+          <FormControl component="fieldset">
+            <TextField
+              disabled={
+                !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].breakfast.active
+              }
+              value={
+                this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].breakfast.quantity
+              }
+              onChange={this.handleChangeRadioScheduleQuantitySecondary.bind(
+                this,
+                profileIndex,
+                stepIndex,
+                'breakfast',
+              )}
+              inputProps={{
+                type: 'number',
+                min: 1,
+              }}
+            />
+
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <Typography type="body1" className="text-uppercase">
+            Lunch
+          </Typography>
+          <FormControl component="fieldset">
+            <FormGroup>
+              <FormControlLabel
+                key={stepIndex}
+                checked={
+                  this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].lunch.active
+                }
+                onChange={this.handleScheduleMealTypeCheckSecondary.bind(
+                  this,
+                  profileIndex,
+                  stepIndex,
+                  'lunch',
+                )}
+                control={<Checkbox value={'value'} />}
+                label={'Lunch'}
+              />
+            </FormGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">
+            Portion
+          </Typography>
+          <FormControl component="fieldset">
+            <RadioGroup
+              aria-label=""
+              name=""
+              disabled={
+                this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].lunch.active
+              }
+              value={
+                this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].lunch.portions
+              }
+              onChange={this.handleChangeRadioSchedulePortionSecondary.bind(
+                this,
+                profileIndex,
+                stepIndex,
+                'lunch',
+              )}
+              style={{ flexDirection: 'row' }}
+            >
+              <FormControlLabel
+                key={stepIndex}
+                value={'regular'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].lunch.active
+                }
+                control={<Radio />}
+                label={'Regular'}
+              />
+
+              <FormControlLabel
+                key={stepIndex}
+                value={'athletic'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].lunch.active
+                }
+                control={<Radio />}
+                label={'Athletic'}
+              />
+
+              <FormControlLabel
+                key={stepIndex}
+                value={'bodybuilder'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].lunch.active
+                }
+                control={<Radio />}
+                label={'Bodybuilder'}
+              />
+            </RadioGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">
+            Quantity
+          </Typography>
+          <FormControl component="fieldset">
+
+            <TextField
+              disabled={
+                !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].lunch.active
+              }
+              value={
+                this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].lunch.quantity
+              }
+              onChange={this.handleChangeRadioScheduleQuantitySecondary.bind(
+                this,
+                profileIndex,
+                stepIndex,
+                'lunch',
+              )}
+              inputProps={{
+                type: 'number',
+                min: 1,
+              }}
+            />
+
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} sm={4}>
+          <Typography type="body1" className="text-uppercase">
+            Dinner
+          </Typography>
+          <FormControl component="fieldset">
+            <FormGroup>
+              <FormControlLabel
+                key={stepIndex}
+                checked={
+                  this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].dinner.active
+                }
+                onChange={this.handleScheduleMealTypeCheckSecondary.bind(
+                  this,
+                  profileIndex,
+                  stepIndex,
+                  'dinner',
+                )}
+                control={<Checkbox value={'value'} />}
+                label={'Dinner'}
+              />
+            </FormGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">
+            Portion
+          </Typography>
+          <FormControl component="fieldset">
+            <RadioGroup
+              aria-label=""
+              name=""
+              value={
+                this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].dinner.portions
+              }
+              onChange={this.handleChangeRadioSchedulePortionSecondary.bind(
+                this,
+                profileIndex,
+                stepIndex,
+                'dinner',
+              )}
+              disabled={
+                !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].dinner.active
+              }
+              style={{ flexDirection: 'row' }}
+            >
+              <FormControlLabel
+                key={stepIndex}
+                value={'regular'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].dinner.active
+                }
+                control={<Radio />}
+                label={'Regular'}
+              />
+
+              <FormControlLabel
+                key={stepIndex}
+                value={'athletic'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].dinner.active
+                }
+                control={<Radio />}
+                label={'Athletic'}
+              />
+
+              <FormControlLabel
+                key={stepIndex}
+                value={'bodybuilder'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].dinner.active
+                }
+                control={<Radio />}
+                label={'Bodybuilder'}
+              />
+            </RadioGroup>
+          </FormControl>
+          <Typography type="body1" className="text-uppercase">
+            Quantity
+          </Typography>
+          <FormControl component="fieldset">
+            <TextField
+              disabled={
+                !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].dinner.active
+              }
+              value={
+                this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].dinner.quantity
+              }
+              onChange={this.handleChangeRadioScheduleQuantitySecondary.bind(
+                this,
+                profileIndex,
+                stepIndex,
+                'dinner',
+              )}
+
+              inputProps={{
+                type: 'number',
+                min: 1,
+              }}
+            />
+
+          </FormControl>
+        </Grid>
+      </Grid >
+    );
+  }
+
+  deleteDialogHandleRequestCloseSecondary(profileIndex) {
+    console.log(profileIndex);
+
+    this.state.secondaryProfilesData[profileIndex].deleteDialogOpen = false;
+    this.forceUpdate();
+  }
+
+  deleteDialogHandleOpenSecondary(profileIndex) {
+    console.log(profileIndex);
+    this.state.secondaryProfilesData[profileIndex].deleteDialogOpen = true;
+    this.forceUpdate();
+  }
+
+
+  handleChangeRadioAdultOrChild(profileIndex, event, value) {
+    const secondaryProfilesDataCopy = this.state.secondaryProfilesData;
+
+    secondaryProfilesDataCopy[profileIndex].adultOrChild = event.target.value;
+
+    this.setState({
+      secondaryProfilesData: secondaryProfilesDataCopy,
+    });
+  }
+
+
+  // STEP 3: Delivery
+
+  handleChangeRadioAddressType(event, value) {
+    this.setState({
+      addressType: value,
+    });
+  }
+
+  changeDormName(event, value) {
+    // console.log(event.target.value);
+
+    if (event.target.value == 'Algonquin College') {
+      var changedResidence = 'Student Residence';
+    }
+
+    if (event.target.value == 'Carleton University') {
+      var changedResidence = 'Dundas House';
+    }
+
+    if (event.target.value == 'University of Ottawa') {
+      var changedResidence = '90 U Residence';
+    }
+
+    this.setState({
+      dormName: event.target.value,
+      dormResidence: changedResidence,
+    });
+  }
+
+  changeDormResidence(event, value) {
+    // console.log(event.target.value);
+
+    this.setState({
+      dormResidence: event.target.value,
+    });
+  }
+
+  changeRadioDeliveryType(index, event, value) {
+    const clonedDeliveryType = this.state.deliveryType.slice();
+
+    clonedDeliveryType[index] = value;
+
+    this.setState({
+      deliveryType: clonedDeliveryType,
+    });
+
+    this.forceUpdate();
+  }
+
+
+  handleNextDeliverySchedule() {
+    const { activeDeliveryScheduleStep } = this.state;
+
+    this.setState({
+      activeDeliveryScheduleStep: activeDeliveryScheduleStep + 1,
+    });
+  }
+
+  handleBackDeliverySchedule() {
+    const { activeDeliveryScheduleStep } = this.state;
+
+    this.setState({
+      activeDeliveryScheduleStep: activeDeliveryScheduleStep - 1,
+    });
+  }
+
+  getSteps() {
+    return [
+      'Monday',
+      'Tuesday',
+      'Wednesday',
+      'Thursday',
+      'Friday',
+      'Saturday/Sunday',
+    ];
+  }
+
+  renderOptionsForTheDay(step) {
+    const previousIndex = step == 0 ? null : step - 1;
+
+    const dayBeforeYestMealSum = step >= 2 ?
+      parseInt(this.state.completeSchedule[previousIndex - 1].breakfast, 10) +
+      parseInt(this.state.completeSchedule[previousIndex - 1].lunch, 10) +
+      parseInt(this.state.completeSchedule[previousIndex - 1].dinner, 10) : null;
+
+    const previousDaysMealSum = step == 0 ? null :
+      parseInt(this.state.completeSchedule[previousIndex].breakfast, 10) +
+      parseInt(this.state.completeSchedule[previousIndex].lunch, 10) +
+      parseInt(this.state.completeSchedule[previousIndex].dinner, 10);
+
+    const daysMealSum =
+      parseInt(this.state.completeSchedule[step].breakfast, 10) +
+      parseInt(this.state.completeSchedule[step].lunch, 10) +
+      parseInt(this.state.completeSchedule[step].dinner, 10);
+
+    const nextDaysSum =
+      parseInt(this.state.completeSchedule[step + 1].breakfast, 10) +
+      parseInt(this.state.completeSchedule[step + 1].lunch, 10) +
+      parseInt(this.state.completeSchedule[step + 1].dinner, 10);
+
+    let radioGroup = (
+      <RadioGroup
+        aria-label={`delivery_${step}`}
+        name={`delivery_${step}`}
+        style={{ flexDirection: 'row' }}
+        value={this.state.deliveryType[step]}
+        onChange={this.changeRadioDeliveryType.bind(this, step)}
+        disabled
+      >
+        <Typography type="body2">No meals on this day</Typography>
+      </RadioGroup>
+    );
+
+    if (this.state.activeDeliveryScheduleStep == 0) {
+      if (daysMealSum == 0) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'row' }}
+            value={this.state.deliveryType[step]}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            disabled
+          >
+            <Typography type="body2">N/a</Typography>
+          </RadioGroup>
+        );
+      }
+
+      if (daysMealSum == 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+      }
+
+      if (daysMealSum > 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+      }
+    }
+
+    if (this.state.activeDeliveryScheduleStep == 1) {
+      if (daysMealSum == 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+
+        if (previousDaysMealSum > 0 && this.state.deliveryType[0] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[0] == 'dayOf') { // daysMealSum == 1
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`Day of 2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0) { // daysMealSum == 1
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="sundayNight"
+                control={<Radio />}
+                label={`Sunday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfMonday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+      }// daysMealSum == 1
+
+      if (daysMealSum > 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+
+        if (previousDaysMealSum > 0 && this.state.deliveryType[0] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[0] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`Day of 2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0) {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="sundayNight"
+                control={<Radio />}
+                label={`Sunday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfMonday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }// previousDaysMealSum == 0
+      }// daysMealSum > 1
+    }// tuesday
+
+    if (this.state.activeDeliveryScheduleStep == 2) {
+      if (daysMealSum == 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+
+        if (previousDaysMealSum > 0 && this.state.deliveryType[1] == 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[1] == 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="sundayNight"
+                control={<Radio />}
+                label={`Sunday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfMonday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeMonday"
+                control={<Radio />}
+                label={`Monday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfTuesday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'sundayNight') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[0] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[0] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+      }// daysMealSum == 1
+
+      if (daysMealSum > 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+        console.log(dayBeforeYestMealSum);
+        if (previousDaysMealSum > 0 && this.state.deliveryType[1] == 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[1] == 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="sundayNight"
+                control={<Radio />}
+                label={`Sunday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfMonday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeMonday"
+                control={<Radio />}
+                label={`Monday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfTuesday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum === 0 && this.state.deliveryType[1] == 'sundayNight') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum === 0 && this.state.deliveryType[1] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum === 0 && this.state.deliveryType[1] == 'nightBefore') { // check this once
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum === 0 && this.state.deliveryType[1] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - Free`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[0] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[0] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum == 0 && this.state.deliveryType[1] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+      }// daysMealSum > 1
+    }// wednesday
+
+    if (this.state.activeDeliveryScheduleStep == 3) {
+      if (daysMealSum == 0) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'row' }}
+            value={this.state.deliveryType[step]}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            disabled
+          >
+            <Typography type="body2">N/a</Typography>
+          </RadioGroup>
+        );
+      }
+
+      if (daysMealSum == 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+        //
+        if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOfTuesday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'nightBeforeMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'dayOfMonday' && this.state.deliveryType[2] == 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[1] == 'dayOfPaired' && this.state.deliveryType[2] == 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[1] == 'nightBeforePaired' && this.state.deliveryType[2] == 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'nightBeforePaired' && this.state.deliveryType[1] != 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0 //mondayNight is here
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="mondayNight"
+                control={<Radio />}
+                label={`Monday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfTuesday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeTuesday"
+                control={<Radio />}
+                label={`Tuesday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfWednesday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'nightBeforePaired' && this.state.deliveryType[1] == 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+      }// daysMealSum == 1
+
+
+      if (daysMealSum > 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+        if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'dayOfTuesday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[2] == 'nightBeforeMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'dayOfMonday' && this.state.deliveryType[2] == 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[1] == 'dayOfPaired' && this.state.deliveryType[2] == 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[1] == 'nightBeforePaired' && this.state.deliveryType[2] == 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[1] == 'sundayNight' && this.state.deliveryType[2] == 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0 //mondayNight is here
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="mondayNight"
+                control={<Radio />}
+                label={`Monday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfTuesday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeTuesday"
+                control={<Radio />}
+                label={`Tuesday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfWednesday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[1] == 'dayOfMonday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+      }// daysMealSum > 1
+    }// thursday
+
+    if (this.state.activeDeliveryScheduleStep == 4) {
+      if (daysMealSum == 0) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'row' }}
+            value={this.state.deliveryType[step]}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            disabled
+          >
+            <Typography type="body2">N/a</Typography>
+          </RadioGroup>
+        );
+      }
+
+      if (daysMealSum == 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $2.50`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+
+        if (this.state.deliveryType[3] === 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'dayOfWednesday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'nightBeforeTuesday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[2] === 'nightBefore' && this.state.deliveryType[3] === 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[2] === 'dayOf' && this.state.deliveryType[3] === 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day-of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="tuesdayNight"
+                control={<Radio />}
+                label={`Tuesday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfWednesday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeWednesday"
+                control={<Radio />}
+                label={`Wednesday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfThursday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day-of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+      }
+
+
+      if (daysMealSum > 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value="nightBefore"
+              control={<Radio />}
+              label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
+            />
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                .add(step, 'd')
+                .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('DD')} - $2.50`}
+            />
+          </RadioGroup>
+        );
+
+        if (this.state.deliveryType[3] === 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`2-day pairing  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'dayOfWednesday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`2-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[3] === 'nightBeforeTuesday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[2] === 'nightBefore' && this.state.deliveryType[3] === 'nightBeforePaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[2] === 'dayOf' && this.state.deliveryType[3] === 'dayOfPaired') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day-of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum == 0) { // previousMealsSum == 0 && dayBeforeMealSum == 0
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="tuesdayNight"
+                control={<Radio />}
+                label={`Tuesday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfWednesday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('dddd')} - $2.50`}
+              />
+
+              <FormControlLabel
+                value="nightBeforeWednesday"
+                control={<Radio />}
+                label={`Wednesday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfThursday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="dayOfPaired"
+                control={<Radio />}
+                label={`3-day pairing day-of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(2, 'd')
+                    .format('D')} - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum == 0 && dayBeforeYestMealSum > 0 && this.state.deliveryType[2] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              <FormControlLabel
+                value="nightBeforePaired"
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(3, 'd')
+                    .format('D')} evening - Free`}
+              />
+              <FormControlLabel
+                value="nightBefore"
+                control={<Radio />}
+                label={`Night before ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .subtract(1, 'd')
+                    .format('D')} - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOf'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd')
+                  .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd')
+                    .format('DD')} - $2.50`}
+              />
+            </RadioGroup>
+          );
+        }
+      }
+    }// friday
+
+    if (this.state.activeDeliveryScheduleStep == 5) {
+      // saturday & sunday
+
+      const totalMealSum = daysMealSum + nextDaysSum;
+
+      if (totalMealSum > 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value={'nightBeforeThursday'}
+              control={<Radio />}
+              label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
+              
+              ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('DD')} evening - Free`}
+            />
+
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+              
+              ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $2.50`}
+            />
+
+
+          </RadioGroup>
+        );
+
+        if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value={'nightBeforeThursday'}
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
+              
+                ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(2, 'd')
+                    .format('DD')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfFriday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'dayOfThursday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value={'nightBeforeThursday'}
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                
+                  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(2, 'd')
+                    .format('DD')} evening - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfFriday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+              {/*  changed this from nightBefore to dayOfFriday */}
+              <FormControlLabel
+                value={'dayOfFriday'}
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[4] == 'dayOfPaired' && this.state.deliveryType[3] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+
+              <FormControlLabel
+                value={'dayOfFriday'}
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} day of - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'nightBeforeThursday'}
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                
+                  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(2, 'd')
+                    .format('DD')} evening - $2.50`}
+              />
+
+            </RadioGroup>
+          );
+        }
+      }// totalMealSum > 1
+
+      if (totalMealSum == 1) {
+        radioGroup = (
+          <RadioGroup
+            aria-label={`delivery_${step}`}
+            name={`delivery_${step}`}
+            style={{ flexDirection: 'column' }}
+            onChange={this.changeRadioDeliveryType.bind(this, step)}
+            value={this.state.deliveryType[step]}
+          >
+
+            <FormControlLabel
+              value={'nightBeforeThursday'}
+              control={<Radio />}
+              label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                  
+                ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(2, 'd')
+                  .format('DD')} evening - $2.50`}
+            />
+
+
+            <FormControlLabel
+              value={'dayOf'}
+              control={<Radio />}
+              label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $2.50`}
+            />
+
+
+          </RadioGroup>
+        );
+
+        if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'nightBefore') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value={'nightBeforeThursday'}
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                
+                  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(2, 'd')
+                    .format('DD')} evening - Free`}
+              />
+
+              <FormControlLabel
+                value={'dayOfFriday'}
+                control={<Radio />}
+                label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'dayOfThursday') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value={'nightBeforeThursday'}
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                
+                  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(2, 'd')
+                    .format('DD')} evening - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'dayOfFriday'}
+                control={<Radio />}
+                label={`Day of  ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+
+            </RadioGroup>
+          );
+        } else if (previousDaysMealSum > 0 && this.state.deliveryType[4] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+              <FormControlLabel
+                value={'dayOfFriday'}
+                control={<Radio />}
+                label={`3-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} - $2.50`}
+              />
+
+            </RadioGroup>
+          );
+        } else if (this.state.deliveryType[4] == 'dayOfPaired' && this.state.deliveryType[3] == 'dayOf') {
+          radioGroup = (
+            <RadioGroup
+              aria-label={`delivery_${step}`}
+              name={`delivery_${step}`}
+              style={{ flexDirection: 'column' }}
+              onChange={this.changeRadioDeliveryType.bind(this, step)}
+              value={this.state.deliveryType[step]}
+            >
+
+
+              <FormControlLabel
+                value={'dayOfFriday'}
+                control={<Radio />}
+                label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
+                
+                ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(1, 'd')
+                    .format('DD')} day of - $2.50`}
+              />
+
+              <FormControlLabel
+                value={'nightBeforeThursday'}
+                control={<Radio />}
+                label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
+                
+                  ${moment(new Date(this.state.subscriptionStartDateRaw))
+                    .add(step, 'd').subtract(2, 'd')
+                    .format('DD')} evening - $2.50`}
+              />
+
+            </RadioGroup>
+          );
+        }
+      }// totalMealSum == 1
+    }// saturday/sunday
+
+
+    return radioGroup;
+  }
+
+
+  setCoolerbagCheckbox(event, checked) {
+    this.setState({
+      coolerBag: checked,
+    });
+  }
+
+  setHotelFrontDeskCheckbox(event, checked) {
+    this.setState({
+      hotelFrontDesk: checked,
+    });
+  }
+
+
   render() {
     const buttonClassname = classNames({
       [this.props.classes.buttonSuccess]: this.state.submitSuccess,
     });
 
     const { customer, history } = this.props;
-    const { activeMealScheduleStep } = this.state;
+    const { activeMealScheduleStep, activeDeliveryScheduleStep } = this.state;
     const mealSteps = this.getMealSteps();
+    const steps = this.getSteps();
 
     return (
       <div style={{ width: '100%' }}>
@@ -1134,8 +6439,8 @@ class CurrentCustomerEditor extends React.Component {
 
           {this.state.currentTab === 1 && (
             <div>
-              <form id="step2" ref={form2 => (this.form2 = form2)} onSubmit={event => event.preventDefault()}>
-                <Paper elevation={2} style={{ width: '100%' }} className="paper-for-fields">
+              <form id="step2" ref={form => (this.secondForm = form)} onSubmit={event => event.preventDefault()}>
+                <Paper elevation={2} className="paper-for-fields">
                   <Typography type="headline" style={{ marginBottom: '25px' }}>
                     {`${customer.profile.name.first}'s profile`}
                   </Typography>
@@ -1289,15 +6594,15 @@ class CurrentCustomerEditor extends React.Component {
 
                       const momentDateObj = moment();
 
-                      const stepLabel = `${label} ${moment(
-                        this.state.subscriptionStartDateRaw,
-                      )
-                        .add(index, 'd')
-                        .format('DD')}`;
+                      // const stepLabel = `${label} ${moment(
+                      //   this.state.subscriptionStartDateRaw,
+                      // )
+                      //   .add(index, 'd')
+                      //   .format('DD')}`;
 
                       return (
                         <Step key={index} {...props}>
-                          <StepLabel>{stepLabel}</StepLabel>
+                          <StepLabel>{label}</StepLabel>
                         </Step>
                       );
                     })}
@@ -1651,7 +6956,7 @@ class CurrentCustomerEditor extends React.Component {
                       />
                     </Grid>
                   </Grid>
-                  {this.props.customer.secondary == undefined && (
+                  {/* {this.props.customer.secondary == undefined && (
                     <Grid container style={{ marginTop: '25px' }}>
                       <Grid item xs={12} sm={12}>
                         <TextField
@@ -1665,37 +6970,722 @@ class CurrentCustomerEditor extends React.Component {
                         />
                       </Grid>
                     </Grid>
-                  )}
-                </Paper>
-                <Button
-                  style={{ marginTop: '25px' }}
-                  disabled={this.state.submitLoading}
-                  raised
-                  className={`${buttonClassname}`}
-                  color="primary"
-                  type="submit"
-                  onClick={() => this.saveSecondStep()}
-                >
-                  Update
-                  {this.state.submitLoading && (
-                    <CircularProgress
-                      size={24}
-                      className={this.props.classes.buttonProgress}
-                    />
-                  )}
-                </Button>
-              </form>
-            </div>
-          )}
+                  )} */}
 
-          {this.state.currentTab === 2 && (
-            <Grid
-              container
-              justify="center"
-              style={{ marginBottom: '50px', marginTop: '25px' }}
-            >
-              <Grid item xs={12} sm={12}>
-                <Paper elevation={2} className="paper-for-fields">
+                  {this.props.customer.secondary == undefined ? this.state.secondaryProfilesData.map((e, profileIndex) => (
+                    <div key={profileIndex}>
+                      <ListItem
+                        style={{ marginTop: '15px', marginBottom: '15px' }}
+                        button
+                        onClick={this.handleProfileOpen.bind(
+                          this,
+                          false,
+                          profileIndex,
+                        )}
+                      >
+                        <ListItemText
+                          primary={
+                            this.state.secondaryProfilesData[profileIndex]
+                              .first_name
+                              ? `${
+                              this.state.secondaryProfilesData[profileIndex]
+                                .first_name
+                              }'s Profile`
+                              : `Profile ${profileIndex + 2}`
+                          }
+                        />
+                        {this.state.secondaryCollapses[profileIndex] ? (
+                          <ExpandLess />
+                        ) : (
+                            <ExpandMore />
+                          )}
+                      </ListItem>
+                      <Collapse
+                        in={this.state.secondaryCollapses[profileIndex]}
+                        transitionDuration="auto"
+                        component="div"
+                      >
+                        <div style={{ paddingLeft: '16px', paddingRight: '16px' }}>
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                margin="normal"
+                                id="first_name"
+                                label="First name"
+                                name={`first_name${profileIndex + 1}`}
+                                fullWidth
+                                // defaultValue={
+                                //   this.props.customerInfo.secondaryProfiles[
+                                //     profileIndex
+                                //   ]
+                                //     ? this.props.customerInfo.secondaryProfiles[
+                                //       profileIndex
+                                //     ].firstName
+                                //     : ''
+                                // }
+                                value={this.state.secondaryProfilesData[profileIndex].first_name}
+                                data-rule-required="true"
+                                inputProps={{}}
+                                onChange={(event) => {
+                                  this.state.secondaryProfilesData[
+                                    profileIndex
+                                  ].first_name =
+                                    event.target.value;
+                                  this.forceUpdate();
+                                }}
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                margin="normal"
+                                id="last_name"
+                                label="Last name"
+                                name={`last_name${profileIndex + 1}`}
+                                data-rule-required="true"
+                                value={this.state.secondaryProfilesData[profileIndex].last_name}
+                                fullWidth
+                                // defaultValue={
+                                //   this.props.customerInfo.secondaryProfiles[
+                                //     profileIndex
+                                //   ]
+                                //     ? this.props.customerInfo.secondaryProfiles[
+                                //       profileIndex
+                                //     ].lastName
+                                //     : ''
+                                // }
+                                onChange={(event) => {
+                                  this.state.secondaryProfilesData[
+                                    profileIndex
+                                  ].last_name = event.target.value;
+                                  this.forceUpdate();
+                                }}
+                                inputProps={{}}
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  <Typography
+                                    type="body1"
+                                    className="text-uppercase font-medium"
+                                  >
+                                    Plan
+                                    </Typography>
+                                </FormLabel>
+                                <RadioGroup
+                                  aria-label="lifestyle"
+                                  name={`lifestyle${profileIndex + 1}`}
+                                  value={
+                                    this.state.secondaryProfilesData[profileIndex]
+                                      .lifestyle
+                                  }
+                                  onChange={this.handleChangeRadioLifestyleSecondary.bind(
+                                    this,
+                                    profileIndex,
+                                  )}
+                                  style={{ flexDirection: 'row' }}
+                                  data-rule-required="true"
+                                >
+                                  {this.props.lifestyles.map(e => (
+                                    <FormControlLabel
+                                      value={e.title}
+                                      control={<Radio />}
+                                      label={e.title}
+                                      selected
+                                    />
+                                  ))}
+                                </RadioGroup>
+                              </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  <Typography
+                                    type="body1"
+                                    className="text-uppercase font-medium"
+                                  >
+                                    Discount
+                                    </Typography>
+                                </FormLabel>
+                                <RadioGroup
+                                  aria-label="discount"
+                                  name="discount"
+                                  value={
+                                    this.state.secondaryProfilesData[profileIndex]
+                                      .discount
+                                  }
+                                  onChange={this.handleChangeRadioDiscountSecondary.bind(
+                                    this,
+                                    profileIndex,
+                                  )}
+                                  style={{ flexDirection: 'row' }}
+                                >
+                                  <FormControlLabel
+                                    value="none"
+                                    control={<Radio />}
+                                    label="None"
+                                    selected
+                                    disabled={
+                                      this.state.secondaryProfilesData[profileIndex]
+                                        .lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                          this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].lifestyle &&
+                                          !element.discountStudent &&
+                                          !element.discountSenior,
+                                      )
+                                    }
+                                  />
+                                  <FormControlLabel
+                                    value="student"
+                                    control={<Radio />}
+                                    label="Student"
+                                    disabled={
+                                      this.state.secondaryProfilesData[profileIndex]
+                                        .lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                          this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].lifestyle && !element.discountStudent,
+                                      )
+                                    }
+                                  />
+                                  <FormControlLabel
+                                    value="senior"
+                                    control={<Radio />}
+                                    label="Senior"
+                                    disabled={
+                                      this.state.secondaryProfilesData[profileIndex]
+                                        .lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                          this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].lifestyle && !element.discountSenior,
+                                      )
+                                    }
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container>
+                            <Grid item sm={6} xs={12}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  <Typography
+                                    type="body1"
+                                    className="text-uppercase font-medium"
+                                  >
+                                    Type
+                                    </Typography>
+                                </FormLabel>
+                                <RadioGroup
+                                  aria-label="adultOrChild"
+                                  name={`adultOrChild${profileIndex + 1}`}
+                                  value={
+                                    this.state.secondaryProfilesData[profileIndex]
+                                      .adultOrChild
+                                  }
+                                  onChange={this.handleChangeRadioAdultOrChild.bind(
+                                    this,
+                                    profileIndex,
+                                  )}
+                                  style={{ flexDirection: 'row' }}
+                                >
+                                  <FormControlLabel
+                                    value={'adult'}
+                                    control={<Radio />}
+                                    label={'Adult'}
+                                  />
+
+                                  <FormControlLabel
+                                    value={'child'}
+                                    control={<Radio />}
+                                    label={'Child'}
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+
+                          <Stepper
+                            activeStep={
+                              this.state.secondaryProfilesData[profileIndex]
+                                .activeMealScheduleStep
+                            }
+                            style={{
+                              marginTop: '40px',
+                              marginBottom: '20px',
+                              background: 'none !important',
+                            }}
+                          >
+                            {mealSteps.map((label, index) => {
+                              const props = {};
+                              const stepLabel = `${label} ${moment(
+                                this.state.subscriptionStartDateRaw,
+                              )
+                                .add(index, 'd')
+                                .format('DD')}`;
+
+                              return (
+                                <Step key={index} {...props}>
+                                  <StepLabel>{stepLabel}</StepLabel>
+                                </Step>
+                              );
+                            })}
+                          </Stepper>
+
+                          <div style={{ marginBottom: '30px' }}>
+                            {this.renderMealStepsContentSecondary(
+                              profileIndex,
+                              this.state.secondaryProfilesData[profileIndex]
+                                .activeMealScheduleStep,
+                            )}
+
+                            {this.state.secondaryProfilesData[profileIndex]
+                              .activeMealScheduleStep >= 1 ? (
+                                <Button
+                                  onClick={this.handleBackMealScheduleSecondary.bind(
+                                    this,
+                                    profileIndex,
+                                  )}
+                                  style={{ marginTop: '20px' }}
+                                >
+                                  Back
+                                  </Button>
+                              ) : (
+                                ''
+                              )}
+
+                            {this.state.secondaryProfilesData[profileIndex]
+                              .activeMealScheduleStep < 6 ? (
+                                <Button
+                                  onClick={this.handleNextMealScheduleSecondary.bind(
+                                    this,
+                                    profileIndex,
+                                  )}
+                                  style={{ marginTop: '20px' }}
+                                >
+                                  Next
+                                  </Button>
+                              ) : (
+                                ''
+                              )}
+                          </div>
+
+                          <Grid container>
+                            <Grid item xs={12} style={{ marginTop: '25px' }}>
+                              <Typography
+                                type="body1"
+                                className="text-uppercase font-medium"
+                              >
+                                Restrictions
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">Allergies</FormLabel>
+                                <FormGroup>
+                                  {this.props.restrictions
+                                    .filter(e => e.restrictionType === 'allergy')
+                                    .map((e, i) => {
+                                      const isSelected = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .restrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].restrictions.indexOf(e._id) != -1
+                                        : false;
+
+                                      const isAlreadyChecked = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .lifestyleRestrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].lifestyleRestrictions.indexOf(e._id) !=
+                                        -1
+                                        : false;
+                                      return (
+                                        <FormControlLabel
+                                          key={i}
+                                          disabled={isAlreadyChecked}
+                                          control={
+                                            <Checkbox
+                                              checked={
+                                                isSelected || isAlreadyChecked
+                                              }
+                                              onChange={this.handleChangeSecondary.bind(
+                                                this,
+                                                profileIndex,
+                                                e._id,
+                                              )}
+                                              value={e.title.toLowerCase()}
+                                            />
+                                          }
+                                          label={e.title}
+                                        />
+                                      );
+                                    })}
+                                </FormGroup>
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">Dietary</FormLabel>
+                                <FormGroup>
+                                  {this.props.restrictions
+                                    .filter(e => e.restrictionType === 'dietary')
+                                    .map((e, i) => {
+                                      const isSelected = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .restrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].restrictions.indexOf(e._id) != -1
+                                        : false;
+                                      const isAlreadyChecked = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .lifestyleRestrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].lifestyleRestrictions.indexOf(e._id) !=
+                                        -1
+                                        : false;
+
+                                      return (
+                                        <FormControlLabel
+                                          key={i}
+                                          disabled={isAlreadyChecked}
+                                          control={
+                                            <Checkbox
+                                              checked={
+                                                isSelected || isAlreadyChecked
+                                              }
+                                              onChange={this.handleChangeSecondary.bind(
+                                                this,
+                                                profileIndex,
+                                                e._id,
+                                              )}
+                                              value={e.title.toLowerCase()}
+                                            />
+                                          }
+                                          label={e.title}
+                                        />
+                                      );
+                                    })}
+                                </FormGroup>
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">Religious</FormLabel>
+                                <FormGroup>
+                                  {this.props.restrictions
+                                    .filter(e => e.restrictionType === 'religious')
+                                    .map((e, i) => {
+                                      const isSelected = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .restrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].restrictions.indexOf(e._id) != -1
+                                        : false;
+                                      const isAlreadyChecked = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .lifestyleRestrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].lifestyleRestrictions.indexOf(e._id) !=
+                                        -1
+                                        : false;
+                                      return (
+                                        <FormControlLabel
+                                          key={i}
+                                          disabled={isAlreadyChecked}
+                                          control={
+                                            <Checkbox
+                                              checked={
+                                                isSelected || isAlreadyChecked
+                                              }
+                                              onChange={this.handleChangeSecondary.bind(
+                                                this,
+                                                profileIndex,
+                                                e._id,
+                                              )}
+                                              value={e.title.toLowerCase()}
+                                            />
+                                          }
+                                          label={e.title}
+                                        />
+                                      );
+                                    })}
+                                </FormGroup>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+
+                          <Dialog
+                            open={this.state.secondaryProfilesData[profileIndex].deleteDialogOpen}
+                            onClose={this.deleteDialogHandleRequestCloseSecondary.bind(
+                              this,
+                              profileIndex,
+                            )}
+                          >
+                            <Typography
+                              style={{
+                                flex: '0 0 auto',
+                                margin: '0',
+                                padding: '24px 24px 20px 24px',
+                              }}
+                              className="title font-medium"
+                              type="title"
+                            >
+                              Add a restriction
+                              </Typography>
+
+                            <DialogContent>
+                              <DialogContentText>
+                                Select if it's a preference or if it's a restriction
+                                </DialogContentText>
+                              <FormControl component="fieldset">
+                                <RadioGroup
+                                  aria-label="restritionOrPref"
+                                  name="restritionOrPref"
+                                  value={this.state.addRestrictionType}
+                                  onChange={this.handleChangeRadioRestriction.bind(
+                                    this,
+                                  )}
+                                  style={{ flexDirection: 'row' }}
+                                >
+                                  <FormControlLabel
+                                    value="Restriction"
+                                    control={<Radio selected />}
+                                    label="Restriction"
+                                  />
+                                  <FormControlLabel
+                                    value="Preference"
+                                    control={<Radio />}
+                                    label="Preference"
+                                    selected
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+
+                              <Autosuggest
+                                id="2"
+                                className="autosuggest"
+                                theme={{
+                                  container: {
+                                    flexGrow: 1,
+                                    position: 'relative',
+                                    marginBottom: '2em',
+                                  },
+                                  suggestionsContainerOpen: {
+                                    position: 'absolute',
+                                    left: 0,
+                                    right: 0,
+                                  },
+                                  suggestion: {
+                                    display: 'block',
+                                  },
+                                  suggestionsList: {
+                                    margin: 0,
+                                    padding: 0,
+                                    listStyleType: 'none',
+                                  },
+                                }}
+                                renderInputComponent={this.renderInput.bind(this)}
+                                suggestions={this.state.suggestions}
+                                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
+                                  this,
+                                )}
+                                onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
+                                  this,
+                                )}
+                                onSuggestionSelected={this.onSuggestionSelectedSecondary.bind(
+                                  this,
+                                  profileIndex,
+                                )}
+                                getSuggestionValue={this.getSuggestionValue.bind(
+                                  this,
+                                )}
+                                renderSuggestion={this.renderSuggestion.bind(this)}
+                                renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                                  this,
+                                )}
+                                fullWidth
+                                focusInputOnSuggestionClick={false}
+                                inputProps={{
+                                  placeholder: 'Search',
+                                  value: this.state.value,
+                                  onChange: this.onChange.bind(this),
+                                  className: 'autoinput',
+                                }}
+                              />
+                            </DialogContent>
+                            <DialogActions>
+                              <Button onClick={this.deleteDialogHandleRequestClose.bind(this, profileIndex)} color="default">Close</Button>
+                            </DialogActions>
+                          </Dialog>
+
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <Typography
+                                type="body1"
+                                className="text-uppercase font-medium"
+                                style={{ marginTop: '25px' }}
+                              >
+                                Preferences
+                                </Typography>
+
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  flexWrap: 'wrap',
+                                  marginTop: '25px',
+                                }}
+                              >
+                                {this.state.secondaryProfilesData[profileIndex].subIngredients && this.state.secondaryProfilesData[profileIndex].subIngredients.length ? (
+                                  this.state.secondaryProfilesData[profileIndex].subIngredients.map((subIngredient, i) => (
+                                    <Chip
+                                      avatar={
+                                        <Avatar>
+                                          {' '}
+                                          {this.getSubIngredientAvatar(
+                                            subIngredient,
+                                          )}{' '}
+                                        </Avatar>
+                                      }
+                                      style={{
+                                        marginRight: '8px',
+                                        marginBottom: '8px',
+                                      }}
+                                      label={this.getSubIngredientTitle(
+                                        subIngredient,
+                                      )}
+                                      key={i}
+                                      onDelete={this.handleSubIngredientChipDelete.bind(
+                                        this,
+                                        subIngredient,
+                                      )}
+                                    />
+                                  ))
+                                ) : (
+                                    <Chip
+                                      className="chip--bordered"
+                                      label="Ingredient"
+                                    />
+                                  )}
+                              </div>
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <Typography
+                                type="body1"
+                                className="text-uppercase font-medium"
+                              >
+                                Restrictions
+                                </Typography>
+
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  flexWrap: 'wrap',
+                                  marginTop: '25px',
+                                }}
+                              >
+                                {this.state.secondaryProfilesData[profileIndex]
+                                  .specificRestrictions.length ? (
+                                    this.state.secondaryProfilesData[
+                                      profileIndex
+                                    ].specificRestrictions.map((subIngredient, i) => (
+                                      <Chip
+                                        avatar={
+                                          <Avatar>
+                                            {' '}
+                                            {this.getSubIngredientAvatar(
+                                              subIngredient,
+                                            )}{' '}
+                                          </Avatar>
+                                        }
+                                        style={{
+                                          marginRight: '8px',
+                                          marginBottom: '8px',
+                                        }}
+                                        label={this.getSubIngredientTitle(
+                                          subIngredient,
+                                        )}
+                                        key={i}
+                                        onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                                          this,
+                                          subIngredient,
+                                        )}
+                                      />
+                                    ))
+                                  ) : (
+                                    <Chip
+                                      className="chip--bordered"
+                                      label="Ingredient"
+                                    />
+                                  )}
+                              </div>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container>
+                            <Grid item xs={12}>
+                              <Button
+                                color="primary"
+                                onClick={this.deleteDialogHandleOpenSecondary.bind(this, profileIndex)}
+                              >
+                                Add a restriction
+                                </Button>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container style={{ marginTop: '25px' }}>
+                            <Grid item xs={12} sm={12}>
+                              <TextField
+                                label="Plating notes"
+                                id="platingNotes"
+                                name="platingNotes"
+                                value={this.state.secondaryProfilesData[profileIndex].platingNotes}
+                                fullWidth
+                                multiline
+                                onChange={this.handlePlatingNotesChangeSecondary.bind(this, profileIndex)}
+                              />
+                            </Grid>
+                          </Grid>
+
+                          <Button
+                            raised
+                            onClick={this.removeProfile.bind(this, profileIndex)}
+                            style={{ float: 'right', marginTop: '25px' }}
+                          >
+                            Remove profile
+                            </Button>
+                        </div>
+                      </Collapse>
+                    </div>
+                  ))
+                    : ''}
+
+                  {this.props.customer.secondary == undefined ? (
+                    <Button color="danger" onClick={this.increaseProfileCount.bind(this)} style={{ marginTop: '50px', marginBottom: '50px' }}>
+                      Add a profile
+                    </Button>) : ''}
+
                   <Grid container>
                     <Grid item xs={12}>
                       <Typography type="body1" className="text-uppercase font-medium">Address Type</Typography>
@@ -1751,7 +7741,7 @@ class CurrentCustomerEditor extends React.Component {
                         <Grid item xs={12}>
                           <Typography type="subheading" className="font-uppercase">
                             Apartment
-                          </Typography>
+                            </Typography>
 
                         </Grid>
                         <Grid item xs={12}>
@@ -1763,9 +7753,7 @@ class CurrentCustomerEditor extends React.Component {
                             fullWidth
                             value={this.state.apartmentName}
                             onChange={(event) => { this.setState({ apartmentName: event.target.value }); }}
-                            defaultValue={
-                              this.props.customerInfo.address.apartmentName
-                            }
+
                             inputProps={{}}
                           />
                         </Grid>
@@ -1778,9 +7766,8 @@ class CurrentCustomerEditor extends React.Component {
                             label="Unit"
                             name="apartmentUnit"
                             fullWidth
+                            value={this.state.unit}
                             onChange={(event) => { this.setState({ unit: event.target.value }); }}
-
-                            defaultValue={this.props.customerInfo.address.unit}
                             inputProps={{}}
                           />
                         </Grid>
@@ -1790,10 +7777,9 @@ class CurrentCustomerEditor extends React.Component {
                             id="buzzer"
                             label="Buzzer"
                             name="buzzer"
+                            value={this.state.buzzer}
                             fullWidth
                             onChange={(event) => { this.setState({ buzzer: event.target.value }); }}
-
-                            defaultValue={this.props.customerInfo.address.buzzer}
                             inputProps={{}}
                           />
                         </Grid>
@@ -1809,7 +7795,7 @@ class CurrentCustomerEditor extends React.Component {
                         <Grid item xs={12}>
                           <Typography type="subheading" className="font-uppercase">
                             Business
-                          </Typography>
+                            </Typography>
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
@@ -1817,12 +7803,10 @@ class CurrentCustomerEditor extends React.Component {
                             id="businessName"
                             label="Business name"
                             name="business_name"
+                            value={this.state.businessName}
+
                             fullWidth
                             onChange={(event) => { this.setState({ businessName: event.target.value }); }}
-
-                            defaultValue={
-                              this.props.customerInfo.address.businessName
-                            }
                             inputProps={{}}
                           />
                         </Grid>
@@ -1834,12 +7818,10 @@ class CurrentCustomerEditor extends React.Component {
                             id="businessUnit"
                             label="Unit"
                             name="businessUnit"
+                            value={this.state.unit}
+
                             fullWidth
                             onChange={(event) => { this.setState({ unit: event.target.value }); }}
-
-                            defaultValue={
-                              this.props.customerInfo.address.businessUnit
-                            }
                             inputProps={{}}
                           />
                         </Grid>
@@ -1849,12 +7831,9 @@ class CurrentCustomerEditor extends React.Component {
                             id="businessBuzzer"
                             label="Buzzer"
                             name="businessBuzzer"
+                            value={this.state.buzzer}
                             fullWidth
                             onChange={(event) => { this.setState({ buzzer: event.target.value }); }}
-
-                            defaultValue={
-                              this.props.customerInfo.address.businessBuzzer
-                            }
                             inputProps={{}}
                           />
                         </Grid>
@@ -1870,7 +7849,7 @@ class CurrentCustomerEditor extends React.Component {
                         <Grid item xs={12}>
                           <Typography type="subheading" className="font-uppercase">
                             Dormitory
-                          </Typography>
+                            </Typography>
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
@@ -1890,14 +7869,14 @@ class CurrentCustomerEditor extends React.Component {
                           >
                             <MenuItem key={1} value="Algonquin College">
                               Algonquin College
-                            </MenuItem>
+                              </MenuItem>
 
                             <MenuItem key={3} value="Carleton University">
                               Carleton University
-                            </MenuItem>
+                              </MenuItem>
                             <MenuItem key={4} value="University of Ottawa">
                               University of Ottawa
-                            </MenuItem>
+                              </MenuItem>
                           </TextField>
                         </Grid>
 
@@ -1921,7 +7900,7 @@ class CurrentCustomerEditor extends React.Component {
 
                                 <MenuItem key={1} value="Student Residence">
                                   Student Residence
-                                </MenuItem>
+                                  </MenuItem>
 
                               </TextField>
                             ) : (
@@ -1945,28 +7924,28 @@ class CurrentCustomerEditor extends React.Component {
                               >
                                 <MenuItem key={1} value="Dundas House">
                                   Dundas House
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={2} value="Glengarry House">
                                   Glengarry House
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={3} value="Grenville House">
                                   Grenville House
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={4} value="Lanark House">
                                   Lanark House
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={5} value="Lennox & Addington House">
                                   Lennox & Addington House
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={6} value="Renfrew House">
                                   Renfrew House
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={7} value="Russell House">
                                   Russell House
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={8} value="Stormont House">
                                   Stormont House
-                                </MenuItem>
+                                  </MenuItem>
                               </TextField>
                             ) : (
                               ''
@@ -1990,19 +7969,19 @@ class CurrentCustomerEditor extends React.Component {
                               >
                                 <MenuItem key={1} value="90 U Residence">
                                   90 U Residence
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={2} value="Hyman Soloway Residence">
                                   Hyman Soloway Residence
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={3} value="Marchand Residence">
                                   Marchand Residence
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={4} value="Stanton Residence">
                                   Stanton Residence
-                                </MenuItem>
+                                  </MenuItem>
                                 <MenuItem key={5} value="Thompson Residence">
                                   Thompson Residence
-                                </MenuItem>
+                                  </MenuItem>
                               </TextField>
                             ) : (
                               ''
@@ -2016,12 +7995,11 @@ class CurrentCustomerEditor extends React.Component {
                             id="roomNumber"
                             label="Room number"
                             name="roomNumber"
+                            value={this.state.roomNumber}
                             fullWidth
                             onChange={(event) => { this.setState({ roomNumber: event.target.value }); }}
 
-                            defaultValue={
-                              this.props.customerInfo.address.roomNumber
-                            }
+
                             inputProps={{}}
                           />
                         </Grid>
@@ -2032,9 +8010,9 @@ class CurrentCustomerEditor extends React.Component {
                             label="Buzzer"
                             name="buzzer"
                             fullWidth
+                            value={this.state.roomNumber}
                             onChange={(event) => { this.setState({ buzzer: event.target.value }); }}
 
-                            defaultValue={this.props.customerInfo.address.buzzer}
                             inputProps={{}}
                           />
                         </Grid>
@@ -2049,7 +8027,7 @@ class CurrentCustomerEditor extends React.Component {
                       <Grid item xs={12}>
                         <Typography type="subheading" className="font-uppercase">
                           Hotel
-                        </Typography>
+                          </Typography>
                       </Grid>
                       <Grid item xs={12} sm={6}>
                         <TextField
@@ -2057,10 +8035,11 @@ class CurrentCustomerEditor extends React.Component {
                           id="hotelName"
                           label="Hotel name"
                           name="hotelName"
+                          value={this.state.hotelName}
+
                           fullWidth
                           onChange={(event) => { this.setState({ hotelNumber: event.target.value }); }}
 
-                          defaultValue={this.props.customerInfo.address.hotelNumber}
                           inputProps={{}}
                         />
                       </Grid>
@@ -2070,10 +8049,11 @@ class CurrentCustomerEditor extends React.Component {
                           id="roomNumber"
                           label="Room number"
                           name="roomNumber"
+                          value={this.state.roomNumber}
+
                           fullWidth
                           onChange={(event) => { this.setState({ roomNumber: event.target.value }); }}
 
-                          defaultValue={this.props.customerInfo.address.roomNumber}
                           inputProps={{}}
                         />
                       </Grid>
@@ -2098,7 +8078,7 @@ class CurrentCustomerEditor extends React.Component {
                         <Grid item xs={12}>
                           <Typography type="subheading" className="font-uppercase">
                             House
-                          </Typography>
+                            </Typography>
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
@@ -2106,10 +8086,10 @@ class CurrentCustomerEditor extends React.Component {
                             id="unitHouse"
                             label="Unit"
                             name="unitHouse"
+                            value={this.state.unit}
+
                             fullWidth
                             onChange={(event) => { this.setState({ unit: event.target.value }); }}
-
-                            defaultValue={this.props.customerInfo.address.unitHouse}
                             inputProps={{}}
                           />
                         </Grid>
@@ -2127,6 +8107,7 @@ class CurrentCustomerEditor extends React.Component {
                           <Geosuggest
                             className="geosuggest-input-material"
                             placeholder="Street address"
+                            initialValue={this.state.streetAddress}
                             onChange={(value) => { this.setState({ streetAddress: value }); }}
                             onSuggestSelect={(suggest) => { this.setState({ streetAddress: suggest.label }); }}
                             name="streetAddress"
@@ -2139,7 +8120,7 @@ class CurrentCustomerEditor extends React.Component {
                             name="postalCode"
                             value={this.state.postalCode}
                             fullWidth
-                            readonly
+                            readOnly
                             disabled
                           />
                         </Grid>
@@ -2155,7 +8136,6 @@ class CurrentCustomerEditor extends React.Component {
                             fullWidth
                             multiline
                             onChange={(event) => { this.setState({ notes: event.target.value }); }}
-                            defaultValue={this.props.customerInfo.address.notes}
                           />
                         </Grid>
                       </Grid>
@@ -2181,7 +8161,7 @@ class CurrentCustomerEditor extends React.Component {
                             className="text-uppercase font-medium"
                           >
                             Complete Schedule
-                          </Typography>
+                            </Typography>
                         </Grid>
                         <Grid item xs={12}>
                           <Table className="table-lifestyles">
@@ -2195,7 +8175,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="font-medium font-uppercase"
                                   >
                                     Breakfast
-                                  </Typography>
+                                    </Typography>
                                 </TableCell>
 
                                 <TableCell style={{ textAlign: 'center' }}>
@@ -2204,7 +8184,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="font-medium font-uppercase"
                                   >
                                     Lunch
-                                  </Typography>
+                                    </Typography>
                                 </TableCell>
 
                                 <TableCell style={{ textAlign: 'center' }}>
@@ -2213,7 +8193,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="font-medium font-uppercase"
                                   >
                                     Dinner
-                                  </Typography>
+                                    </Typography>
                                 </TableCell>
                               </TableRow>
                             </TableHead>
@@ -2306,7 +8286,7 @@ class CurrentCustomerEditor extends React.Component {
                             className="text-uppercase font-medium"
                           >
                             Delivery type
-                          </Typography>
+                            </Typography>
                         </Grid>
                         <Grid item xs={12}>
 
@@ -2316,27 +8296,27 @@ class CurrentCustomerEditor extends React.Component {
                           >
                             {steps.map((label, index) => {
                               const props = {};
-                              let stepLabel = `${label} ${moment(
-                                new Date(this.props.customerInfo.subscriptionStartDateRaw),
-                              )
-                                .add(index, 'd')
-                                .format('DD')}`;
+                              // let stepLabel = `${label} ${moment(
+                              //   new Date(this.state.subscriptionStartDateRaw),
+                              // )
+                              //   .add(index, 'd')
+                              //   .format('DD')}`;
 
-                              if (index == 5) {
-                                stepLabel = `${label.split('/')[0]} ${moment(
-                                  new Date(this.props.customerInfo.subscriptionStartDateRaw),
-                                )
-                                  .add(index, 'd')
-                                  .format('DD')} & ${label.split('/')[1]} ${moment(
-                                    new Date(this.props.customerInfo.subscriptionStartDateRaw),
-                                  )
-                                    .add(index + 1, 'd')
-                                    .format('DD')}`;
-                              }
+                              // if (index == 5) {
+                              //   stepLabel = `${label.split('/')[0]} ${moment(
+                              //     new Date(this.state.subscriptionStartDateRaw),
+                              //   )
+                              //     .add(index, 'd')
+                              //     .format('DD')} & ${label.split('/')[1]} ${moment(
+                              //     new Date(this.state.subscriptionStartDateRaw),
+                              //   )
+                              //     .add(index + 1, 'd')
+                              //     .format('DD')}`;
+                              // }
 
                               return (
                                 <Step key={index} {...props}>
-                                  <StepLabel>{stepLabel}</StepLabel>
+                                  <StepLabel>{label}</StepLabel>
                                 </Step>
                               );
                             })}
@@ -2357,7 +8337,7 @@ class CurrentCustomerEditor extends React.Component {
                               onClick={this.handleBackDeliverySchedule.bind(this)}
                             >
                               Back
-                            </Button>
+                              </Button>
                           ) : (
                               ''
                             )}
@@ -2367,7 +8347,7 @@ class CurrentCustomerEditor extends React.Component {
                               onClick={this.handleNextDeliverySchedule.bind(this)}
                             >
                               Next
-                            </Button>
+                              </Button>
                           ) : (
                               ''
                             )}
@@ -2377,8 +8357,59 @@ class CurrentCustomerEditor extends React.Component {
                   ) : (
                       ''
                     )}
+
                 </Paper>
-              </Grid>
+                <Button
+                  style={{ marginTop: '25px' }}
+                  disabled={this.state.submitLoading}
+                  raised
+                  className={`${buttonClassname}`}
+                  color="primary"
+                  type="submit"
+                  onClick={() => this.saveSecondStep()}
+                >
+                  Update
+                  {this.state.submitLoading && (
+                    <CircularProgress
+                      size={24}
+                      className={this.props.classes.buttonProgress}
+                    />
+                  )}
+                </Button>
+              </form>
+            </div>
+          )}
+
+          {this.state.currentTab === 2 && (
+            <Grid
+              container
+              justify="center"
+              style={{ marginBottom: '50px', marginTop: '25px' }}
+            >
+              <form id="step3" ref={form => (this.thirdForm = form)} onSubmit={event => event.preventDefault()}>
+                <Grid item xs={12} sm={12}>
+                  <Paper elevation={2} className="paper-for-fields">
+
+                  </Paper>
+                </Grid>
+              </form>
+              <Button
+                style={{ marginTop: '25px' }}
+                disabled={this.state.submitLoading}
+                raised
+                className={`${buttonClassname}`}
+                color="primary"
+                type="submit"
+                onClick={() => this.saveThirdStep()}
+              >
+                Update
+                {this.state.submitLoading && (
+                  <CircularProgress
+                    size={24}
+                    className={this.props.classes.buttonProgress}
+                  />
+                )}
+              </Button>
             </Grid>
           )}
 

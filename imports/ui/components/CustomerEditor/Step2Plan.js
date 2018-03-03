@@ -468,7 +468,7 @@ class Step2Plan extends React.Component {
             el => el.breakfast.active || el.lunch.active || el.dinner.active,
           ) === undefined
         ) {
-          this.popTheSnackbar({
+          this.props.popTheSnackbar({
             message: `There should be at least one meal type selected in one of the secondary profile ${index +
               1}.`,
           });
@@ -1304,7 +1304,6 @@ class Step2Plan extends React.Component {
             Quantity
           </Typography>
           <FormControl component="fieldset">
-            {/* {this.state.isLifestyleCustom ? ( */}
 
             <TextField
               disabled={!this.state.scheduleReal[index].breakfast.active}
@@ -1319,40 +1318,6 @@ class Step2Plan extends React.Component {
                 min: 1,
               }}
             />
-
-            {/* ) : (
-                <RadioGroup
-                  aria-label=""
-                  name=""
-                  disabled={!this.state.scheduleReal[index].breakfast.active}
-                  value={this.state.scheduleReal[index].breakfast.quantity}
-                  onChange={this.handleChangeRadioScheduleQuantity.bind(
-                    this,
-                    index,
-                    'breakfast',
-                  )}
-                  style={{ flexDirection: 'row' }}
-                >
-                  <FormControlLabel
-                    value={'1'}
-                    control={<Radio />}
-                    label={'1'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].breakfast.active}
-                  />
-
-                  <FormControlLabel
-                    value={'2'}
-                    control={<Radio />}
-                    label={'2'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].breakfast.active}
-                  />
-                </RadioGroup>
-
-              )} */}
 
           </FormControl>
         </Grid>
@@ -1424,8 +1389,6 @@ class Step2Plan extends React.Component {
           </Typography>
           <FormControl component="fieldset">
 
-            {/* {this.state.isLifestyleCustom ? ( */}
-
             <TextField
               disabled={!this.state.scheduleReal[index].lunch.active}
               value={this.state.scheduleReal[index].lunch.quantity}
@@ -1440,41 +1403,6 @@ class Step2Plan extends React.Component {
               }}
 
             />
-
-            {/* ) : ( */}
-
-            {/* <RadioGroup
-                  aria-label=""
-                  name=""
-                  disabled={!this.state.scheduleReal[index].lunch.active}
-                  value={this.state.scheduleReal[index].lunch.quantity}
-                  onChange={this.handleChangeRadioScheduleQuantity.bind(
-                    this,
-                    index,
-                    'lunch',
-                  )}
-                  style={{ flexDirection: 'row' }}
-                >
-                  <FormControlLabel
-                    value={'1'}
-                    control={<Radio />}
-                    label={'1'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].lunch.active}
-                  />
-
-                  <FormControlLabel
-                    value={'2'}
-                    control={<Radio />}
-                    label={'2'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].lunch.active}
-                  />
-                </RadioGroup>
-              )} */}
-
 
           </FormControl>
         </Grid>
@@ -1544,7 +1472,7 @@ class Step2Plan extends React.Component {
             Quantity
           </Typography>
           <FormControl component="fieldset">
-            {/* {this.state.isLifestyleCustom ? ( */}
+
             <TextField
               name=""
               disabled={!this.state.scheduleReal[index].dinner.active}
@@ -1561,39 +1489,6 @@ class Step2Plan extends React.Component {
               }}
 
             />
-            {/* ) : (
-
-                <RadioGroup
-                  aria-label=""
-                  name=""
-                  disabled={!this.state.scheduleReal[index].dinner.active}
-                  value={this.state.scheduleReal[index].dinner.quantity}
-                  onChange={this.handleChangeRadioScheduleQuantity.bind(
-                    this,
-                    index,
-                    'dinner',
-                  )}
-                  style={{ flexDirection: 'row' }}
-                >
-                  <FormControlLabel
-                    value={'1'}
-                    control={<Radio />}
-                    label={'1'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].dinner.active}
-                  />
-
-                  <FormControlLabel
-                    value={'2'}
-                    control={<Radio />}
-                    label={'2'}
-                    selected
-                    key={index}
-                    disabled={!this.state.scheduleReal[index].dinner.active}
-                  />
-                </RadioGroup>
-              )} */}
 
           </FormControl>
         </Grid>
@@ -1696,7 +1591,7 @@ class Step2Plan extends React.Component {
             Quantity
           </Typography>
           <FormControl component="fieldset">
-            {/* {this.state.secondaryProfilesData[profileIndex].isLifestyleCustom ? ( */}
+
             <TextField
               disabled={
                 !this.state.secondaryProfilesData[profileIndex].scheduleReal[
@@ -1719,55 +1614,6 @@ class Step2Plan extends React.Component {
                 min: 1,
               }}
             />
-            {/* ) : (
-                <RadioGroup
-                  aria-label=""
-                  name=""
-                  disabled={
-                    !this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                      stepIndex
-                    ].breakfast.active
-                  }
-                  value={
-                    this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                      stepIndex
-                    ].breakfast.quantity
-                  }
-                  onChange={this.handleChangeRadioScheduleQuantitySecondary.bind(
-                    this,
-                    profileIndex,
-                    stepIndex,
-                    'breakfast',
-                  )}
-                  style={{ flexDirection: 'row' }}
-                >
-                  <FormControlLabel
-                    value={'1'}
-                    control={<Radio />}
-                    label={'1'}
-                    selected
-                    key={stepIndex}
-                    disabled={
-                      !this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                        stepIndex
-                      ].breakfast.active
-                    }
-                  />
-
-                  <FormControlLabel
-                    value={'2'}
-                    control={<Radio />}
-                    label={'2'}
-                    selected
-                    key={stepIndex}
-                    disabled={
-                      !this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                        stepIndex
-                      ].breakfast.active
-                    }
-                  />
-                </RadioGroup>
-              )} */}
 
           </FormControl>
         </Grid>
@@ -1865,7 +1711,6 @@ class Step2Plan extends React.Component {
           </Typography>
           <FormControl component="fieldset">
 
-            {/* {this.state.secondaryProfilesData[profileIndex].isLifestyleCustom ? ( */}
             <TextField
               disabled={
                 !this.state.secondaryProfilesData[profileIndex].scheduleReal[
@@ -1888,55 +1733,6 @@ class Step2Plan extends React.Component {
                 min: 1,
               }}
             />
-            {/* ) : (
-                <RadioGroup
-                  aria-label=""
-                  name=""
-                  disabled={
-                    !this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                      stepIndex
-                    ].lunch.active
-                  }
-                  value={
-                    this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                      stepIndex
-                    ].lunch.quantity
-                  }
-                  onChange={this.handleChangeRadioScheduleQuantitySecondary.bind(
-                    this,
-                    profileIndex,
-                    stepIndex,
-                    'lunch',
-                  )}
-                  style={{ flexDirection: 'row' }}
-                >
-                  <FormControlLabel
-                    value={'1'}
-                    control={<Radio />}
-                    label={'1'}
-                    selected
-                    key={stepIndex}
-                    disabled={
-                      !this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                        stepIndex
-                      ].lunch.active
-                    }
-                  />
-
-                  <FormControlLabel
-                    value={'2'}
-                    control={<Radio />}
-                    label={'2'}
-                    selected
-                    key={stepIndex}
-                    disabled={
-                      !this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                        stepIndex
-                      ].lunch.active
-                    }
-                  />
-                </RadioGroup>
-              )} */}
 
           </FormControl>
         </Grid>
@@ -2032,7 +1828,6 @@ class Step2Plan extends React.Component {
             Quantity
           </Typography>
           <FormControl component="fieldset">
-            {/* {this.state.secondaryProfilesData[profileIndex].isLifestyleCustom ? ( */}
             <TextField
               disabled={
                 !this.state.secondaryProfilesData[profileIndex].scheduleReal[
@@ -2056,56 +1851,6 @@ class Step2Plan extends React.Component {
                 min: 1,
               }}
             />
-            {/* ) : (
-
-                <RadioGroup
-                  aria-label=""
-                  name=""
-                  disabled={
-                    !this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                      stepIndex
-                    ].dinner.active
-                  }
-                  value={
-                    this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                      stepIndex
-                    ].dinner.quantity
-                  }
-                  onChange={this.handleChangeRadioScheduleQuantitySecondary.bind(
-                    this,
-                    profileIndex,
-                    stepIndex,
-                    'dinner',
-                  )}
-                  style={{ flexDirection: 'row' }}
-                >
-                  <FormControlLabel
-                    value={'1'}
-                    control={<Radio />}
-                    label={'1'}
-                    selected
-                    key={stepIndex}
-                    disabled={
-                      !this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                        stepIndex
-                      ].dinner.active
-                    }
-                  />
-
-                  <FormControlLabel
-                    value={'2'}
-                    control={<Radio />}
-                    label={'2'}
-                    selected
-                    key={stepIndex}
-                    disabled={
-                      !this.state.secondaryProfilesData[profileIndex].scheduleReal[
-                        stepIndex
-                      ].dinner.active
-                    }
-                  />
-                </RadioGroup>
-              )} */}
 
           </FormControl>
         </Grid>

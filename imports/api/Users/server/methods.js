@@ -14,6 +14,8 @@ import createSubscriptionFromCustomerProfile from '../../../modules/server/autho
 
 import PostalCodes from '../../PostalCodes/PostalCodes';
 import Subscriptions from '../../Subscriptions/Subscriptions';
+import Lifestyles from '../../Lifestyles/Lifestyles';
+
 import Jobs from '../../Jobs/Jobs';
 
 moment.tz.setDefault('America/Toronto');
@@ -97,35 +99,35 @@ Meteor.methods({
       'profile.name.last': data.lastName || '',
     }
 
-    if(data.secondary){
+    if (data.secondary) {
 
       toUpdate.username = data.username;
-      
-    }else{
+
+    } else {
 
       const postalCodeExists = PostalCodes.findOne({
         title: data.postalCode.substr(0, 3).toUpperCase(),
       });
-  
+
       console.log(postalCodeExists);
 
       if (!postalCodeExists) {
         console.log(postalCodeExists);
         throw new Meteor.Error(400, 'Delivery not available in that area.');
       }
-      
+
       toUpdate.postalCode = data.postalCode;
       toUpdate.postalCodeId = postalCodeExists._id;
       toUpdate['emails.0.address'] = data.email;
       toUpdate.phone = data.phoneNumber;
     }
-    
+
 
     Meteor.users.update({
       _id: data.id,
     }, {
-      $set: toUpdate,
-    });
+        $set: toUpdate,
+      });
 
 
     console.log(data);
@@ -134,25 +136,160 @@ Meteor.methods({
 
   'edit.customer.step2': function editStep2(data) {
 
+    // check(data, {
+    //   id: String,
+    //   restrictions: Array,
+    //   specificRestrictions: Array,
+    //   subIngredients: Array,
+    //   platingNotes: String,
+    //   deliveryNotes: String,
+    //   secondary: Match.Optional(Boolean)
+    // });
+
+    // Meteor.users.update({ _id: data.id },{ 
+    //   $set: {
+    //     restrictions: data.restrictions,
+    //     specificRestrictions: data.specificRestrictions,
+    //     preferences: data.subIngredients,
+    //     platingNotes: data.platingNotes,
+    //     'address.notes': data.deliveryNotes
+    //   }
+    // });
+
+
     check(data, {
       id: String,
+      address: Object,
+      lifestyle: String,
+      discount: String,
       restrictions: Array,
       specificRestrictions: Array,
       subIngredients: Array,
       platingNotes: String,
-      deliveryNotes: String,
-      secondary: Match.Optional(Boolean)
+      secondary: Match.Optional(Boolean),
+      completeSchedule: Array,
+      secondaryProfiles: Array,
+      subscriptionId: String,
+      delivery: Array,
+      scheduleReal: Array,
     });
 
-    Meteor.users.update({ _id: data.id },{ 
+    // console.log(data);
+
+    // return;
+
+    if (data.secondaryProfiles && data.secondaryProfiles.length > 0) {
+
+      data.secondaryProfiles.forEach(e => {
+        if (e._id) {
+          Meteor.users.update({ _id: e._id }, {
+            $set: {
+              profile: {
+                name: {
+                  first: e.first_name,
+                  last: e.last_name,
+                }
+              },
+
+              secondary: true,
+              primaryAccount: data.id,
+              subscriptionId: data.subscriptionId,
+
+              lifestyle: Lifestyles.findOne({ title: e.lifestyle })._id,
+              discount: e.discount,
+              restrictions: e.restrictions,
+              specificRestrictions: e.specificRestrictions,
+              preferences: e.subIngredients,
+
+              schedule: e.scheduleReal,
+
+              platingNotes: e.platingNotes,
+              adultOrChild: e.adultOrChild,
+            }
+          });
+        } else {
+          const randomId = Random.id();
+
+          Meteor.users.insert({
+            _id: randomId,
+            profile: {
+              name: {
+                first: e.first_name,
+                last: e.last_name,
+              }
+            },
+            secondary: true,
+            primaryAccount: data.id,
+            subscriptionId: data.subscriptionId,
+            username: Random.id(),
+            lifestyle: Lifestyles.findOne({ title: e.lifestyle })._id,
+            discount: e.discount,
+            restrictions: e.restrictions,
+            specificRestrictions: e.specificRestrictions,
+            preferences: e.subIngredients,
+            platingNotes: e.platingNotes,
+            roles: ["customer"],
+            schedule: e.scheduleReal,
+            platingNotes: e.platingNotes,
+            adultOrChild: e.adultOrChild,
+
+          });
+        }
+      })
+    }
+
+    const secondaryAccounts = Meteor.users.find({
+      primaryAccount: data.id,
+    }).fetch();
+
+    console.log(secondaryAccounts);
+
+    const secondaryAccountIds = [];
+
+    secondaryAccounts.forEach(e => {
+      secondaryAccountIds.push(e._id)
+    });
+
+
+    Meteor.users.update({ _id: data.id }, {
       $set: {
+        lifestyle: data.lifestyle,
+        discount: data.discount,
+
+        schedule: data.scheduleReal,
+
         restrictions: data.restrictions,
         specificRestrictions: data.specificRestrictions,
         preferences: data.subIngredients,
         platingNotes: data.platingNotes,
-        'address.notes': data.deliveryNotes
+        address: data.address,
+        secondaryAccounts: secondaryAccountIds,
+        associatedProfiles: secondaryAccountIds.length,
       }
     });
+
+    const newDeliveryType = data.delivery.map((e, i) => {
+
+      if (e == '') {
+        return data.delivery[i] == null;
+      }
+
+      return e;
+
+    });
+
+    Subscriptions.update({
+      _id: data.subscriptionId,
+    }, {
+        $set: {
+          completeSchedule: data.completeSchedule,
+          delivery: newDeliveryType,
+        }
+      });
+
+  },
+
+  'customer.removeSecondaryProfile': function removeSecondaryProfile(data) {
 
   },
 
