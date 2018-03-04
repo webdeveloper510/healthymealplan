@@ -45,10 +45,10 @@ function setUpLifestyles() {
 
 function setUpPlates(lifestyles, nextDay) {
   const lifestylePlates = [];
-  console.log('Inside setup PLATEs');
+  // console.log('Inside setup PLATEs');
 
-  console.log(lifestyles);
-  console.log(nextDay);
+  // console.log(lifestyles);
+  // console.log(nextDay);
 
   lifestyles.forEach((e) => {
     const currentLifestylePlates = {
@@ -126,7 +126,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
     // console.log('Schedule array');
 
     scheduleDays.forEach((e) => {
-      console.log(e);
+      // console.log(e);
 
       if (e.breakfast.active) {
         this.dataByLifestyle[lifestyleIndex].breakfast[e.breakfast.portions] += parseInt(e.breakfast.quantity, 10);
@@ -175,7 +175,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       schedule: customer.schedule,
       delivery,
       scheduleDays,
-      platingNotes: customer.platingNotes != undefined ? customer.platingNotes : '',
+      platingNotes: customer.platingNotes,
     };
 
     scheduleDays.forEach((e) => {
@@ -220,7 +220,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
 
     if (customer.hasOwnProperty('preferences') && customer.preferences != null) {
       if (customer.preferences.length > 0) {
-        customerToAdd.preferences = customer.preferences.map((e) => { return { _id: e._id, title: e.title } });
+        customerToAdd.preferences = customer.preferences.map(e => ({ _id: e._id, title: e.title }));
       }
     }
 
@@ -231,14 +231,14 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
     const subscription = aggregatedSubs[i];
     const delivery = subscription.delivery;
 
-    console.log(`Subscription ID: ${subscription._id}`);
-    console.log('Complete Schedule');
-    console.log(subscription.completeSchedule);
+    // console.log(`Subscription ID: ${subscription._id}`);
+    // console.log('Complete Schedule');
+    // console.log(subscription.completeSchedule);
 
 
     subscription.customers.forEach((customer) => {
-      console.log('Customer from sub');
-      console.log(customer.platingNotes);
+      // console.log('Customer from sub');
+      // console.log(customer.platingNotes);
       const customerId = customer._id;
       const customerSchedule = customer.schedule;
       const customerLifestyleId = customer.lifestyle;
@@ -662,7 +662,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
   }
   // aggregated subs
 
-  console.log(this.dataByLifestyle);
+  // console.log(this.dataByLifestyle);
 
   return {
     tableData: this.dataByLifestyle,

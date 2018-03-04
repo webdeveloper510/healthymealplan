@@ -23,8 +23,8 @@ const worker = Job.processJobs('coreJobQueue', 'createInvoices', (job, cb) => {
         lineItems: e.subscriptionItems,
       });
     } catch (error) {
-      job.log('createInvoices for subscription - ' + e._id + ' failed.');
-      job.fail(error); // when failing
+      job.log(`createInvoices for subscription - ${e._id} failed.`);
+      // job.fail(error); // when failing
     }
   });
 

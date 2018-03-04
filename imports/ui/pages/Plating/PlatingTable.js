@@ -117,7 +117,7 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
     doc.setFontSize(7);
-    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.75), 0.25, 1.65);
+    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.3), 0.25, 1.65);
   }
 
   // instructions
@@ -127,33 +127,38 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
     doc.text(doc.splitTextToSize(currentPlate.instruction.description, 3.25), 0.25, 2);
   }
 
-  let restrictionsLine = "";
+  let restrictionsLine = '';
   let restrictionsPresent = false;
+  const allRestrictions = [];
 
   // restrictions
   if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
-    restrictionsLine += `Restrictions: ${userData.restrictions.map(rest => rest.title).join(', ')}`;
+    // restrictionsLine += `Restrictions: ${userData.restrictions.map(rest => rest.title).join(', ')}`;
     restrictionsPresent = true;
+    allRestrictions.push(...userData.restrictions.map(rest => rest.title));
   }
 
   if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
-    restrictionsLine += `${restrictionsPresent ? ` ` : `Restrictions: `}${userData.specificRestrictions.map(rest => rest.title).join(', ')}`;
+    // restrictionsLine += `${restrictionsPresent ? '' : 'Restrictions: '}${userData.specificRestrictions.map(rest => rest.title).join(', ')}`;
     restrictionsPresent = true;
+    allRestrictions.push(...userData.specificRestrictions.map(rest => rest.title));
   }
 
   if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
-    restrictionsLine += `${restrictionsPresent ? ` ` : `Restrictions: `}${userData.preferences.map(rest => rest.title).join(', ')}`;
+    // restrictionsLine += `${restrictionsPresent ? '' : 'Restrictions: '}${userData.preferences.map(rest => rest.title).join(', ')}`;
     restrictionsPresent = true;
+    allRestrictions.push(...userData.preferences.map(rest => rest.title));
   }
 
   if (restrictionsPresent) {
+    restrictionsLine = "Restrictions: " + allRestrictions.join(', ');
     doc.setFontStyle('bold');
     doc.setFontSize(7);
     doc.text(doc.splitTextToSize(restrictionsLine, 3.25), 0.25, 2.2);
   }
 
-  console.log(currentPlate.plate.nutritional);
-  console.log(currentPlate.plate.nutritional[mealPortion]);
+  // console.log(currentPlate.plate.nutritional);
+  // console.log(currentPlate.plate.nutritional[mealPortion]);
 
   if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
     // calories
@@ -257,6 +262,15 @@ class PlatingTable extends React.Component {
       return;
     }
 
+    const userDataNew = this.state.aggregateData.userData.filter(user => user.lifestyleId == this.state.lifestyleSelected
+      &&
+      (user[this.state.mealTitle.toLowerCase()] > 0 ||
+        user[`athletic${this.state.mealTitle}`] > 0 ||
+        user[`bodybuilder${this.state.mealTitle}`] > 0));
+
+    console.log(userDataNew);
+
+
     const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
     const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
 
@@ -276,74 +290,75 @@ class PlatingTable extends React.Component {
       format: [4, 3],
     });
 
-    const aggregatedUsers = this.state.aggregateData.userData;
+    // const aggregatedUsers = this.state.aggregateData.userData;
+    // this.state.aggregateData.userData.filter(user => user.lifestyleId == this.state.lifestyleSelected &&
+    //   user[this.state.mealTitle.toLowerCase()] > 0 ||
+    //   user[`athletic${this.state.mealTitle}`] > 0 ||
+    //   user[`bodybuilder${this.state.mealTitle}`] > 0)
 
-    aggregatedUsers.filter(user => user.lifestyleId == this.state.lifestyleSelected &&
-      user[this.state.mealTitle.toLowerCase()] > 0 ||
-      user[`athletic${this.state.mealTitle}`] > 0 ||
-      user[`bodybuilder${this.state.mealTitle}`] > 0).forEach((userData, index) => {
-        if (this.state.mealTitle === 'Breakfast') {
-          if (userData.breakfast > 0) {
-            for (let i = 1; i <= userData.breakfast; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast', 'regular', this.props.currentSelectorDate);
-            }
+    userDataNew.forEach((userData, index) => {
+      if (this.state.mealTitle === 'Breakfast') {
+        if (userData.breakfast > 0) {
+          for (let i = 1; i <= userData.breakfast; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast', 'regular', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.athleticBreakfast > 0) {
-            for (let i = 1; i <= userData.athleticBreakfast; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Athletic)', 'athletic', this.props.currentSelectorDate);
-            }
+        if (userData.athleticBreakfast > 0) {
+          for (let i = 1; i <= userData.athleticBreakfast; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Athletic)', 'athletic', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.bodybuilderBreakfast > 0) {
-            for (let i = 1; i <= userData.bodybuilderBreakfast; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
-            }
+        if (userData.bodybuilderBreakfast > 0) {
+          for (let i = 1; i <= userData.bodybuilderBreakfast; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
           }
-        }// Breakfast
+        }
+      }// Breakfast
 
-        if (this.state.mealTitle === 'Dinner') {
-          if (userData.dinner > 0) {
-            for (let i = 1; i <= userData.dinner; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner', 'regular', this.props.currentSelectorDate);
-            }
+      if (this.state.mealTitle === 'Dinner') {
+        if (userData.dinner > 0) {
+          for (let i = 1; i <= userData.dinner; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner', 'regular', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.athleticDinner > 0) {
-            for (let i = 1; i <= userData.athleticDinner; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Athletic)', 'athletic', this.props.currentSelectorDate);
-            }
+        if (userData.athleticDinner > 0) {
+          for (let i = 1; i <= userData.athleticDinner; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Athletic)', 'athletic', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.bodybuilderDinner > 0) {
-            for (let i = 1; i <= userData.bodybuilderDinner; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
-            }
+        if (userData.bodybuilderDinner > 0) {
+          for (let i = 1; i <= userData.bodybuilderDinner; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
           }
-        } // Dinner
+        }
+      } // Dinner
 
-        if (this.state.mealTitle === 'Lunch') {
-          if (userData.lunch > 0) {
-            for (let i = 1; i <= userData.lunch; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch', 'regular', this.props.currentSelectorDate);
-            }
+      if (this.state.mealTitle === 'Lunch') {
+        if (userData.lunch > 0) {
+          for (let i = 1; i <= userData.lunch; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch', 'regular', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.athleticLunch > 0) {
-            for (let i = 1; i <= userData.athleticLunch; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Athletic)', 'athletic', this.props.currentSelectorDate);
-            }
+        if (userData.athleticLunch > 0) {
+          for (let i = 1; i <= userData.athleticLunch; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Athletic)', 'athletic', this.props.currentSelectorDate);
           }
+        }
 
-          if (userData.bodybuilderLunch > 0) {
-            for (let i = 1; i <= userData.bodybuilderLunch; i++) {
-              renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
-            }
+        if (userData.bodybuilderLunch > 0) {
+          for (let i = 1; i <= userData.bodybuilderLunch; i++) {
+            renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
           }
-        } // Lunch
+        }
+      } // Lunch
 
-        // console.log(userData);
-      }); // map
+      // console.log(userData);
+    }); // map
 
     doc.deletePage(1);
 
@@ -470,7 +485,7 @@ class PlatingTable extends React.Component {
         <Dialog
           fullWidth
           maxWidth={false}
-          style={{ maxHeight: '100% !important', margin: '0', height: '100%' }}
+          style={{ maxHeight: '100vh !important', margin: '0 !important' }}
           open={this.state.assignDialogOpen}
           onClose={this.closeAssignDialog}
           transition={Transition}
@@ -513,13 +528,13 @@ class PlatingTable extends React.Component {
                         const mealType = this.state.mealTitle.toLowerCase();
                         const mealTypeNormal = this.state.mealTitle;
 
-                        console.log(n);
+                        // console.log(n);
 
                         return (
                           <TableRow key={Random.id()}>
                             <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
                             <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.platingNotes ? n.platingNotes : '-'}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.platingNotes && n.platingNotes.length > 0 ? n.platingNotes : ''}</Typography></TableCell>
                             <TableCell>
                               <Typography type="subheading">
                                 {n[mealType] > 0 ? `Regular x${n[`${mealType}`]}` : ''}

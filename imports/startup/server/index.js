@@ -21,17 +21,6 @@ const job = new Job(Jobs, 'createInvoices', {});
 
 const createInvoicesExists = Jobs.findOne({ type: 'createInvoices' });
 
-// console.log(createInvoicesExists);
-
-
-// sendDeliveredEmail({
-//   firstName: 'Jivanysh',
-//   email: 'jivanyesh@gmail.com',
-//   totalMeals: '2 meals',
-//   address: 'ABC1, ABC2',
-//   deliveredAt: '10:30 AM'
-// })
-
 if (!createInvoicesExists) {
   job
     .priority('normal')
@@ -1544,7 +1533,7 @@ aggregation.forEach((el, i) => {
     // if a day is not paired and not empty only then push the document into deliveries array
 
     if ((e != '' || e != 'false') && daysPaired.indexOf(index) == -1) {
-      console.log('Pushing this delivery');
+      // console.log('Pushing this delivery');
       deliveries.push(delivery);
 
       // console.log('Meals inside this delivery');

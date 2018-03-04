@@ -10,7 +10,7 @@ import Lifestyles from '../Lifestyles/Lifestyles';
 import platingDataMapper from '../../modules/server/platingDataMapper';
 
 Meteor.methods({
-  'getPlatingAggregatedData': function (currentDate) {
+  getPlatingAggregatedData(currentDate) {
     check(currentDate, String);
 
     const subs = Subscriptions.aggregate([
@@ -80,6 +80,7 @@ Meteor.methods({
             specificRestrictions: 1,
             preferences: 1,
             schedule: 1,
+            platingNotes: 1,
           },
           lifestyles: {
             _id: 1,
