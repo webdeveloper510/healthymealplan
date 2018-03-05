@@ -147,11 +147,11 @@ class Plating extends React.Component {
             </Grid>
           </Grid>
 
-          <Grid container className="clearfix">
+          {/* <Grid container className="clearfix">
             <Grid item xs={12} style={{ alignItems: 'center', marginBottom: '25px' }}>
-              <Typography type="headline" gutterBottom style={{ fontWeight: 500 }}>Plating for for {moment(this.state.currentSelectorDate).format('dddd, MMMM D')}</Typography>
+              <Typography type="headline" gutterBottom style={{ fontWeight: 500 }}>Plating for {moment(this.state.currentSelectorDate).format('dddd, MMMM D')}</Typography>
             </Grid>
-          </Grid>
+          </Grid> */}
 
 
           <ListContainer

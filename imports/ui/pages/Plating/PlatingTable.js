@@ -39,6 +39,8 @@ import sumBy from 'lodash/sumBy';
 import Loading from '../../components/Loading/Loading';
 import Slide from 'material-ui/transitions/Slide';
 import jsPDF from 'jspdf';
+import autotable from 'jspdf-autotable';
+
 import vittlebase64 from '../../../modules/vittlelogobase64';
 import hmpbase64 from '../../../modules/hmplogobase64';
 
@@ -151,7 +153,7 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   }
 
   if (restrictionsPresent) {
-    restrictionsLine = "Restrictions: " + allRestrictions.join(', ');
+    restrictionsLine = `Restrictions: ${allRestrictions.join(', ')}`;
     doc.setFontStyle('bold');
     doc.setFontSize(7);
     doc.text(doc.splitTextToSize(restrictionsLine, 3.25), 0.25, 2.2);
@@ -182,6 +184,89 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
     const fats = [currentPlate.plate.nutritional[mealPortion].fat, 'fats'];
     doc.text(fats, 3.55, 2.7);
   }
+
+  if (userData.platingNotes) {
+    doc.setFontStyle('normal');
+    doc.setFontSize(8);
+    doc.text('See plating notes', 0.25, 2.7);
+  }
+}
+
+
+
+function renderSummary(doc, currentPlate, dataCurrentLifestyle, lifestyleTitle, mealTitle, currentSelectorDate, count) {
+
+  doc.addPage();
+
+  // VITTLE LOGO
+  // doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+
+  // HMP LOGO
+  doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
+
+  // plating day + 1
+  doc.setFontStyle('normal');
+  doc.setFontSize(9);
+  const day = moment(currentSelectorDate).add(1, 'd').format('M/D/YYYY');
+  doc.text(day, 3.2, 0.55);
+
+
+  // total meals for this customer
+  doc.setFontStyle('normal');
+  doc.setFontSize(9);
+  const totalMeals = dataCurrentLifestyle[mealTitle.toLowerCase()].regular +
+    dataCurrentLifestyle[mealTitle.toLowerCase()].athletic +
+    dataCurrentLifestyle[mealTitle.toLowerCase()].bodybuilder;
+
+  doc.text(`${totalMeals}`, 0.25, 0.55);
+
+  doc.setFontStyle('normal');
+  doc.setFontSize(14);
+  doc.text(lifestyleTitle + " " + mealTitle, 0.25, 1);
+
+  // dish title
+  doc.setFontStyle('bold');
+  doc.setFontSize(10);
+  doc.text(doc.splitTextToSize(currentPlate.plate.title, 3.25), 0.25, 1.3);
+
+  // dish subtitle
+  doc.setFontStyle('normal');
+  doc.setFontSize(10);
+  doc.text(doc.splitTextToSize(currentPlate.plate.subtitle, 3.25), 0.25, 1.5);
+
+
+  // dish ingredients
+  if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
+    doc.setFontSize(7);
+    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.3), 0.25, 1.75);
+  }
+
+  doc.setFontSize(8);
+  doc.text(`With restrictions: Regular ${count.regularRestrictionsCount} Athletic ${count.athleticRestrictionsCount} Bodybuilder ${count.bodybuilderRestrictionsCount}`, 0.25, 2.2);
+
+  doc.setFontSize(8);
+  doc.text(`Without restrictions: Regular ${count.regularWithoutRestrictionsCount} Athletic ${count.athleticWithoutRestrictionsCount} Bodybuilder ${count.bodybuilderWithoutRestrictionsCount}`, 0.25, 2.35);
+
+
+  // Regular
+  const regularText = dataCurrentLifestyle[mealTitle.toLowerCase()].regular + "";
+  doc.setFontStyle('bold');
+  doc.setFontSize(11);
+  const regular = [regularText, 'Regular'];
+  doc.text(regular, 0.75, 2.6);
+
+  // Athletic
+  const athleticText = dataCurrentLifestyle[mealTitle.toLowerCase()].athletic + "";
+  doc.setFontSize(11);
+  const athletic = [athleticText, 'Athletic'];
+  doc.text(athletic, 1.6, 2.6);
+
+  // Bodybuilder
+  const bodybuilderText = dataCurrentLifestyle[mealTitle.toLowerCase()].bodybuilder + "";
+  doc.setFontSize(11);
+  const bodybuilder = [bodybuilderText, 'Bodybuilder'];
+  doc.text(bodybuilder, 2.4, 2.6);
+
 }
 
 class PlatingTable extends React.Component {
@@ -205,10 +290,19 @@ class PlatingTable extends React.Component {
       aggregateDataLoading: true,
     };
 
+
+    this.getCurrentSelectionPlate = this.getCurrentSelectionPlate.bind(this);
+
+
     this.openAssignDialog = this.openAssignDialog.bind(this);
     this.closeAssignDialog = this.closeAssignDialog.bind(this);
 
+    // this.printSummary = this.printSummary.bind(this);
+
+    this.printPopupSummary = this.printPopupSummary.bind(this);
     this.printLabels = this.printLabels.bind(this);
+
+    this.usersWithoutRestrictions = this.usersWithoutRestrictions.bind(this);
   }
 
   componentDidMount() {
@@ -239,6 +333,28 @@ class PlatingTable extends React.Component {
     }
   }
 
+  getCurrentSelectionPlate(what) {
+    if (!this.state.aggregateDataLoading && this.state.lifestyleSelected && this.state.mealSelected) {
+      const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
+      const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
+
+      // console.log(currentPlate);
+
+      if (lifestylePlates.length === 0 || !currentPlate) {
+        return;
+      }
+
+      if (what == 'title') {
+        return currentPlate.plate && currentPlate.plate.title ? currentPlate.plate.title : '';
+      } else if (what == 'subtitle') {
+        return currentPlate.plate && currentPlate.plate.subtitle ? currentPlate.plate.subtitle : '';
+      } else if (what == 'ingredients') {
+        return currentPlate.plate && currentPlate.plate.ingredients &&
+          currentPlate.plate.ingredients.length > 0 ? currentPlate.plate.ingredients.map(e => e.title).join(', ') : '';
+      }
+    }
+  }
+
   openAssignDialog(lifestyleId, mealId) {
     const lifestyle = this.props.lifestyles.find(el => el._id === lifestyleId);
     const meal = this.props.meals.find(el => el._id === mealId);
@@ -253,28 +369,53 @@ class PlatingTable extends React.Component {
   }
 
   printLabels() {
-    // console.log(this.props.currentSelectorDate);
-    // console.log(this.state.lifestyleSelected);
-    // console.log(this.state.mealSelected);
-
 
     if (this.state.aggregateDataLoading) {
       return;
     }
 
     const userDataNew = this.state.aggregateData.userData.filter(user => user.lifestyleId == this.state.lifestyleSelected
-      &&
-      (user[this.state.mealTitle.toLowerCase()] > 0 ||
+      && (user[this.state.mealTitle.toLowerCase()] > 0 ||
         user[`athletic${this.state.mealTitle}`] > 0 ||
-        user[`bodybuilder${this.state.mealTitle}`] > 0));
+        user[`bodybuilder${this.state.mealTitle}`] > 0)).sort((a, b) => {
+          let totalRestrictionsA = 0;
+          let totalRestrictionsB = 0;
 
-    console.log(userDataNew);
+          if (a.specificRestrictions) {
+            totalRestrictionsA += a.specificRestrictions.length;
+          }
+
+          if (a.restrictions) {
+            totalRestrictionsA += a.restrictions.length;
+          }
+
+          if (a.preferences) {
+            totalRestrictionsA += a.preferences.length;
+          }
+
+
+          if (b.specificRestrictions) {
+            totalRestrictionsB += b.specificRestrictions.length;
+          }
+
+          if (b.restrictions) {
+            totalRestrictionsB += b.restrictions.length;
+          }
+
+          if (b.preferences) {
+            totalRestrictionsB += b.preferences.length;
+          }
+
+          return totalRestrictionsB - totalRestrictionsA;
+        });
+
+    // console.log(userDataNew);
 
 
     const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
     const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
 
-    console.log(currentPlate);
+    // console.log(currentPlate);
 
     if (lifestylePlates.length === 0 || !currentPlate) {
       this.props.popTheSnackbar({
@@ -283,6 +424,9 @@ class PlatingTable extends React.Component {
 
       return;
     }
+
+    const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === this.state.lifestyleSelected);
+
 
     const doc = new jsPDF({
       orientation: 'landscape',
@@ -360,7 +504,10 @@ class PlatingTable extends React.Component {
       // console.log(userData);
     }); // map
 
+    renderSummary(doc, currentPlate, dataCurrentLifestyle, this.state.lifestyleTitle, this.state.mealTitle, this.props.currentSelectorDate, this.usersWithoutRestrictions());
+
     doc.deletePage(1);
+
 
     doc.save(`Plating_${this.state.lifestyleTitle} _${this.state.mealTitle} _${new Date().toDateString()} `);
   }
@@ -374,12 +521,206 @@ class PlatingTable extends React.Component {
     });
   }
 
+
+  usersWithoutRestrictions() {
+
+    if (this.state.aggregateDataLoading || this.state.lifestyleSelected == "" || this.state.mealSelected == "") {
+      return '';
+    }
+
+    const count = {
+      athleticRestrictionsCount: 0,
+      regularRestrictionsCount: 0,
+      bodybuilderRestrictionsCount: 0,
+
+      athleticWithoutRestrictionsCount: 0,
+      regularWithoutRestrictionsCount: 0,
+      bodybuilderWithoutRestrictionsCount: 0,
+    };
+
+    this.state.aggregateData.userData.filter((user) => {
+
+      if (user.lifestyleId == this.state.lifestyleSelected && (user[this.state.mealTitle.toLowerCase()] > 0 ||
+        user[`athletic${this.state.mealTitle}`] > 0 ||
+        user[`bodybuilder${this.state.mealTitle}`] > 0)) {
+
+        if ((user.restrictions && user.restrictions.length > 0) ||
+          (user.specificRestrictions && user.specificRestrictions.length > 0) ||
+          (user.preferences && user.preferences.length > 0)) {
+
+          count.regularRestrictionsCount += user[this.state.mealTitle.toLowerCase()];
+          count.athleticRestrictionsCount += user[`athletic${this.state.mealTitle}`];
+          count.bodybuilderRestrictionsCount += user[`bodybuilder${this.state.mealTitle}`];
+
+          return false;
+        } else {
+
+          count.regularWithoutRestrictionsCount += user[this.state.mealTitle.toLowerCase()];
+          count.athleticWithoutRestrictionsCount += user[`athletic${this.state.mealTitle}`];
+          count.bodybuilderWithoutRestrictionsCount += user[`bodybuilder${this.state.mealTitle}`];
+
+          return true;
+        }
+      }
+
+      return false;
+
+    });
+
+    return count;
+  }
+
+
+  printPopupSummary() {
+    const columns = ['Name', 'Plan', 'Notes', 'Portions', , 'Preferences', 'Allergies', 'Allergies', 'Dietary', 'Religious'];
+    const rows = [];
+    const plateTitle = this.getCurrentSelectionPlate('title');
+    const plateSubtitle = this.getCurrentSelectionPlate('subtitle');
+    const plateIngredients = this.getCurrentSelectionPlate('ingredients')
+
+    const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
+    const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
+
+    if (lifestylePlates.length === 0 || !currentPlate) {
+      this.props.popTheSnackbar({
+        message: `Could not find a dish for ${this.state.lifestyleTitle} ${this.state.mealTitle}. Please assign a dish.`,
+      });
+
+      return;
+    }
+
+    this.state.aggregateData.userData.filter(user => user.lifestyleId == this.state.lifestyleSelected &&
+      (user[this.state.mealTitle.toLowerCase()] > 0 ||
+        user[`athletic${this.state.mealTitle}`] > 0 ||
+        user[`bodybuilder${this.state.mealTitle}`] > 0)).sort((a, b) => {
+          let totalRestrictionsA = 0;
+          let totalRestrictionsB = 0;
+
+          if (a.specificRestrictions) {
+            totalRestrictionsA += a.specificRestrictions.length;
+          }
+
+          if (a.restrictions) {
+            totalRestrictionsA += a.restrictions.length;
+          }
+
+          if (a.preferences) {
+            totalRestrictionsA += a.preferences.length;
+          }
+
+
+          if (b.specificRestrictions) {
+            totalRestrictionsB += b.specificRestrictions.length;
+          }
+
+          if (b.restrictions) {
+            totalRestrictionsB += b.restrictions.length;
+          }
+
+          if (b.preferences) {
+            totalRestrictionsB += b.preferences.length;
+          }
+
+          return totalRestrictionsB - totalRestrictionsA;
+        }).map((n) => {
+          const mealType = this.state.mealTitle.toLowerCase();
+          const mealTypeNormal = this.state.mealTitle;
+
+          let mealText = "";
+
+          if (n[mealType] > 0) {
+            mealText += `Regular x${n[`${mealType}`]}`;
+          }
+
+          if (n[`athletic${mealTypeNormal}`] > 0) {
+            mealText += `${mealText.length > 0 ? ' ' : ''}Athletic x${n[`athletic${mealTypeNormal}`]}`;
+          }
+
+          if (n[`bodybuilder${mealTypeNormal}`] > 0) {
+            mealText += `${mealText.length > 0 ? ' ' : ''}Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}`
+          }
+
+
+          rows.push([
+            n.name,
+            n.lifestyleName,
+            n.platingNotes && n.platingNotes.length > 0 ? n.platingNotes : '',
+            mealText,
+            n.preferences ? n.preferences.map(pref => pref.title).join(', ') : '',
+            n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title).join(', ') : '',
+            n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title).join(', ') : '',
+            n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title).join(', ') : '',
+            n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title).join(', ') : '',
+          ]);
+
+        });
+
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      format: 'letter',
+      unit: 'pt',
+    });
+
+    doc.setFontSize(18);
+    doc.text(`Customers ${this.state.lifestyleTitle} ${this.state.mealTitle} ${moment(this.state.currentSelectorDate).format('dddd, MMMM D')}`, 40, 30);
+
+    doc.setFontSize(16);
+    doc.text(plateTitle, 40, 60);
+
+    doc.setFontSize(14);
+    doc.text(plateSubtitle, 40, 80);
+
+    doc.setFontSize(9);
+    doc.text(plateIngredients, 40, 100);
+
+    doc.setFontSize(9);
+    doc.text(`With restrictions: Regular ${this.usersWithoutRestrictions().regularRestrictionsCount} Athletic ${this.usersWithoutRestrictions().athleticRestrictionsCount} Bodybuilder ${this.usersWithoutRestrictions().bodybuilderRestrictionsCount}`, 40, 120);
+
+    doc.setFontSize(9);
+    doc.text(`Without restrictions: Regular ${this.usersWithoutRestrictions().regularWithoutRestrictionsCount} Athletic ${this.usersWithoutRestrictions().athleticWithoutRestrictionsCount} Bodybuilder ${this.usersWithoutRestrictions().bodybuilderWithoutRestrictionsCount}`, 40, 130);
+
+    const totalPagesExp = "{total_pages_count_string}";
+
+    doc.autoTable(columns, rows, {
+      startY: 140,
+      styles: {
+        overflow: 'linebreak',
+      },
+      headerStyles: {
+        fillColor: [0, 0, 0],
+        fontSize: 8,
+        // fontSize: 15
+      },
+      afterPageContent: data => {
+        let footerStr = "Page " + doc.internal.getNumberOfPages();
+        if (typeof doc.putTotalPages === 'function') {
+          footerStr = footerStr + " of " + totalPagesExp;
+        }
+        doc.setFontSize(10);
+        doc.text(footerStr, data.settings.margin.right, doc.internal.pageSize.height - 10);
+      }
+    });
+
+    if (typeof doc.putTotalPages === 'function') {
+      doc.putTotalPages(totalPagesExp);
+    }
+
+
+    doc.save(`Plating_summary_${this.state.lifestyleTitle}_${this.state.mealTitle}_${moment(this.state.currentSelectorDate).format('dddd, MMMM D')}.pdf`);
+
+  }
+
   render() {
     return (
       <div>
 
 
         <Paper elevation={2} className="table-container">
+          <div style={{ padding: '20px 20px 1em', borderBottom: '1px solid rgba(235, 235, 235, 1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <Typography type="headline" gutterBottom style={{ fontWeight: 500 }}>Plating for {moment(this.props.currentSelectorDate).format('dddd, MMMM D')}</Typography>
+            {/* <Button style={{ float: 'right' }} onClick={this.printSummary}>Print plating summary</Button> */}
+          </div>
           <Table className="table-container plating-table" style={{ tableLayout: 'fixed' }}>
             <TableHead>
               <TableRow>
@@ -391,6 +732,10 @@ class PlatingTable extends React.Component {
                 <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
                   <Typography className="body2" type="body2">Meal type</Typography>
                 </TableCell>
+
+                {/* <TableCell padding="none" style={{ width: '14.28%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">No restrictions</Typography>
+                </TableCell> */}
 
                 <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
                   <Typography className="body2" type="body2">Regular</Typography>
@@ -405,7 +750,7 @@ class PlatingTable extends React.Component {
                 </TableCell>
 
                 <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                  <Typography className="body2" type="body2">Customer</Typography>
+                  <Typography className="body2" type="body2">Customers</Typography>
                 </TableCell>
 
               </TableRow>
@@ -427,6 +772,35 @@ class PlatingTable extends React.Component {
 
                         </TableCell>
 
+                        {/* <TableCell padding="none" style={{ width: '14.28%' }}>
+                          <Typography className="subheading" type="subheading">{!this.state.aggregateDataLoading &&
+                            this.state.aggregateData.userData.reduce((accumulator, user) => {
+
+                              if (user.specificRestrictions) {
+                                if (user.specificRestrictions.length > 0) {
+                                  return 0;
+                                }
+                              }
+
+                              if (user.restrictions) {
+                                if (user.restrictions.length > 0) {
+                                  return 0;
+                                }
+                              }
+
+                              if (user.preferences) {
+                                if (user.preferences.length > 0) {
+                                  return 0;
+                                }
+                              }
+
+                              return accumulator + user[meal.title.toLowerCase()].regular + user[meal.title.toLowerCase()].athletic + user[meal.title.toLowerCase()].bodybuilder;
+
+                            }, 0)
+
+                          }</Typography>
+
+                        </TableCell> */}
                         <TableCell
                           style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
                           padding="none"
@@ -492,16 +866,43 @@ class PlatingTable extends React.Component {
         >
           <AppBar className={this.props.classes.appBar}>
             <Toolbar>
-              <Typography type="title" color="inherit" className={this.props.classes.flex}>
+              <Typography type="headline" color="inherit" className={this.props.classes.flex}>
                 Customers - {this.state.lifestyleTitle} {this.state.mealTitle.toLowerCase()}
               </Typography>
+              <Button color="inherit" onClick={this.printPopupSummary}>
+                Print summary
+              </Button>
               <Button color="inherit" onClick={this.printLabels}>
-                Print
+                Print labels
               </Button>
               <IconButton color="inherit" onClick={this.closeAssignDialog} aria-label="Close">
                 <CloseIcon />
               </IconButton>
             </Toolbar>
+
+            <div style={{ paddingLeft: "24px", paddingRight: "24px", paddingBottom: "20px" }}>
+              {!this.state.aggregateDataLoading && this.state.lifestyleSelected != '' ?
+                (<Typography type="title" color="inherit">{this.getCurrentSelectionPlate('title')}</Typography>) : ''}
+              {!this.state.aggregateDataLoading && this.state.lifestyleSelected != '' ?
+                (<Typography type="subheading" color="inherit">{this.getCurrentSelectionPlate('subtitle')}</Typography>) : ''}
+              {!this.state.aggregateDataLoading && this.state.lifestyleSelected != '' ?
+                (<Typography type="body2" color="inherit">{this.getCurrentSelectionPlate('ingredients')}</Typography>) : ''}
+
+
+              <Typography type="body2" color="inherit">With restrictions:
+                Regular {this.usersWithoutRestrictions().regularRestrictionsCount} {" "}
+                Athletic {this.usersWithoutRestrictions().athleticRestrictionsCount} {" "}
+                Bodybuilder {this.usersWithoutRestrictions().bodybuilderRestrictionsCount}
+
+              </Typography>
+
+              <Typography type="body2" color="inherit">Without restrictions:
+                Regular {this.usersWithoutRestrictions().regularWithoutRestrictionsCount} {" "}
+                Athletic {this.usersWithoutRestrictions().athleticWithoutRestrictionsCount} {" "}
+                Bodybuilder {this.usersWithoutRestrictions().bodybuilderWithoutRestrictionsCount}
+
+              </Typography>
+            </div>
           </AppBar>
 
           <Paper className={this.props.classes.root}>
@@ -512,8 +913,8 @@ class PlatingTable extends React.Component {
                   <TableCell>Lifestyle</TableCell>
                   <TableCell>Notes</TableCell>
                   <TableCell>Portion</TableCell>
-                  <TableCell>Specific Restrictions</TableCell>
                   <TableCell>Preferences</TableCell>
+                  <TableCell>Allergies</TableCell>
                   <TableCell>Allergies</TableCell>
                   <TableCell>Dietary</TableCell>
                   <TableCell>Religious</TableCell>
@@ -524,7 +925,37 @@ class PlatingTable extends React.Component {
                   this.state.aggregateData.userData.filter(user => user.lifestyleId == this.state.lifestyleSelected &&
                     (user[this.state.mealTitle.toLowerCase()] > 0 ||
                       user[`athletic${this.state.mealTitle}`] > 0 ||
-                      user[`bodybuilder${this.state.mealTitle}`] > 0)).map((n) => {
+                      user[`bodybuilder${this.state.mealTitle}`] > 0)).sort((a, b) => {
+                        let totalRestrictionsA = 0;
+                        let totalRestrictionsB = 0;
+
+                        if (a.specificRestrictions) {
+                          totalRestrictionsA += a.specificRestrictions.length;
+                        }
+
+                        if (a.restrictions) {
+                          totalRestrictionsA += a.restrictions.length;
+                        }
+
+                        if (a.preferences) {
+                          totalRestrictionsA += a.preferences.length;
+                        }
+
+
+                        if (b.specificRestrictions) {
+                          totalRestrictionsB += b.specificRestrictions.length;
+                        }
+
+                        if (b.restrictions) {
+                          totalRestrictionsB += b.restrictions.length;
+                        }
+
+                        if (b.preferences) {
+                          totalRestrictionsB += b.preferences.length;
+                        }
+
+                        return totalRestrictionsB - totalRestrictionsA;
+                      }).map((n) => {
                         const mealType = this.state.mealTitle.toLowerCase();
                         const mealTypeNormal = this.state.mealTitle;
 
@@ -542,8 +973,8 @@ class PlatingTable extends React.Component {
                                 {n[`bodybuilder${mealTypeNormal}`] > 0 ? `Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}` : ''}
                               </Typography>
                             </TableCell>
-                            <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
                             <TableCell><Typography type="subheading">{n.preferences ? n.preferences.map(pref => pref.title).join(', ') : ''}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
                             <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
                             <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
                             <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
@@ -555,7 +986,7 @@ class PlatingTable extends React.Component {
           </Paper>
         </Dialog>
 
-      </div>
+      </div >
     );
   }
 }
