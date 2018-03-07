@@ -188,8 +188,8 @@ class CurrentCustomerEditor extends React.Component {
 
       secondaryCollapses: [false, false, false, false, false, false],
       secondaryProfileCount: this.props.customer && this.props.customer.associatedProfiles > 0 ? this.props.customer.associatedProfiles : 0,
-      secondaryProfilesData: this.props.customer && this.props.lifestyles 
-      && this.props.secondaryAccounts ? this.props.secondaryAccounts.map((e) => {
+      secondaryProfilesData: this.props.customer && this.props.lifestyles
+        && this.props.secondaryAccounts ? this.props.secondaryAccounts.map((e) => {
           return {
             _id: e._id,
             first_name: e.profile.name.first,
@@ -211,26 +211,26 @@ class CurrentCustomerEditor extends React.Component {
 
       // Step 3: Delivery
 
-      addressType: this.props.customer.address.type,
+      addressType: !this.props.customer.secondary ? this.props.customer.address.type : '',
 
-      apartmentName: this.props.customer.address.apartmentName ? this.props.customer.address.apartmentName : '',
-      unit: this.props.customer.address.unit ? this.props.customer.address.unit : '',
-      buzzer: this.props.customer.address.buzzer ? this.props.customer.address.buzzer : '',
+      apartmentName: !this.props.customer.secondary && this.props.customer.address.apartmentName ? this.props.customer.address.apartmentName : '',
+      unit: !this.props.customer.secondary && this.props.customer.address.unit ? this.props.customer.address.unit : '',
+      buzzer: !this.props.customer.secondary && this.props.customer.address.buzzer ? this.props.customer.address.buzzer : '',
 
-      businessName: this.props.customer.address.businessName ? this.props.customer.address.businessName : '',
+      businessName: !this.props.customer.secondary && this.props.customer.address.businessName ? this.props.customer.address.businessName : '',
 
-      roomNumber: this.props.customer.address.roomNumber ? this.props.customer.address.roomNumber : '',
+      roomNumber: !this.props.customer.secondary && this.props.customer.address.roomNumber ? this.props.customer.address.roomNumber : '',
 
-      hotelName: this.props.customer.address.hotelName ? this.props.customer.address.hotelName : '',
-      hotelFrontDesk: this.props.customer.address.leaveAtFrontDesk ? this.props.customer.address.leaveAtFrontDesk : '',
+      hotelName: !this.props.customer.secondary && this.props.customer.address.hotelName ? this.props.customer.address.hotelName : '',
+      hotelFrontDesk: !this.props.customer.secondary && this.props.customer.address.leaveAtFrontDesk ? this.props.customer.address.leaveAtFrontDesk : '',
 
-      dormName: this.props.customer.address.dormName ? this.props.customer.address.dormName : 'Algonquin College',
-      dormResidence: this.props.customer.address.dormResidence ? this.props.customer.address.dormResidence : 'Student Residence',
+      dormName: !this.props.customer.secondary && this.props.customer.address.dormName ? this.props.customer.address.dormName : 'Algonquin College',
+      dormResidence: !this.props.customer.secondary && this.props.customer.address.dormResidence ? this.props.customer.address.dormResidence : 'Student Residence',
 
-      streetAddress: this.props.customer.address.streetAddress ? this.props.customer.address.streetAddress : '',
-      postalCode: this.props.customer.postalCode,
+      streetAddress: !this.props.customer.secondary && this.props.customer.address.streetAddress ? this.props.customer.address.streetAddress : '',
+      postalCode: !this.props.customer.secondary && this.props.customer.postalCode,
 
-      notes: this.props.customer.secondary === undefined && this.props.customer.address && this.props.customer.address.notes ?
+      notes: !this.props.customer.secondary && this.props.customer.secondary === undefined && this.props.customer.address && this.props.customer.address.notes ?
         this.props.customer.address.notes : '',
 
       coolerBag: false,
@@ -243,7 +243,7 @@ class CurrentCustomerEditor extends React.Component {
         'dddd MMMM Do YYYY',
       ),
       subscriptionStartDateRaw: this.renderStartDays()[0],
-        
+
       submitLoading: false,
       submitSuccess: false,
     };

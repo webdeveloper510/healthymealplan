@@ -22,6 +22,7 @@ import RightArrow from 'material-ui-icons/ArrowForward';
 import moment from 'moment';
 import jsPDF from 'jspdf';
 import vittlebase64 from '../../../modules/vittlelogobase64';
+import hmplogobase64 from '../../../modules/hmplogobase64';
 
 
 import Deliveries from '../../../api/Deliveries/Deliveries';
@@ -54,7 +55,7 @@ class Directions extends React.Component {
       searchSelector: '',
       currentTabValue: /./,
       selectedRoute: '',
-      currentSelectorDate: moment(new Date()).format('YYYY-MM-DD')
+      currentSelectorDate: moment(new Date()).format('YYYY-MM-DD'),
     };
   }
 
@@ -128,7 +129,6 @@ class Directions extends React.Component {
     this.setState({
       options: { sort: newOptions },
     });
-
   }
 
   handleTabChange(event, value) {
@@ -136,19 +136,18 @@ class Directions extends React.Component {
   }
 
   changeDate(operation) {
-    if (operation === "add") {
+    if (operation === 'add') {
       this.setState({
-        currentSelectorDate: moment(this.state.currentSelectorDate).add(1, "d").format('YYYY-MM-DD')
+        currentSelectorDate: moment(this.state.currentSelectorDate).add(1, 'd').format('YYYY-MM-DD'),
       });
     } else {
       this.setState({
-        currentSelectorDate: moment(this.state.currentSelectorDate).subtract(1, "d").format('YYYY-MM-DD')
+        currentSelectorDate: moment(this.state.currentSelectorDate).subtract(1, 'd').format('YYYY-MM-DD'),
       });
     }
   }
 
   printLabels(type) {
-
     const sweetType = type == 'dayOf' ? 'morning' : type == 'nightBefore' ? 'evening' : '';
     const formalType = type == 'dayOf' ? 'day of' : type == 'nightBefore' ? 'evening' : '';
 
@@ -159,61 +158,56 @@ class Directions extends React.Component {
 
     if (deliveries.length == 0) {
       this.props.popTheSnackbar({
-        message: 'There are no ' + sweetType + ' labels to print for this day'
+        message: `There are no ${sweetType} labels to print for this day`,
       });
 
       return;
     }
 
-    let doc = new jsPDF({
+    const doc = new jsPDF({
       orientation: 'landscape',
       unit: 'in',
-      format: [4, 3]
+      format: [4, 3],
     });
 
     deliveries.forEach((e, i) => {
-
       if (i > 0) {
         doc.addPage();
-        doc.setPage(i + 1)
+        doc.setPage(i + 1);
       }
 
-      doc.addImage(vittlebase64, "PNG", 1.78, 0.15, 0.4, 0.4);
+      doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
 
       doc.setFontSize(14.5); // name
 
-      let names = [];
+      const names = [];
 
       e.meals.forEach((meal) => {
         if (meal.total > 0) {
-          names.push(`${meal.name} (${meal.total})`)
+          names.push(`${meal.name} (${meal.total})`);
         }
       });
 
       doc.text(names, 1, 1.15);
 
       doc.setFontSize(48); // Route
-      doc.setFontStyle("bold"); // Route
+      doc.setFontStyle('bold'); // Route
 
       const route = this.props.routes.find(rt => rt._id == e.routeId);
       const postalCode = this.props.postalCodes.find(pc => pc._id == e.postalCode);
 
 
-      doc.text(route.title === "Downtown" ? "DT" : route.title.slice(0, 1), 0.3, 2.75);
+      doc.text(route.title === 'Downtown' ? 'DT' : route.title.slice(0, 1), 0.3, 2.75);
 
       doc.setFontSize(12); // day postalcode
-      doc.setFontStyle("normal"); // Route
+      doc.setFontStyle('normal'); // Route
 
-      let info = [`${formalType} ${moment(e.onDate).format("MMMM D")}`, `${postalCode.title}`];
+      const info = [`${formalType} ${moment(e.onDate).format('MMMM D')}`, `${postalCode.title}`];
 
       doc.text(info, 1.5, 2.4);
-
     });
 
     doc.save(`Delivery_${this.state.currentSelectorDate}.pdf`);
-
-
-
   }
 
   render() {
@@ -337,8 +331,7 @@ class Directions extends React.Component {
             selector={{
               onDate: this.state.currentSelectorDate,
               routeId: { $regex: new RegExp(this.state.currentTabValue), $options: 'i' },
-              $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-              ],
+              $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }],
             }}
           >
             <DirectionsTable
@@ -348,6 +341,8 @@ class Directions extends React.Component {
               history={this.props.history}
               sortByOptions={this.sortByOption.bind(this)}
               currentSelectorDate={this.state.currentSelectorDate}
+              searchSelector={this.state.searchSelector}
+              routeSelector={this.state.currentTabValue}
             />
 
           </ListContainer>

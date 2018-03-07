@@ -23,6 +23,16 @@ Deliveries.schema = new SimpleSchema({
     type: String,
     label: 'The title of the delivery Day or Evening.',
   },
+  customer: {
+    type: Object,
+    label: 'Customer details',
+    blackbox: true,
+  },
+  route: {
+    type: Object,
+    label: 'Route details',
+    blackbox: true,
+  },
   customerId: {
     type: String,
     label: 'Customer ID of the delivery.',
