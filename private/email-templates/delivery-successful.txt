@@ -3,4 +3,4 @@ Hi, {{firstName}}
 Your {{totalMeals}} meals have been delivered to {{address}} at {{deliveredAt}}.
 
 Bon appétit!
-The Vittle Team
+The {{applicationName}} Team

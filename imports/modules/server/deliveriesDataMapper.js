@@ -91,6 +91,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           profile: customer.profile,
           postalCode: customer.postalCode,
           address: customer.address,
+          associatedProfiles: customer.associatedProfiles,
         },
         route: {
           title: route.title,

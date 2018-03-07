@@ -20,9 +20,6 @@ import RightArrow from 'material-ui-icons/ArrowForward';
 
 
 import moment from 'moment';
-import jsPDF from 'jspdf';
-import vittlebase64 from '../../../modules/vittlelogobase64';
-import hmplogobase64 from '../../../modules/hmplogobase64';
 
 
 import Deliveries from '../../../api/Deliveries/Deliveries';
@@ -147,69 +144,6 @@ class Directions extends React.Component {
     }
   }
 
-  printLabels(type) {
-    const sweetType = type == 'dayOf' ? 'morning' : type == 'nightBefore' ? 'evening' : '';
-    const formalType = type == 'dayOf' ? 'day of' : type == 'nightBefore' ? 'evening' : '';
-
-
-    const currentDate = this.state.currentSelectorDate;
-
-    const deliveries = this.props.deliveries.filter(e => e.onDate == currentDate && e.title == type);
-
-    if (deliveries.length == 0) {
-      this.props.popTheSnackbar({
-        message: `There are no ${sweetType} labels to print for this day`,
-      });
-
-      return;
-    }
-
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'in',
-      format: [4, 3],
-    });
-
-    deliveries.forEach((e, i) => {
-      if (i > 0) {
-        doc.addPage();
-        doc.setPage(i + 1);
-      }
-
-      doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
-
-      doc.setFontSize(14.5); // name
-
-      const names = [];
-
-      e.meals.forEach((meal) => {
-        if (meal.total > 0) {
-          names.push(`${meal.name} (${meal.total})`);
-        }
-      });
-
-      doc.text(names, 1, 1.15);
-
-      doc.setFontSize(48); // Route
-      doc.setFontStyle('bold'); // Route
-
-      const route = this.props.routes.find(rt => rt._id == e.routeId);
-      const postalCode = this.props.postalCodes.find(pc => pc._id == e.postalCode);
-
-
-      doc.text(route.title === 'Downtown' ? 'DT' : route.title.slice(0, 1), 0.3, 2.75);
-
-      doc.setFontSize(12); // day postalcode
-      doc.setFontStyle('normal'); // Route
-
-      const info = [`${formalType} ${moment(e.onDate).format('MMMM D')}`, `${postalCode.title}`];
-
-      doc.text(info, 1.5, 2.4);
-    });
-
-    doc.save(`Delivery_${this.state.currentSelectorDate}.pdf`);
-  }
-
   render() {
     const { loading, history } = this.props;
 
@@ -240,17 +174,13 @@ class Directions extends React.Component {
           </Grid>
 
           <Grid container className="clearfix">
-            <Grid item xs={6} style={{ alignItems: 'center' }}>
+            <Grid item xs={12} style={{ alignItems: 'center' }}>
               <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }}>Directions for {moment(this.state.currentSelectorDate).format('dddd, MMMM D')}
 
               </Typography>
 
             </Grid>
-            <Grid item xs={6}>
-              <Button className="btn btn-primary" onClick={() => this.printLabels('nightBefore')} raised color="primary" style={{ float: 'right', marginLeft: '1em' }}>Print evening labels</Button>
-              <Button className="btn btn-primary" onClick={() => this.printLabels('dayOf')} raised color="primary" style={{ float: 'right' }}>Print day of labels</Button>
 
-            </Grid>
           </Grid>
 
           <div style={{ marginTop: '25px' }}>

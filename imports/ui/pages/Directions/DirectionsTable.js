@@ -27,6 +27,10 @@ import Button from 'material-ui/Button';
 import moment from 'moment';
 
 import sumBy from 'lodash/sumBy';
+import jsPDF from 'jspdf';
+
+import vittlebase64 from '../../../modules/vittlelogobase64';
+import hmpbase64 from '../../../modules/hmplogobase64';
 
 // import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
@@ -239,6 +243,71 @@ class DirectionsTable extends React.Component {
     this.setState({ updateDialogOpen: false });
   }
 
+  printLabels(type) {
+    const sweetType = type == 'dayOf' ? 'morning' : type == 'nightBefore' ? 'evening' : '';
+    const formalType = type == 'dayOf' ? 'Day of' : type == 'nightBefore' ? 'Evening' : '';
+
+
+    const currentDate = this.props.currentSelectorDate;
+
+    const deliveries = this.state.aggregateData.deliveries.filter(e => e.onDate == currentDate && e.title == type);
+
+    if (deliveries.length == 0) {
+      this.props.popTheSnackbar({
+        message: `There are no ${sweetType} labels to print`,
+      });
+
+      return;
+    }
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'in',
+      format: [4, 3],
+    });
+
+    deliveries.forEach((e, i) => {
+      if (i > 0) {
+        doc.addPage();
+        doc.setPage(i + 1);
+      }
+
+      // doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+      doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
+
+
+      doc.setFontSize(14.5); // name
+
+      const names = [];
+
+      e.meals.forEach((meal) => {
+        if (meal.total > 0) {
+          names.push(`${meal.name} (${meal.total})`);
+        }
+      });
+
+      doc.text(names, 0.25, 1.15);
+
+      doc.setFontSize(48); // Route
+      doc.setFontStyle('bold'); // Route
+
+      const route = e.route.title;
+      const postalCode = e.customer.postalCode;
+
+
+      doc.text(route === 'Downtown' ? 'DT' : route.slice(0, 1), 0.25, 2.75);
+
+      doc.setFontSize(12); // day postalcode
+      doc.setFontStyle('normal'); // Route
+
+      const info = [`${formalType} ${moment(e.onDate).format('MMMM D')}`, `${postalCode}`];
+
+      doc.text(info, 1.5, 2.4);
+    });
+
+    doc.save(`Delivery_${this.props.currentSelectorDate}.pdf`);
+  }
+
   getStatusClass(status) {
     let statusToReturn = '';
     switch (status) {
@@ -284,7 +353,13 @@ class DirectionsTable extends React.Component {
 
     return (
       <div>
+
+
         <Paper elevation={2} className="table-container">
+          <div style={{ padding: "20px" }}>
+            <Button className="btn btn-primary" onClick={() => this.printLabels('nightBefore')} raised color="primary" style={{ float: 'right', marginLeft: '1em' }}>Print evening labels</Button>
+            <Button className="btn btn-primary" onClick={() => this.printLabels('dayOf')} raised color="primary" style={{ float: 'right' }}>Print day of labels</Button>
+          </div>
           {this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container" style={{ backgroundColor: '#607d8b' }}>
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
@@ -322,25 +397,34 @@ class DirectionsTable extends React.Component {
             : ''
 
           }
-          <Table className="table-container" style={{ tableLayout: 'fixed' }}>
+          <Table className="table-container" style={{ marginTop: "10px", tableLayout: 'fixed' }}>
 
             <TableHead>
               <TableRow>
                 <TableCell padding="checkbox" style={{ width: '12%' }}>
                   <Checkbox onChange={this.selectAllRows.bind(this)} />
                 </TableCell>
-                <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                  <Typography className="body2" type="body2">Customer</Typography></TableCell>
-                <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                  <Typography className="body2" type="body2">Address</Typography></TableCell>
-                <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                  <Typography className="body2" type="body2">Route</Typography></TableCell>
-                <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                  <Typography className="body2" type="body2">Delivery Type</Typography></TableCell>
-                <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                  <Typography className="body2" type="body2">Meals</Typography></TableCell>
-                <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                  <Typography className="body2" type="body2">Status</Typography></TableCell>
+                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('SKU')}>
+                  <Typography className="body2" type="body2">Customer</Typography>
+                </TableCell>
+                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('SKU')}>
+                  <Typography className="body2" type="body2">Notes</Typography>
+                </TableCell>
+                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Address</Typography>
+                </TableCell>
+                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Route</Typography>
+                </TableCell>
+                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Delivery Type</Typography>
+                </TableCell>
+                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Meals</Typography>
+                </TableCell>
+                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Status</Typography>
+                </TableCell>
 
               </TableRow>
             </TableHead>
@@ -364,23 +448,31 @@ class DirectionsTable extends React.Component {
                       />
                     </TableCell>
 
-                    <TableCell padding="none" style={{ width: '14.66%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
-                      <Typography className="subheading" type="subheading">{e.customer ? (
-                        `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''} 
-                          ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''}`
-                      ) : ''}</Typography>
-                      <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                    <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
+                      <Typography className="subheading" type="subheading">
+                        <span className="status-circle" />{" "}
                         {e.customer ? (
-                          `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''}${e.customer.associatedProfiles > 1 ? ' profiles' : ''}`
+                          `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''}
+                          ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''}`
+                        ) : ''}</Typography>
+                      <Typography className="body1" type="body1" style={{ marginLeft: "1.5em", color: 'rgba(0, 0, 0, .54)' }}>
+                        {e.customer ? (
+                          `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''}${e.customer.associatedProfiles > 1 ? ' profiles' : e.customer.associatedProfiles == 1 ? ' profile' : ''}`
                         ) : ''}
                       </Typography>
                     </TableCell>
 
+                    <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
+                      <Typography className="subheading" type="subheading">
+                        {e.deliveryNotes}
+                      </Typography>
+                    </TableCell>
+
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.57%' }}
                       padding="none"
                     >
-                      <a target="_blank" href={`https://www.google.com/maps/search/?api=1&query=${this.renderAddress(e.customer.address)}`}>
+                      <a target="_blank" style={{ textDecoration: 'none' }} href={`https://www.google.com/maps/search/?api=1&query=${this.renderAddress(e.customer.address)}`}>
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
                           {e.customer ? this.renderAddress(e.customer.address) : ''}
                         </Typography>
@@ -390,7 +482,7 @@ class DirectionsTable extends React.Component {
                     </TableCell>
 
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.57%' }}
                       padding="none"
                       onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                     >
@@ -410,7 +502,7 @@ class DirectionsTable extends React.Component {
                     </TableCell>
 
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.57%' }}
                       padding="none"
                     >
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
@@ -422,7 +514,7 @@ class DirectionsTable extends React.Component {
                     </TableCell>
 
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.57%' }}
                       padding="none"
                       onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                     >
@@ -437,7 +529,7 @@ class DirectionsTable extends React.Component {
                     </TableCell>
 
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '14.66%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.57%' }}
                       padding="none"
                     >
                       <TextField

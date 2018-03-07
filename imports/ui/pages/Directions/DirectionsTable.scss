@@ -2,18 +2,45 @@
   background-color: rgba(255,255,255,1);
 }
 
+.status-circle{
+  width: .8em;
+  height: .8em;
+  display: inline-block;
+  border-radius: 50%;
+  margin-right: 5px;
+  background-color: grey;
+}
+
 .status--in-transit{
-  background-color: rgba(33,150,243,.20);
+  background-color: rgba(33,150,243,.85);
+
+  .status-circle{
+    background-color: rgba(33,150,243,.85);
+  }
 }
 
 .status--not-delivered{
-  background-color: rgba(244,67,54,.20);
+  background-color: rgba(244,67,54,.85);
+
+  .status-circle{
+    background-color: rgba(244,67,54,.85);
+  }
 }
 
 .status--delivered{
-  background-color:  rgba(76,175,80,.20); 
+  background-color:  rgba(76,175,80,.85); 
+
+
+  .status-circle{
+    background-color:  rgba(76,175,80,.85); 
+  }
 }
 
 .status--delayed{
- background-color: rgba(255,152,0,.20); 
+ background-color: rgba(255,152,0,.85); 
+
+ .status-circle{
+    background-color: rgba(255,152,0,.85); 
+  }
+ 
 }
