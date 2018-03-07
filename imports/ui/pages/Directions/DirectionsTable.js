@@ -347,7 +347,6 @@ class DirectionsTable extends React.Component {
 
             <TableBody>
               {!this.state.aggregateDataLoading && this.state.aggregateData.deliveries.map((e, i) => {
-
                 const inDeliveries = this.checkInDeliveries(e);
                 const rowId = inDeliveries != undefined ? inDeliveries._id : e._id;
                 const status = inDeliveries != undefined ? inDeliveries.status : 'Scheduled';
@@ -387,11 +386,6 @@ class DirectionsTable extends React.Component {
                         </Typography>
                       </a>
 
-                      <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                        {e.customer ? (
-                          `${e.customer.postalCode}`
-                        ) : ''}
-                      </Typography>
 
                     </TableCell>
 
@@ -406,6 +400,12 @@ class DirectionsTable extends React.Component {
                           `${e.route.title}`
                         ) : ''}
                       </Typography>
+                      <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                        {e.customer ? (
+                          `${e.customer.postalCode}`
+                        ) : ''}
+                      </Typography>
+
 
                     </TableCell>
 

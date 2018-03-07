@@ -50,6 +50,8 @@ Meteor.methods({
       status: String,
       meals: Array,
       onDate: String,
+      deliveryNotes: String,
+      coolerBag: Boolean,
     });
 
     check(statusChange, String);
@@ -140,7 +142,7 @@ Meteor.methods({
 
       return delivery._id;
     } catch (exception) {
-      console.log(exception)
+      console.log(exception);
       throw new Meteor.Error('500', exception);
     }
   },
@@ -157,7 +159,7 @@ Meteor.methods({
     const twilioClient = new twilio(Meteor.settings.public.twilioAccountSid, Meteor.settings.private.twilioAuthToken);
 
     try {
-      deliveries.forEach(e => {
+      deliveries.forEach((e) => {
         Deliveries.update(
           {
             routeId: e.routeId,
@@ -183,8 +185,7 @@ Meteor.methods({
           },
           { upsert: true },
         );
-      })
-
+      });
 
 
       deliveries.forEach((e) => {
@@ -236,7 +237,7 @@ Meteor.methods({
         }
       });
     } catch (exception) {
-      console.log(exception)
+      console.log(exception);
       throw new Meteor.Error('500', exception);
     }
   },
