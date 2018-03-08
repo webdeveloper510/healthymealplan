@@ -144,7 +144,8 @@ class Step4Checkout extends React.Component {
           athleticQty: 0,
           bodybuilderQty: 0
         },
-        coolerBag: this.props.customerInfo.coolerBag ? 20 : 0,
+        // coolerBag: this.props.customerInfo.coolerBag ? 20 : 0,
+        coolerBag: 0,
         deliveryCost: 0,
         discount: this.props.customerInfo.discount,
         discountActual: 0,
@@ -2009,7 +2010,8 @@ class Step4Checkout extends React.Component {
                                 type="subheading"
                                 style={{ textAlign: "right" }}
                               >
-                                $20.00
+                                {/* $20.00 */}
+                                $0
                               </Typography>
                             </Grid>
                           </Grid>

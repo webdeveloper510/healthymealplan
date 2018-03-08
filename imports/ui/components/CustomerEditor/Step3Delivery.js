@@ -14,6 +14,7 @@ import Radio, { RadioGroup } from 'material-ui/Radio';
 import Geosuggest from 'react-geosuggest';
 import './GeoSuggest.scss';
 
+import Switch from 'material-ui/Switch';
 import Checkbox from 'material-ui/Checkbox';
 import {
   FormLabel,
@@ -107,7 +108,14 @@ class Step3Delivery extends React.Component {
       completeSchedule: this.props.customerInfo.completeSchedule,
       deliveryType: ['', '', '', '', '', '', ''],
 
+      deliveryNotifcations: {
+        email: false,
+        sms: false,
+      }
+
     };
+
+    this.handleDeliveryNotification = this.handleDeliveryNotification.bind(this);
   }
 
   componentWillReceiveProps(nextProps) {
@@ -170,6 +178,17 @@ class Step3Delivery extends React.Component {
     });
   }
 
+  handleDeliveryNotification(type, event) {
+
+    const notificationClone = this.state.deliveryNotifcations;
+
+    notificationClone[type] = event.target.checked;
+
+    this.setState({
+      deliveryNotifcations: notificationClone
+    });
+  }
+
   handleSubmitStep() {
 
     const check = this.state.completeSchedule.map(day => (day.breakfast + day.lunch + day.dinner) > 0);
@@ -227,6 +246,12 @@ class Step3Delivery extends React.Component {
       address,
       coolerBag: this.state.coolerBag,
       deliveryType: this.state.deliveryType,
+      notifications: {
+        delivery: {
+          sms: this.state.deliveryNotifcations.sms,
+          email: this.state.deliveryNotifcations.email
+        }
+      }
     });
 
     this.props.handleNext();
@@ -4858,6 +4883,37 @@ class Step3Delivery extends React.Component {
                       </FormGroup>
                     </Grid>
                   </Grid>
+
+                  <Grid item xs={12} style={{ marginTop: '25px' }}>
+                    <Typography
+                      type="body1"
+                      className="text-uppercase font-medium"
+                    >
+                      Delivery Notifications
+                      </Typography>
+                  </Grid>
+
+                  <Grid container>
+                    <Grid item sm={6} xs={12}>
+                      <Typography type="body2">Email</Typography>
+                      <FormControl component="fieldset">
+                        <Switch
+                          checked={this.state.deliveryNotifcations.email}
+                          onChange={this.handleDeliveryNotification.bind(this, 'email')}
+                        />
+                      </FormControl>
+                    </Grid>
+                    <Grid item sm={6} xs={12}>
+                      <Typography type="body2">SMS</Typography>
+                      <FormControl component="fieldset">
+                        <Switch
+                          checked={this.state.deliveryNotifcations.sms}
+                          onChange={this.handleDeliveryNotification.bind(this, 'sms')}
+                        />
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+
 
                   <Grid container>
                     <Grid item xs={12} style={{ marginTop: '25px' }}>

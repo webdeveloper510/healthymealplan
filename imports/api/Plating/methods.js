@@ -17,9 +17,7 @@ Meteor.methods({
       {
         $match: {
           status: 'active',
-          'completeSchedule.6': { $exists: true },
         },
-
       },
 
       {

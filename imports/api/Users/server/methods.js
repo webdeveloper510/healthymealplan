@@ -94,10 +94,10 @@ Meteor.methods({
       username: Match.Optional(String),
     });
 
-    let toUpdate = {
+    const toUpdate = {
       'profile.name.first': data.firstName,
       'profile.name.last': data.lastName || '',
-    }
+    };
 
     if (data.secondary) {
 
@@ -146,7 +146,7 @@ Meteor.methods({
     //   secondary: Match.Optional(Boolean)
     // });
 
-    // Meteor.users.update({ _id: data.id },{ 
+    // Meteor.users.update({ _id: data.id },{
     //   $set: {
     //     restrictions: data.restrictions,
     //     specificRestrictions: data.specificRestrictions,
@@ -172,6 +172,8 @@ Meteor.methods({
       subscriptionId: String,
       delivery: Array,
       scheduleReal: Array,
+      notifications: Object,
+      coolerBag: Boolean,
     });
 
     // console.log(data);
@@ -180,7 +182,7 @@ Meteor.methods({
 
     if (data.secondaryProfiles && data.secondaryProfiles.length > 0) {
 
-      data.secondaryProfiles.forEach(e => {
+      data.secondaryProfiles.forEach((e) => {
         if (e._id) {
           Meteor.users.update({ _id: e._id }, {
             $set: {
@@ -188,7 +190,7 @@ Meteor.methods({
                 name: {
                   first: e.first_name,
                   last: e.last_name,
-                }
+                },
               },
 
               secondary: true,
@@ -205,7 +207,7 @@ Meteor.methods({
 
               platingNotes: e.platingNotes,
               adultOrChild: e.adultOrChild,
-            }
+            },
           });
         } else {
           const randomId = Random.id();
@@ -216,7 +218,7 @@ Meteor.methods({
               name: {
                 first: e.first_name,
                 last: e.last_name,
-              }
+              },
             },
             secondary: true,
             primaryAccount: data.id,
@@ -228,14 +230,14 @@ Meteor.methods({
             specificRestrictions: e.specificRestrictions,
             preferences: e.subIngredients,
             platingNotes: e.platingNotes,
-            roles: ["customer"],
+            roles: ['customer'],
             schedule: e.scheduleReal,
             platingNotes: e.platingNotes,
             adultOrChild: e.adultOrChild,
 
           });
         }
-      })
+      });
     }
 
     const secondaryAccounts = Meteor.users.find({
@@ -246,8 +248,8 @@ Meteor.methods({
 
     const secondaryAccountIds = [];
 
-    secondaryAccounts.forEach(e => {
-      secondaryAccountIds.push(e._id)
+    secondaryAccounts.forEach((e) => {
+      secondaryAccountIds.push(e._id);
     });
 
 
@@ -265,7 +267,9 @@ Meteor.methods({
         address: data.address,
         secondaryAccounts: secondaryAccountIds,
         associatedProfiles: secondaryAccountIds.length,
-      }
+        coolerBag: data.coolerBag,
+        notifications: data.notifications
+      },
     });
 
     const newDeliveryType = data.delivery.map((e, i) => {
@@ -284,7 +288,7 @@ Meteor.methods({
         $set: {
           completeSchedule: data.completeSchedule,
           delivery: newDeliveryType,
-        }
+        },
       });
 
   },
@@ -398,6 +402,8 @@ Meteor.methods({
           subscriptionStartDate: customerInfo.activeImmediate ? new Date() : customerInfo.subscriptionStartDate,
           subscriptionStartDateRaw: customerInfo.activeImmediate ? new Date() : customerInfo.subscriptionStartDateRaw,
           associatedProfiles: customerInfo.secondaryProfileCount,
+          coolerBag: customerInfo.coolerBag,
+          notifications: customerInfo.notifications
         },
       },
     );
@@ -763,6 +769,8 @@ Meteor.methods({
           subscriptionStartDate: customerInfo.subscriptionStartDate,
           subscriptionStartDateRaw: customerInfo.subscriptionStartDateRaw,
           associatedProfiles: customerInfo.secondaryProfileCount,
+          coolerBag: customerInfo.coolerBag,
+          notifications: customerInfo.notifications
         },
       },
     );

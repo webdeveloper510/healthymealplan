@@ -13,7 +13,12 @@ import Dialog, {
   DialogActions,
   DialogContent,
   DialogContentText,
+  DialogTitle,
+  withMobileDialog,
 } from 'material-ui/Dialog';
+
+import NoteIcon from 'material-ui-icons/Note';
+
 
 import $ from 'jquery';
 import Paper from 'material-ui/Paper';
@@ -47,6 +52,12 @@ class DirectionsTable extends React.Component {
       updateDialogOpen: false,
       batchDeliveryStatus: '',
 
+      addressDialogOpen: false,
+      noteDialogOpen: false,
+
+      selectedCustomer: '',
+      selectedCustomerNote: '',
+      selectedCustomerAddress: '',
 
       aggregateData: null,
       aggregateDataLoading: true,
@@ -54,6 +65,14 @@ class DirectionsTable extends React.Component {
 
     this.handleStatusChange = this.handleStatusChange.bind(this);
     this.checkInDeliveries = this.checkInDeliveries.bind(this);
+
+    this.handleAddressDialogOpen = this.handleAddressDialogOpen.bind(this);
+    this.handleAddressDialogClose = this.handleAddressDialogClose.bind(this);
+
+
+    this.handleNoteDialogOpen = this.handleNoteDialogOpen.bind(this);
+    this.handleNoteDialogClose = this.handleNoteDialogClose.bind(this);
+
   }
 
   componentDidMount() {
@@ -65,6 +84,44 @@ class DirectionsTable extends React.Component {
       });
 
       console.log(res);
+    });
+  }
+
+  handleAddressDialogOpen(customerProfile, customerAddress) {
+    this.setState({
+      selectedCustomer: customerProfile.name.first + " " + customerProfile.name.last,
+      selectedCustomerAddress: customerAddress
+    }, () => {
+      this.setState({
+        addressDialogOpen: true
+      })
+    });
+  }
+
+  handleAddressDialogClose() {
+    this.setState({
+      selectedCustomer: '',
+      selectedCustomerAddress: '',
+      addressDialogOpen: false
+    });
+  }
+
+  handleNoteDialogOpen(customerProfile, customerNote) {
+    this.setState({
+      selectedCustomer: customerProfile.name.first + " " + customerProfile.name.last,
+      selectedCustomerNote: customerNote
+    }, () => {
+      this.setState({
+        noteDialogOpen: true
+      })
+    });
+  }
+
+  handleNoteDialogClose() {
+    this.setState({
+      selectedCustomer: '',
+      selectedCustomerNote: '',
+      noteDialogOpen: false
     });
   }
 
@@ -197,27 +254,27 @@ class DirectionsTable extends React.Component {
     }
   }
 
-  renderNoResults(count) {
-    if (count == 0) {
-      return (
-        <p style={{ padding: '25px' }} className="subheading">No delivery found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo; on {moment(this.props.currentSelectorDate).format('DD MMMM, YYYY')}</p>
-      );
-    }
-  }
+  // renderNoResults(count) {
+  //   if (count == 0) {
+  //     return (
+  //       <p style={{ padding: '25px' }} className="subheading">No delivery found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo; on {moment(this.props.currentSelectorDate).format('DD MMMM, YYYY')}</p>
+  //     );
+  //   }
+  // }
 
-  renderAddress(address) {
+  renderAddressSubText(address) {
     let toRender = '';
 
     if (address.type == 'apartment') {
-      toRender = `${address.apartmentName} ${address.unit} ${address.buzzer} ${address.streetAddress}`;
+      toRender = `Apartment name ${address.apartmentName}, Unit ${address.unit}, Buzzer ${address.buzzer}`;
     } else if (address.type == 'hotel') {
-      toRender = `${address.hotelName} ${address.roomNumber} ${address.streetAddress}`;
+      toRender = `Hotel name ${address.hotelName}, Room number${address.roomNumber}`;
     } else if (address.type == 'house') {
-      toRender = `${address.unit} ${address.streetAddress}`;
+      toRender = `Unit ${address.unit}`;
     } else if (address.type == 'business') {
-      toRender = `${address.businessName} ${address.unit} ${address.buzzer} ${address.streetAddress}`;
+      toRender = `Business name ${address.businessName}, Unit ${address.unit}, Buzzer ${address.buzzer}`;
     } else if (address.type == 'dormitory') {
-      toRender = `${address.dormName} ${address.dormResidence} ${address.roomNumber} ${address.buzzer} ${address.streetAddress}`;
+      toRender = `Dorm name ${address.dormName}, Dorm residence, ${address.dormResidence} Room number ${address.roomNumber}, Buzzer ${address.buzzer}`;
     }
 
     return toRender;
@@ -245,7 +302,7 @@ class DirectionsTable extends React.Component {
 
   printLabels(type) {
     const sweetType = type == 'dayOf' ? 'morning' : type == 'nightBefore' ? 'evening' : '';
-    const formalType = type == 'dayOf' ? 'Day of' : type == 'nightBefore' ? 'Evening' : '';
+    const formalType = type == 'dayOf' ? 'Day of' : type == 'nightBefore' ? 'Evening of' : '';
 
 
     const currentDate = this.props.currentSelectorDate;
@@ -300,7 +357,9 @@ class DirectionsTable extends React.Component {
       doc.setFontSize(12); // day postalcode
       doc.setFontStyle('normal'); // Route
 
-      const info = [`${formalType} ${moment(e.onDate).format('MMMM D')}`, `${postalCode}`];
+      const coolerBag = e.customer.coolerBag ? 'Cooler bag' : ''
+
+      const info = [`${formalType} ${moment(e.onDate).format('MMMM D')}`, `${postalCode}`, coolerBag];
 
       doc.text(info, 1.5, 2.4);
     });
@@ -356,7 +415,7 @@ class DirectionsTable extends React.Component {
 
 
         <Paper elevation={2} className="table-container">
-          <div style={{ padding: "20px" }}>
+          <div style={{ padding: '20px' }}>
             <Button className="btn btn-primary" onClick={() => this.printLabels('nightBefore')} raised color="primary" style={{ float: 'right', marginLeft: '1em' }}>Print evening labels</Button>
             <Button className="btn btn-primary" onClick={() => this.printLabels('dayOf')} raised color="primary" style={{ float: 'right' }}>Print day of labels</Button>
           </div>
@@ -397,32 +456,33 @@ class DirectionsTable extends React.Component {
             : ''
 
           }
-          <Table className="table-container" style={{ marginTop: "10px", tableLayout: 'fixed' }}>
+          <Table className="table-container" style={{ marginTop: '10px', tableLayout: 'fixed' }}>
 
             <TableHead>
               <TableRow>
-                <TableCell padding="checkbox" style={{ width: '12%' }}>
+                <TableCell padding="checkbox" style={{ width: '8%' }}>
                   <Checkbox onChange={this.selectAllRows.bind(this)} />
                 </TableCell>
-                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('SKU')}>
+                <TableCell padding="none" style={{ width: '22%' }} onClick={() => this.props.sortByOptions('SKU')}>
                   <Typography className="body2" type="body2">Customer</Typography>
                 </TableCell>
-                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                  <Typography className="body2" type="body2">Notes</Typography>
-                </TableCell>
-                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('title')}>
+
+                <TableCell padding="none" style={{ width: '25%' }} onClick={() => this.props.sortByOptions('title')}>
                   <Typography className="body2" type="body2">Address</Typography>
                 </TableCell>
-                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('title')}>
+                <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.sortByOptions('title')}>
                   <Typography className="body2" type="body2">Route</Typography>
                 </TableCell>
-                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('title')}>
-                  <Typography className="body2" type="body2">Delivery Type</Typography>
+                <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Delivery</Typography>
                 </TableCell>
-                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('title')}>
+                <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.sortByOptions('title')}>
                   <Typography className="body2" type="body2">Meals</Typography>
                 </TableCell>
-                <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.sortByOptions('title')}>
+                <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <Typography className="body2" type="body2">Cooler bag</Typography>
+                </TableCell>
+                <TableCell padding="none" style={{ width: '13%' }} onClick={() => this.props.sortByOptions('title')}>
                   <Typography className="body2" type="body2">Status</Typography>
                 </TableCell>
 
@@ -439,7 +499,7 @@ class DirectionsTable extends React.Component {
 
                 return (
                   <TableRow hover className={`${rowId} ${statusClass}`} key={rowId}>
-                    <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
+                    <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }} padding="checkbox">
                       <Checkbox
                         className="row-checkbox"
                         id={rowId}
@@ -448,43 +508,44 @@ class DirectionsTable extends React.Component {
                       />
                     </TableCell>
 
-                    <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
-                      <Typography className="subheading" type="subheading">
-                        <span className="status-circle" />{" "}
+                    <TableCell padding="none" style={{ width: '22%' }} >
+                      <Typography className="subheading" type="subheading" style={{ display: 'flex', alignItems: 'center' }}>
+                        <span className="status-circle" />{' '}
+
                         {e.customer ? (
                           `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''}
                           ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''}`
-                        ) : ''}</Typography>
-                      <Typography className="body1" type="body1" style={{ marginLeft: "1.5em", color: 'rgba(0, 0, 0, .54)' }}>
+                        ) : ''}
+                        {' '}
+                        {e.customer.address.notes && e.customer.address.notes.length > 0 ? (<NoteIcon style={{ marginLeft: '10px' }} onClick={() => this.handleNoteDialogOpen(e.customer.profile, e.customer.address.notes)} />) : ''}
+                      </Typography>
+
+                      <Typography className="body1" type="body1" style={{ marginLeft: '1.5em', color: 'rgba(0, 0, 0, .54)' }}>
                         {e.customer ? (
                           `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''}${e.customer.associatedProfiles > 1 ? ' profiles' : e.customer.associatedProfiles == 1 ? ' profile' : ''}`
                         ) : ''}
-                      </Typography>
-                    </TableCell>
 
-                    <TableCell padding="none" style={{ width: '12.57%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
-                      <Typography className="subheading" type="subheading">
-                        {e.deliveryNotes}
                       </Typography>
                     </TableCell>
 
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.57%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '25%' }}
                       padding="none"
+                      onClick={() => this.handleAddressDialogOpen(e.customer.profile, e.customer.address.streetAddress)}
                     >
-                      <a target="_blank" style={{ textDecoration: 'none' }} href={`https://www.google.com/maps/search/?api=1&query=${this.renderAddress(e.customer.address)}`}>
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                          {e.customer ? this.renderAddress(e.customer.address) : ''}
-                        </Typography>
-                      </a>
+                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                        {e.customer.address.streetAddress}
+                      </Typography>
+                      <Typography type="body2" className="body2">
+                        {e.customer ? this.renderAddressSubText(e.customer.address) : ''}
+                      </Typography>
 
 
                     </TableCell>
 
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.57%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }}
                       padding="none"
-                      onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                     >
 
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
@@ -502,7 +563,7 @@ class DirectionsTable extends React.Component {
                     </TableCell>
 
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.57%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }}
                       padding="none"
                     >
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
@@ -514,9 +575,8 @@ class DirectionsTable extends React.Component {
                     </TableCell>
 
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.57%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }}
                       padding="none"
-                      onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
                     >
 
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
@@ -528,8 +588,18 @@ class DirectionsTable extends React.Component {
 
                     </TableCell>
 
+                    <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }} padding="none">
+
+                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+
+                        {e.customer.coolerBag ? 'Yes' : 'No'}
+                      </Typography>
+
+                    </TableCell>
+
+
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.57%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '13%' }}
                       padding="none"
                     >
                       <TextField
@@ -568,7 +638,7 @@ class DirectionsTable extends React.Component {
               )
               }
 
-              {this.renderNoResults(this.props.count)}
+              {/* {this.renderNoResults(this.props.count)} */}
 
             </TableBody>
           </Table>
@@ -589,7 +659,54 @@ class DirectionsTable extends React.Component {
             </Button>
           </DialogActions>
         </Dialog>
-      </div>
+        <Dialog
+          fullScreen={false}
+          open={this.state.addressDialogOpen}
+          onClose={this.handleAddressDialogClose}
+          aria-labelledby="responsive-dialog-title"
+        >
+          <DialogTitle id="responsive-dialog-title">Search address - {this.state.selectedCustomer}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              How do you want to open this link in?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions>
+            <a target="_blank" href={`https://maps.apple.com/?q=${encodeURIComponent(this.state.selectedCustomerAddress)}`} style={{ textDecoration: 'none' }}>
+              <Button color="primary">
+                Apple Maps
+              </Button>
+            </a>
+
+            <a target="_blank" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(this.state.selectedCustomerAddress)}`} style={{ textDecoration: 'none' }}>
+              <Button color="primary">
+                Google Maps
+              </Button>
+            </a>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog
+          fullScreen={false}
+          open={this.state.noteDialogOpen}
+          onClose={this.handleNoteDialogClose}
+          aria-labelledby="responsive-dialog-title"
+        >
+          <DialogTitle id="responsive-dialog-title">Delivery Notes for {this.state.selectedCustomer}</DialogTitle>
+          <DialogContent>
+            <DialogContentText>
+              {this.state.selectedCustomerNote}
+            </DialogContentText>
+          </DialogContent>
+
+          <DialogActions>
+            <Button onClick={this.handleNoteDialogClose} color="default">
+              Cancel
+            </Button>
+          </DialogActions>
+
+        </Dialog>
+      </div >
     );
   }
 }

@@ -50,8 +50,6 @@ Meteor.methods({
       status: String,
       meals: Array,
       onDate: String,
-      deliveryNotes: String,
-      coolerBag: Boolean,
     });
 
     check(statusChange, String);
@@ -94,50 +92,63 @@ Meteor.methods({
       // const delivery = Deliveries.findOne({ _id: delivery._id });
       const deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
 
-      // console.log(deliveryUser);
+      const notifyUserByEmail = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.email : false;
+      const notifyUserBySms = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.sms : false;
 
       if (updated && statusChange == 'Delivered') {
-        sendDeliveredEmail({
-          firstName: deliveryUser.profile.name.first,
-          email: deliveryUser.emails[0].address,
-          totalMeals: sumBy(delivery.meals, 'total'),
-          address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
-          deliveredAt: moment(new Date()).format('h:mm a'),
-        });
+        if (notifyUserByEmail) {
+          sendDeliveredEmail({
+            firstName: deliveryUser.profile.name.first,
+            email: deliveryUser.emails[0].address,
+            totalMeals: sumBy(delivery.meals, 'total'),
+            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+            deliveredAt: moment(new Date()).format('h:mm a'),
+          });
+        }
 
-        twilioClient.messages.create({
-          body: `Your ${sumBy(delivery.meals, 'total')} meals have been delivered to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}.`,
-          to: `+1${deliveryUser.phone}`,
-          from: '+16138006196',
-        });
+        if (notifyUserBySms) {
+          twilioClient.messages.create({
+            body: `Your ${sumBy(delivery.meals, 'total')} meals have been delivered to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}.`,
+            to: `+1${deliveryUser.phone}`,
+            from: '+16138006196',
+          });
+        }
       } else if (updated && statusChange == 'Not delivered') {
-        sendNotDeliveredEmail({
-          firstName: deliveryUser.profile.name.first,
-          email: deliveryUser.emails[0].address,
-          totalMeals: sumBy(delivery.meals, 'total'),
-          address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
-          deliveredAt: moment(new Date()).format('h:mm a'),
-        });
+        if (notifyUserByEmail) {
+          sendNotDeliveredEmail({
+            firstName: deliveryUser.profile.name.first,
+            email: deliveryUser.emails[0].address,
+            totalMeals: sumBy(delivery.meals, 'total'),
+            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+            deliveredAt: moment(new Date()).format('h:mm a'),
+          });
+        }
 
-        twilioClient.messages.create({
-          body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us so we can try again.`,
-          to: `+1${deliveryUser.phone}`,
-          from: '+16138006196',
-        });
+        if (notifyUserBySms) {
+          twilioClient.messages.create({
+            body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us so we can try again.`,
+            to: `+1${deliveryUser.phone}`,
+            from: '+16138006196',
+          });
+        }
       } else if (updated && statusChange == 'Delayed') {
-        sendDeliveryDelayedEmail({
-          firstName: deliveryUser.profile.name.first,
-          email: deliveryUser.emails[0].address,
-          totalMeals: sumBy(delivery.meals, 'total'),
-          address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
-          deliveredAt: moment(new Date()).format('h:mm a'),
-        });
+        if (notifyUserByEmail) {
+          sendDeliveryDelayedEmail({
+            firstName: deliveryUser.profile.name.first,
+            email: deliveryUser.emails[0].address,
+            totalMeals: sumBy(delivery.meals, 'total'),
+            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+            deliveredAt: moment(new Date()).format('h:mm a'),
+          });
+        }
 
-        twilioClient.messages.create({
-          body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today. Please get in touch with us if you cannot accept a late delivery.`,
-          to: `+1${deliveryUser.phone}`,
-          from: '+16138006196',
-        });
+        if (notifyUserBySms) {
+          twilioClient.messages.create({
+            body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today. Please get in touch with us if you cannot accept a late delivery.`,
+            to: `+1${deliveryUser.phone}`,
+            from: '+16138006196',
+          });
+        }
       }
 
       return delivery._id;
@@ -192,48 +203,64 @@ Meteor.methods({
         const delivery = Deliveries.findOne({ _id: e._id });
         const deliveryUser = Meteor.users.findOne({ _id: e.customerId });
 
+        const notifyUserByEmail = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.email : false;
+        const notifyUserBySms = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.sms : false;
+
+
         if (statusChange == 'Delivered') {
-          sendDeliveredEmail({
-            firstName: deliveryUser.profile.name.first,
-            email: deliveryUser.emails[0].address,
-            totalMeals: sumBy(delivery.meals, 'total'),
-            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
-            deliveredAt: moment(new Date()).format('h:mm a'),
-          });
+          if (notifyUserByEmail) {
+            sendDeliveredEmail({
+              firstName: deliveryUser.profile.name.first,
+              email: deliveryUser.emails[0].address,
+              totalMeals: sumBy(delivery.meals, 'total'),
+              address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+              deliveredAt: moment(new Date()).format('h:mm a'),
+            });
+          }
 
-          twilioClient.messages.create({
-            body: `Your ${sumBy(delivery.meals, 'total')} meals have been delivered to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}.`,
-            to: `+1${deliveryUser.phone}`,
-            from: '+16138006196',
-          });
+          if (notifyUserBySms) {
+            twilioClient.messages.create({
+              body: `Your ${sumBy(delivery.meals, 'total')} meals have been delivered to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}.`,
+              to: `+1${deliveryUser.phone}`,
+              from: '+16138006196',
+            });
+          }
         } else if (statusChange == 'Not delivered') {
-          sendNotDeliveredEmail({
-            firstName: deliveryUser.profile.name.first,
-            email: deliveryUser.emails[0].address,
-            totalMeals: sumBy(delivery.meals, 'total'),
-            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
-            deliveredAt: moment(new Date()).format('h:mm a'),
-          });
+          if (notifyUserByEmail) {
+            sendNotDeliveredEmail({
+              firstName: deliveryUser.profile.name.first,
+              email: deliveryUser.emails[0].address,
+              totalMeals: sumBy(delivery.meals, 'total'),
+              address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+              deliveredAt: moment(new Date()).format('h:mm a'),
+            });
+          }
 
-          twilioClient.messages.create({
-            body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us so we can try again.`,
-            to: `+1${deliveryUser.phone}`,
-            from: '+16138006196',
-          });
+          if (notifyUserBySms) {
+            twilioClient.messages.create({
+              body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us so we can try again.`,
+              to: `+1${deliveryUser.phone}`,
+              from: '+16138006196',
+            });
+          }
         } else if (statusChange == 'Delayed') {
-          sendDeliveryDelayedEmail({
-            firstName: deliveryUser.profile.name.first,
-            email: deliveryUser.emails[0].address,
-            totalMeals: sumBy(delivery.meals, 'total'),
-            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
-            deliveredAt: moment(new Date()).format('h:mm a'),
-          });
+          if (notifyUserByEmail) {
+            sendDeliveryDelayedEmail({
+              firstName: deliveryUser.profile.name.first,
+              email: deliveryUser.emails[0].address,
+              totalMeals: sumBy(delivery.meals, 'total'),
+              address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+              deliveredAt: moment(new Date()).format('h:mm a'),
+            });
+          }
 
-          twilioClient.messages.create({
-            body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today. Please get in touch with us if you cannot accept a late delivery.`,
-            to: `+1${deliveryUser.phone}`,
-            from: '+16138006196',
-          });
+          if (notifyUserBySms) {
+            twilioClient.messages.create({
+              body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today. Please get in touch with us if you cannot accept a late delivery.`,
+              to: `+1${deliveryUser.phone}`,
+              from: '+16138006196',
+            });
+          }
         }
       });
     } catch (exception) {
@@ -249,7 +276,6 @@ Meteor.methods({
       {
         $match: {
           status: 'active',
-          'completeSchedule.6': { $exists: true },
         },
       },
       {

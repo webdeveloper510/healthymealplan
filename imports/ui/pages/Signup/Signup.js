@@ -130,7 +130,7 @@ class Signup extends React.Component {
             className="form-control"
           />
           Use at least six characters.
-          <Button raised>Sign Up</Button>
+          <Button raised type="submit">Sign Up</Button>
           <p>
             Already have an account? <Link to="/login">Log In</Link>.
           </p>

@@ -15,6 +15,7 @@ import { Meteor } from 'meteor/meteor';
 
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
+import Switch from 'material-ui/Switch';
 
 import Radio, { RadioGroup } from 'material-ui/Radio';
 import Checkbox from 'material-ui/Checkbox';
@@ -233,7 +234,21 @@ class CurrentCustomerEditor extends React.Component {
       notes: !this.props.customer.secondary && this.props.customer.secondary === undefined && this.props.customer.address && this.props.customer.address.notes ?
         this.props.customer.address.notes : '',
 
-      coolerBag: false,
+      coolerBag: !this.props.customer.secondary && this.props.customer.secondary === undefined && this.props.customer.coolerBag != undefined ? this.props.customer.coolerBag : false,
+
+
+      deliveryNotifcations: !this.props.customer.secondary && this.props.customer.secondary === undefined && this.props.customer.notifications ?
+        {
+          email: this.props.customer.notifications.delivery.email,
+          sms: this.props.customer.notifications.delivery.sms,
+        }
+        : {
+          email: false, sms: false
+        },
+
+
+
+
       activeDeliveryScheduleStep: 0,
 
       completeSchedule: this.props.subscription ? this.props.subscription.completeSchedule : [],
@@ -253,6 +268,7 @@ class CurrentCustomerEditor extends React.Component {
     this.saveSecondStep = this.saveSecondStep.bind(this);
     this.saveThirdStep = this.saveThirdStep.bind(this);
     this.saveFourthStep = this.saveFourthStep.bind(this);
+    this.handleDeliveryNotification = this.handleDeliveryNotification.bind(this);
   }
 
   componentDidMount() {
@@ -584,6 +600,13 @@ class CurrentCustomerEditor extends React.Component {
       secondaryProfiles: this.state.secondaryProfilesData,
       completeSchedule: this.state.completeSchedule,
       delivery: this.state.deliveryType,
+      coolerBag: this.state.coolerBag,
+      notifications: {
+        delivery: {
+          sms: this.state.deliveryNotifcations.sms,
+          email: this.state.deliveryNotifcations.email
+        }
+      }
     };
 
     Meteor.call('edit.customer.step2', step2Data, (err, res) => {
@@ -2129,6 +2152,16 @@ class CurrentCustomerEditor extends React.Component {
 
 
   // STEP 3: Delivery
+  handleDeliveryNotification(type, event) {
+
+    const notificationClone = this.state.deliveryNotifcations;
+
+    notificationClone[type] = event.target.checked;
+
+    this.setState({
+      deliveryNotifcations: notificationClone
+    });
+  }
 
   handleChangeRadioAddressType(event, value) {
     this.setState({
@@ -8151,6 +8184,36 @@ class CurrentCustomerEditor extends React.Component {
                               label="Cooler bag (One time fee - $20)"
                             />
                           </FormGroup>
+                        </Grid>
+                      </Grid>
+
+                      <Grid item xs={12} style={{ marginTop: '25px' }}>
+                        <Typography
+                          type="body1"
+                          className="text-uppercase font-medium"
+                        >
+                          Delivery Notifications
+                          </Typography>
+                      </Grid>
+
+                      <Grid container>
+                        <Grid item sm={6} xs={12}>
+                          <Typography type="body2">Email</Typography>
+                          <FormControl component="fieldset">
+                            <Switch
+                              checked={this.state.deliveryNotifcations.email}
+                              onChange={this.handleDeliveryNotification.bind(this, 'email')}
+                            />
+                          </FormControl>
+                        </Grid>
+                        <Grid item sm={6} xs={12}>
+                          <Typography type="body2">SMS</Typography>
+                          <FormControl component="fieldset">
+                            <Switch
+                              checked={this.state.deliveryNotifcations.sms}
+                              onChange={this.handleDeliveryNotification.bind(this, 'sms')}
+                            />
+                          </FormControl>
                         </Grid>
                       </Grid>
 

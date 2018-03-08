@@ -92,6 +92,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           postalCode: customer.postalCode,
           address: customer.address,
           associatedProfiles: customer.associatedProfiles,
+          coolerBag: customer.coolerBag ? customer.coolerBag : false,
         },
         route: {
           title: route.title,
@@ -103,8 +104,6 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
         title: '',
         status: 'Scheduled',
         meals: [],
-        deliveryNotes: customer.deliveryNotes ? customer.deliveryNotes : '',
-        coolerBag: customer.coolerBag ? customer.coolerBag : false,
       };
 
 

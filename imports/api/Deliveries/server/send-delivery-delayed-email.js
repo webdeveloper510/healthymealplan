@@ -20,8 +20,7 @@ export default (options) => {
       firstName,
       totalMeals,
     },
-  })
-    .catch((error) => {
-      throw new Meteor.Error('500', `${error}`);
-    });
+  }).catch((error) => {
+    throw new Meteor.Error('500', `${error}`);
+  });
 };

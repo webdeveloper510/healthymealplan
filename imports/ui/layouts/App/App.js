@@ -182,12 +182,12 @@ const styles = theme => ({
     boxShadow: 'none',
     backgroundColor: '#263238',
     marginLeft: drawerWidth,
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('lg')]: {
       width: `calc(100% - ${drawerWidth}px)`,
     },
   },
   navIconHide: {
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('lg')]: {
       display: 'none',
     },
   },
@@ -220,7 +220,7 @@ const styles = theme => ({
       height: 'calc(100% - 64px)',
       marginTop: 64,
     },
-    [theme.breakpoints.up('md')]: {
+    [theme.breakpoints.up('lg')]: {
       marginLeft: `${drawerWidth}px`,
     },
   },
@@ -413,7 +413,7 @@ class App extends React.Component {
               )}
               {this.props.authenticated ? (
                 <div style={{ backgroundColor: '#FFFFFF' }}>
-                  <Hidden mdUp>
+                  <Hidden lgUp>
                     <Drawer
                       type="temporary"
                       anchor={theme.direction === 'rtl' ? 'right' : 'left'}
@@ -454,7 +454,7 @@ class App extends React.Component {
                     </Drawer>
                   </Hidden>
 
-                  <Hidden smDown implementation="css">
+                  <Hidden mdDown implementation="css">
                     <Drawer
                       type="permanent"
                       open
