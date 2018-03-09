@@ -32,6 +32,7 @@ import Button from 'material-ui/Button';
 import moment from 'moment';
 
 import sumBy from 'lodash/sumBy';
+import groupBy from 'lodash/groupBy';
 import jsPDF from 'jspdf';
 
 import vittlebase64 from '../../../modules/vittlelogobase64';
@@ -255,15 +256,15 @@ class DirectionsTable extends React.Component {
     let toRender = '';
 
     if (address.type == 'apartment') {
-      toRender = `Apartment name ${address.apartmentName}, Unit ${address.unit}, Buzzer ${address.buzzer}`;
+      toRender = `${address.apartmentName ? `Apartment name  ${address.apartmentName}` : ''}, ${address.unit ? `Unit ${address.unit}` : ''}, ${address.buzzer ? `Business ${address.buzzer}` : ''}`;
     } else if (address.type == 'hotel') {
-      toRender = `Hotel name ${address.hotelName}, Room number${address.roomNumber}`;
+      toRender = `${address.hotelName ? `Unit ${address.hotelName}` : ''}, ${address.roomNumber ? `Room number ${address.roomNumber}` : ''}`;
     } else if (address.type == 'house') {
-      toRender = `Unit ${address.unit}`;
+      toRender = `${address.unit ? `Unit ${address.unit}` : ''} `;
     } else if (address.type == 'business') {
-      toRender = `Business name ${address.businessName}, Unit ${address.unit}, Buzzer ${address.buzzer}`;
+      toRender = `${address.businessName ? `Business name ${address.businessName}` : ''}, ${address.unit ? `Unit ${address.unit}` : ''}, ${address.buzzer ? `Business ${address.buzzer}` : ''}`;
     } else if (address.type == 'dormitory') {
-      toRender = `Dorm name ${address.dormName}, Dorm residence, ${address.dormResidence} Room number ${address.roomNumber}, Buzzer ${address.buzzer}`;
+      toRender = `${address.dormName ? `Dorm name ${address.dormName}` : ''},  ${address.dormResidence ? `Dorm residence ${address.dormResidence}` : ''} ${address.roomNumber ? `Room number ${address.roomNumber}` : ''}, ${address.buzzer ? `Business ${address.buzzer}` : ''}`;
     }
 
     return toRender;
@@ -296,6 +297,8 @@ class DirectionsTable extends React.Component {
 
     const deliveries = this.state.aggregateData.deliveries.filter(e => e.onDate == currentDate && e.title == type);
 
+    console.log(groupBy(deliveries, e => e.route.title));
+
     if (deliveries.length == 0) {
       this.props.popTheSnackbar({
         message: `There are no ${sweetType} labels to print`,
@@ -326,7 +329,7 @@ class DirectionsTable extends React.Component {
 
       e.meals.forEach((meal) => {
         if (meal.total > 0) {
-          names.push(`${meal.name} (${meal.total})`);
+          names.push(`${meal.name} (${meal.total}) `);
         }
       });
 
@@ -346,7 +349,7 @@ class DirectionsTable extends React.Component {
 
       const coolerBag = e.customer.coolerBag ? 'Cooler bag' : '';
 
-      const info = [`${formalType} ${moment(e.onDate).format('MMMM D')}`, `${postalCode}`, coolerBag];
+      const info = [`${formalType} ${moment(e.onDate).format('MMMM D')} `, `${postalCode} `, coolerBag];
 
       doc.text(info, 1.5, 2.4);
     });
@@ -485,7 +488,7 @@ class DirectionsTable extends React.Component {
                 const statusClass = this.getStatusClass(status);
 
                 return (
-                  <TableRow hover className={`${rowId} ${statusClass}`} key={rowId}>
+                  <TableRow hover className={`${rowId} ${statusClass} `} key={rowId}>
                     <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }} padding="checkbox">
                       <Checkbox
                         className="row-checkbox"
@@ -501,7 +504,7 @@ class DirectionsTable extends React.Component {
 
                         {e.customer ? (
                           `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''}
-                          ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''}`
+      ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''} `
                         ) : ''}
                         {' '}
                         {e.customer.address.notes && e.customer.address.notes.length > 0 ? (<NoteIcon style={{ marginLeft: '10px' }} onClick={() => this.handleNoteDialogOpen(e.customer.profile, e.customer.address.notes)} />) : ''}
@@ -509,7 +512,7 @@ class DirectionsTable extends React.Component {
 
                       <Typography className="body1" type="body1" style={{ marginLeft: '1.5em', color: 'rgba(0, 0, 0, .54)' }}>
                         {e.customer ? (
-                          `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''}${e.customer.associatedProfiles > 1 ? ' profiles' : e.customer.associatedProfiles == 1 ? ' profile' : ''}`
+                          `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''} ${e.customer.associatedProfiles > 1 ? ' profiles' : e.customer.associatedProfiles == 1 ? ' profile' : ''} `
                         ) : ''}
 
                       </Typography>
@@ -520,10 +523,10 @@ class DirectionsTable extends React.Component {
                       padding="none"
                       onClick={() => this.handleAddressDialogOpen(e.customer.profile, e.customer.address.streetAddress)}
                     >
-                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                      <Typography type="subheading" style={{ textTransform: 'capitalize' }}>
                         {e.customer.address.streetAddress}
                       </Typography>
-                      <Typography type="body2" className="body2">
+                      <Typography type="body1">
                         {e.customer ? this.renderAddressSubText(e.customer.address) : ''}
                       </Typography>
 
@@ -537,12 +540,12 @@ class DirectionsTable extends React.Component {
 
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
                         {e.route ? (
-                          `${e.route.title}`
+                          `${e.route.title} `
                         ) : ''}
                       </Typography>
                       <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
                         {e.customer ? (
-                          `${e.customer.postalCode}`
+                          `${e.customer.postalCode} `
                         ) : ''}
                       </Typography>
 
@@ -659,19 +662,19 @@ class DirectionsTable extends React.Component {
             </DialogContentText>
           </DialogContent>
           <DialogActions>
-            <a target="_blank" href={`https://maps.apple.com/?q=${encodeURIComponent(this.state.selectedCustomerAddress)}`} style={{ textDecoration: 'none' }}>
+            <a target="_blank" onClick={this.handleAddressDialogClose} href={`https://maps.apple.com/?q=${encodeURIComponent(this.state.selectedCustomerAddress)}`} style={{ textDecoration: 'none' }}>
               <Button color="primary">
                 Apple Maps
               </Button>
-            </a>
+            </a >
 
-            <a target="_blank" href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(this.state.selectedCustomerAddress)}`} style={{ textDecoration: 'none' }}>
+            <a target="_blank" onClick={this.handleAddressDialogClose} href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(this.state.selectedCustomerAddress)}`} style={{ textDecoration: 'none' }}>
               <Button color="primary">
                 Google Maps
               </Button>
             </a>
-          </DialogActions>
-        </Dialog>
+          </DialogActions >
+        </Dialog >
 
         <Dialog
           fullScreen={false}
@@ -688,7 +691,7 @@ class DirectionsTable extends React.Component {
 
           <DialogActions>
             <Button onClick={this.handleNoteDialogClose} color="default">
-              Cancel
+              Close
             </Button>
           </DialogActions>
 

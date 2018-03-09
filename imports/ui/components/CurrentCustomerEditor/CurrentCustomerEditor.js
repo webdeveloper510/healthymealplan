@@ -243,10 +243,9 @@ class CurrentCustomerEditor extends React.Component {
           sms: this.props.customer.notifications.delivery.sms,
         }
         : {
-          email: false, sms: false
+          email: false, 
+          sms: false
         },
-
-
 
 
       activeDeliveryScheduleStep: 0,
