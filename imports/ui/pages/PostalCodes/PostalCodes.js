@@ -39,33 +39,11 @@ class PostalCodes extends React.Component {
     };
   }
 
-  componentDidMount() {}
-
   searchByName() {
-    // const searchValue = new RegExp(, 'i');
-    // console.log(searchValue);
 
     this.setState({
       searchSelector: $("#search-type-text").val()
     });
-
-    // const query = {
-    //   title: { $regex: searchValue },
-    // };
-
-    // if ($('#search-type-text').val() > 1) {
-    //   this.setState({
-    //     searchSelector: query,
-    //   });
-
-    //   return true;
-    // }
-
-    // this.setState({
-    //   searchSelector: {},
-    // });
-
-    // return false;
   }
 
   clearSearchBox() {
@@ -78,7 +56,6 @@ class PostalCodes extends React.Component {
 
   sortByOption(field) {
     // const field = event.currentTarget.getAttribute('data-sortby');
-    console.log(field);
 
     // This is a filler object that we are going to use set the state with.
     // Putting the sortBy field using index as objects can also be used as arrays.
@@ -102,9 +79,6 @@ class PostalCodes extends React.Component {
     this.setState({
       options: { sort: newOptions }
     });
-
-    // console.log('Data sorting changed');
-    // console.log(this.state.options);
   }
 
   searchByKey(restrictionType = "", key = "") {
@@ -238,21 +212,21 @@ class PostalCodes extends React.Component {
               typeof this.state.searchByKey === "object"
                 ? this.state.searchByKey
                 : {
-                    $or: [
-                      {
-                        title: {
-                          $regex: new RegExp(this.state.searchSelector),
-                          $options: "i"
-                        }
-                      },
-                      {
-                        SKU: {
-                          $regex: new RegExp(this.state.searchSelector),
-                          $options: "i"
-                        }
+                  $or: [
+                    {
+                      title: {
+                        $regex: new RegExp(this.state.searchSelector),
+                        $options: "i"
                       }
-                    ]
-                  }
+                    },
+                    {
+                      SKU: {
+                        $regex: new RegExp(this.state.searchSelector),
+                        $options: "i"
+                      }
+                    }
+                  ]
+                }
             }
           >
             <PostalCodesTable
@@ -266,8 +240,8 @@ class PostalCodes extends React.Component {
         </Grid>
       </div>
     ) : (
-      <Loading />
-    );
+        <Loading />
+      );
   }
 }
 

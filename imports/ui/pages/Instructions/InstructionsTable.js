@@ -41,17 +41,7 @@ class InstructionsTable extends React.Component {
     };
   }
 
-  renderType(type) {
-    console.log(type);
-  }
-
   rowSelected(e, event, checked) {
-    // console.log(e);
-    console.log(checked);
-    // console.log($(event.target).prop('checked'));
-    // console.log(event.target.parentNode.parentNode);
-
-
     const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
     $(`.${selectedRowId}`).toggleClass('row-selected');
     let currentlySelectedCheckboxes;
@@ -66,7 +56,6 @@ class InstructionsTable extends React.Component {
       clonedSelectedCheckboxes.splice(clonedSelectedCheckboxes.indexOf(e._id), 1);
     }
 
-
     this.setState({
       selectedCheckboxesNumber: currentlySelectedCheckboxes,
       selectedCheckboxes: clonedSelectedCheckboxes,
@@ -75,7 +64,6 @@ class InstructionsTable extends React.Component {
 
   selectAllRows(event) {
     let allCheckboxIds = [];
-    console.log(event.target);
 
     if ($(event.target).prop('checked')) {
       $('.row-checkbox').each((index, el) => {
@@ -107,16 +95,11 @@ class InstructionsTable extends React.Component {
   }
 
   deleteSelectedRows() {
-    console.log('Delete selected rows');
-
     localStorage.setItem('instructionTableDeleted', this.state.selectedCheckboxesNumber);
 
     const instructionIds = this.state.selectedCheckboxes;
 
-    console.log(instructionIds);
-
     Meteor.call('instructions.batchRemove', instructionIds, (error) => {
-      console.log('inside method');
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
@@ -133,9 +116,6 @@ class InstructionsTable extends React.Component {
       selectedCheckboxesNumber: 0,
       deleteDialogOpen: false,
     });
-
-    // this.deleteDialogHandleRe/questClose.bind(this)
-    // $('.row-selected').toggleClass('row-selected');
   }
 
 
@@ -148,8 +128,6 @@ class InstructionsTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-    // console.log(this.state.selectedCheckboxes);
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -166,11 +144,6 @@ class InstructionsTable extends React.Component {
   deleteDialogHandleRequestClose() {
     this.setState({ deleteDialogOpen: false });
   }
-
-  // renderDeleteDialog() {
-  //   return (
-  //   );
-  // }
 
   render() {
     return (
@@ -195,14 +168,14 @@ class InstructionsTable extends React.Component {
                     <Checkbox onChange={this.selectAllRows.bind(this)} /></TableCell>
                   <TableCell padding="none" style={{ width: '88%' }} onClick={() => this.props.sortByOptions('title')}>
                     <Typography className="body2" type="body2">Instruction</Typography></TableCell>
-                  
+
                 </TableRow>
               </TableHead>)
               : ''
             }
             <TableBody>
 
-             
+
               {
                 this.props.results.map((e, i) => {
                   const isSelected = this.isCheckboxSelected(e._id);
@@ -227,10 +200,10 @@ class InstructionsTable extends React.Component {
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
                           {e.title}
                         </Typography>
-          
+
 
                       </TableCell>
-                     
+
                     </TableRow>
                   );
                 },
@@ -261,17 +234,17 @@ class InstructionsTable extends React.Component {
         </Paper>
         <Dialog open={this.state.deleteDialogOpen} onClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-      Delete {this.state.selectedCheckboxesNumber} instructions?
+            Delete {this.state.selectedCheckboxesNumber} instructions?
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} instructions?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
-        Cancel
+              Cancel
             </Button>
             <Button stroked className="button--bordered button--bordered--accent" onClick={this.deleteSelectedRows.bind(this)} color="accent">
-        Delete
+              Delete
             </Button>
           </DialogActions>
         </Dialog>

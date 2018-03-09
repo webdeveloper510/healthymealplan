@@ -38,13 +38,8 @@ class CustomersTable extends React.Component {
     };
   }
 
-  renderType(type) {
-    console.log(type);
-  }
-
   rowSelected(e, event, checked) {
     // console.log(e);
-    console.log(checked);
     // console.log($(event.target).prop('checked'));
     // console.log(event.target.parentNode.parentNode);
 
@@ -75,7 +70,6 @@ class CustomersTable extends React.Component {
 
   selectAllRows(event) {
     let allCheckboxIds = [];
-    console.log(event.target);
 
     if ($(event.target).prop('checked')) {
       $('.row-checkbox').each((index, el) => {
@@ -113,8 +107,6 @@ class CustomersTable extends React.Component {
   }
 
   deleteSelectedRows() {
-    console.log('Delete selected rows');
-
     localStorage.setItem(
       'LifestylesTableDeleted',
       this.state.selectedCheckboxesNumber,
@@ -122,10 +114,7 @@ class CustomersTable extends React.Component {
 
     const lifestyleIds = this.state.selectedCheckboxes;
 
-    console.log(lifestyleIds);
-
     Meteor.call('lifestyles.batchRemove', lifestyleIds, (error) => {
-      console.log('inside method');
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
@@ -144,9 +133,6 @@ class CustomersTable extends React.Component {
       selectedCheckboxesNumber: 0,
       deleteDialogOpen: false,
     });
-
-    // this.deleteDialogHandleRe/questClose.bind(this)
-    // $('.row-selected').toggleClass('row-selected');
   }
 
   renderNoResults(count) {
@@ -162,8 +148,6 @@ class CustomersTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-    // console.log(this.state.selectedCheckboxes);
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -186,8 +170,6 @@ class CustomersTable extends React.Component {
   }
 
   handleDeleteCustomer(customerId) {
-    console.log(customerId);
-
     this.deleteDialogHandleRequestClose();
 
     Meteor.call('customers.delete', customerId, (err, res) => {
@@ -196,7 +178,6 @@ class CustomersTable extends React.Component {
           message: `${this.state.selectedCustomerName} successfully removed.`,
         });
       } else {
-        console.log(err);
         this.props.popTheSnackbar({
           message: 'There was a problem deleting this user',
         });
@@ -205,7 +186,6 @@ class CustomersTable extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     return (
       <div>
         <Paper elevation={2} className="table-container">

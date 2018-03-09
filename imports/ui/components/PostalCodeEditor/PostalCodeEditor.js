@@ -37,7 +37,7 @@ const styles = theme => ({
 
 $.validator.addMethod(
   "cdnPostalStart",
-  function(postal, element) {
+  function (postal, element) {
     return this.optional(element) || postal.match(/[a-zA-Z][0-9][a-zA-Z]/);
   },
   "Please specify a valid postal code."
@@ -65,20 +65,20 @@ class PostalCodeEditor extends React.Component {
       ),
       extraType:
         !this.props.newPostalCode &&
-        this.props.postalCode &&
-        this.props.postalCode.extraSurchargeType
+          this.props.postalCode &&
+          this.props.postalCode.extraSurchargeType
           ? this.props.postalCode.extraSurchargeType
           : "Percentage",
       valueExtraSurcharge:
         !this.props.newPostalCode &&
-        this.props.postalCode &&
-        this.props.postalCode.hasOwnProperty("extraSurcharge")
+          this.props.postalCode &&
+          this.props.postalCode.hasOwnProperty("extraSurcharge")
           ? "extra"
           : "none",
       extraAmount:
         !this.props.newPostalCode &&
-        this.props.postalCode &&
-        this.props.postalCode.hasOwnProperty("extraSurcharge")
+          this.props.postalCode &&
+          this.props.postalCode.hasOwnProperty("extraSurcharge")
           ? this.props.postalCode.extraSurcharge
           : ""
     };
@@ -86,7 +86,6 @@ class PostalCodeEditor extends React.Component {
 
   componentDidMount() {
     const component = this;
-    console.log(component.form);
     validate(component.form, {
       errorPlacement(error, element) {
         error.insertAfter(
@@ -168,7 +167,6 @@ class PostalCodeEditor extends React.Component {
   }
 
   handleSubmit() {
-    console.log("Reached handle submti");
     const { history, popTheSnackbar } = this.props;
     const existingPostalCode =
       this.props.postalCode && this.props.postalCode._id;
@@ -202,8 +200,6 @@ class PostalCodeEditor extends React.Component {
       }
     }
 
-    console.log(postalCode);
-
     Meteor.call(methodToCall, postalCode, (error, postalCodeId) => {
       if (error) {
         popTheSnackbar({
@@ -234,8 +230,6 @@ class PostalCodeEditor extends React.Component {
   }
 
   handleCityChange(event, value) {
-    // console.log(event.target.value);
-
     this.setState({
       city: event.target.value,
       hasFormChanged: true
@@ -243,8 +237,6 @@ class PostalCodeEditor extends React.Component {
   }
 
   handleRouteChange(event, value) {
-    // console.log(event.target.value);
-
     this.setState({
       route: event.target.value,
       hasFormChanged: true
@@ -252,8 +244,6 @@ class PostalCodeEditor extends React.Component {
   }
 
   handleExtraTypeChange(event, value) {
-    // console.log(event.target.value);
-
     this.setState({
       extraType: event.target.value
     });
@@ -545,10 +535,10 @@ class PostalCodeEditor extends React.Component {
                 Delete
               </Button>
             ) : (
-              <Button raised onClick={() => history.push("/postal-codes")}>
-                Cancel
+                <Button raised onClick={() => history.push("/postal-codes")}>
+                  Cancel
               </Button>
-            )}
+              )}
           </Grid>
 
           <Grid item xs={6}>
@@ -612,8 +602,8 @@ class PostalCodeEditor extends React.Component {
             </DialogActions>
           </Dialog>
         ) : (
-          ""
-        )}
+            ""
+          )}
       </form>
     );
   }

@@ -76,7 +76,7 @@ class Plating extends React.Component {
 
   sortByOption(field) {
     // const field = event.currentTarget.getAttribute('data-sortby');
-    console.log(field);
+    // console.log(field);
 
     // This is a filler object that we are going to use set the state with.
     // Putting the sortBy field using index as objects can also be used as arrays.

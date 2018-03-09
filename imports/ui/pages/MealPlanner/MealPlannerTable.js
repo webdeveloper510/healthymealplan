@@ -78,14 +78,13 @@ class MealPlannerTable extends React.Component {
   }
 
   openAssignDialog(lifestyleId, mealId) {
-
     const lifestyle = this.props.lifestyles.find(el => el._id === lifestyleId);
     const meal = this.props.meals.find(el => el._id === mealId);
 
-    let assignResult = {
+    const assignResult = {
       lifestyle,
-      meal
-    }
+      meal,
+    };
 
     this.setState({
       assignResult,
@@ -106,8 +105,8 @@ class MealPlannerTable extends React.Component {
 
   closeReassignDialog() {
     this.setState({
-      reassignDialogOpen: false
-    })
+      reassignDialogOpen: false,
+    });
   }
 
   openReassignDialog(lifestyleId, mealId) {
@@ -121,8 +120,6 @@ class MealPlannerTable extends React.Component {
   }
 
   rowSelected(e, event, checked) {
-    console.log(checked);
-
     const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
     $(`.${selectedRowId}`).toggleClass('row-selected');
     let currentlySelectedCheckboxes;
@@ -145,7 +142,6 @@ class MealPlannerTable extends React.Component {
 
   selectAllRows(event) {
     let allCheckboxIds = [];
-    console.log(event.target);
 
     if ($(event.target).prop('checked')) {
       $('.row-checkbox').each((index, el) => {
@@ -177,19 +173,13 @@ class MealPlannerTable extends React.Component {
   }
 
   handleMealAssignment() {
-
     localStorage.setItem('mealAssigned', this.state.selectedSugestion.title);
-    console.log(this.props.currentSelectorDate);
-    console.log(this.state.lifestyleSelected);
-    console.log(this.state.mealSelected);
-    console.log(this.state.selectedSugestion._id);
 
     Meteor.call('mealPlanner.insert',
       this.props.currentSelectorDate,
       this.state.lifestyleSelected,
       this.state.mealSelected,
       this.state.selectedSugestion._id, (error) => {
-
         if (error) {
           this.props.popTheSnackbar({
             message: error.reason,
@@ -210,11 +200,9 @@ class MealPlannerTable extends React.Component {
   }
 
   handleMealReassignment() {
-
     localStorage.setItem('mealReassigned', this.state.selectedSugestion.title);
 
     Meteor.call('mealPlanner.update', this.props.currentSelectorDate, this.state.reassignPlannerId, this.state.selectedSugestion._id, (error) => {
-
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
@@ -229,7 +217,7 @@ class MealPlannerTable extends React.Component {
     this.setState({
       reassignDialogOpen: false,
       selectedSuggestion: null,
-      reassignPlannerId: null
+      reassignPlannerId: null,
     });
   }
 
@@ -242,7 +230,6 @@ class MealPlannerTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -279,7 +266,7 @@ class MealPlannerTable extends React.Component {
 
   renderPresentPlate(results, lifestyleId, mealId, date) {
     const plateToReturn = results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === date);
-    return (<Typography type="subheading">{plateToReturn.plate.title}</Typography>)
+    return (<Typography type="subheading">{plateToReturn.plate.title}</Typography>);
   }
 
 
@@ -353,17 +340,13 @@ class MealPlannerTable extends React.Component {
     event,
     { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
-
     this.setState({
-      selectedSugestion: suggestion
-    })
-
+      selectedSugestion: suggestion,
+    });
   }
 
 
-
   render() {
-
     return (
       <div>
         <Paper elevation={2} className="table-container">
@@ -419,13 +402,14 @@ class MealPlannerTable extends React.Component {
                         <div>
                           {this.renderPresentPlate(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate)}
                           <Button onClick={() => this.openReassignDialog(lifestyle._id, meal._id,
-                            this.getPlannerId(this.props.results, lifestyle._id, meal._id))}>Reassign</Button>
+                            this.getPlannerId(this.props.results, lifestyle._id, meal._id))}
+                          >Reassign</Button>
                         </div>
                       ) : (
-                          <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                            <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>Assign</Button>
-                          </Typography>
-                        )
+                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                          <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>Assign</Button>
+                        </Typography>
+                      )
                       }
 
                     </TableCell>

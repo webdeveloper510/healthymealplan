@@ -72,7 +72,6 @@ class DirectionsTable extends React.Component {
 
     this.handleNoteDialogOpen = this.handleNoteDialogOpen.bind(this);
     this.handleNoteDialogClose = this.handleNoteDialogClose.bind(this);
-
   }
 
   componentDidMount() {
@@ -82,19 +81,17 @@ class DirectionsTable extends React.Component {
       }, () => {
         this.setState({ aggregateDataLoading: false });
       });
-
-      console.log(res);
     });
   }
 
   handleAddressDialogOpen(customerProfile, customerAddress) {
     this.setState({
-      selectedCustomer: customerProfile.name.first + " " + customerProfile.name.last,
-      selectedCustomerAddress: customerAddress
+      selectedCustomer: `${customerProfile.name.first} ${customerProfile.name.last}`,
+      selectedCustomerAddress: customerAddress,
     }, () => {
       this.setState({
-        addressDialogOpen: true
-      })
+        addressDialogOpen: true,
+      });
     });
   }
 
@@ -102,18 +99,18 @@ class DirectionsTable extends React.Component {
     this.setState({
       selectedCustomer: '',
       selectedCustomerAddress: '',
-      addressDialogOpen: false
+      addressDialogOpen: false,
     });
   }
 
   handleNoteDialogOpen(customerProfile, customerNote) {
     this.setState({
-      selectedCustomer: customerProfile.name.first + " " + customerProfile.name.last,
-      selectedCustomerNote: customerNote
+      selectedCustomer: `${customerProfile.name.first} ${customerProfile.name.last}`,
+      selectedCustomerNote: customerNote,
     }, () => {
       this.setState({
-        noteDialogOpen: true
-      })
+        noteDialogOpen: true,
+      });
     });
   }
 
@@ -121,7 +118,7 @@ class DirectionsTable extends React.Component {
     this.setState({
       selectedCustomer: '',
       selectedCustomerNote: '',
-      noteDialogOpen: false
+      noteDialogOpen: false,
     });
   }
 
@@ -131,7 +128,6 @@ class DirectionsTable extends React.Component {
         aggregateDataLoading: true,
       }, () => {
         Meteor.call('getDeliveryAggregatedData', this.props.currentSelectorDate, (err, res) => {
-          console.log(res);
           this.setState({
             aggregateData: res,
           }, () => {
@@ -143,8 +139,6 @@ class DirectionsTable extends React.Component {
   }
 
   rowSelected(rowId, event, checked) {
-    console.log(checked);
-
     const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
     $(`.${selectedRowId}`).toggleClass('row-selected');
     let currentlySelectedCheckboxes;
@@ -167,7 +161,6 @@ class DirectionsTable extends React.Component {
 
   selectAllRows(event) {
     let allCheckboxIds = [];
-    // console.log(event.target);
 
     if ($(event.target).prop('checked')) {
       $('.row-checkbox').each((index, el) => {
@@ -199,8 +192,6 @@ class DirectionsTable extends React.Component {
   }
 
   handleBatchStatusChange() {
-    console.log('Update selected rows');
-
     localStorage.setItem('deliveryUpdated', this.state.selectedCheckboxesNumber);
 
     const categoryIds = this.state.selectedCheckboxes;
@@ -209,7 +200,6 @@ class DirectionsTable extends React.Component {
 
 
     Meteor.call('deliveries.batchUpdate', deliveries, this.state.batchDeliveryStatus, (error) => {
-      console.log('inside method');
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
@@ -240,7 +230,6 @@ class DirectionsTable extends React.Component {
       const delivery = this.state.aggregateData.deliveries.find(el => el._id == deliveryId);
 
       Meteor.call('deliveries.update', delivery, event.target.value, (error) => {
-        console.log('inside method');
         if (error) {
           this.props.popTheSnackbar({
             message: error.reason,
@@ -281,8 +270,6 @@ class DirectionsTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-    // console.log(this.state.selectedCheckboxes);
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -357,7 +344,7 @@ class DirectionsTable extends React.Component {
       doc.setFontSize(12); // day postalcode
       doc.setFontStyle('normal'); // Route
 
-      const coolerBag = e.customer.coolerBag ? 'Cooler bag' : ''
+      const coolerBag = e.customer.coolerBag ? 'Cooler bag' : '';
 
       const info = [`${formalType} ${moment(e.onDate).format('MMMM D')}`, `${postalCode}`, coolerBag];
 

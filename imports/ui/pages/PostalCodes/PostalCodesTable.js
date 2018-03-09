@@ -36,15 +36,7 @@ class PostalCodesTable extends React.Component {
     };
   }
 
-  renderType(type) {
-    console.log(type);
-  }
-
   rowSelected(e, event, checked) {
-    // console.log(e);
-    console.log(checked);
-    // console.log($(event.target).prop('checked'));
-    // console.log(event.target.parentNode.parentNode);
 
     const selectedRowId = event.target.parentNode.parentNode.getAttribute("id");
     $(`.${selectedRowId}`).toggleClass("row-selected");
@@ -67,13 +59,12 @@ class PostalCodesTable extends React.Component {
 
     this.setState({
       selectedCheckboxesNumber: currentlySelectedCheckboxes,
-      selectedCheckboxes: clonedSelectedCheckboxes
+      selectedCheckboxes: clonedSelectedCheckboxes,
     });
   }
 
   selectAllRows(event) {
     let allCheckboxIds = [];
-    console.log(event.target);
 
     if ($(event.target).prop("checked")) {
       $(".row-checkbox").each((index, el) => {
@@ -111,7 +102,6 @@ class PostalCodesTable extends React.Component {
   }
 
   deleteSelectedRows() {
-    console.log("Delete selected rows");
 
     localStorage.setItem(
       "PostalCodesDeleted",
@@ -120,10 +110,7 @@ class PostalCodesTable extends React.Component {
 
     const postalCodeIds = this.state.selectedCheckboxes;
 
-    console.log(postalCodeIds);
-
     Meteor.call("postalCodes.batchRemove", postalCodeIds, error => {
-      console.log("inside method");
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason
@@ -143,8 +130,6 @@ class PostalCodesTable extends React.Component {
       deleteDialogOpen: false
     });
 
-    // this.deleteDialogHandleRe/questClose.bind(this)
-    // $('.row-selected').toggleClass('row-selected');
   }
 
   renderNoResults(count) {
@@ -163,8 +148,6 @@ class PostalCodesTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-    // console.log(this.state.selectedCheckboxes);
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -186,7 +169,7 @@ class PostalCodesTable extends React.Component {
     if (e.extraSurcharge) {
       return `${e.extraSurchargeType == "Fixed amount" ? "$" : ""}${
         e.extraSurcharge
-      }${e.extraSurchargeType == "Percentage" ? "%" : ""}`;
+        }${e.extraSurchargeType == "Percentage" ? "%" : ""}`;
     }
     return (
       <Typography
@@ -224,8 +207,8 @@ class PostalCodesTable extends React.Component {
               </Button>
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
           <Table className="table-container" style={{ tableLayout: "fixed" }}>
             {this.props.count > 0 ? (
               <TableHead>
@@ -277,13 +260,11 @@ class PostalCodesTable extends React.Component {
                 </TableRow>
               </TableHead>
             ) : (
-              ""
-            )}
+                ""
+              )}
             <TableBody>
               {this.props.results.map((e, i) => {
                 const isSelected = this.isCheckboxSelected(e._id);
-
-                console.log(e);
 
                 return (
                   <TableRow hover className={e._id} key={e._id}>
@@ -406,8 +387,8 @@ class PostalCodesTable extends React.Component {
                           Extra
                         </Typography>
                       ) : (
-                        ""
-                      )}
+                          ""
+                        )}
                     </TableCell>
                   </TableRow>
                 );
@@ -439,8 +420,8 @@ class PostalCodesTable extends React.Component {
                     <Button onClick={this.props.loadMore}>Load More</Button>
                   </TableCell>
                 ) : (
-                  ""
-                )}
+                    ""
+                  )}
               </TableRow>
             </TableFooter>
           </Table>

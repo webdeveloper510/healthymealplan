@@ -1,18 +1,18 @@
-import React from "react";
-import PropTypes from "prop-types";
-import { Link } from "react-router-dom";
-import { Meteor } from "meteor/meteor";
-import { createContainer } from "meteor/react-meteor-data";
-import { teal, red } from "material-ui/colors";
-import Containers from "meteor/utilities:react-list-container";
+import React from 'react';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+import { Meteor } from 'meteor/meteor';
+import { createContainer } from 'meteor/react-meteor-data';
+import { teal, red } from 'material-ui/colors';
+import Containers from 'meteor/utilities:react-list-container';
 
 const ListContainer = Containers.ListContainer;
 
-import Button from "material-ui/Button";
-import Grid from "material-ui/Grid";
-import Input from "material-ui/Input";
+import Button from 'material-ui/Button';
+import Grid from 'material-ui/Grid';
+import Input from 'material-ui/Input';
 
-import $ from "jquery";
+import $ from 'jquery';
 
 import Table, {
   TableBody,
@@ -21,26 +21,26 @@ import Table, {
   TableHead,
   TablePagination,
   TableRow,
-  TableSortLabel
-} from "material-ui/Table";
-import Toolbar from "material-ui/Toolbar";
-import Typography from "material-ui/Typography";
-import Paper from "material-ui/Paper";
-import Checkbox from "material-ui/Checkbox";
-import IconButton from "material-ui/IconButton";
-import Tooltip from "material-ui/Tooltip";
-import DeleteIcon from "material-ui-icons/Delete";
-import FilterListIcon from "material-ui-icons/FilterList";
-import SearchIcon from "material-ui-icons/Search";
-import ClearIcon from "material-ui-icons/Clear";
-import AppBar from "material-ui/AppBar";
-import Tabs, { Tab } from "material-ui/Tabs";
+  TableSortLabel,
+} from 'material-ui/Table';
+import Toolbar from 'material-ui/Toolbar';
+import Typography from 'material-ui/Typography';
+import Paper from 'material-ui/Paper';
+import Checkbox from 'material-ui/Checkbox';
+import IconButton from 'material-ui/IconButton';
+import Tooltip from 'material-ui/Tooltip';
+import DeleteIcon from 'material-ui-icons/Delete';
+import FilterListIcon from 'material-ui-icons/FilterList';
+import SearchIcon from 'material-ui-icons/Search';
+import ClearIcon from 'material-ui-icons/Clear';
+import AppBar from 'material-ui/AppBar';
+import Tabs, { Tab } from 'material-ui/Tabs';
 
-import InstructionsCollection from "../../../api/Instructions/Instructions";
+import InstructionsCollection from '../../../api/Instructions/Instructions';
 
-import AuthenticatedSideNav from "../../components/AuthenticatedSideNav/AuthenticatedSideNav";
-import Loading from "../../components/Loading/Loading";
-import InstructionsTable from "./InstructionsTable";
+import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
+import Loading from '../../components/Loading/Loading';
+import InstructionsTable from './InstructionsTable';
 
 const primary = teal[500];
 const danger = red[700];
@@ -54,51 +54,27 @@ class Instructions extends React.Component {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
       options: { sort: { title: 1 } },
-      searchSelector: "",
-      currentTabValue: 0
+      searchSelector: '',
+      currentTabValue: 0,
     };
   }
 
-  componentDidMount() {}
-
   searchByName() {
-    // const searchValue = new RegExp(, 'i');
-    // console.log(searchValue);
-
     this.setState({
-      searchSelector: $("#search-instruction-text").val()
+      searchSelector: $('#search-instruction-text').val(),
     });
-
-    // const query = {
-    //   title: { $regex: searchValue },
-    // };
-
-    // if ($('#search-instruction-text').val() > 1) {
-    //   this.setState({
-    //     searchSelector: query,
-    //   });
-
-    //   return true;
-    // }
-
-    // this.setState({
-    //   searchSelector: {},
-    // });
-
-    // return false;
   }
 
   clearSearchBox() {
-    $("#search-instruction-text").val("");
+    $('#search-instruction-text').val('');
 
     this.setState({
-      searchSelector: {}
+      searchSelector: {},
     });
   }
 
   sortByOption(field) {
     // const field = event.currentTarget.getAttribute('data-sortby');
-    console.log(field);
 
     // This is a filler object that we are going to use set the state with.
     // Putting the sortBy field using index as objects can also be used as arrays.
@@ -120,29 +96,26 @@ class Instructions extends React.Component {
     }
 
     this.setState({
-      options: { sort: newOptions }
+      options: { sort: newOptions },
     });
-
-    // console.log('Data sorting changed');
-    // console.log(this.state.options);
   }
 
   rowSelected(e) {
-    const selectedRowId = e.target.parentNode.parentNode.getAttribute("id");
+    const selectedRowId = e.target.parentNode.parentNode.getAttribute('id');
 
-    $(`.${selectedRowId}`).toggleClass("row-selected");
+    $(`.${selectedRowId}`).toggleClass('row-selected');
 
     const currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber;
 
     this.setState({
       checkboxesSelected: true,
-      selectedCheckboxesNumber: currentlySelectedCheckboxes + 1
+      selectedCheckboxesNumber: currentlySelectedCheckboxes + 1,
     });
   }
 
   renderTableHeadClasses() {
     const classes = `${
-      this.state.checboxesSelected ? "table-head--show" : "table-head--hide"
+      this.state.checboxesSelected ? 'table-head--show' : 'table-head--hide'
     }`;
     return classes;
   }
@@ -154,7 +127,7 @@ class Instructions extends React.Component {
       return `${subIngredient.length} sub-ingredient`;
     }
 
-    return "";
+    return '';
   }
 
   handleTabChange(event, value) {
@@ -187,7 +160,7 @@ class Instructions extends React.Component {
                   className="btn btn-primary"
                   raised
                   color="primary"
-                  style={{ float: "right" }}
+                  style={{ float: 'right' }}
                 >
                   Add instruction
                 </Button>
@@ -195,7 +168,7 @@ class Instructions extends React.Component {
             </Grid>
           </Grid>
 
-          <div style={{ marginTop: "25px" }}>
+          <div style={{ marginTop: '25px' }}>
             <AppBar
               position="static"
               className="appbar--no-background appbar--no-shadow"
@@ -206,31 +179,31 @@ class Instructions extends React.Component {
                 onChange={this.handleTabChange.bind(this)}
               >
                 <Tab label="All" />
-     
+
               </Tabs>
             </AppBar>
           </div>
 
           <div
             style={{
-              width: "100%",
-              background: "#FFF",
-              borderTopRightRadius: "2px",
-              borderTopLeftRadius: "2px",
-              marginTop: "3em",
-              padding: "16px 25px 1em",
+              width: '100%',
+              background: '#FFF',
+              borderTopRightRadius: '2px',
+              borderTopLeftRadius: '2px',
+              marginTop: '3em',
+              padding: '16px 25px 1em',
               boxShadow:
-                "0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)",
-              position: "relative"
+                '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
+              position: 'relative',
             }}
           >
             <SearchIcon
               className="autoinput-icon autoinput-icon--search"
               style={{
                 display:
-                  this.state.searchSelector.length > 0 ? "none" : "block",
-                top: "33%",
-                right: "1.8em !important"
+                  this.state.searchSelector.length > 0 ? 'none' : 'block',
+                top: '33%',
+                right: '1.8em !important',
               }}
             />
 
@@ -238,19 +211,19 @@ class Instructions extends React.Component {
               className="autoinput-icon--clear"
               onClick={this.clearSearchBox.bind(this)}
               style={{
-                cursor: "pointer",
-                display: this.state.searchSelector.length > 0 ? "block" : "none"
+                cursor: 'pointer',
+                display: this.state.searchSelector.length > 0 ? 'block' : 'none',
               }}
             />
 
             <Input
               className="input-box"
-              style={{ width: "100%", position: "relative" }}
+              style={{ width: '100%', position: 'relative' }}
               placeholder="Search instructions"
               onKeyUp={this.searchByName.bind(this)}
               inputProps={{
-                id: "search-instruction-text",
-                "aria-label": "Description"
+                id: 'search-instruction-text',
+                'aria-label': 'Description',
               }}
             />
           </div>
@@ -264,16 +237,16 @@ class Instructions extends React.Component {
                 {
                   title: {
                     $regex: new RegExp(this.state.searchSelector),
-                    $options: "i"
-                  }
+                    $options: 'i',
+                  },
                 },
                 {
                   description: {
                     $regex: RegExp(this.state.searchSelector),
-                    $options: "i"
-                  }
-                }
-              ]
+                    $options: 'i',
+                  },
+                },
+              ],
             }}
           >
             <InstructionsTable
@@ -284,7 +257,7 @@ class Instructions extends React.Component {
             />
           </ListContainer>
 
-          {/* 
+          {/*
                 joins={[{
                     localProperty: "typeId",
                     collection: IngredientTypes,
@@ -308,11 +281,11 @@ Instructions.propTypes = {
   loading: PropTypes.bool.isRequired,
   instructions: PropTypes.arrayOf(PropTypes.object),
   match: PropTypes.object.isRequired,
-  history: PropTypes.object.isRequired
+  history: PropTypes.object.isRequired,
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe("instructions");
+  const subscription = Meteor.subscribe('instructions');
 
   return {
     loading: !subscription.ready(),

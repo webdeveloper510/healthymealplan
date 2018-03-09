@@ -74,8 +74,6 @@ class Login extends React.Component {
 
   showPasswordField() {
 
-    console.log($('#password').prop('type'));
-
     if ($('#password').prop('type') == 'password') {
       $('#password').prop('type', 'text');
       return true;

@@ -190,7 +190,6 @@ class Profile extends React.Component {
     if ($('#personalForm').valid()) {
       this.handleSubmit();
     } else {
-      console.log('not valid');
     }
   }
 
@@ -217,8 +216,6 @@ class Profile extends React.Component {
   }
 
   handlePasswordSubmit() {
-    console.log(this.currentPassword.value);
-    console.log(this.newPassword.value);
 
     Accounts.changePassword(
       this.currentPassword.value,
@@ -324,8 +321,8 @@ class Profile extends React.Component {
               placeholder="Phone"
               defaultValue={user.profile.phone}
               inputRef={phone => (this.phone = phone)}
-              /* inputComponent={TextMaskCustom} */
-              /* onChange={} */
+            /* inputComponent={TextMaskCustom} */
+            /* onChange={} */
             />
           </Grid>
 
@@ -335,8 +332,8 @@ class Profile extends React.Component {
         </Grid>
       </div>
     ) : (
-      <div />
-    );
+        <div />
+      );
   }
 
   renderProfileForm(loading, user) {
@@ -346,8 +343,8 @@ class Profile extends React.Component {
         oauth: this.renderOAuthUser,
       }[this.getUserType(user)](loading, user)
     ) : (
-      <div />
-    );
+        <div />
+      );
   }
 
   render() {

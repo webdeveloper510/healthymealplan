@@ -35,7 +35,6 @@ EditCategory.defaultProps = {
 EditCategory.propTypes = {
   category: PropTypes.object,
   history: PropTypes.object.isRequired,
-  // potentialSubIngredients: PropTypes.isRequired,
   ingredientTypes: PropTypes.array.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };
@@ -44,12 +43,6 @@ export default createContainer(({ match }) => {
   const categoryId = match.params._id;
   const subscription = Meteor.subscribe('categories.view', categoryId);
   const subscription2 = Meteor.subscribe('ingredientTypes');
-
-  // let categorySubReady = new ReactiveVar(false);
-
-  // if(subscription.ready()){
-  //   currentIngredientTypes = 
-  // }
 
   return {
     loading: !subscription.ready() && !subscription2.ready(),

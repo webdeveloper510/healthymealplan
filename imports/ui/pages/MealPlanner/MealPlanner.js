@@ -56,30 +56,9 @@ class MealPlanner extends React.Component {
   }
 
   searchByName() {
-    // const searchValue = new RegExp(, 'i');
-    // console.log(searchValue);
-
     this.setState({
       searchSelector: $('#search-type-text').val(),
     });
-
-    // const query = {
-    //   title: { $regex: searchValue },
-    // };
-
-    // if ($('#search-type-text').val() > 1) {
-    //   this.setState({
-    //     searchSelector: query,
-    //   });
-
-    //   return true;
-    // }
-
-    // this.setState({
-    //   searchSelector: {},
-    // });
-
-    // return false;
   }
 
   clearSearchBox() {
@@ -92,8 +71,6 @@ class MealPlanner extends React.Component {
 
   sortByOption(field) {
     // const field = event.currentTarget.getAttribute('data-sortby');
-    console.log(field);
-
     // This is a filler object that we are going to use set the state with.
     // Putting the sortBy field using index as objects can also be used as arrays.
     // the value of it would be 1 or -1 Asc or Desc

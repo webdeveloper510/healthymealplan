@@ -44,8 +44,6 @@ class Meals extends React.Component {
     };
   }
 
-  componentDidMount() { }
-
   handleRemove(mealId) {
     if (confirm('Are you sure? This is permanent!')) {
       Meteor.call('meals.remove', mealId, (error) => {
@@ -59,30 +57,9 @@ class Meals extends React.Component {
   }
 
   searchByName() {
-    // const searchValue = new RegExp(, 'i');
-    // console.log(searchValue);
-
     this.setState({
       searchSelector: $('#search-meal-text').val(),
     });
-
-    // const query = {
-    //   title: { $regex: searchValue },
-    // };
-
-    // if ($('#search-type-text').val() > 1) {
-    //   this.setState({
-    //     searchSelector: query,
-    //   });
-
-    //   return true;
-    // }
-
-    // this.setState({
-    //   searchSelector: {},
-    // });
-
-    // return false;
   }
 
   clearSearchBox() {
@@ -95,8 +72,6 @@ class Meals extends React.Component {
 
   sortByOption(field) {
     // const field = event.currentTarget.getAttribute('data-sortby');
-    console.log(field);
-
     // This is a filler object that we are going to use set the state with.
     // Putting the sortBy field using index as objects can also be used as arrays.
     // the value of it would be 1 or -1 Asc or Desc
@@ -143,8 +118,6 @@ class Meals extends React.Component {
 
   render() {
     const { loading, history } = this.props;
-    console.log('meals table');
-
 
     return (
       <div>
@@ -171,14 +144,16 @@ class Meals extends React.Component {
             </AppBar>
           </div>
 
-          <div style={{ width: '100%',
+          <div style={{
+            width: '100%',
             background: '#FFF',
             borderTopRightRadius: '2px',
             borderTopLeftRadius: '2px',
             marginTop: '3em',
             padding: '16px 25px 1em',
             boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
-            position: 'relative' }}
+            position: 'relative'
+          }}
           >
 
             <SearchIcon
@@ -189,8 +164,10 @@ class Meals extends React.Component {
             <ClearIcon
               className="autoinput-icon--clear"
               onClick={this.clearSearchBox.bind(this)}
-              style={{ cursor: 'pointer',
-                display: (this.state.searchSelector.length > 0) ? 'block' : 'none' }}
+              style={{
+                cursor: 'pointer',
+                display: (this.state.searchSelector.length > 0) ? 'block' : 'none'
+              }}
             />
 
             <Input
@@ -209,8 +186,10 @@ class Meals extends React.Component {
             collection={MealsCollection}
             publication="Meals"
             options={this.state.options}
-            selector={typeof (this.state.searchByKey) === 'object' ? this.state.searchByKey : { $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-              { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
+            selector={typeof (this.state.searchByKey) === 'object' ? this.state.searchByKey : {
+              $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+              { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }]
+            }}
           >
             <MealsTableNew
               popTheSnackbar={this.props.popTheSnackbar}

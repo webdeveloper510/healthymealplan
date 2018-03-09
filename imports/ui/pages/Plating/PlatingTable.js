@@ -159,9 +159,6 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
     doc.text(doc.splitTextToSize(restrictionsLine, 3.25), 0.25, 2.2);
   }
 
-  // console.log(currentPlate.plate.nutritional);
-  // console.log(currentPlate.plate.nutritional[mealPortion]);
-
   if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
     // calories
     doc.setFontStyle('normal');
@@ -193,9 +190,7 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
 }
 
 
-
 function renderSummary(doc, currentPlate, dataCurrentLifestyle, lifestyleTitle, mealTitle, currentSelectorDate, count) {
-
   doc.addPage();
 
   // VITTLE LOGO
@@ -222,7 +217,7 @@ function renderSummary(doc, currentPlate, dataCurrentLifestyle, lifestyleTitle, 
 
   doc.setFontStyle('normal');
   doc.setFontSize(14);
-  doc.text(lifestyleTitle + " " + mealTitle, 0.25, 1);
+  doc.text(`${lifestyleTitle} ${mealTitle}`, 0.25, 1);
 
   // dish title
   doc.setFontStyle('bold');
@@ -249,24 +244,23 @@ function renderSummary(doc, currentPlate, dataCurrentLifestyle, lifestyleTitle, 
 
 
   // Regular
-  const regularText = dataCurrentLifestyle[mealTitle.toLowerCase()].regular + "";
+  const regularText = `${dataCurrentLifestyle[mealTitle.toLowerCase()].regular}`;
   doc.setFontStyle('bold');
   doc.setFontSize(11);
   const regular = [regularText, 'Regular'];
   doc.text(regular, 0.75, 2.6);
 
   // Athletic
-  const athleticText = dataCurrentLifestyle[mealTitle.toLowerCase()].athletic + "";
+  const athleticText = `${dataCurrentLifestyle[mealTitle.toLowerCase()].athletic}`;
   doc.setFontSize(11);
   const athletic = [athleticText, 'Athletic'];
   doc.text(athletic, 1.6, 2.6);
 
   // Bodybuilder
-  const bodybuilderText = dataCurrentLifestyle[mealTitle.toLowerCase()].bodybuilder + "";
+  const bodybuilderText = `${dataCurrentLifestyle[mealTitle.toLowerCase()].bodybuilder}`;
   doc.setFontSize(11);
   const bodybuilder = [bodybuilderText, 'Bodybuilder'];
   doc.text(bodybuilder, 2.4, 2.6);
-
 }
 
 class PlatingTable extends React.Component {
@@ -312,8 +306,6 @@ class PlatingTable extends React.Component {
       }, () => {
         this.setState({ aggregateDataLoading: false });
       });
-
-      console.log(res);
     });
   }
 
@@ -337,8 +329,6 @@ class PlatingTable extends React.Component {
     if (!this.state.aggregateDataLoading && this.state.lifestyleSelected && this.state.mealSelected) {
       const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
       const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
-
-      // console.log(currentPlate);
 
       if (lifestylePlates.length === 0 || !currentPlate) {
         return;
@@ -369,7 +359,6 @@ class PlatingTable extends React.Component {
   }
 
   printLabels() {
-
     if (this.state.aggregateDataLoading) {
       return;
     }
@@ -409,13 +398,8 @@ class PlatingTable extends React.Component {
           return totalRestrictionsB - totalRestrictionsA;
         });
 
-    // console.log(userDataNew);
-
-
     const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
     const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
-
-    // console.log(currentPlate);
 
     if (lifestylePlates.length === 0 || !currentPlate) {
       this.props.popTheSnackbar({
@@ -500,8 +484,6 @@ class PlatingTable extends React.Component {
           }
         }
       } // Lunch
-
-      // console.log(userData);
     }); // map
 
     renderSummary(doc, currentPlate, dataCurrentLifestyle, this.state.lifestyleTitle, this.state.mealTitle, this.props.currentSelectorDate, this.usersWithoutRestrictions());
@@ -523,8 +505,7 @@ class PlatingTable extends React.Component {
 
 
   usersWithoutRestrictions() {
-
-    if (this.state.aggregateDataLoading || this.state.lifestyleSelected == "" || this.state.mealSelected == "") {
+    if (this.state.aggregateDataLoading || this.state.lifestyleSelected == '' || this.state.mealSelected == '') {
       return '';
     }
 
@@ -539,32 +520,27 @@ class PlatingTable extends React.Component {
     };
 
     this.state.aggregateData.userData.filter((user) => {
-
       if (user.lifestyleId == this.state.lifestyleSelected && (user[this.state.mealTitle.toLowerCase()] > 0 ||
         user[`athletic${this.state.mealTitle}`] > 0 ||
         user[`bodybuilder${this.state.mealTitle}`] > 0)) {
-
         if ((user.restrictions && user.restrictions.length > 0) ||
           (user.specificRestrictions && user.specificRestrictions.length > 0) ||
           (user.preferences && user.preferences.length > 0)) {
-
           count.regularRestrictionsCount += user[this.state.mealTitle.toLowerCase()];
           count.athleticRestrictionsCount += user[`athletic${this.state.mealTitle}`];
           count.bodybuilderRestrictionsCount += user[`bodybuilder${this.state.mealTitle}`];
 
           return false;
-        } else {
-
-          count.regularWithoutRestrictionsCount += user[this.state.mealTitle.toLowerCase()];
-          count.athleticWithoutRestrictionsCount += user[`athletic${this.state.mealTitle}`];
-          count.bodybuilderWithoutRestrictionsCount += user[`bodybuilder${this.state.mealTitle}`];
-
-          return true;
         }
+
+        count.regularWithoutRestrictionsCount += user[this.state.mealTitle.toLowerCase()];
+        count.athleticWithoutRestrictionsCount += user[`athletic${this.state.mealTitle}`];
+        count.bodybuilderWithoutRestrictionsCount += user[`bodybuilder${this.state.mealTitle}`];
+
+        return true;
       }
 
       return false;
-
     });
 
     return count;
@@ -576,7 +552,7 @@ class PlatingTable extends React.Component {
     const rows = [];
     const plateTitle = this.getCurrentSelectionPlate('title');
     const plateSubtitle = this.getCurrentSelectionPlate('subtitle');
-    const plateIngredients = this.getCurrentSelectionPlate('ingredients')
+    const plateIngredients = this.getCurrentSelectionPlate('ingredients');
 
     const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
     const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
@@ -626,7 +602,7 @@ class PlatingTable extends React.Component {
           const mealType = this.state.mealTitle.toLowerCase();
           const mealTypeNormal = this.state.mealTitle;
 
-          let mealText = "";
+          let mealText = '';
 
           if (n[mealType] > 0) {
             mealText += `Regular x${n[`${mealType}`]}`;
@@ -637,7 +613,7 @@ class PlatingTable extends React.Component {
           }
 
           if (n[`bodybuilder${mealTypeNormal}`] > 0) {
-            mealText += `${mealText.length > 0 ? ' ' : ''}Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}`
+            mealText += `${mealText.length > 0 ? ' ' : ''}Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}`;
           }
 
 
@@ -652,7 +628,6 @@ class PlatingTable extends React.Component {
             n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title).join(', ') : '',
             n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title).join(', ') : '',
           ]);
-
         });
 
 
@@ -680,7 +655,7 @@ class PlatingTable extends React.Component {
     doc.setFontSize(9);
     doc.text(`Without restrictions: Regular ${this.usersWithoutRestrictions().regularWithoutRestrictionsCount} Athletic ${this.usersWithoutRestrictions().athleticWithoutRestrictionsCount} Bodybuilder ${this.usersWithoutRestrictions().bodybuilderWithoutRestrictionsCount}`, 40, 130);
 
-    const totalPagesExp = "{total_pages_count_string}";
+    const totalPagesExp = '{total_pages_count_string}';
 
     doc.autoTable(columns, rows, {
       startY: 140,
@@ -692,14 +667,14 @@ class PlatingTable extends React.Component {
         fontSize: 8,
         // fontSize: 15
       },
-      afterPageContent: data => {
-        let footerStr = "Page " + doc.internal.getNumberOfPages();
+      afterPageContent: (data) => {
+        let footerStr = `Page ${doc.internal.getNumberOfPages()}`;
         if (typeof doc.putTotalPages === 'function') {
-          footerStr = footerStr + " of " + totalPagesExp;
+          footerStr = `${footerStr} of ${totalPagesExp}`;
         }
         doc.setFontSize(10);
         doc.text(footerStr, data.settings.margin.right, doc.internal.pageSize.height - 10);
-      }
+      },
     });
 
     if (typeof doc.putTotalPages === 'function') {
@@ -708,7 +683,6 @@ class PlatingTable extends React.Component {
 
 
     doc.save(`Plating_summary_${this.state.lifestyleTitle}_${this.state.mealTitle}_${moment(this.state.currentSelectorDate).format('dddd, MMMM D')}.pdf`);
-
   }
 
   render() {
@@ -880,7 +854,7 @@ class PlatingTable extends React.Component {
               </IconButton>
             </Toolbar>
 
-            <div style={{ paddingLeft: "24px", paddingRight: "24px", paddingBottom: "20px" }}>
+            <div style={{ paddingLeft: '24px', paddingRight: '24px', paddingBottom: '20px' }}>
               {!this.state.aggregateDataLoading && this.state.lifestyleSelected != '' ?
                 (<Typography type="title" color="inherit">{this.getCurrentSelectionPlate('title')}</Typography>) : ''}
               {!this.state.aggregateDataLoading && this.state.lifestyleSelected != '' ?
@@ -890,15 +864,15 @@ class PlatingTable extends React.Component {
 
 
               <Typography type="body2" color="inherit">With restrictions:
-                Regular {this.usersWithoutRestrictions().regularRestrictionsCount} {" "}
-                Athletic {this.usersWithoutRestrictions().athleticRestrictionsCount} {" "}
+                Regular {this.usersWithoutRestrictions().regularRestrictionsCount} {' '}
+                Athletic {this.usersWithoutRestrictions().athleticRestrictionsCount} {' '}
                 Bodybuilder {this.usersWithoutRestrictions().bodybuilderRestrictionsCount}
 
               </Typography>
 
               <Typography type="body2" color="inherit">Without restrictions:
-                Regular {this.usersWithoutRestrictions().regularWithoutRestrictionsCount} {" "}
-                Athletic {this.usersWithoutRestrictions().athleticWithoutRestrictionsCount} {" "}
+                Regular {this.usersWithoutRestrictions().regularWithoutRestrictionsCount} {' '}
+                Athletic {this.usersWithoutRestrictions().athleticWithoutRestrictionsCount} {' '}
                 Bodybuilder {this.usersWithoutRestrictions().bodybuilderWithoutRestrictionsCount}
 
               </Typography>
@@ -958,8 +932,6 @@ class PlatingTable extends React.Component {
                       }).map((n) => {
                         const mealType = this.state.mealTitle.toLowerCase();
                         const mealTypeNormal = this.state.mealTitle;
-
-                        // console.log(n);
 
                         return (
                           <TableRow key={Random.id()}>

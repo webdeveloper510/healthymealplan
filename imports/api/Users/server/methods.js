@@ -109,10 +109,10 @@ Meteor.methods({
         title: data.postalCode.substr(0, 3).toUpperCase(),
       });
 
-      console.log(postalCodeExists);
+      // console.log(postalCodeExists);
 
       if (!postalCodeExists) {
-        console.log(postalCodeExists);
+        // console.log(postalCodeExists);
         throw new Meteor.Error(400, 'Delivery not available in that area.');
       }
 
@@ -126,11 +126,11 @@ Meteor.methods({
     Meteor.users.update({
       _id: data.id,
     }, {
-        $set: toUpdate,
-      });
+      $set: toUpdate,
+    });
 
 
-    console.log(data);
+    // console.log(data);
 
   },
 
@@ -244,7 +244,7 @@ Meteor.methods({
       primaryAccount: data.id,
     }).fetch();
 
-    console.log(secondaryAccounts);
+    // console.log(secondaryAccounts);
 
     const secondaryAccountIds = [];
 
@@ -268,7 +268,7 @@ Meteor.methods({
         secondaryAccounts: secondaryAccountIds,
         associatedProfiles: secondaryAccountIds.length,
         coolerBag: data.coolerBag,
-        notifications: data.notifications
+        notifications: data.notifications,
       },
     });
 
@@ -285,11 +285,11 @@ Meteor.methods({
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-        $set: {
-          completeSchedule: data.completeSchedule,
-          delivery: newDeliveryType,
-        },
-      });
+      $set: {
+        completeSchedule: data.completeSchedule,
+        delivery: newDeliveryType,
+      },
+    });
 
   },
 
@@ -310,7 +310,7 @@ Meteor.methods({
       title: data.postalCode.substr(0, 3).toUpperCase(),
     }).fetch();
 
-    console.log(postalCodeExists);
+    // console.log(postalCodeExists);
 
     let userId;
 
@@ -344,7 +344,7 @@ Meteor.methods({
     );
 
     if (postalCodeExists.length == 0) {
-      console.log(postalCodeExists);
+      // console.log(postalCodeExists);
       throw new Meteor.Error(400, 'Delivery not available in that area.');
     }
 
@@ -381,7 +381,7 @@ Meteor.methods({
   'customer.step5.noCreditCard': function noCreditCard(customerInfo) {
     check(customerInfo, Object);
 
-    console.log(customerInfo);
+    // console.log(customerInfo);
 
     const subscriptionIdToSave = Random.id();
 
@@ -403,7 +403,7 @@ Meteor.methods({
           subscriptionStartDateRaw: customerInfo.activeImmediate ? new Date() : customerInfo.subscriptionStartDateRaw,
           associatedProfiles: customerInfo.secondaryProfileCount,
           coolerBag: customerInfo.coolerBag,
-          notifications: customerInfo.notifications
+          notifications: customerInfo.notifications,
         },
       },
     );
@@ -651,7 +651,7 @@ Meteor.methods({
         subscriptionItemsReal.push(currentProfileLineItems);
       });
     }
-    console.log(subscriptionItemsReal);
+    // console.log(subscriptionItemsReal);
 
     const newDeliveryType = customerInfo.deliveryType.map((e, i) => {
 
@@ -665,7 +665,7 @@ Meteor.methods({
     });
 
 
-    console.log(newDeliveryType);
+    // console.log(newDeliveryType);
 
 
     const subscriptionId = Subscriptions.insert({
@@ -770,7 +770,7 @@ Meteor.methods({
           subscriptionStartDateRaw: customerInfo.subscriptionStartDateRaw,
           associatedProfiles: customerInfo.secondaryProfileCount,
           coolerBag: customerInfo.coolerBag,
-          notifications: customerInfo.notifications
+          notifications: customerInfo.notifications,
         },
       },
     );

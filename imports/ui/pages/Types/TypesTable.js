@@ -40,27 +40,7 @@ class TypesTable extends React.Component {
       deleteDialogOpen: false
     };
   }
-
-  // renderSubIngredientsNumber(subIngredient) {
-  //   if (subIngredient && subIngredient.length > 1) {
-  //     return `${subIngredient.length} sub-ingredients`;
-  //   } else if (subIngredient && subIngredient.length == 1) {
-  //     return `${subIngredient.length} sub-ingredient`;
-  //   }
-
-  //   return '';
-  // }
-
-  renderType(type) {
-    console.log(type);
-  }
-
   rowSelected(e, event, checked) {
-    // console.log(e);
-    console.log(checked);
-    // console.log($(event.target).prop('checked'));
-    console.log(event.target.parentNode.parentNode);
-
     const selectedRowId = event.target.parentNode.parentNode.getAttribute("id");
     $(`.${selectedRowId}`).toggleClass("row-selected");
     let currentlySelectedCheckboxes;
@@ -88,7 +68,6 @@ class TypesTable extends React.Component {
 
   selectAllRows(event) {
     let allCheckboxIds = [];
-    console.log(event.target);
 
     if ($(event.target).prop("checked")) {
       $(".row-checkbox").each((index, el) => {
@@ -126,7 +105,6 @@ class TypesTable extends React.Component {
   }
 
   deleteSelectedRows() {
-    console.log("Delete selected rows");
 
     localStorage.setItem(
       "ingredientTypeTableDeleted",
@@ -135,10 +113,7 @@ class TypesTable extends React.Component {
 
     const ingredientIds = this.state.selectedCheckboxes;
 
-    console.log(ingredientIds);
-
     Meteor.call("ingredientTypes.batchRemove", ingredientIds, error => {
-      console.log("inside method");
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason
@@ -157,8 +132,6 @@ class TypesTable extends React.Component {
       selectedCheckboxesNumber: 0,
       deleteDialogOpen: false
     });
-
-    // $('.row-selected').toggleClass('row-selected');
   }
 
   renderNoResults(count) {
@@ -174,7 +147,6 @@ class TypesTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-    // console.log(this.state.selectedCheckboxes);
 
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
@@ -220,8 +192,8 @@ class TypesTable extends React.Component {
               </Button>
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
 
           <Table style={{ tableLayout: "fixed" }}>
             {this.props.count > 0 ? (
@@ -258,8 +230,8 @@ class TypesTable extends React.Component {
                 </TableRow>
               </TableHead>
             ) : (
-              ""
-            )}
+                ""
+              )}
             <TableBody>
               {this.props.results.map((e, i) => {
                 const isSelected = this.isCheckboxSelected(e._id);
@@ -360,8 +332,8 @@ class TypesTable extends React.Component {
                   {this.props.hasMore ? (
                     <Button onClick={this.props.loadMore}>Load More</Button>
                   ) : (
-                    ""
-                  )}
+                      ""
+                    )}
                 </TableCell>
               </TableRow>
             </TableFooter>

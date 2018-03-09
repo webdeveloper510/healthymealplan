@@ -47,32 +47,12 @@ class Team extends React.Component {
     this.state = {
 
     };
-
-    // console.log(this.props.ingredient);
   }
 
   componentDidMount() {
     const component = this;
-    // validate(component.form, {
-    //   rules: {
-    //     title: {
-    //       required: true,
-    //     },
 
-    //   },
-    //   messages: {
-    //     title: {
-    //       required: 'Need a title in here, Seuss.',
-    //     },
-
-    //   },
-    //   submitHandler() { component.handleSubmit(); },
-    // });
   }
-
-
-  // Use your imagination to render suggestions.
-
 
   render() {
     console.log(this.props.users);

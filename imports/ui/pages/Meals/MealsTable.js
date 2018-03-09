@@ -39,11 +39,6 @@ class MealsTable extends React.Component {
   }
 
   rowSelected(e, event, checked) {
-    // console.log(e);
-    console.log(checked);
-    // console.log($(event.target).prop('checked'));
-    console.log(event.target.parentNode.parentNode);
-
 
     const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
     $(`.${selectedRowId}`).toggleClass('row-selected');
@@ -59,7 +54,6 @@ class MealsTable extends React.Component {
       clonedSelectedCheckboxes.splice(clonedSelectedCheckboxes.indexOf(e._id), 1);
     }
 
-
     this.setState({
       selectedCheckboxesNumber: currentlySelectedCheckboxes,
       selectedCheckboxes: clonedSelectedCheckboxes,
@@ -68,7 +62,6 @@ class MealsTable extends React.Component {
 
   selectAllRows(event) {
     let allCheckboxIds = [];
-    console.log(event.target);
 
     if ($(event.target).prop('checked')) {
       $('.row-checkbox').each((index, el) => {
@@ -104,10 +97,7 @@ class MealsTable extends React.Component {
 
     const mealIds = this.state.selectedCheckboxes;
 
-    console.log(mealIds);
-
     Meteor.call('meals.batchRemove', mealIds, (error) => {
-      console.log('inside method');
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
@@ -138,8 +128,6 @@ class MealsTable extends React.Component {
 
 
   isCheckboxSelected(id) {
-    // console.log(this.state.selectedCheckboxes);
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -158,9 +146,6 @@ class MealsTable extends React.Component {
   }
 
   render() {
-    console.log('meals table');
-    console.log(this.props.results);
-
     return (
       <div>
         <Paper elevation={2} className="table-container">
@@ -196,7 +181,7 @@ class MealsTable extends React.Component {
                       className="body2 table-head-col-hover"
                       type="body2"
                     >
-                  Meal</Typography>
+                      Meal</Typography>
                   </TableCell>
 
                   <TableCell padding="none" style={{ width: '44%' }} onClick={() => this.props.sortByOptions('title')}>
@@ -264,17 +249,17 @@ class MealsTable extends React.Component {
         </Paper>
         <Dialog open={this.state.deleteDialogOpen} onClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-    Delete {this.state.selectedCheckboxesNumber} meal{this.state.selectedCheckboxes.length > 1 ? ('s') : ''}?
+            Delete {this.state.selectedCheckboxesNumber} meal{this.state.selectedCheckboxes.length > 1 ? ('s') : ''}?
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} meal{this.state.selectedCheckboxes.length > 1 ? ('s') : ''}?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
-      Cancel
+              Cancel
             </Button>
             <Button stroked className="button--bordered button--bordered--accent" onClick={this.deleteSelectedRows.bind(this)} color="accent">
-      Delete
+              Delete
             </Button>
           </DialogActions>
         </Dialog>

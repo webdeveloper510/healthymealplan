@@ -36,15 +36,7 @@ class RestrictionsTable extends React.Component {
     };
   }
 
-  renderType(type) {
-    console.log(type);
-  }
-
   rowSelected(e, event, checked) {
-    // console.log(e);
-    console.log(checked);
-    // console.log($(event.target).prop('checked'));
-    // console.log(event.target.parentNode.parentNode);
 
     const selectedRowId = event.target.parentNode.parentNode.getAttribute("id");
     $(`.${selectedRowId}`).toggleClass("row-selected");
@@ -73,8 +65,6 @@ class RestrictionsTable extends React.Component {
 
   selectAllRows(event) {
     let allCheckboxIds = [];
-    console.log(event.target);
-
     if ($(event.target).prop("checked")) {
       $(".row-checkbox").each((index, el) => {
         // make the row selected
@@ -111,8 +101,6 @@ class RestrictionsTable extends React.Component {
   }
 
   deleteSelectedRows() {
-    console.log("Delete selected rows");
-
     localStorage.setItem(
       "restrictionsTableDeleted",
       this.state.selectedCheckboxesNumber
@@ -120,10 +108,7 @@ class RestrictionsTable extends React.Component {
 
     const categoryIds = this.state.selectedCheckboxes;
 
-    console.log(categoryIds);
-
     Meteor.call("restrictions.batchRemove", categoryIds, error => {
-      console.log("inside method");
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason
@@ -143,8 +128,6 @@ class RestrictionsTable extends React.Component {
       deleteDialogOpen: false
     });
 
-    // this.deleteDialogHandleRe/questClose.bind(this)
-    // $('.row-selected').toggleClass('row-selected');
   }
 
   renderNoResults(count) {
@@ -163,8 +146,6 @@ class RestrictionsTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-    // console.log(this.state.selectedCheckboxes);
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -186,7 +167,7 @@ class RestrictionsTable extends React.Component {
     if (e.discount) {
       const toReturn = `${e.discountOrExtraType == "Fixed amount" ? "$" : ""}${
         e.discount
-      }${e.discountOrExtraType == "Percentage" ? "%" : ""}`;
+        }${e.discountOrExtraType == "Percentage" ? "%" : ""}`;
 
       return (
         <div>
@@ -208,7 +189,7 @@ class RestrictionsTable extends React.Component {
     if (e.extra) {
       const toReturn = `${e.discountOrExtraType == "Fixed amount" ? "$" : ""}${
         e.extra
-      }${e.discountOrExtraType == "Percentage" ? "%" : ""}`;
+        }${e.discountOrExtraType == "Percentage" ? "%" : ""}`;
 
       return (
         <div>
@@ -263,8 +244,8 @@ class RestrictionsTable extends React.Component {
               </Button>
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
           <Table className="table-container" style={{ tableLayout: "fixed" }}>
             {this.props.count > 0 ? (
               <TableHead>
@@ -311,13 +292,11 @@ class RestrictionsTable extends React.Component {
                 </TableRow>
               </TableHead>
             ) : (
-              ""
-            )}
+                ""
+              )}
             <TableBody>
               {this.props.results.map((e, i) => {
                 const isSelected = this.isCheckboxSelected(e._id);
-                console.log(e);
-
                 return (
                   <TableRow hover className={e._id} key={e._id}>
                     <TableCell
@@ -434,8 +413,8 @@ class RestrictionsTable extends React.Component {
                     <Button onClick={this.props.loadMore}>Load More</Button>
                   </TableCell>
                 ) : (
-                  ""
-                )}
+                    ""
+                  )}
               </TableRow>
             </TableFooter>
           </Table>

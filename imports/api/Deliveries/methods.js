@@ -55,7 +55,6 @@ Meteor.methods({
     check(statusChange, String);
 
     // console.log(deliveryId);
-    console.log(statusChange);
 
     const twilioClient = new twilio(Meteor.settings.public.twilioAccountSid, Meteor.settings.private.twilioAuthToken);
 
@@ -86,8 +85,6 @@ Meteor.methods({
         },
         { upsert: true },
       );
-
-      console.log(updated);
 
       // const delivery = Deliveries.findOne({ _id: delivery._id });
       const deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
@@ -161,9 +158,6 @@ Meteor.methods({
   'deliveries.batchUpdate': function deliveriesBatchUpdate(deliveries, statusChange) {
     check(deliveries, Array);
     check(statusChange, String);
-
-    console.log(deliveries);
-    console.log(statusChange);
 
     console.log('Server: deliveries.batchUpdate');
 
@@ -312,8 +306,6 @@ Meteor.methods({
         },
       },
     ]);
-
-    // console.log(aggregation);
 
     const result = deliveriesDataMapper(aggregation, currentDate);
 

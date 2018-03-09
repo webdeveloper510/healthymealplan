@@ -41,27 +41,8 @@ class CategoriesTable extends React.Component {
     };
   }
 
-  // renderSubIngredientsNumber(subIngredient) {
-  //   if (subIngredient && subIngredient.length > 1) {
-  //     return `${subIngredient.length} sub-ingredients`;
-  //   } else if (subIngredient && subIngredient.length == 1) {
-  //     return `${subIngredient.length} sub-ingredient`;
-  //   }
-
-  //   return '';
-  // }
-
-  renderType(type) {
-    console.log(type);
-  }
 
   rowSelected(e, event, checked) {
-    // console.log(e);
-    console.log(checked);
-    // console.log($(event.target).prop('checked'));
-    // console.log(event.target.parentNode.parentNode);
-
-
     const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
     $(`.${selectedRowId}`).toggleClass('row-selected');
     let currentlySelectedCheckboxes;
@@ -76,7 +57,6 @@ class CategoriesTable extends React.Component {
       clonedSelectedCheckboxes.splice(clonedSelectedCheckboxes.indexOf(e._id), 1);
     }
 
-
     this.setState({
       selectedCheckboxesNumber: currentlySelectedCheckboxes,
       selectedCheckboxes: clonedSelectedCheckboxes,
@@ -85,7 +65,6 @@ class CategoriesTable extends React.Component {
 
   selectAllRows(event) {
     let allCheckboxIds = [];
-    console.log(event.target);
 
     if ($(event.target).prop('checked')) {
       $('.row-checkbox').each((index, el) => {
@@ -117,16 +96,11 @@ class CategoriesTable extends React.Component {
   }
 
   deleteSelectedRows() {
-    console.log('Delete selected rows');
-
     localStorage.setItem('categoriesTableDeleted', this.state.selectedCheckboxesNumber);
 
     const categoryIds = this.state.selectedCheckboxes;
 
-    console.log(categoryIds);
-
     Meteor.call('categories.batchRemove', categoryIds, (error) => {
-      console.log('inside method');
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
@@ -143,9 +117,6 @@ class CategoriesTable extends React.Component {
       selectedCheckboxesNumber: 0,
       deleteDialogOpen: false,
     });
-
-    // this.deleteDialogHandleRe/questClose.bind(this)
-    // $('.row-selected').toggleClass('row-selected');
   }
 
 
@@ -158,8 +129,6 @@ class CategoriesTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-    // console.log(this.state.selectedCheckboxes);
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -176,11 +145,6 @@ class CategoriesTable extends React.Component {
   deleteDialogHandleRequestClose() {
     this.setState({ deleteDialogOpen: false });
   }
-
-  // renderDeleteDialog() {
-  //   return (
-  //   );
-  // }
 
   render() {
     return (
@@ -288,17 +252,17 @@ class CategoriesTable extends React.Component {
         </Paper>
         <Dialog open={this.state.deleteDialogOpen} onClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-      Delete {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?
+            Delete {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} categories?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
-        Cancel
+              Cancel
             </Button>
             <Button stroked className="button--bordered button--bordered--accent" onClick={this.deleteSelectedRows.bind(this)} color="accent">
-        Delete
+              Delete
             </Button>
           </DialogActions>
         </Dialog>

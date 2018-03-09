@@ -36,16 +36,7 @@ class RoutesTable extends React.Component {
     };
   }
 
-  renderType(type) {
-    console.log(type);
-  }
-
   rowSelected(e, event, checked) {
-    // console.log(e);
-    console.log(checked);
-    // console.log($(event.target).prop('checked'));
-    // console.log(event.target.parentNode.parentNode);
-
     const selectedRowId = event.target.parentNode.parentNode.getAttribute("id");
     $(`.${selectedRowId}`).toggleClass("row-selected");
     let currentlySelectedCheckboxes;
@@ -73,7 +64,6 @@ class RoutesTable extends React.Component {
 
   selectAllRows(event) {
     let allCheckboxIds = [];
-    console.log(event.target);
 
     if ($(event.target).prop("checked")) {
       $(".row-checkbox").each((index, el) => {
@@ -111,7 +101,6 @@ class RoutesTable extends React.Component {
   }
 
   deleteSelectedRows() {
-    console.log("Delete selected rows");
 
     localStorage.setItem(
       "RoutesTableDeleted",
@@ -121,7 +110,6 @@ class RoutesTable extends React.Component {
     const routeIds = this.state.selectedCheckboxes;
 
     Meteor.call("routes.batchRemove", routeIds, error => {
-      console.log("inside method");
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason
@@ -140,9 +128,6 @@ class RoutesTable extends React.Component {
       selectedCheckboxesNumber: 0,
       deleteDialogOpen: false
     });
-
-    // this.deleteDialogHandleRe/questClose.bind(this)
-    // $('.row-selected').toggleClass('row-selected');
   }
 
   renderNoResults(count) {
@@ -161,8 +146,6 @@ class RoutesTable extends React.Component {
   }
 
   isCheckboxSelected(id) {
-    // console.log(this.state.selectedCheckboxes);
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -184,7 +167,7 @@ class RoutesTable extends React.Component {
     if (e.extraSurcharge) {
       return `${e.extraSurchargeType == "Fixed amount" ? "$" : ""}${
         e.extraSurcharge
-      }${e.extraSurchargeType == "Percentage" ? "%" : ""}`;
+        }${e.extraSurchargeType == "Percentage" ? "%" : ""}`;
     }
     return (
       <Typography
@@ -222,8 +205,8 @@ class RoutesTable extends React.Component {
               </Button>
             </div>
           ) : (
-            ""
-          )}
+              ""
+            )}
           <Table className="table-container" style={{ tableLayout: "fixed" }}>
             {this.props.count > 0 ? (
               <TableHead>
@@ -243,8 +226,8 @@ class RoutesTable extends React.Component {
                 </TableRow>
               </TableHead>
             ) : (
-              ""
-            )}
+                ""
+              )}
             <TableBody>
               {this.props.results.map((e, i) => {
                 const isSelected = this.isCheckboxSelected(e._id);
@@ -316,8 +299,8 @@ class RoutesTable extends React.Component {
                     <Button onClick={this.props.loadMore}>Load More</Button>
                   </TableCell>
                 ) : (
-                  ""
-                )}
+                    ""
+                  )}
               </TableRow>
             </TableFooter>
           </Table>

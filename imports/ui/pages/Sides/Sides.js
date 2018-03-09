@@ -53,12 +53,7 @@ class Sides extends React.Component {
     };
   }
 
-  componentDidMount() {
-  }
-
   searchByName() {
-    // const searchValue = new RegExp(, 'i');
-    // console.log(searchValue);
 
     this.setState({
       searchSelector: $('#search-type-text').val(),
@@ -75,7 +70,6 @@ class Sides extends React.Component {
 
   sortByOption(field) {
     // const field = event.currentTarget.getAttribute('data-sortby');
-    console.log(field);
 
     // This is a filler object that we are going to use set the state with.
     // Putting the sortBy field using index as objects can also be used as arrays.
@@ -99,9 +93,6 @@ class Sides extends React.Component {
     this.setState({
       options: { sort: newOptions },
     });
-
-    // console.log('Data sorting changed');
-    // console.log(this.state.options);
   }
 
   rowSelected(e) {
@@ -164,14 +155,16 @@ class Sides extends React.Component {
               </AppBar>
             </div>
 
-            <div style={{ width: '100%',
+            <div style={{
+              width: '100%',
               background: '#FFF',
               borderTopRightRadius: '2px',
               borderTopLeftRadius: '2px',
               marginTop: '3em',
               padding: '16px 25px 1em',
               boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
-              position: 'relative' }}
+              position: 'relative'
+            }}
             >
 
               <SearchIcon
@@ -182,8 +175,10 @@ class Sides extends React.Component {
               <ClearIcon
                 className="autoinput-icon--clear"
                 onClick={this.clearSearchBox.bind(this)}
-                style={{ cursor: 'pointer',
-                  display: (this.state.searchSelector.length > 0) ? 'block' : 'none' }}
+                style={{
+                  cursor: 'pointer',
+                  display: (this.state.searchSelector.length > 0) ? 'block' : 'none'
+                }}
               />
 
               <Input
@@ -207,8 +202,10 @@ class Sides extends React.Component {
               }]}
 
               options={this.state.options}
-              selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-                { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
+              selector={{
+                $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+                { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }]
+              }}
 
             >
 
