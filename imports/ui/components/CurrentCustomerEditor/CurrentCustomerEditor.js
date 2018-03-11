@@ -8339,7 +8339,7 @@ class CurrentCustomerEditor extends React.Component {
 
           {(this.state.currentTab === 2 && this.props.customer && this.props.customer.secondary == undefined) && (
             <Step4CheckoutCurrent
-              
+              secondaryAccounts={this.props.secondaryAccounts}
               activeStep={this.state.currentTab}
               customer={this.props.customer}
               subscription={this.props.subscription}

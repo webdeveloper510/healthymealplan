@@ -276,7 +276,7 @@ class Step4CheckoutCurrent extends React.Component {
     console.log(metCriteria);
 
     if (this.props.customer.associatedProfiles > 0) {
-      this.props.customer.secondaryAccounts.forEach((el, index) => {
+      this.props.secondaryAccounts.forEach((el, index) => {
         let currentProfileQtys;
 
         currentProfileQtys = el.schedule.map((e, i) => {
