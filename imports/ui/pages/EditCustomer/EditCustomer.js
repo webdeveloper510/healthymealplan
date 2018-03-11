@@ -10,8 +10,9 @@ import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
 import Restrictions from '../../../api/Restrictions/Restrictions';
 import Ingredients from '../../../api/Ingredients/Ingredients';
+import PostalCodes from '../../../api/PostalCodes/PostalCodes';
 
-const EditCustomer = ({ customer, history, subscription, secondaryAccounts, popTheSnackbar, lifestyles, restrictions, potentialSubIngredients }) => (customer ? (
+const EditCustomer = ({ customer, history, subscription, secondaryAccounts, popTheSnackbar, postalCodes, lifestyles, restrictions, potentialSubIngredients }) => (customer ? (
   <div className="EditCurrentCustomer">
     <Grid container className="EditCategory SideContent SideContent--spacer-2x--horizontal">
       <CurrentCustomerEditor
@@ -19,6 +20,7 @@ const EditCustomer = ({ customer, history, subscription, secondaryAccounts, popT
         restrictions={restrictions}
         potentialSubIngredients={potentialSubIngredients}
         popTheSnackbar={popTheSnackbar}
+        postalCodes={postalCodes}
         secondaryAccounts={secondaryAccounts}
         subscription={subscription}
         customer={customer}
@@ -33,6 +35,7 @@ EditCustomer.defaultProps = {
 
 EditCustomer.propTypes = {
   customer: PropTypes.object,
+
   subscription: PropTypes.object,
   secondaryAccounts: PropTypes.arrayOf(Object).isRequired,
   history: PropTypes.object.isRequired,
@@ -57,6 +60,7 @@ export default createContainer(({ match }) => {
     lifestyles: Lifestyles.find().fetch(),
     restrictions: Restrictions.find().fetch(),
     potentialSubIngredients: Ingredients.find().fetch(),
+    postalCodes: PostalCodes.find().fetch(),
 
   };
 }, EditCustomer);

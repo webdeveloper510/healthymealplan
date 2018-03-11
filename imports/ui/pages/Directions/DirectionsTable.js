@@ -43,6 +43,49 @@ import Loading from '../../components/Loading/Loading';
 
 import './DirectionsTable.scss';
 
+function renderDeliveryLabelData(doc, delivery, formalType, multiple = false, multipleCurrent = 0, multipleTotal = 0) {
+  doc.addPage();
+
+  // doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+  doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
+
+  if (multiple) {
+    doc.setFontSize(10); // name
+
+    doc.text(`${multipleCurrent}/${multipleTotal}`, 3.5, 0.285);
+  }
+
+  doc.setFontSize(14.5); // name
+
+  const names = [];
+
+  delivery.meals.forEach((meal) => {
+    if (meal.total > 0) {
+      names.push(`${meal.name} (${meal.total}) `);
+    }
+  });
+
+  doc.text(names, 0.25, 1.15);
+
+  doc.setFontSize(48); // Route
+  doc.setFontStyle('bold'); // Route
+
+  const route = delivery.route.title;
+  const postalCode = delivery.customer.postalCode;
+
+
+  doc.text(route === 'Downtown' ? 'DT' : route.slice(0, 1), 0.25, 2.75);
+
+  doc.setFontSize(12); // day postalcode
+  doc.setFontStyle('normal'); // Route
+
+  const coolerBag = delivery.customer.coolerBag ? 'Cooler bag' : '';
+
+  const info = [`${formalType} ${moment(delivery.onDate).format('MMMM D')} `, `${postalCode} `, coolerBag];
+
+  doc.text(info, 1.5, 2.4);
+}
+
 class DirectionsTable extends React.Component {
   constructor(props) {
     super(props);
@@ -244,14 +287,6 @@ class DirectionsTable extends React.Component {
     }
   }
 
-  // renderNoResults(count) {
-  //   if (count == 0) {
-  //     return (
-  //       <p style={{ padding: '25px' }} className="subheading">No delivery found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo; on {moment(this.props.currentSelectorDate).format('DD MMMM, YYYY')}</p>
-  //     );
-  //   }
-  // }
-
   renderAddressSubText(address) {
     let toRender = '';
 
@@ -297,7 +332,7 @@ class DirectionsTable extends React.Component {
 
     const deliveries = this.state.aggregateData.deliveries.filter(e => e.onDate == currentDate && e.title == type);
 
-    console.log(groupBy(deliveries, e => e.route.title));
+    const deliveriesByRoute = groupBy(deliveries, e => e.route.title);
 
     if (deliveries.length == 0) {
       this.props.popTheSnackbar({
@@ -313,46 +348,49 @@ class DirectionsTable extends React.Component {
       format: [4, 3],
     });
 
-    deliveries.forEach((e, i) => {
-      if (i > 0) {
-        doc.addPage();
-        doc.setPage(i + 1);
+
+    for (const key in deliveriesByRoute) {
+      if (deliveriesByRoute.hasOwnProperty(key)) {
+        const element = deliveriesByRoute[key];
+
+        element.forEach((e, i) => {
+
+          let mealTotal = 0;
+
+          e.meals.forEach((meal) => {
+            if (meal.total > 0) {
+              mealTotal += meal.total;
+            }
+          });
+
+
+          if (mealTotal > 3) {
+
+            const perBag = 3;
+            const totalBags = Math.ceil(mealTotal / perBag);
+
+            for (let index = 1; index <= totalBags; index++) {
+
+              renderDeliveryLabelData(doc, e, formalType, multiple = true, index, totalBags)
+
+            }
+
+
+          } else {
+
+            renderDeliveryLabelData(doc, e, formalType, multiple = false)
+
+          }
+        });
+
       }
-
-      // doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
-      doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
+    }
 
 
-      doc.setFontSize(14.5); // name
-
-      const names = [];
-
-      e.meals.forEach((meal) => {
-        if (meal.total > 0) {
-          names.push(`${meal.name} (${meal.total}) `);
-        }
-      });
-
-      doc.text(names, 0.25, 1.15);
-
-      doc.setFontSize(48); // Route
-      doc.setFontStyle('bold'); // Route
-
-      const route = e.route.title;
-      const postalCode = e.customer.postalCode;
 
 
-      doc.text(route === 'Downtown' ? 'DT' : route.slice(0, 1), 0.25, 2.75);
 
-      doc.setFontSize(12); // day postalcode
-      doc.setFontStyle('normal'); // Route
-
-      const coolerBag = e.customer.coolerBag ? 'Cooler bag' : '';
-
-      const info = [`${formalType} ${moment(e.onDate).format('MMMM D')} `, `${postalCode} `, coolerBag];
-
-      doc.text(info, 1.5, 2.4);
-    });
+    doc.deletePage(1);
 
     doc.save(`Delivery_${this.props.currentSelectorDate}.pdf`);
   }

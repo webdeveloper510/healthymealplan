@@ -760,11 +760,13 @@ Meteor.methods({
           subscriptionId: subscriptionIdToSave,
           address: customerInfo.address,
           lifestyle: customerInfo.primaryProfileBilling.lifestyle._id,
+          discount: customerInfo.primaryProfileBilling.discount,
           restrictions: customerInfo.primaryProfileBilling.restrictions,
           specificRestrictions:
             customerInfo.primaryProfileBilling.specificRestrictions,
           preferences: customerInfo.primaryProfileBilling.preferences,
           schedule: customerInfo.scheduleReal,
+          platingNotes: customerInfo.platingNotes,
 
           subscriptionStartDate: customerInfo.subscriptionStartDate,
           subscriptionStartDateRaw: customerInfo.subscriptionStartDateRaw,
@@ -816,6 +818,7 @@ Meteor.methods({
               preferences:
                 customerInfo.secondaryProfilesBilling[index].preferences,
               schedule: element.scheduleReal,
+              platingNotes: element.platingNotes,
               adultOrChild: element.adultOrChild,
             },
           },
@@ -845,6 +848,9 @@ Meteor.methods({
     }
 
     actualTotal = parseFloat(actualTotal.toFixed(2));
+
+    console.log(actualTotal);
+
 
     // subscriptionDate (Previous saturday)
     const lastWeeksSaturday = moment(
@@ -1044,14 +1050,14 @@ Meteor.methods({
           customerInfo.secondaryProfilesBilling[i].restrictionsActual.length > 0
         ) {
           customerInfo.secondaryProfilesBilling[i].restrictionsActual.forEach(
-            (e, i) => {
+            (restriction, restrictionIndex) => {
               primaryProfileLineItems.restrictions.push({
-                title: e.title,
-                extra: e.extra,
-                type: e.discountOrExtraType,
+                title: restriction.title,
+                extra: restriction.extra,
+                type: restriction.discountOrExtraType,
                 surcharge:
                   customerInfo.secondaryProfilesBilling[i]
-                    .restrictionsSurcharges[i],
+                    .restrictionsSurcharges[restrictionIndex],
               });
             },
           );

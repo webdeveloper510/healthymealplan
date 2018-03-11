@@ -1076,6 +1076,8 @@ class Step4Checkout extends React.Component {
         ) {
           primaryCustomer.deliverySurcharges += surchargePerDelivery;
         }
+
+
         // calculate actual delivery cost / delivery
         if (deliveryTypeSelected == "") {
           continue;
@@ -1137,7 +1139,7 @@ class Step4Checkout extends React.Component {
         primaryCustomer.coolerBag +
         _.sum(primaryCustomer.restrictionsSurcharges) +
         _.sum(primaryCustomer.specificRestrictionsSurcharges) +
-        primaryCustomer.deliveryCost;
+        primaryCustomer.deliveryCost + primaryCustomer.deliverySurcharges;
 
       primaryCustomer.totalCost -= primaryCustomer.discountActual;
 
@@ -1158,6 +1160,9 @@ class Step4Checkout extends React.Component {
 
       primaryCustomer.groupTotal =
         secondaryGroupCost + primaryCustomer.totalCost + primaryCustomer.taxes;
+
+      primaryCustomer.taxes = parseFloat(primaryCustomer.taxes.toFixed(2));
+      primaryCustomer.groupTotal = parseFloat(primaryCustomer.groupTotal.toFixed(2));
 
       this.setState({
         primaryProfileBilling: primaryCustomer,
