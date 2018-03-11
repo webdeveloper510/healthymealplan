@@ -126,8 +126,8 @@ Meteor.methods({
     Meteor.users.update({
       _id: data.id,
     }, {
-      $set: toUpdate,
-    });
+        $set: toUpdate,
+      });
 
 
     // console.log(data);
@@ -285,11 +285,11 @@ Meteor.methods({
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-      $set: {
-        completeSchedule: data.completeSchedule,
-        delivery: newDeliveryType,
-      },
-    });
+        $set: {
+          completeSchedule: data.completeSchedule,
+          delivery: newDeliveryType,
+        },
+      });
 
   },
 
@@ -832,6 +832,9 @@ Meteor.methods({
       );
     }
 
+    Meteor._sleepForMs(10000);
+
+
     // totaling
     let actualTotal = customerInfo.primaryProfileBilling.groupTotal;
 
@@ -847,6 +850,8 @@ Meteor.methods({
     const lastWeeksSaturday = moment(
       customerInfo.subscriptionStartDateRaw,
     ).subtract(2, 'd');
+
+    console.log(lastWeeksSaturday);
 
     // subscription
     const createSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(

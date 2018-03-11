@@ -47,9 +47,10 @@ export default createContainer(({ match }) => {
   const subscription4 = Meteor.subscribe('lifestyles');
   const subscription5 = Meteor.subscribe('restrictions');
   const subscription6 = Meteor.subscribe('ingredients');
+  const subscription7 = Meteor.subscribe('postalcodes');
 
   return {
-    loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready() && !subscription6.ready(),
+    loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready() && !subscription6.ready() && !subscription7.ready(),
     customer: Meteor.users.findOne(customerId),
     subscription: Subscriptions.findOne({ customerId: customerId }),
     secondaryAccounts: Meteor.users.find({ secondary: true, primaryAccount: customerId }).fetch(),

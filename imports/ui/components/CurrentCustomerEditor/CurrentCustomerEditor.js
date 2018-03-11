@@ -77,8 +77,8 @@ import ChevronLeft from 'material-ui-icons/ChevronLeft';
 import Search from 'material-ui-icons/Search';
 
 import validate from '../../../modules/validate';
+import Step4CheckoutCurrent from './Step4CheckoutCurrent'
 
-// const primary = teal[500];
 const danger = red[700];
 
 const styles = theme => ({
@@ -184,8 +184,6 @@ class CurrentCustomerEditor extends React.Component {
         },
       ],
       platingNotes: this.props.customer.platingNotes ? this.props.customer.platingNotes : '',
-      // deliveryNotes: this.props.customer.secondary === undefined && this.props.customer.address && this.props.customer.address.notes ?
-      //   this.props.customer.address.notes : '',
 
       secondaryCollapses: [false, false, false, false, false, false],
       secondaryProfileCount: this.props.customer && this.props.customer.associatedProfiles > 0 ? this.props.customer.associatedProfiles : 0,
@@ -212,7 +210,7 @@ class CurrentCustomerEditor extends React.Component {
 
       // Step 3: Delivery
 
-      addressType: !this.props.customer.secondary ? this.props.customer.address.type : '',
+      addressType: this.props.customer && this.props.customer.secondary == undefined ? this.props.customer.address.type : '',
 
       apartmentName: !this.props.customer.secondary && this.props.customer.address.apartmentName ? this.props.customer.address.apartmentName : '',
       unit: !this.props.customer.secondary && this.props.customer.address.unit ? this.props.customer.address.unit : '',
@@ -243,7 +241,7 @@ class CurrentCustomerEditor extends React.Component {
           sms: this.props.customer.notifications.delivery.sms,
         }
         : {
-          email: false, 
+          email: false,
           sms: false
         },
 
@@ -342,14 +340,6 @@ class CurrentCustomerEditor extends React.Component {
           first_name5: { required: true },
           first_name6: { required: true },
           first_name7: { required: true },
-
-          // last_name1: { required: true },
-          // last_name2: { required: true },
-          // last_name3: { required: true },
-          // last_name4: { required: true },
-          // last_name5: { required: true },
-          // last_name6: { required: true },
-          // last_name7: { required: true },
 
           lifestyle1: { required: true },
           lifestyle2: { required: true },
@@ -1454,11 +1444,6 @@ class CurrentCustomerEditor extends React.Component {
       return;
     }
 
-
-    // if(){
-
-    // }
-
     const decreasedProfileCount = this.state.secondaryProfileCount - 1;
     const profileToRemove = this.state.secondaryProfilesData.slice();
 
@@ -1654,6 +1639,7 @@ class CurrentCustomerEditor extends React.Component {
       secondaryProfilesData: secondaryProfilesDataCopy,
     });
   }
+
   handleChangeRadioLifestyleSecondary(i, event, value) {
     this.state.secondaryProfilesData[i].lifestyle = value;
 
@@ -1661,10 +1647,6 @@ class CurrentCustomerEditor extends React.Component {
       el => el.title === value,
     );
 
-    // const currentRestrictionsIds = [this.state.secondaryProfilesData[i]
-    //   .restrictions.length
-    //   ? this.state.secondaryProfilesData[i].restrictions.slice()
-    //   : [];]
     const currentRestrictionsIds = [];
     currentRestrictionsIds.push(...getLifestyleRestrictions.restrictions);
 
@@ -1676,10 +1658,12 @@ class CurrentCustomerEditor extends React.Component {
 
     this.forceUpdate();
   }
+
   handleChangeRadioDiscountSecondary(i, event, value) {
     this.state.secondaryProfilesData[i].discount = value;
     this.forceUpdate();
   }
+
   handleChangeSecondary(index, id, event, checked) {
     const clonedRestrictionIds = this.state.secondaryProfilesData[index]
       .restrictions
@@ -1696,6 +1680,7 @@ class CurrentCustomerEditor extends React.Component {
 
     this.forceUpdate();
   }
+
   onSuggestionSelectedSecondary(
     index,
     event,
@@ -1706,7 +1691,6 @@ class CurrentCustomerEditor extends React.Component {
     console.log(index);
 
     if (this.state.addRestrictionType == 'Preference') {
-      // subingredients
       let isThere = false;
 
       if (this.state.secondaryProfilesData[index].subIngredients.length > 0) {
@@ -6358,12 +6342,19 @@ class CurrentCustomerEditor extends React.Component {
         <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
-              <Tabs indicatorColor="#000" value={this.state.currentTab} onChange={this.handleTabChange}>
-                <Tab label="Basic" />
-                <Tab label="Plan" />
-                <Tab label="Delivery" />
-                <Tab label="Subscription" />
-              </Tabs>
+
+
+              {(this.props.customer && this.props.customer.secondary == undefined) ? (
+                <Tabs indicatorColor="#000" value={this.state.currentTab} onChange={this.handleTabChange}>
+                  <Tab label="Basic" />
+                  (<Tab label="Plan" />
+                  <Tab label="Subscription" />
+                </Tabs>
+              ) : (
+                  <Tabs indicatorColor="#000" value={this.state.currentTab} onChange={this.handleTabChange}>
+                    <Tab label="Basic" />
+                  </Tabs>
+                )}
             </AppBar>
           </Grid>
 
@@ -6469,7 +6460,7 @@ class CurrentCustomerEditor extends React.Component {
             </div>
           )}
 
-          {this.state.currentTab === 1 && (
+          {(this.state.currentTab === 1 && this.props.customer && this.props.customer.secondary == undefined) && (
             <div>
               <form id="step2" ref={form => (this.secondForm = form)} onSubmit={event => event.preventDefault()}>
                 <Paper elevation={2} className="paper-for-fields">
@@ -6574,45 +6565,6 @@ class CurrentCustomerEditor extends React.Component {
                     </Grid>
                   </Grid>
 
-                  {/* <Grid container style={{ marginTop: '25px' }}>
-                <Grid item xs={12} sm={6}>
-                  <Typography
-                    type="body1"
-                    className="text-uppercase font-medium"
-                  >
-                    Subscription
-                  </Typography>
-
-                  <TextField
-                    select
-                    id="startDate"
-                    label="Select a start date"
-                    name="startDate"
-                    fullWidth
-                    value={this.state.subscriptionStartDate}
-                    SelectProps={{ native: false }}
-                    onChange={(event) => {
-                      this.setState({
-                        subscriptionStartDate: event.target.value,
-                        subscriptionStartDateRaw: new Date(
-                          event.currentTarget.getAttribute('data-original-date'),
-                        ),
-                      });
-                    }}
-                  >
-                    {this.renderStartDays().map((e, i) => (
-                      <MenuItem
-                        key={i}
-                        value={moment(e).format('dddd MMMM Do YYYY')}
-                        data-original-date={e}
-                      >
-                        {moment(e).format('dddd MMMM Do YYYY')}
-                      </MenuItem>
-                    ))}
-                  </TextField>
-                </Grid>
-              </Grid> */}
-
                   <Stepper
                     activeStep={activeMealScheduleStep}
                     style={{
@@ -6625,12 +6577,6 @@ class CurrentCustomerEditor extends React.Component {
                       const props = {};
 
                       const momentDateObj = moment();
-
-                      // const stepLabel = `${label} ${moment(
-                      //   this.state.subscriptionStartDateRaw,
-                      // )
-                      //   .add(index, 'd')
-                      //   .format('DD')}`;
 
                       return (
                         <Step key={index} {...props}>
@@ -6988,21 +6934,6 @@ class CurrentCustomerEditor extends React.Component {
                       />
                     </Grid>
                   </Grid>
-                  {/* {this.props.customer.secondary == undefined && (
-                    <Grid container style={{ marginTop: '25px' }}>
-                      <Grid item xs={12} sm={12}>
-                        <TextField
-                          label="Delivery notes"
-                          id="deliveryNotes"
-                          name="deliveryNotes"
-                          value={this.state.deliveryNotes}
-                          fullWidth
-                          multiline
-                          onChange={(event) => { this.setState({ deliveryNotes: event.target.value }); }}
-                        />
-                      </Grid>
-                    </Grid>
-                  )} */}
 
                   {this.props.customer.secondary == undefined ? this.state.secondaryProfilesData.map((e, profileIndex) => (
                     <div key={profileIndex}>
@@ -7046,15 +6977,6 @@ class CurrentCustomerEditor extends React.Component {
                                 label="First name"
                                 name={`first_name${profileIndex + 1}`}
                                 fullWidth
-                                // defaultValue={
-                                //   this.props.customerInfo.secondaryProfiles[
-                                //     profileIndex
-                                //   ]
-                                //     ? this.props.customerInfo.secondaryProfiles[
-                                //       profileIndex
-                                //     ].firstName
-                                //     : ''
-                                // }
                                 value={this.state.secondaryProfilesData[profileIndex].first_name}
                                 data-rule-required="true"
                                 inputProps={{}}
@@ -7076,15 +6998,6 @@ class CurrentCustomerEditor extends React.Component {
                                 data-rule-required="true"
                                 value={this.state.secondaryProfilesData[profileIndex].last_name}
                                 fullWidth
-                                // defaultValue={
-                                //   this.props.customerInfo.secondaryProfiles[
-                                //     profileIndex
-                                //   ]
-                                //     ? this.props.customerInfo.secondaryProfiles[
-                                //       profileIndex
-                                //     ].lastName
-                                //     : ''
-                                // }
                                 onChange={(event) => {
                                   this.state.secondaryProfilesData[
                                     profileIndex
@@ -7724,7 +7637,6 @@ class CurrentCustomerEditor extends React.Component {
                     </Grid>
                     <Grid item xs={12}>
                       <FormControl component="fieldset">
-                        {/* <FormLabel component="legend">Type</FormLabel> */}
                         <RadioGroup
                           aria-label="account-type"
                           name="addressType"
@@ -8358,23 +8270,6 @@ class CurrentCustomerEditor extends React.Component {
                           >
                             {steps.map((label, index) => {
                               const props = {};
-                              // let stepLabel = `${label} ${moment(
-                              //   new Date(this.state.subscriptionStartDateRaw),
-                              // )
-                              //   .add(index, 'd')
-                              //   .format('DD')}`;
-
-                              // if (index == 5) {
-                              //   stepLabel = `${label.split('/')[0]} ${moment(
-                              //     new Date(this.state.subscriptionStartDateRaw),
-                              //   )
-                              //     .add(index, 'd')
-                              //     .format('DD')} & ${label.split('/')[1]} ${moment(
-                              //     new Date(this.state.subscriptionStartDateRaw),
-                              //   )
-                              //     .add(index + 1, 'd')
-                              //     .format('DD')}`;
-                              // }
 
                               return (
                                 <Step key={index} {...props}>
@@ -8442,37 +8337,18 @@ class CurrentCustomerEditor extends React.Component {
             </div>
           )}
 
-          {this.state.currentTab === 2 && (
-            <Grid
-              container
-              justify="center"
-              style={{ marginBottom: '50px', marginTop: '25px' }}
-            >
-              <form id="step3" ref={form => (this.thirdForm = form)} onSubmit={event => event.preventDefault()}>
-                <Grid item xs={12} sm={12}>
-                  <Paper elevation={2} className="paper-for-fields">
-
-                  </Paper>
-                </Grid>
-              </form>
-              <Button
-                style={{ marginTop: '25px' }}
-                disabled={this.state.submitLoading}
-                raised
-                className={`${buttonClassname}`}
-                color="primary"
-                type="submit"
-                onClick={() => this.saveThirdStep()}
-              >
-                Update
-                {this.state.submitLoading && (
-                  <CircularProgress
-                    size={24}
-                    className={this.props.classes.buttonProgress}
-                  />
-                )}
-              </Button>
-            </Grid>
+          {(this.state.currentTab === 2 && this.props.customer && this.props.customer.secondary == undefined) && (
+            <Step4CheckoutCurrent
+              activeStep={this.state.currentTab}
+              customer={this.props.customer}
+              subscription={this.props.subscription}
+              popTheSnackbar={this.props.popTheSnackbar.bind(this)}
+              lifestyles={this.props.lifestyles}
+              restrictions={this.props.restrictions}
+              ingredients={this.props.potentialSubIngredients}
+              postalCodes={this.props.postalCodes}
+              history={this.props.history}
+            />
           )}
 
         </Grid>
