@@ -232,7 +232,7 @@ Meteor.methods({
 
           if (notifyUserBySms) {
             twilioClient.messages.create({
-              body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us so we can try again.`,
+              body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us to discuss pick up.`,
               to: `+1${deliveryUser.phone}`,
               from: '+16138006196',
             });
@@ -250,7 +250,7 @@ Meteor.methods({
 
           if (notifyUserBySms) {
             twilioClient.messages.create({
-              body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today. Please get in touch with us if you cannot accept a late delivery.`,
+              body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today.`,
               to: `+1${deliveryUser.phone}`,
               from: '+16138006196',
             });
