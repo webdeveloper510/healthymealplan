@@ -38,7 +38,8 @@ import jsPDF from 'jspdf';
 import vittlebase64 from '../../../modules/vittlelogobase64';
 import hmpbase64 from '../../../modules/hmplogobase64';
 
-// import { createContainer } from 'meteor/react-meteor-data';
+import AppBar from 'material-ui/AppBar';
+import Tabs, { Tab } from 'material-ui/Tabs';
 import Loading from '../../components/Loading/Loading';
 
 import './DirectionsTable.scss';
@@ -105,6 +106,8 @@ class DirectionsTable extends React.Component {
 
       aggregateData: null,
       aggregateDataLoading: true,
+
+      currentTabValue: "all",
     };
 
     this.handleStatusChange = this.handleStatusChange.bind(this);
@@ -429,6 +432,12 @@ class DirectionsTable extends React.Component {
     return statusToReturn;
   }
 
+
+  handleTabChange(event, value) {
+    this.setState({ currentTabValue: value });
+  }
+
+
   checkInDeliveries(data) {
     return this.props.results.find(e => e.customerId == data.customerId && e.subscriptionId == data.subscriptionId && e.onDate == this.props.currentSelectorDate);
   }
@@ -441,12 +450,31 @@ class DirectionsTable extends React.Component {
     return (
       <div>
 
+        <AppBar position="static" className="appbar--no-background appbar--no-shadow" style={{ margin: "25px 0" }}>
+          <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
+            <Tab label="All" value="all" />
+            {this.props.routes && this.props.routes.map((e, i) => (
+              <Tab key={i} label={e.title} value={e._id} />
+            ))}
+          </Tabs>
+        </AppBar>
 
         <Paper elevation={2} className="table-container">
           <div style={{ padding: '20px' }}>
             <Button className="btn btn-primary" onClick={() => this.printLabels('nightBefore')} raised color="primary" style={{ float: 'right', marginLeft: '1em' }}>Print evening labels</Button>
             <Button className="btn btn-primary" onClick={() => this.printLabels('dayOf')} raised color="primary" style={{ float: 'right' }}>Print day of labels</Button>
           </div>
+
+            {/* <Input
+              className="input-box"
+              style={{ width: '100%', position: 'relative' }}
+              placeholder="Search directions"
+              onKeyUp={this.searchByName.bind(this)}
+              inputProps={{
+                id: 'search-type-text',
+                'aria-label': 'Description',
+              }}
+            /> */}
           {this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container" style={{ backgroundColor: '#607d8b' }}>
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
@@ -518,7 +546,15 @@ class DirectionsTable extends React.Component {
             </TableHead>
 
             <TableBody>
-              {!this.state.aggregateDataLoading && this.state.aggregateData.deliveries.map((e, i) => {
+              {!this.state.aggregateDataLoading && this.state.aggregateData.deliveries.filter(el => {
+                
+                if(this.state.currentTabValue != 'all' && el.routeId != this.state.currentTabValue){
+                  return false;
+                }else{
+                  return true;
+                }
+
+              }).map((e, i) => {
                 const inDeliveries = this.checkInDeliveries(e);
                 const rowId = inDeliveries != undefined ? inDeliveries._id : e._id;
                 const status = inDeliveries != undefined ? inDeliveries.status : 'Scheduled';
@@ -542,7 +578,7 @@ class DirectionsTable extends React.Component {
 
                         {e.customer ? (
                           `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''}
-      ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''} `
+                                   ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''} `
                         ) : ''}
                         {' '}
                         {e.customer.address.notes && e.customer.address.notes.length > 0 ? (<NoteIcon style={{ marginLeft: '10px' }} onClick={() => this.handleNoteDialogOpen(e.customer.profile, e.customer.address.notes)} />) : ''}

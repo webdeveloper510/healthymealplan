@@ -9,6 +9,10 @@ import tz from 'moment-timezone';
 import { Accounts } from 'meteor/accounts-base';
 import editProfile from './edit-profile';
 import rateLimit from '../../../modules/rate-limit';
+
+import getSubscription from '../../../modules/server/authorize/getSubscription';
+import getCustomerPaymentProfile from '../../../modules/server/authorize/getCustomerPaymentProfile';
+
 import createCustomerProfile from '../../../modules/server/authorize/createCustomerProfile';
 import createSubscriptionFromCustomerProfile from '../../../modules/server/authorize/createSubscriptionFromCustomerProfile';
 
@@ -1100,6 +1104,34 @@ Meteor.methods({
 
     return createSubscriptionFromCustomerProfileRes;
   },
+
+
+  getSubscriptionDetails(subscriptionId) {
+
+    check(subscriptionId, String);
+
+    const syncGetSubscription = Meteor.wrapAsync(getSubscription);
+
+    const getSubscriptionRes = syncGetSubscription(subscriptionId);
+
+    return getSubscriptionRes;
+
+  },
+
+
+  getCustomerPaymentProfile(customerProfileId, paymentProfileId) {
+
+    check(paymentProfileId, String);
+    check(customerProfileId, String);
+
+
+    const syncGetCustomerPaymentProfile = Meteor.wrapAsync(getCustomerPaymentProfile);
+
+    const getCustomerPaymentProfileRes = syncGetCustomerPaymentProfile(customerProfileId, paymentProfileId);
+
+    return getCustomerPaymentProfileRes;
+
+  },
 });
 
 rateLimit({
@@ -1113,3 +1145,4 @@ rateLimit({
   limit: 5,
   timeRange: 1000,
 });
+

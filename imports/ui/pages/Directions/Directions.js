@@ -152,7 +152,7 @@ class Directions extends React.Component {
 
           </Grid>
 
-          <div style={{ marginTop: '25px' }}>
+          {/* <div style={{ marginTop: '25px' }}>
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
               <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
                 <Tab label="All" value={/./} />
@@ -161,9 +161,9 @@ class Directions extends React.Component {
                 ))}
               </Tabs>
             </AppBar>
-          </div>
+          </div> */}
 
-          <div style={{
+          {/* <div style={{
             width: '100%',
             background: '#FFF',
             borderTopRightRadius: '2px',
@@ -189,17 +189,7 @@ class Directions extends React.Component {
               }}
             />
 
-            <Input
-              className="input-box"
-              style={{ width: '100%', position: 'relative' }}
-              placeholder="Search directions"
-              onKeyUp={this.searchByName.bind(this)}
-              inputProps={{
-                id: 'search-type-text',
-                'aria-label': 'Description',
-              }}
-            />
-          </div>
+          </div> */}
           <ListContainer
             limit={50}
             collection={Deliveries}
@@ -242,6 +232,7 @@ class Directions extends React.Component {
               currentSelectorDate={this.state.currentSelectorDate}
               searchSelector={this.state.searchSelector}
               routeSelector={this.state.currentTabValue}
+              routes={this.props.routes}
             />
 
           </ListContainer>
