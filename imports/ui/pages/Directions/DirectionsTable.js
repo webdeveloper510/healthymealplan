@@ -41,6 +41,9 @@ import hmpbase64 from '../../../modules/hmplogobase64';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 import Loading from '../../components/Loading/Loading';
+import Input from 'material-ui/Input';
+import SearchIcon from 'material-ui-icons/Search';
+import ClearIcon from 'material-ui-icons/Clear';
 
 import './DirectionsTable.scss';
 
@@ -108,6 +111,8 @@ class DirectionsTable extends React.Component {
       aggregateDataLoading: true,
 
       currentTabValue: "all",
+
+      searchBy: '',
     };
 
     this.handleStatusChange = this.handleStatusChange.bind(this);
@@ -442,6 +447,12 @@ class DirectionsTable extends React.Component {
     return this.props.results.find(e => e.customerId == data.customerId && e.subscriptionId == data.subscriptionId && e.onDate == this.props.currentSelectorDate);
   }
 
+  clearSearchBox() {
+    this.setState({
+      searchBy: '',
+    });
+  }
+
   render() {
     if (this.state.aggregateDataLoading) {
       return (<Loading />);
@@ -458,23 +469,52 @@ class DirectionsTable extends React.Component {
             ))}
           </Tabs>
         </AppBar>
+      
 
+         <div style={{
+            background: '#FFF',
+            borderTopRightRadius: '2px',
+            borderTopLeftRadius: '2px',
+            marginTop: '3em',
+            padding: '16px 25px 1em',
+            boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
+            position: 'relative',
+          }}
+          >
+            <Input
+              className="input-box"
+              style={{ width: '100%', position: 'relative' }}
+              placeholder="Search directions"
+              onKeyUp={(e) => {this.setState({ searchBy: e.target.value })}}
+              // onKeyUp={this.searchByName.bind(this)}
+              inputProps={{
+                id: 'search-type-text',
+                'aria-label': 'Description',
+              }}
+            /> 
+
+            <SearchIcon
+              className="autoinput-icon autoinput-icon--search"
+              style={{ display: (this.state.searchBy.length > 0) ? 'none' : 'block', top: '33%', right: '1.8em !important' }}
+            />
+
+            <ClearIcon
+              className="autoinput-icon--clear"
+              onClick={this.clearSearchBox.bind(this)}
+              style={{
+                cursor: 'pointer',
+                display: (this.state.searchBy.length > 0) ? 'block' : 'none',
+              }}
+            />
+
+          </div>
         <Paper elevation={2} className="table-container">
           <div style={{ padding: '20px' }}>
             <Button className="btn btn-primary" onClick={() => this.printLabels('nightBefore')} raised color="primary" style={{ float: 'right', marginLeft: '1em' }}>Print evening labels</Button>
             <Button className="btn btn-primary" onClick={() => this.printLabels('dayOf')} raised color="primary" style={{ float: 'right' }}>Print day of labels</Button>
           </div>
 
-            {/* <Input
-              className="input-box"
-              style={{ width: '100%', position: 'relative' }}
-              placeholder="Search directions"
-              onKeyUp={this.searchByName.bind(this)}
-              inputProps={{
-                id: 'search-type-text',
-                'aria-label': 'Description',
-              }}
-            /> */}
+        
           {this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container" style={{ backgroundColor: '#607d8b' }}>
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
@@ -550,6 +590,22 @@ class DirectionsTable extends React.Component {
                 
                 if(this.state.currentTabValue != 'all' && el.routeId != this.state.currentTabValue){
                   return false;
+                }else{
+                  return true;
+                }
+
+              }).filter(el => {
+
+                const fullName = el.customer.profile.name.first + " " + el.customer.profile.name.last;
+
+                const like = new RegExp(this.state.searchBy, "gi");
+
+                console.log(like)
+
+                if(this.state.searchBy != "" && !like.test(fullName)){
+                  
+                  return false;
+
                 }else{
                   return true;
                 }
