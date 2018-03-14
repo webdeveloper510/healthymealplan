@@ -162,23 +162,38 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
     doc.setFontSize(8);
 
     // calories
-    const currentMealPortionCalories = currentPlate.plate.nutritional[mealPortion].calories == 0 || currentPlate.plate.nutritional[mealPortion].calories == "0" ? '0' : currentPlate.plate.nutritional[mealPortion].calories;
+    let currentMealPortionCalories = "0";
+    let currentMealPortionProteins = "0";
+    let currentMealPortionCarbs = "0";
+    let currentMealPortionFat = "0";
+
+    if (currentPlate.plate.nutritional[mealPortion].calories > 0) {
+      currentMealPortionCalories = currentPlate.plate.nutritional[mealPortion].calories;
+    }
+
     const calories = [currentMealPortionCalories, 'calories'];
     // console.log(calories);
     doc.text(calories, 2, 2.7);
 
     // protein
-    const currentMealPortionProteins = currentPlate.plate.nutritional[mealPortion].proteins == 0 || currentPlate.plate.nutritional[mealPortion].proteins == "0" ? '0' : currentPlate.plate.nutritional[mealPortion].proteins;
+    if (currentPlate.plate.nutritional[mealPortion].proteins > 0) {
+      currentMealPortionProteins = currentPlate.plate.nutritional[mealPortion].proteins;
+    }
     const protein = [currentMealPortionProteins, 'protein'];
     doc.text(protein, 2.6, 2.7);
 
     // carbs
-    const currentMealPortionCarbs = currentPlate.plate.nutritional[mealPortion].carbs == 0 || currentPlate.plate.nutritional[mealPortion].carbs == "0" ? '0' : currentPlate.plate.nutritional[mealPortion].carbs;
+    if (currentPlate.plate.nutritional[mealPortion].carbs > 0) {
+      currentMealPortionCarbs = currentPlate.plate.nutritional[mealPortion].carbs;
+    }
     const carbs = [currentMealPortionCarbs, 'carbs'];
     doc.text(carbs, 3.1, 2.7);
 
     // fats
-    const currentMealPortionFat = currentPlate.plate.nutritional[mealPortion].fat == 0 || currentPlate.plate.nutritional[mealPortion].fat == "0" ? '0' : currentPlate.plate.nutritional[mealPortion].fat;
+    if (currentPlate.plate.nutritional[mealPortion].fat > 0) {
+      currentMealPortionFat = currentPlate.plate.nutritional[mealPortion].fat;
+    }
+
     const fats = [currentMealPortionFat, 'fats'];
     doc.text(fats, 3.55, 2.7);
   }

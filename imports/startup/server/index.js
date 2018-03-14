@@ -8,6 +8,7 @@ import './jobs';
 import './jobs/setSubscriptionActive';
 import './jobs/setSubscriptionActiveCard';
 import './jobs/createInvoices';
+import './jobs/setSubscriptionCancelled';
 
 import '../../modules/server/authorize/webhooks/';
 

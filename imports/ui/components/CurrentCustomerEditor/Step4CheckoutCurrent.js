@@ -13,7 +13,11 @@ import Typography from 'material-ui/Typography';
 import Radio, { RadioGroup } from 'material-ui/Radio';
 import Payment from 'payment';
 
+import ClearIcon from 'material-ui-icons/Clear';
+import Chip from 'material-ui/Chip';
+
 import Checkbox from 'material-ui/Checkbox';
+
 import {
   FormLabel,
   FormControl,
@@ -21,11 +25,19 @@ import {
   FormHelperText,
 } from 'material-ui/Form';
 
+import Dialog, {
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+} from 'material-ui/Dialog';
+
 import classNames from 'classnames';
 import { withStyles } from 'material-ui/styles';
 import { CircularProgress } from 'material-ui/Progress';
 import green from 'material-ui/colors/green';
 
+import moment from 'moment';
 import _ from 'lodash';
 import $ from 'jquery';
 import validate from '../../../modules/validate';
@@ -75,9 +87,23 @@ class Step4CheckoutCurrent extends React.Component {
 
       paymentProfileDetails: null,
       subscriptionDetails: null,
+
+      dialogCancelSubscription: false,
+      dialogEditPaymentMethod: false,
+      dialogActivateSubscription: false,
     };
 
-    this.renderPaymentMethod = this.renderPaymentMethod.bind(this);
+    this.editPaymentMethod = this.editPaymentMethod.bind(this);
+
+    this.openCancelSubscriptionDialog = this.openCancelSubscriptionDialog.bind(this);
+    this.closeCancelSubscriptionDialog = this.closeCancelSubscriptionDialog.bind(this);
+
+    this.openActivateSubscriptionDialog = this.openActivateSubscriptionDialog.bind(this);
+    this.closeActivateSubscriptionDialog = this.closeActivateSubscriptionDialog.bind(this);
+
+    this.openEditPaymentMethodDialog = this.openEditPaymentMethodDialog.bind(this);
+    this.closeEditPaymentMethodDialog = this.closeEditPaymentMethodDialog.bind(this);
+
   }
 
   componentWillMount() {
@@ -130,24 +156,24 @@ class Step4CheckoutCurrent extends React.Component {
 
       Meteor.call('getSubscriptionDetails', this.props.subscription.authorizeSubscriptionId, (err, res) => {
         if (err) {
-          console.log(err)
+          console.log(err);
         } else {
           console.log(res);
 
           this.setState({
-            subscriptionDetails: res.subscription
-          })
+            subscriptionDetails: res.subscription,
+          });
         }
       });
 
       Meteor.call('getCustomerPaymentProfile', this.props.subscription.authorizeCustomerProfileId, this.props.subscription.authorizePaymentProfileId, (err, res) => {
         if (err) {
-          console.log(err)
+          console.log(err);
         } else {
           console.log(res);
 
           this.setState({
-            paymentProfileDetails: res.paymentProfile
+            paymentProfileDetails: res.paymentProfile,
           });
         }
       });
@@ -1310,7 +1336,7 @@ class Step4CheckoutCurrent extends React.Component {
               this.props.popTheSnackbar({
                 message: `Successfully created subscription with ID:${
                   res.subscriptionId
-                  }`,
+                }`,
               });
 
               this.props.history.push('/customers');
@@ -1342,8 +1368,93 @@ class Step4CheckoutCurrent extends React.Component {
     });
   }
 
-  renderPaymentMethod() {
+  editPaymentMethod() {
 
+
+  }
+
+  openCancelSubscriptionDialog() {
+    this.setState({
+      dialogCancelSubscription: true,
+    });
+  }
+
+
+  closeCancelSubscriptionDialog() {
+    this.setState({
+      dialogCancelSubscription: false,
+    });
+  }
+
+  openActivateSubscriptionDialog() {
+    this.setState({
+      dialogActivateSubscription: true,
+    });
+  }
+
+
+  closeActivateSubscriptionDialog() {
+    this.setState({
+      dialogActivateSubscription: false,
+    });
+  }
+
+  openEditPaymentMethodDialog() {
+    this.setState({
+      dialogEditPaymentMethod: true,
+    });
+  }
+
+  closeEditPaymentMethodDialog() {
+    this.setState({
+      dialogEditPaymentMethod: false,
+    });
+  }
+
+  handleCancelSubscription(when) {
+
+    Meteor.call('cancelSubscription', when, this.props.customer._id, (err, res) => {
+
+      this.setState({
+        dialogCancelSubscription: false,
+      });
+
+      if (err) {
+        this.props.popTheSnackbar({
+          messages: err.reason,
+        });
+      } else {
+        console.log(res);
+        this.props.popTheSnackbar({
+          message: 'Successfully cancelled the subscription.',
+        });
+      }
+
+    });
+
+  }
+
+  handleActivateSubscription(when) {
+
+    Meteor.call('activateSubscription', when, this.props.customer._id, this.state.primaryProfileBilling.groupTotal, (err, res) => {
+      this.setState({
+        dialogActivateSubscription: false,
+      });
+
+      if (err) {
+        this.props.popTheSnackbar({
+          messages: err.reason,
+        });
+      } else {
+        console.log(res);
+        this.props.popTheSnackbar({
+          message: 'Successfully activated the subscription.',
+        });
+      }
+    });
+  }
+
+  handleEditPaymentMethod() {
 
   }
 
@@ -1372,65 +1483,136 @@ class Step4CheckoutCurrent extends React.Component {
                   <Typography type="headline" style={{ marginBottom: '25px' }}>Payment Method</Typography>
                 </Grid>
 
-                {this.state.paymentMethod === "card" && this.state.paymentProfileDetails != null && this.state.subscriptionDetails != null ? (
-                  <div>
-                    <Typography type="headline">Card</Typography>
-                    {
-                      this.state.paymentProfileDetails.payment.creditCard.cardType == "Visa" && (
-                        <img width="200" src="/visa.svg" />
-                      )
-                
-                    }
+                <Grid item xs={12}>
+                  {this.state.paymentMethod === 'card' && this.state.paymentProfileDetails != null ? (
+                    <div>
+                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                        <div>
+                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Visa' && (<img width="80" src="/visa.svg" />)}
 
-                     {
-                      this.state.paymentProfileDetails.payment.creditCard.cardType == "Mastercard" && (
-                        <img width="200" src="/mastercard.svg" />
-                      )
-                
-                    }
+                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Mastercard' && (<img width="80" src="/mastercard.svg" />)}
 
-                    {
-                      this.state.paymentProfileDetails.payment.creditCard.cardType == "AmericanExpress" && (
-                        <img width="200" src="/amex.svg" />
-                      )
-                
-                    }
+                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'AmericanExpress' && (<img width="80" src="/amex.svg" />)}
 
-                    {
-                      this.state.paymentProfileDetails.payment.creditCard.cardType == "Discover" && (
-                        <img width="200" src="/discover.svg" />
-                      )
-                
-                    }
+                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Discover' && (<img width="80" src="/discover.svg" />)}
 
-                    {
-                      this.state.paymentProfileDetails.payment.creditCard.cardType == "JCB" && (
-                        <img width="200" src="/jcb.svg" />
-                      )
-                
-                    }
+                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'JCB' && (<img width="80" src="/jcb.svg" />)}
 
-                     {
-                      this.state.paymentProfileDetails.payment.creditCard.cardType == "DinersClub" && (
-                        <img width="200" src="/diners.svg" />
-                      )
-                
-                    }
+                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'DinersClub' && (<img width="80" src="/diners.svg" />)}
+                        </div>
+                        <div style={{ marginLeft: '10px' }}>
+                          <Typography type="body2">Card {this.state.paymentProfileDetails.payment.creditCard.cardNumber}</Typography>
+                          <Typography type="body2">Expiry {this.state.paymentProfileDetails.payment.creditCard.expirationDate}</Typography>
+                        </div>
+                        <Button onClick={this.editPaymentMethod} style={{ marginLeft: '1em' }}>Edit</Button>
+                      </div>
+                    </div>
+                  ) : ''}
+
+                  {this.state.paymentMethod === 'cash' ? (
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography type="headline">Cash</Typography>
+                      <Button onClick={this.editPaymentMethod} style={{ marginLeft: '1em' }}>Edit</Button>
+
+                    </div>
+
+
+                  ) : ''}
+
+                  {this.state.paymentMethod === 'interac' ? (
+
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography type="headline">Interac e-Transfer</Typography>
+                      <Button onClick={this.editPaymentMethod} style={{ marginLeft: '1em' }}>Edit</Button>
+                    </div>
+
+                  ) : ''}
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography type="headline" style={{ margin: '25px 0', display: 'flex', alignItems: 'center' }}>Subscription
+                    <Chip style={{ marginLeft: '10px' }} label={this.props.subscription.status.toUpperCase()} /></Typography>
+
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography type="subheading">Customer since {moment(this.props.customer.subscriptionStartDateRaw).format('YYYY-MM-DD')}</Typography>
+
+                  <div style={{ margin: '20px 0' }}>
+                    {(this.props.subscription.status == 'paused' || this.props.subscription.status == 'active') && (
+                      <Button color="secondary" raised onClick={this.openCancelSubscriptionDialog}>Cancel subscription</Button>
+                    )}
+
+                    {(this.props.subscription.status == 'cancelled') && (
+                      <Button color="accent" raised onClick={this.openActivateSubscriptionDialog}>Activate subscription</Button>
+                    )}
                   </div>
-                ) : ''}
+                </Grid>
 
-
-                {this.state.paymentMethod === "cash" ? (
-                  <div>
-                    <Typography type="headline">Cash</Typography>
+                <Dialog
+                  open={this.state.dialogCancelSubscription}
+                  onClose={this.closeCancelSubscriptionDialog}
+                  aria-labelledby="responsive-dialog-title"
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <DialogTitle id="responsive-dialog-title" style={{}}>{`Cancel ${this.props.customer.profile.name.first} ${this.props.customer.profile.name.last}'s subscription?`}</DialogTitle>
+                    <ClearIcon onClick={this.closeCancelSubscriptionDialog} spacing={8} />
                   </div>
-                ) : ''}
+                  <DialogContent>
+                    <DialogContentText>
+                      Do you want to cancel the subscription immediately or the earliest saturday?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.handleCancelSubscription.bind(this, 'immediate')} color="primary">Immediate</Button>
+                    <Button onClick={this.handleCancelSubscription.bind(this, 'saturday')} color="primary" autoFocus>Saturday</Button>
+                  </DialogActions>
+                </Dialog>
 
-                {this.state.paymentMethod === "interac" ? (
-                  <div>
-                    <Typography type="headline">Interac e-Transfer</Typography>
+
+
+                <Dialog
+                  open={this.state.dialogActivateSubscription}
+                  onClose={this.closeActivateSubscriptionDialog}
+                  aria-labelledby="responsive-dialog-title"
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <DialogTitle id="responsive-dialog-title" style={{}}>{`Activate ${this.props.customer.profile.name.first} ${this.props.customer.profile.name.last}'s subscription?`}</DialogTitle>
+                    <ClearIcon onClick={this.closeActivateSubscriptionDialog} />
                   </div>
-                ) : ''}
+                  <DialogContent>
+                    <DialogContentText>
+                      Do you want to activate the subscription immediately or the earliest saturday?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.handleActivateSubscription.bind(this, 'immediate')} color="primary">Immediate</Button>
+                    <Button onClick={this.handleActivateSubscription.bind(this, 'saturday')} color="primary" autoFocus>Saturday</Button>
+                  </DialogActions>
+                </Dialog>
+
+
+                <Dialog
+                  open={this.state.dialogEditPaymentMethod}
+                  onClose={this.closeEditPaymentMethodDialog}
+                  aria-labelledby="responsive-dialog-title"
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <DialogTitle id="responsive-dialog-title" style={{}}>{`Edit ${this.props.customer.profile.name.first} ${this.props.customer.profile.name.last}'s payment method?`}</DialogTitle>
+                    <ClearIcon onClick={this.closeEditPaymentMethodDialog} />
+                  </div>
+                  <DialogContent>
+                    <DialogContentText>
+                      Do you want to activate the subscription immediately or the earliest saturday?
+                    </DialogContentText>
+                  </DialogContent>
+                  <DialogActions>
+                    <Button onClick={this.handleEditPaymentMethod.bind(this, 'immediate')} color="primary">Immediate</Button>
+                    <Button onClick={this.handleEditPaymentMethod.bind(this, 'saturday')} color="primary" autoFocus>Saturday</Button>
+                  </DialogActions>
+                </Dialog>
+
+
                 {/* <Grid item xs={12}>
                       <FormControl component="fieldset">
                         <RadioGroup
@@ -1560,14 +1742,14 @@ class Step4CheckoutCurrent extends React.Component {
                     style={{ marginBottom: '25px' }}
                   >
                     Overview
-                      </Typography>
+                  </Typography>
                   <Typography
                     type="title"
                     className="font-medium font-uppercase"
                     style={{ marginTop: '.75em', marginBottom: '.75em' }}
                   >
                     Meal Plan
-                      </Typography>
+                  </Typography>
 
                   <Typography
                     type="title"
@@ -1625,7 +1807,7 @@ class Step4CheckoutCurrent extends React.Component {
                             style={{ marginTop: '.75em' }}
                           >
                             Discount
-                              </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Typography type="subheading">
@@ -1659,14 +1841,14 @@ class Step4CheckoutCurrent extends React.Component {
                       0 ||
                       this.state.primaryProfileBilling
                         .totalBodybuilderSurcharge > 0) ? (
-                      <Grid item xs={12}>
+                          <Grid item xs={12}>
                         <Typography
                           type="body2"
                           className="font-medium font-uppercase"
                           style={{ marginTop: '.75em' }}
                         >
                           Extra
-                            </Typography>
+                        </Typography>
                       </Grid>
                     ) : (
                       ''
@@ -1700,7 +1882,7 @@ class Step4CheckoutCurrent extends React.Component {
                               .discountOrExtraTypeAthletic == 'Percentage'
                               ? '%'
                               : ''})
-                              </Typography>
+                          </Typography>
                         </Grid>
                       </Grid>
                     ) : (
@@ -1710,11 +1892,11 @@ class Step4CheckoutCurrent extends React.Component {
                   {this.state.primaryProfileBilling &&
                     this.state.primaryProfileBilling
                       .totalBodybuilderSurcharge > 0 ? (
-                      <Grid container>
+                        <Grid container>
                         <Grid item xs={12} sm={6}>
                           <Typography type="subheading">
                             Bodybuilder
-                              </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Typography
@@ -1738,7 +1920,7 @@ class Step4CheckoutCurrent extends React.Component {
                               .discountOrExtraTypeBodybuilder == 'Percentage'
                               ? '%'
                               : ''})
-                              </Typography>
+                          </Typography>
                         </Grid>
                       </Grid>
                     ) : (
@@ -1757,7 +1939,7 @@ class Step4CheckoutCurrent extends React.Component {
                         }}
                       >
                         Restrictions
-                          </Typography>
+                      </Typography>
                     )}
 
                   {this.state.primaryProfileBilling &&
@@ -1776,7 +1958,7 @@ class Step4CheckoutCurrent extends React.Component {
                               {e.discountOrExtraType == 'Percentage'
                                 ? '%'
                                 : ''})
-                                </Typography>
+                            </Typography>
                           </Grid>
                           <Grid item xs={12} sm={6}>
                             <Typography
@@ -1871,7 +2053,7 @@ class Step4CheckoutCurrent extends React.Component {
                                   style={{ marginTop: '.75em' }}
                                 >
                                   Discount
-                                    </Typography>
+                                </Typography>
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                 <Typography type="subheading">
@@ -1902,7 +2084,7 @@ class Step4CheckoutCurrent extends React.Component {
                                 style={{ marginTop: '.75em' }}
                               >
                                 Extra
-                                  </Typography>
+                              </Typography>
                             </Grid>
                           ) : (
                             ''
@@ -1913,7 +2095,7 @@ class Step4CheckoutCurrent extends React.Component {
                             <Grid item xs={6}>
                               <Typography type="subheading">
                                 Athletic
-                                  </Typography>
+                              </Typography>
                             </Grid>
                             <Grid item xs={6}>
                               <Typography
@@ -1931,19 +2113,19 @@ class Step4CheckoutCurrent extends React.Component {
                                   'Percentage'
                                   ? '%'
                                   : ''})
-                                  </Typography>
+                              </Typography>
                             </Grid>
                           </Grid>
                         ) : (
-                            ''
-                          )}
+                          ''
+                        )}
 
                         {e.totalBodybuilderSurcharge > 0 ? (
                           <Grid container>
                             <Grid item sm={6} xs={12}>
                               <Typography type="subheading">
                                 Bodybuilder
-                                  </Typography>
+                              </Typography>
                             </Grid>
                             <Grid item sm={6} xs={12}>
                               <Typography
@@ -1962,12 +2144,12 @@ class Step4CheckoutCurrent extends React.Component {
                                   'Percentage'
                                   ? '%'
                                   : ''})
-                                  </Typography>
+                              </Typography>
                             </Grid>
                           </Grid>
                         ) : (
-                            ''
-                          )}
+                          ''
+                        )}
 
                         {e.restrictionsActual.length > 0 && (
                           <Typography
@@ -1979,7 +2161,7 @@ class Step4CheckoutCurrent extends React.Component {
                             }}
                           >
                             Restrictions
-                              </Typography>
+                          </Typography>
                         )}
 
                         {e.restrictionsActual.length > 0 &&
@@ -1995,7 +2177,7 @@ class Step4CheckoutCurrent extends React.Component {
                                   {el.discountOrExtraType == 'Percentage'
                                     ? '%'
                                     : ''})
-                                    </Typography>
+                                </Typography>
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                 <Typography
@@ -2050,7 +2232,7 @@ class Step4CheckoutCurrent extends React.Component {
                         {this.state.primaryProfileBilling &&
                           this.state.primaryProfileBilling.deliveryCost > 0
                           ? `$${
-                          this.state.primaryProfileBilling.deliveryCost
+                            this.state.primaryProfileBilling.deliveryCost
                           }`
                           : 'Free'}
                       </Typography>
@@ -2073,7 +2255,7 @@ class Step4CheckoutCurrent extends React.Component {
                                   ),
                               ).extraSurcharge
                             })
-                              </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={6}>
                           <Typography
@@ -2084,8 +2266,8 @@ class Step4CheckoutCurrent extends React.Component {
                               this.state.primaryProfileBilling
                                 .deliverySurcharges > 0
                               ? `$${
-                              this.state.primaryProfileBilling
-                                .deliverySurcharges
+                                this.state.primaryProfileBilling
+                                  .deliverySurcharges
                               }`
                               : ''}
                           </Typography>
@@ -2099,7 +2281,7 @@ class Step4CheckoutCurrent extends React.Component {
                         <Grid item xs={6}>
                           <Typography type="subheading">
                             Cooler bag
-                              </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={6}>
                           <Typography
@@ -2108,7 +2290,7 @@ class Step4CheckoutCurrent extends React.Component {
                           >
                             {/* $20.00 */}
                             $0
-                              </Typography>
+                          </Typography>
                         </Grid>
                       </Grid>
                     )}
@@ -2119,7 +2301,7 @@ class Step4CheckoutCurrent extends React.Component {
                     style={{ marginTop: '.75em', marginBottom: '.75em' }}
                   >
                     Price
-                      </Typography>
+                  </Typography>
 
                   {!this.state.taxExempt ? (
                     <Grid container>
@@ -2137,8 +2319,8 @@ class Step4CheckoutCurrent extends React.Component {
                       </Grid>
                     </Grid>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
                   <Grid container>
                     <Grid item xs={12} sm={6}>
                       <Typography type="title">Total</Typography>
@@ -2158,7 +2340,7 @@ class Step4CheckoutCurrent extends React.Component {
                           this.state.primaryProfileBilling.taxes}/week`
                           : this.state.primaryProfileBilling &&
                           `$${
-                          this.state.primaryProfileBilling.groupTotal
+                            this.state.primaryProfileBilling.groupTotal
                           }/week`}
                       </Typography>
                     </Grid>
