@@ -135,19 +135,16 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
 
   // restrictions
   if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
-    // restrictionsLine += `Restrictions: ${userData.restrictions.map(rest => rest.title).join(', ')}`;
     restrictionsPresent = true;
     allRestrictions.push(...userData.restrictions.map(rest => rest.title));
   }
 
   if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
-    // restrictionsLine += `${restrictionsPresent ? '' : 'Restrictions: '}${userData.specificRestrictions.map(rest => rest.title).join(', ')}`;
     restrictionsPresent = true;
     allRestrictions.push(...userData.specificRestrictions.map(rest => rest.title));
   }
 
   if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
-    // restrictionsLine += `${restrictionsPresent ? '' : 'Restrictions: '}${userData.preferences.map(rest => rest.title).join(', ')}`;
     restrictionsPresent = true;
     allRestrictions.push(...userData.preferences.map(rest => rest.title));
   }
@@ -160,25 +157,29 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   }
 
   if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
-    // calories
+
     doc.setFontStyle('normal');
     doc.setFontSize(8);
-    const calories = [currentPlate.plate.nutritional[mealPortion].calories, 'calories'];
+
+    // calories
+    const currentMealPortionCalories = currentPlate.plate.nutritional[mealPortion].calories == 0 || currentPlate.plate.nutritional[mealPortion].calories == "0" ? '0' : currentPlate.plate.nutritional[mealPortion].calories;
+    const calories = [currentMealPortionCalories, 'calories'];
+    // console.log(calories);
     doc.text(calories, 2, 2.7);
 
     // protein
-    doc.setFontSize(8);
-    const protein = [currentPlate.plate.nutritional[mealPortion].proteins, 'protein'];
+    const currentMealPortionProteins = currentPlate.plate.nutritional[mealPortion].proteins == 0 || currentPlate.plate.nutritional[mealPortion].proteins == "0" ? '0' : currentPlate.plate.nutritional[mealPortion].proteins;
+    const protein = [currentMealPortionProteins, 'protein'];
     doc.text(protein, 2.6, 2.7);
 
     // carbs
-    doc.setFontSize(8);
-    const carbs = [currentPlate.plate.nutritional[mealPortion].carbs, 'carbs'];
+    const currentMealPortionCarbs = currentPlate.plate.nutritional[mealPortion].carbs == 0 || currentPlate.plate.nutritional[mealPortion].carbs == "0" ? '0' : currentPlate.plate.nutritional[mealPortion].carbs;
+    const carbs = [currentMealPortionCarbs, 'carbs'];
     doc.text(carbs, 3.1, 2.7);
 
     // fats
-    doc.setFontSize(8);
-    const fats = [currentPlate.plate.nutritional[mealPortion].fat, 'fats'];
+    const currentMealPortionFat = currentPlate.plate.nutritional[mealPortion].fat == 0 || currentPlate.plate.nutritional[mealPortion].fat == "0" ? '0' : currentPlate.plate.nutritional[mealPortion].fat;
+    const fats = [currentMealPortionFat, 'fats'];
     doc.text(fats, 3.55, 2.7);
   }
 
@@ -313,12 +314,12 @@ class PlatingTable extends React.Component {
     if (nextProps.currentSelectorDate != this.props.currentSelectorDate) {
       this.setState({
         aggregateDataLoading: true,
+        aggregateData: null,
       }, () => {
         Meteor.call('getPlatingAggregatedData', this.props.currentSelectorDate, (err, res) => {
           this.setState({
+            aggregateDataLoading: false,
             aggregateData: res,
-          }, () => {
-            this.setState({ aggregateDataLoading: false });
           });
         });
       });
