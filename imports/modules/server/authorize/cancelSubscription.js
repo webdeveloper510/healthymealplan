@@ -14,7 +14,7 @@ export default function cancelSubscription(subscriptionId, callback) {
   cancelRequest.setMerchantAuthentication(merchantAuthenticationType);
   cancelRequest.setSubscriptionId(subscriptionId);
 
-  console.log(JSON.stringify(cancelRequest.getJSON(), null, 2));
+  // console.log(JSON.stringify(cancelRequest.getJSON(), null, 2));
 
   const ctrl = new ApiControllers.ARBCancelSubscriptionController(cancelRequest.getJSON());
 
@@ -24,7 +24,7 @@ export default function cancelSubscription(subscriptionId, callback) {
     const response = new ApiContracts.ARBCancelSubscriptionResponse(apiResponse);
 
     let err = null;
-    console.log(JSON.stringify(response, null, 2));
+    // console.log(JSON.stringify(response, null, 2));
 
     if (response != null) {
       if (response.getMessages().getResultCode() == ApiContracts.MessageTypeEnum.OK) {

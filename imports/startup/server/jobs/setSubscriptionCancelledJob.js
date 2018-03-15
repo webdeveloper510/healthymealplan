@@ -1,11 +1,11 @@
-import { Job } from "meteor/vsivsi:job-collection";
-import { Meteor } from "meteor/meteor";
+import { Job } from 'meteor/vsivsi:job-collection';
+import { Meteor } from 'meteor/meteor';
 
-import Subscriptions from "../../../api/Subscriptions/Subscriptions";
+import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 
 const worker = Job.processJobs(
-  "coreJobQueue",
-  "setSubscriptionCancelled",
+  'coreJobQueue',
+  'setSubscriptionCancelledJob',
   (job, cb) => {
     const insertData = job.data;
 
@@ -16,18 +16,17 @@ const worker = Job.processJobs(
       Subscriptions.update({ _id: insertData.subscriptionId },
         {
           $set: {
-            status: "cancelled"
-          }
-        }
+            status: 'cancelled',
+          },
+        },
       );
-
     } catch (error) {
       job.log(
-        "setSubscriptionActive for customer: " +
+        'setSubscriptionActive for customer: ' +
         insertData.customerId +
-        " with subscription - " +
+        ' with subscription - ' +
         insertData.subscriptionId +
-        " failed."
+        ' failed.',
       );
       job.fail(error); // when failing
     }
@@ -37,7 +36,7 @@ const worker = Job.processJobs(
     // Be sure to invoke the callback
     // when work on this job has finished
     cb();
-  }
+  },
 );
 
 export default worker;

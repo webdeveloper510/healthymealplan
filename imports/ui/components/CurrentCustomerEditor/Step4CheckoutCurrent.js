@@ -1336,7 +1336,7 @@ class Step4CheckoutCurrent extends React.Component {
               this.props.popTheSnackbar({
                 message: `Successfully created subscription with ID:${
                   res.subscriptionId
-                }`,
+                  }`,
               });
 
               this.props.history.push('/customers');
@@ -1420,8 +1420,9 @@ class Step4CheckoutCurrent extends React.Component {
       });
 
       if (err) {
+        console.log(err)
         this.props.popTheSnackbar({
-          messages: err.reason,
+          message: err.reason,
         });
       } else {
         console.log(res);
@@ -1443,7 +1444,7 @@ class Step4CheckoutCurrent extends React.Component {
 
       if (err) {
         this.props.popTheSnackbar({
-          messages: err.reason,
+          messages: err,
         });
       } else {
         console.log(res);
@@ -1841,7 +1842,7 @@ class Step4CheckoutCurrent extends React.Component {
                       0 ||
                       this.state.primaryProfileBilling
                         .totalBodybuilderSurcharge > 0) ? (
-                          <Grid item xs={12}>
+                      <Grid item xs={12}>
                         <Typography
                           type="body2"
                           className="font-medium font-uppercase"
@@ -1892,7 +1893,7 @@ class Step4CheckoutCurrent extends React.Component {
                   {this.state.primaryProfileBilling &&
                     this.state.primaryProfileBilling
                       .totalBodybuilderSurcharge > 0 ? (
-                        <Grid container>
+                      <Grid container>
                         <Grid item xs={12} sm={6}>
                           <Typography type="subheading">
                             Bodybuilder
@@ -2117,8 +2118,8 @@ class Step4CheckoutCurrent extends React.Component {
                             </Grid>
                           </Grid>
                         ) : (
-                          ''
-                        )}
+                            ''
+                          )}
 
                         {e.totalBodybuilderSurcharge > 0 ? (
                           <Grid container>
@@ -2148,8 +2149,8 @@ class Step4CheckoutCurrent extends React.Component {
                             </Grid>
                           </Grid>
                         ) : (
-                          ''
-                        )}
+                            ''
+                          )}
 
                         {e.restrictionsActual.length > 0 && (
                           <Typography
@@ -2232,7 +2233,7 @@ class Step4CheckoutCurrent extends React.Component {
                         {this.state.primaryProfileBilling &&
                           this.state.primaryProfileBilling.deliveryCost > 0
                           ? `$${
-                            this.state.primaryProfileBilling.deliveryCost
+                          this.state.primaryProfileBilling.deliveryCost
                           }`
                           : 'Free'}
                       </Typography>
@@ -2266,8 +2267,8 @@ class Step4CheckoutCurrent extends React.Component {
                               this.state.primaryProfileBilling
                                 .deliverySurcharges > 0
                               ? `$${
-                                this.state.primaryProfileBilling
-                                  .deliverySurcharges
+                              this.state.primaryProfileBilling
+                                .deliverySurcharges
                               }`
                               : ''}
                           </Typography>
@@ -2319,8 +2320,8 @@ class Step4CheckoutCurrent extends React.Component {
                       </Grid>
                     </Grid>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
                   <Grid container>
                     <Grid item xs={12} sm={6}>
                       <Typography type="title">Total</Typography>
@@ -2340,7 +2341,7 @@ class Step4CheckoutCurrent extends React.Component {
                           this.state.primaryProfileBilling.taxes}/week`
                           : this.state.primaryProfileBilling &&
                           `$${
-                            this.state.primaryProfileBilling.groupTotal
+                          this.state.primaryProfileBilling.groupTotal
                           }/week`}
                       </Typography>
                     </Grid>

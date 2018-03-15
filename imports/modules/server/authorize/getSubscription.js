@@ -14,7 +14,7 @@ export default function getSubscription(subscriptionId, callback) {
   getRequest.setMerchantAuthentication(merchantAuthenticationType);
   getRequest.setSubscriptionId(subscriptionId);
 
-  console.log(JSON.stringify(getRequest.getJSON(), null, 2));
+  // console.log(JSON.stringify(getRequest.getJSON(), null, 2));
 
   const ctrl = new ApiControllers.ARBGetSubscriptionController(getRequest.getJSON());
 
@@ -24,7 +24,7 @@ export default function getSubscription(subscriptionId, callback) {
     const response = new ApiContracts.ARBGetSubscriptionResponse(apiResponse);
     let err = null;
 
-    console.log(JSON.stringify(response, null, 2));
+    // console.log(JSON.stringify(response, null, 2));
 
     if (response != null) {
       if (response.getMessages().getResultCode() == ApiContracts.MessageTypeEnum.OK) {

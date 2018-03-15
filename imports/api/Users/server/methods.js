@@ -1139,89 +1139,112 @@ Meteor.methods({
     check(when, String);
     check(customerId, String);
 
-    let saturday = "";
+    let saturday = '';
 
     // if we haven't yet passed the day of the week that I need:
     if (moment().isoWeekday() <= 6) {
       // then just give me this week's instance of that day
-      saturday = moment().isoWeekday(6);
+      saturday = moment().isoWeekday(6).toDate();
     } else {
       // otherwise, give me next week's instance of that day
-      saturday = moment().add(1, 'weeks').isoWeekday(6);
+      saturday = moment().add(1, 'weeks').isoWeekday(6).toDate();
     }
 
-    console.log(saturday.startOf('day').toDate())
+    console.log(saturday);
 
-    const subscription = Subscriptions.findOne({ customerId: customerId });
+    const subscription = Subscriptions.findOne({ customerId });
 
     if (!subscription) {
-      throw new Meteor.Error('500', 'No subscription found to cancel.')
+      throw new Meteor.Error('500', 'No subscription found to cancel.');
     }
 
-    if (subscription && subscription.status === "cancelled") {
-      throw new Meteor.Error('500', 'Subscription is already in the cancelled state.')
+    if (subscription && subscription.status === 'cancelled') {
+      throw new Meteor.Error('500', 'Subscription is already in the cancelled state.');
     }
 
 
-    if (subscription.paymentMethod == "card") {
-      if (when == "immediate") {
+    if (subscription.paymentMethod == 'card') {
+      if (when == 'immediate') {
         const syncCancelSubscription = Meteor.wrapAsync(cancelSubscription);
 
         const syncCancelSubscriptionRes = syncCancelSubscription(subscription.authorizeSubscriptionId);
 
-        if (syncCancelSubscriptionRes.messages.resultCode == "Ok") {
+        if (syncCancelSubscriptionRes.messages.resultCode == 'Ok') {
 
-          const statusUpdate = Subscriptions.update({ customerId: customerId }, { $set: { status: "cancelled" } });
+          const statusUpdate = Subscriptions.update({ customerId }, { $set: { status: 'cancelled' } });
+
+          const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+
+          if (jobExists) {
+            Jobs.remove({ _id: jobExists._id });
+          }
 
           return true;
 
-        } else {
-          throw new Meteor.Error('500', syncCancelSubscriptionRes.messages.message[0].text)
         }
 
-      } else if (when == "saturday") {
+        throw new Meteor.Error('500', syncCancelSubscriptionRes.messages.message[0].text);
 
 
-      }
+      } else if (when == 'saturday') {
 
-    } else if (subscription.paymentMethod == "cash") {
-      if (when == "immediate") {
+        const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
 
-        const statusUpdate = Subscriptions.update({ customerId: customerId }, { $set: { status: "cancelled" } })
-
-        if (statusUpdate) {
-          return true;
+        if (jobExists) {
+          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for cancellation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
         }
-
-      } else if (when == "saturday") {
 
         const job = new Job(
           Jobs,
-          'setSubscriptionCancelled', // type of job
+          'setSubscriptionCancelledCardJob', // type of job
+          {
+            subscriptionId: subscription._id,
+            customerId,
+          },
+        );
+
+        job.priority('normal').delay(60 * 500).save(); // Commit it to the server
+      }
+
+    } else if (subscription.paymentMethod == 'cash' || subscription.paymentMethod == 'interac') {
+      if (when == 'immediate') {
+
+        const statusUpdate = Subscriptions.update({ customerId }, { $set: { status: 'cancelled' } });
+
+        if (statusUpdate) {
+
+          const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+
+          if (jobExists) {
+            Jobs.remove({ _id: jobExists._id });
+          }
+
+          return true;
+
+        }
+
+      } else if (when == 'saturday') {
+        const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+
+        if (jobExists) {
+          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for cancellation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+        }
+
+        const job = new Job(
+          Jobs,
+          'setSubscriptionCancelledJob', // type of job
           {
             subscriptionId: subscription._id,
           },
         );
 
-        job.priority('normal').after(moment(saturday.startOf('day').toDate())).save(); // Commit it to the server
+        // job.priority('normal').after(saturday).save(); // Commit it to the server
 
-      }
-
-    } else if (subscription.paymentMethod == "interac") {
-
-      if (when == "immediate") {
-
-        const statusUpdate = Subscriptions.update({ customerId: customerId }, { $set: { status: "cancelled" } })
-
-        if (statusUpdate) {
-          return true;
-        }
-
-      } else if (when == "saturday") {
-
+        job.priority('normal').delay(60 * 500).save(); // Commit it to the server
 
 
       }
+
     }
 
   },
@@ -1232,82 +1255,128 @@ Meteor.methods({
     check(customerId, String);
     check(subscriptionAmount, Number);
 
-    let saturday = "";
+    let saturday = '';
 
     // if we haven't yet passed the day of the week that I need:
     if (moment().isoWeekday() <= 6) {
       // then just give me this week's instance of that day
-      saturday = moment().isoWeekday(6).startOf('day');
+      saturday = moment().isoWeekday(6).toDate();
     } else {
       // otherwise, give me next week's instance of that day
-      saturday = moment().add(1, 'weeks').isoWeekday(6).startOf('day');
+      saturday = moment().add(1, 'weeks').isoWeekday(6).toDate();
     }
 
     console.log(saturday);
 
-    const subscription = Subscriptions.findOne({ customerId: customerId });
+    const subscription = Subscriptions.findOne({ customerId });
 
     if (!subscription) {
-      throw new Meteor.Error('500', 'No subscription found to cancel.')
+      throw new Meteor.Error('500', 'No subscription found to cancel.');
     }
 
-    if (subscription && subscription.status === "active") {
-      throw new Meteor.Error('500', 'Subscription is already active.')
+    if (subscription && subscription.status === 'active') {
+      throw new Meteor.Error('500', 'Subscription is already active.');
     }
 
-    if (subscription.paymentMethod == "card") {
-      const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(createSubscriptionFromCustomerProfile);
-
-      const syncCreateSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
-        subscription.authorizeCustomerProfileId,
-        subscription.authorizePaymentProfileId,
-        moment(saturday).format('YYYY-MM-DD'),
-        subscriptionAmount,
-      );
-
-      if (syncCreateSubscriptionFromCustomerProfileRes.messages.resultCode == "Ok") {
-
-        const newAuthSubId = syncCreateSubscriptionFromCustomerProfileRes.subscriptionId;
-
-        const statusUpdate = Subscriptions.update({ customerId: customerId }, { $set: { status: "paused", authorizeSubscriptionId: newAuthSubId, amount: subscriptionAmount } });
-
-        return true;
-
-      } else {
-        throw new Meteor.Error('500', syncCreateSubscriptionFromCustomerProfileRes.messages.message[0].text)
-      }
-
-
-    } else if (subscription.paymentMethod == "cash") {
-      if (when == "immediate") {
-
-        const statusUpdate = Subscriptions.update({ customerId: customerId }, { $set: { status: "active", amount: subscriptionAmount } })
-
-        if (statusUpdate) {
-          return true;
-        }
-
-      } else if (when == "saturday") {
-
-        console.log(moment().isoWeekday("Saturday"))
-
-      }
-
-    } else if (subscription.paymentMethod == "interac") {
+    if (subscription.paymentMethod == 'card') {
 
       if (when == "immediate") {
 
-        const statusUpdate = Subscriptions.update({ customerId: customerId }, { $set: { status: "active", amount: subscriptionAmount } })
+        const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(createSubscriptionFromCustomerProfile);
 
-        if (statusUpdate) {
+        const syncCreateSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
+          subscription.authorizeCustomerProfileId,
+          subscription.authorizePaymentProfileId,
+          moment(saturday).format('YYYY-MM-DD'),
+          subscriptionAmount,
+        );
+
+        if (syncCreateSubscriptionFromCustomerProfileRes.messages.resultCode == 'Ok') {
+
+          const newAuthSubId = syncCreateSubscriptionFromCustomerProfileRes.subscriptionId;
+
+          const statusUpdate = Subscriptions.update({ _id: subscription._id }, { $set: { status: 'paused', authorizeSubscriptionId: newAuthSubId, amount: subscriptionAmount } });
+
+
+          const jobExists = Jobs.findOne({ type: 'setSubscriptionActiveCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+
+          if (jobExists) {
+            Jobs.remove({ _id: jobExists._id });
+          }
+
           return true;
+
         }
+
+        throw new Meteor.Error('500', syncCreateSubscriptionFromCustomerProfileRes.messages.message[0].text);
 
       } else if (when == "saturday") {
 
+        const jobExists = Jobs.findOne({ type: 'setSubscriptionActiveCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+
+        if (jobExists) {
+          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for activation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+        }
+
+        const job = new Job(
+          Jobs,
+          'setSubscriptionActiveCardJob', // type of job
+          {
+            subscriptionId: subscription._id,
+            customerId,
+            subscriptionAmount: subscriptionAmount,
+            subDate: moment(saturday).format('YYYY-MM-DD'),
+          },
+        );
+
+        job.priority('normal').delay(60 * 500).save(); // Commit it to the server
+
+        // job.priority('normal').after(saturday).save(); // Commit it to the server
 
 
       }
+
+
+    } else if (subscription.paymentMethod == 'cash' || subscription.paymentMethod == 'interac') {
+
+
+      if (when == 'immediate') {
+
+        const statusUpdate = Subscriptions.update({ _id: subscription._id }, { $set: { status: 'active', amount: subscriptionAmount } });
+
+        if (statusUpdate) {
+          const jobExists = Jobs.findOne({ type: 'setSubscriptionActiveJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+
+          if (jobExists) {
+            Jobs.remove({ _id: jobExists._id });
+          }
+
+          return true;
+        }
+
+      } else if (when == 'saturday') {
+
+        const jobExists = Jobs.findOne({ type: 'setSubscriptionActiveJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+
+        if (jobExists) {
+          throw new Meteor.Error('activate-job-already-present', `This subscription is already scheduled for activation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+        }
+
+        const job = new Job(
+          Jobs,
+          'setSubscriptionActiveJob', // type of job
+          {
+            subscriptionId: subscription._id,
+            subscriptionAmount,
+          },
+        );
+
+        // job.priority('normal').after(saturday).save(); // Commit it to the server
+
+        job.priority('normal').delay(60 * 500).save(); // Commit it to the server
+
+      }
+
     }
 
   },

@@ -13,7 +13,7 @@ const worker = Job.processJobs(
     // do anything with the job data here.
     // when done, call job.done() or job.fail()
 
-    console.log('setSubscriptionActive Starts 123123');
+    // console.log('setSubscriptionActive Starts');
 
     const syncGetTransactionDetails = Meteor.wrapAsync(getTransactionDetails);
 
@@ -52,9 +52,9 @@ const worker = Job.processJobs(
       } catch (error) {
         job.log(
           'setSubscriptionActiveCard for customer: ' +
-            transaction.transaction.customer.id +
-            ' - ' +
-            ' failed.',
+          transaction.transaction.customer.id +
+          ' - ' +
+          ' failed.',
         );
         job.fail(error); // when failing
         return false;
@@ -70,8 +70,8 @@ const worker = Job.processJobs(
       } catch (error) {
         job.log(
           'createInvoicesCard for subscription - ' +
-            subscription._id +
-            ' failed.',
+          subscription._id +
+          ' failed.',
         );
         job.fail(error); // when failing
         return false;
@@ -87,8 +87,8 @@ const worker = Job.processJobs(
       } catch (error) {
         job.log(
           'createInvoicesCard for subscription - ' +
-            subscription._id +
-            ' failed.',
+          subscription._id +
+          ' failed.',
         );
         job.fail(error); // when failing
         return false;
