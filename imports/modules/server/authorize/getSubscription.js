@@ -17,6 +17,7 @@ export default function getSubscription(subscriptionId, callback) {
   // console.log(JSON.stringify(getRequest.getJSON(), null, 2));
 
   const ctrl = new ApiControllers.ARBGetSubscriptionController(getRequest.getJSON());
+  ctrl.setEnvironment('https://api2.authorize.net/xml/v1/request.api');
 
   ctrl.execute(() => {
     const apiResponse = ctrl.getResponse();

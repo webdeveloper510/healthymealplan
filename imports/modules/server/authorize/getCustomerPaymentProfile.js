@@ -19,6 +19,7 @@ export default function getCustomerPaymentProfile(customerProfileId, customerPay
   // pretty print reques
 
   let ctrl = new ApiControllers.GetCustomerProfileController(getRequest.getJSON());
+  ctrl.setEnvironment('https://api2.authorize.net/xml/v1/request.api');
 
   ctrl.execute(() => {
 

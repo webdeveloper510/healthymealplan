@@ -20,6 +20,8 @@ export default function getTransactionDetails(transactionId, callback) {
     getRequest.getJSON(),
   );
 
+  ctrl.setEnvironment('https://api2.authorize.net/xml/v1/request.api');
+
   ctrl.execute(() => {
     const apiResponse = ctrl.getResponse();
 
@@ -44,33 +46,33 @@ export default function getTransactionDetails(transactionId, callback) {
         );
         console.log(
           'Message Code : ' +
-            response
-              .getMessages()
-              .getMessage()[0]
-              .getCode(),
+          response
+            .getMessages()
+            .getMessage()[0]
+            .getCode(),
         );
         console.log(
           'Message Text : ' +
-            response
-              .getMessages()
-              .getMessage()[0]
-              .getText(),
+          response
+            .getMessages()
+            .getMessage()[0]
+            .getText(),
         );
       } else {
         console.log('Result Code: ' + response.getMessages().getResultCode());
         console.log(
           'Error Code: ' +
-            response
-              .getMessages()
-              .getMessage()[0]
-              .getCode(),
+          response
+            .getMessages()
+            .getMessage()[0]
+            .getCode(),
         );
         console.log(
           'Error message: ' +
-            response
-              .getMessages()
-              .getMessage()[0]
-              .getText(),
+          response
+            .getMessages()
+            .getMessage()[0]
+            .getText(),
         );
         err = response
           .getMessages()

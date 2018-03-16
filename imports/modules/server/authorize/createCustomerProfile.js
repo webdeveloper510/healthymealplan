@@ -65,6 +65,9 @@ export default function createCustomerProfile(
     createRequest.getJSON(),
   );
 
+  ctrl.setEnvironment('https://api2.authorize.net/xml/v1/request.api');
+
+
   ctrl.execute(() => {
     const apiResponse = ctrl.getResponse();
     let err;
@@ -82,23 +85,23 @@ export default function createCustomerProfile(
       ) {
         console.log(
           'Successfully created a customer profile with id: ' +
-            response.getCustomerProfileId(),
+          response.getCustomerProfileId(),
         );
       } else {
         console.log('Result Code: ' + response.getMessages().getResultCode());
         console.log(
           'Error Code: ' +
-            response
-              .getMessages()
-              .getMessage()[0]
-              .getCode(),
+          response
+            .getMessages()
+            .getMessage()[0]
+            .getCode(),
         );
         console.log(
           'Error message: ' +
-            response
-              .getMessages()
-              .getMessage()[0]
-              .getText(),
+          response
+            .getMessages()
+            .getMessage()[0]
+            .getText(),
         );
 
         err = {
