@@ -1238,9 +1238,9 @@ Meteor.methods({
           },
         );
 
-        // job.priority('normal').after(saturday).save(); // Commit it to the server
+        job.priority('normal').after(saturday).save(); // Commit it to the server
 
-        job.priority('normal').delay(60 * 500).save(); // Commit it to the server
+        // job.priority('normal').delay(60 * 500).save(); // Commit it to the server
 
 
       }
@@ -1280,7 +1280,7 @@ Meteor.methods({
 
     if (subscription.paymentMethod == 'card') {
 
-      if (when == "immediate") {
+      if (when == 'immediate') {
 
         const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(createSubscriptionFromCustomerProfile);
 
@@ -1310,7 +1310,7 @@ Meteor.methods({
 
         throw new Meteor.Error('500', syncCreateSubscriptionFromCustomerProfileRes.messages.message[0].text);
 
-      } else if (when == "saturday") {
+      } else if (when == 'saturday') {
 
         const jobExists = Jobs.findOne({ type: 'setSubscriptionActiveCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
 
@@ -1324,14 +1324,14 @@ Meteor.methods({
           {
             subscriptionId: subscription._id,
             customerId,
-            subscriptionAmount: subscriptionAmount,
+            subscriptionAmount,
             subDate: moment(saturday).format('YYYY-MM-DD'),
           },
         );
 
-        job.priority('normal').delay(60 * 500).save(); // Commit it to the server
+        // job.priority('normal').delay(60 * 500).save(); // Commit it to the server
 
-        // job.priority('normal').after(saturday).save(); // Commit it to the server
+        job.priority('normal').after(saturday).save(); // Commit it to the server
 
 
       }
@@ -1371,12 +1371,159 @@ Meteor.methods({
           },
         );
 
-        // job.priority('normal').after(saturday).save(); // Commit it to the server
+        job.priority('normal').after(saturday).save(); // Commit it to the server
 
-        job.priority('normal').delay(60 * 500).save(); // Commit it to the server
+        // job.priority('normal').delay(60 * 500).save(); // Commit it to the server
 
       }
 
+    }
+
+  },
+
+  changePaymentMethod(userId, opaqueData, subscriptionAmount, billingInfo) {
+
+    let saturday = '';
+
+    // if we haven't yet passed the day of the week that I need:
+    if (moment().isoWeekday() <= 6) {
+      // then just give me this week's instance of that day
+      saturday = moment().isoWeekday(6).toDate();
+    } else {
+      // otherwise, give me next week's instance of that day
+      saturday = moment().add(1, 'weeks').isoWeekday(6).toDate();
+    }
+
+    check(opaqueData, {
+      dataDescriptor: String,
+      dataValue: String,
+    });
+
+    check(subscriptionAmount, Number);
+
+    check(billingInfo, Object);
+
+    check(userId, String);
+
+    const userChange = Meteor.users.findOne({ _id: userId });
+    console.log(userChange);
+
+    const syncCreateCustomerProfile = Meteor.wrapAsync(createCustomerProfile);
+    const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(
+      createSubscriptionFromCustomerProfile,
+    );
+
+    // create primary profile over on Authorize
+    const createCustomerProfileRes = syncCreateCustomerProfile(
+      opaqueData.dataDescriptor,
+      opaqueData.dataValue,
+      {
+        email: userChange.emails[0].address,
+        id: userChange._id,
+        postalCode: billingInfo.billingPostalCode,
+        nameOnCard: billingInfo.nameOnCard,
+      },
+    );
+
+    if (
+      createCustomerProfileRes.messages.resultCode &&
+      createCustomerProfileRes.messages.resultCode != 'Ok'
+    ) {
+      throw new Meteor.Error(500, 'There was a problem creating user profile.');
+    }
+
+    // console.log('Customer');
+    // console.log(createCustomerProfileRes);
+
+    Meteor._sleepForMs(10000);
+
+    // subscription
+    const createSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
+      createCustomerProfileRes.customerProfileId,
+      createCustomerProfileRes.customerPaymentProfileIdList.numericString[0],
+      moment(saturday).format('YYYY-MM-DD'),
+      subscriptionAmount,
+    );
+
+    console.log('Subscription data');
+    console.log(createSubscriptionFromCustomerProfileRes);
+
+    if (
+      createSubscriptionFromCustomerProfileRes.messages.resultCode &&
+      createSubscriptionFromCustomerProfileRes.messages.resultCode != 'Ok'
+    ) {
+      throw new Meteor.Error(
+        500,
+        'There was a problem creating subscription from user profile.',
+      );
+    }
+
+    console.log(userChange._id);
+
+    console.log(Subscriptions.findOne({ customerId: userChange._id }));
+
+    Subscriptions.update({ customerId: userChange._id },
+      {
+        $set: {
+          amount: subscriptionAmount,
+          paymentMethod: 'card',
+          status: 'active',
+          authorizeSubscriptionId: createSubscriptionFromCustomerProfileRes.subscriptionId,
+          authorizeCustomerProfileId: createSubscriptionFromCustomerProfileRes.profile.customerProfileId,
+          authorizePaymentProfileId: createSubscriptionFromCustomerProfileRes.profile.customerPaymentProfileId,
+        },
+
+      },
+    );
+
+  },
+
+  changePaymentMethodNonCard(type, userId) {
+
+    check(type, String);
+    check(userId, String);
+
+    const user = Meteor.users.findOne({ _id: userId })
+    const subscription = Subscriptions.findOne({ customerId: user._id });
+
+    if (subscription.paymentMethod == "card") {
+
+      const syncCancelSubscription = Meteor.wrapAsync(cancelSubscription);
+
+      const syncCancelSubscriptionRes = syncCancelSubscription(subscription.authorizeSubscriptionId);
+
+      if (syncCancelSubscriptionRes.messages.resultCode == 'Ok') {
+
+        const statusUpdate = Subscriptions.update({ _id: subscription._id }, { $set: { paymentMethod: type, status: 'active' } });
+
+        const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+
+        if (jobExists) {
+          Jobs.remove({ _id: jobExists._id });
+        }
+
+        return true;
+
+      }
+
+      throw new Meteor.Error('500', syncCancelSubscriptionRes.messages.message[0].text);
+
+    } else {
+
+
+      try {
+
+        Subscriptions.update({
+          _id: subscription._id,
+        }, {
+            $set: {
+              paymentMethod: type
+            }
+          });
+      } catch (error) {
+        console.log(error);
+        throw new Meteor.Error(500, error);
+      }
     }
 
   },
@@ -1393,4 +1540,3 @@ rateLimit({
   limit: 5,
   timeRange: 1000,
 });
-

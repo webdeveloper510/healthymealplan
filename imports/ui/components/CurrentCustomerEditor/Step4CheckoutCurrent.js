@@ -91,9 +91,12 @@ class Step4CheckoutCurrent extends React.Component {
       dialogCancelSubscription: false,
       dialogEditPaymentMethod: false,
       dialogActivateSubscription: false,
+
+      dialogAddCard: false,
+
     };
 
-    this.editPaymentMethod = this.editPaymentMethod.bind(this);
+    // this.editPaymentMethod = this.editPaymentMethod.bind(this);
 
     this.openCancelSubscriptionDialog = this.openCancelSubscriptionDialog.bind(this);
     this.closeCancelSubscriptionDialog = this.closeCancelSubscriptionDialog.bind(this);
@@ -104,10 +107,12 @@ class Step4CheckoutCurrent extends React.Component {
     this.openEditPaymentMethodDialog = this.openEditPaymentMethodDialog.bind(this);
     this.closeEditPaymentMethodDialog = this.closeEditPaymentMethodDialog.bind(this);
 
-  }
 
-  componentWillMount() {
+    this.openAddCardDialog = this.openAddCardDialog.bind(this);
+    this.closeAddCardDialog = this.closeAddCardDialog.bind(this);
 
+    this.attachPaymentFormatHandlers = this.attachPaymentFormatHandlers.bind(this);
+    this.handleSubmitStep = this.handleSubmitStep.bind(this);
   }
 
   componentDidMount() {
@@ -136,13 +141,9 @@ class Step4CheckoutCurrent extends React.Component {
       },
 
       submitHandler() {
-        component.handleSubmitStep();
+        this.handleSubmitStep();
       },
     });
-
-    // Payment.formatCardNumber(document.querySelector('#cardNumber'));
-    // Payment.formatCardExpiry(document.querySelector('#expiry'));
-    // Payment.formatCardCVC(document.querySelector('#cvc'));
 
     /*
     * The best way to refactor the below bill calculator is to separate it
@@ -1224,62 +1225,103 @@ class Step4CheckoutCurrent extends React.Component {
       secondaryProfilesBilling: secondaryCustomers,
     });
 
-  } // willReceiveProps
+    // Payment.formatCardNumber(document.querySelector('#cardNumber'));
+    // Payment.formatCardExpiry(document.querySelector('#expiry'));
+    // Payment.formatCardCVC(document.querySelector('#cvc'));
+
+  }
+
+  attachPaymentFormatHandlers() {
+    console.log('entered');
+
+
+    validate($('#add-card-form'), {
+      errorPlacement(error, element) {
+        error.insertAfter(
+          $(element)
+            .parent()
+            .parent(),
+        );
+      },
+
+      rules: {
+        nameOnCard: {
+          required: true,
+        },
+
+        postal_code: {
+          minlength: 6,
+          maxlength: 6,
+          cdnPostal: true,
+          required: true,
+        },
+      },
+
+      submitHandler() {
+        this.handleSubmitStep();
+      },
+    });
+
+    Payment.formatCardNumber(document.querySelector('#cardNumber'));
+    Payment.formatCardExpiry(document.querySelector('#expiry'));
+    Payment.formatCardCVC(document.querySelector('#cvc'));
+  }
 
   handleSubmitStep() {
-    console.log('Reached');
+
+    if (!$('#add-card-form').valid()) {
+      return;
+    }
 
     this.setState({
       submitSuccess: false,
       submitLoading: true,
     });
 
-    this.props.saveValues({
-      primaryProfileBilling: this.state.primaryProfileBilling,
-      secondaryProfilesBilling: this.state.secondaryProfilesBilling,
-      taxExempt: this.state.taxExempt,
-    });
+    // this.props.saveValues({
+    //   primaryProfileBilling: this.state.primaryProfileBilling,
+    //   secondaryProfilesBilling: this.state.secondaryProfilesBilling,
+    //   taxExempt: this.state.taxExempt,
+    // });
 
-    const customerInfo = this.props.customerInfo;
+    // customerInfo.primaryProfileBilling = this.state.primaryProfileBilling;
+    // customerInfo.secondaryProfilesBilling = this.state.secondaryProfilesBilling;
+    // customerInfo.taxExempt = this.state.taxExempt;
+    // customerInfo.paymentMethod = this.state.paymentMethod;
+    // customerInfo.nameOnCard = $('[name="nameOnCard"]')
+    //   .val()
+    //   .trim();
+    // customerInfo.billingPostalCode = $('[name="postal_code"]')
+    //   .val()
+    //   .trim();
 
-    customerInfo.primaryProfileBilling = this.state.primaryProfileBilling;
-    customerInfo.secondaryProfilesBilling = this.state.secondaryProfilesBilling;
-    customerInfo.taxExempt = this.state.taxExempt;
-    customerInfo.paymentMethod = this.state.paymentMethod;
-    customerInfo.nameOnCard = $('[name="nameOnCard"]')
-      .val()
-      .trim();
-    customerInfo.billingPostalCode = $('[name="postal_code"]')
-      .val()
-      .trim();
+    // if (
+    //   this.state.paymentMethod == 'interac' ||
+    //   this.state.paymentMethod == 'cash'
+    // ) {
+    //   console.log("It's cash or interac");
 
-    if (
-      this.state.paymentMethod == 'interac' ||
-      this.state.paymentMethod == 'cash'
-    ) {
-      console.log("It's cash or interac");
+    //   console.log(customerInfo);
 
-      console.log(customerInfo);
+    //   Meteor.call('customer.step5.noCreditCard', customerInfo, (err, res) => {
+    //     if (err) {
+    //       console.log(err);
+    //     } else {
+    //       this.setState({
+    //         submitSuccess: false,
+    //         submitLoading: true,
+    //       });
 
-      Meteor.call('customer.step5.noCreditCard', customerInfo, (err, res) => {
-        if (err) {
-          console.log(err);
-        } else {
-          this.setState({
-            submitSuccess: false,
-            submitLoading: true,
-          });
+    //       this.props.popTheSnackbar({
+    //         message: 'Customer added successfully.',
+    //       });
 
-          this.props.popTheSnackbar({
-            message: 'Customer added successfully.',
-          });
+    //       this.props.history.push('/customers');
+    //     }
+    //   });
 
-          this.props.history.push('/customers');
-        }
-      });
-
-      return;
-    }
+    //   return;
+    // }
 
     const authData = {};
     authData.clientKey = Meteor.settings.public.clientKey;
@@ -1300,49 +1342,55 @@ class Step4CheckoutCurrent extends React.Component {
     cardData.year = expiration[1].trim();
     cardData.cardCode = document.getElementById('cvc').value.trim();
 
-    console.log(cardData);
+    // console.log(cardData);
     const secureData = {};
     secureData.authData = authData;
     secureData.cardData = cardData;
 
     Accept.dispatchData(secureData, (response) => {
-      console.log(response);
+      // console.log(response);
 
       if (response.messages.resultCode === 'Ok' && response.opaqueData) {
-        Meteor.call(
-          'customers.step5',
-          response.opaqueData,
-          customerInfo,
-          (err, res) => {
-            if (err) {
-              console.log(err);
 
-              this.setState({
-                submitSuccess: false,
-                submitLoading: false,
-              });
+        Meteor.call('changePaymentMethod', this.props.customer._id, response.opaqueData, this.state.primaryProfileBilling.groupTotal, {
+          nameOnCard: $('[name="nameOnCard"]')
+            .val()
+            .trim(),
+          billingPostalCode: $('[name="postal_code"]')
+            .val()
+            .trim(),
+        }, (err, response) => {
 
-              this.props.popTheSnackbar({
-                message: 'There was an error saving customer data',
-              });
-            } else {
-              console.log(res);
+          if (err) {
 
-              this.setState({
-                submitSuccess: true,
-                submitLoading: false,
-              });
+            this.setState({
+              submitSuccess: false,
+              submitLoading: false,
+            });
 
-              this.props.popTheSnackbar({
-                message: `Successfully created subscription with ID:${
-                  res.subscriptionId
-                  }`,
-              });
+            this.props.popTheSnackbar({
+              message: 'There was an error switching customer profiles',
+            });
+          } else {
 
-              this.props.history.push('/customers');
-            }
-          },
-        );
+            this.setState({
+              submitSuccess: true,
+              submitLoading: false,
+              dialogAddCard: false,
+              dialogEditPaymentMethod: false,
+            });
+
+            this.props.popTheSnackbar({
+              message: 'Successfully switched customer to card',
+            });
+
+            this.setState({
+              submitSuccess: false,
+            });
+
+          }
+        });
+
       } else {
         this.setState({
           submitSuccess: false,
@@ -1368,11 +1416,7 @@ class Step4CheckoutCurrent extends React.Component {
     });
   }
 
-  editPaymentMethod() {
-
-
-  }
-
+  //refactor all these dialog open methods into one
   openCancelSubscriptionDialog() {
     this.setState({
       dialogCancelSubscription: true,
@@ -1411,6 +1455,19 @@ class Step4CheckoutCurrent extends React.Component {
     });
   }
 
+  openAddCardDialog() {
+    this.setState({
+      dialogAddCard: true,
+    });
+  }
+
+  closeAddCardDialog() {
+    this.setState({
+      dialogAddCard: false,
+    });
+  }
+
+
   handleCancelSubscription(when) {
 
     Meteor.call('cancelSubscription', when, this.props.customer._id, (err, res) => {
@@ -1420,7 +1477,7 @@ class Step4CheckoutCurrent extends React.Component {
       });
 
       if (err) {
-        console.log(err)
+        console.log(err);
         this.props.popTheSnackbar({
           message: err.reason,
         });
@@ -1455,7 +1512,37 @@ class Step4CheckoutCurrent extends React.Component {
     });
   }
 
-  handleEditPaymentMethod() {
+  handleEditPaymentMethod(type) {
+
+    if (type == 'card') {
+      this.openAddCardDialog();
+    }
+
+    if (type == 'interac' || type == 'cash') {
+
+      Meteor.call('changePaymentMethodNonCard', type, this.props.customer._id, (err, res) => {
+
+        if (err) {
+          // console.log(err);
+          this.props.popTheSnackbar({
+            messages: err,
+          });
+        } else {
+
+          this.setState({
+            dialogEditPaymentMethod: false,
+          }, () => {
+
+            this.props.popTheSnackbar({
+              message: `Successfully changed the payment method to ${type}`,
+            });
+
+          })
+        }
+      })
+
+
+    }
 
   }
 
@@ -1505,7 +1592,7 @@ class Step4CheckoutCurrent extends React.Component {
                           <Typography type="body2">Card {this.state.paymentProfileDetails.payment.creditCard.cardNumber}</Typography>
                           <Typography type="body2">Expiry {this.state.paymentProfileDetails.payment.creditCard.expirationDate}</Typography>
                         </div>
-                        <Button onClick={this.editPaymentMethod} style={{ marginLeft: '1em' }}>Edit</Button>
+                        <Button onClick={this.openEditPaymentMethodDialog} style={{ marginLeft: '1em' }}>Edit</Button>
                       </div>
                     </div>
                   ) : ''}
@@ -1513,7 +1600,7 @@ class Step4CheckoutCurrent extends React.Component {
                   {this.state.paymentMethod === 'cash' ? (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <Typography type="headline">Cash</Typography>
-                      <Button onClick={this.editPaymentMethod} style={{ marginLeft: '1em' }}>Edit</Button>
+                      <Button onClick={this.openEditPaymentMethodDialog} style={{ marginLeft: '1em' }}>Edit</Button>
 
                     </div>
 
@@ -1524,7 +1611,7 @@ class Step4CheckoutCurrent extends React.Component {
 
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <Typography type="headline">Interac e-Transfer</Typography>
-                      <Button onClick={this.editPaymentMethod} style={{ marginLeft: '1em' }}>Edit</Button>
+                      <Button onClick={this.openEditPaymentMethodDialog} style={{ marginLeft: '1em' }}>Edit</Button>
                     </div>
 
                   ) : ''}
@@ -1557,7 +1644,7 @@ class Step4CheckoutCurrent extends React.Component {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <DialogTitle id="responsive-dialog-title" style={{}}>{`Cancel ${this.props.customer.profile.name.first} ${this.props.customer.profile.name.last}'s subscription?`}</DialogTitle>
-                    <ClearIcon onClick={this.closeCancelSubscriptionDialog} spacing={8} />
+                    <ClearIcon onClick={this.closeCancelSubscriptionDialog} style={{ paddingRight: '24px' }} />
                   </div>
                   <DialogContent>
                     <DialogContentText>
@@ -1571,7 +1658,6 @@ class Step4CheckoutCurrent extends React.Component {
                 </Dialog>
 
 
-
                 <Dialog
                   open={this.state.dialogActivateSubscription}
                   onClose={this.closeActivateSubscriptionDialog}
@@ -1579,7 +1665,7 @@ class Step4CheckoutCurrent extends React.Component {
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <DialogTitle id="responsive-dialog-title" style={{}}>{`Activate ${this.props.customer.profile.name.first} ${this.props.customer.profile.name.last}'s subscription?`}</DialogTitle>
-                    <ClearIcon onClick={this.closeActivateSubscriptionDialog} />
+                    <ClearIcon onClick={this.closeActivateSubscriptionDialog} style={{ paddingRight: '24px' }} />
                   </div>
                   <DialogContent>
                     <DialogContentText>
@@ -1599,18 +1685,117 @@ class Step4CheckoutCurrent extends React.Component {
                   aria-labelledby="responsive-dialog-title"
                 >
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <DialogTitle id="responsive-dialog-title" style={{}}>{`Edit ${this.props.customer.profile.name.first} ${this.props.customer.profile.name.last}'s payment method?`}</DialogTitle>
-                    <ClearIcon onClick={this.closeEditPaymentMethodDialog} />
+                    <DialogTitle id="responsive-dialog-title" style={{}}>{`Change ${this.props.customer.profile.name.first} ${this.props.customer.profile.name.last}'s payment method?`}</DialogTitle>
+                    <ClearIcon onClick={this.closeEditPaymentMethodDialog} style={{ paddingRight: '24px' }} />
                   </div>
                   <DialogContent>
                     <DialogContentText>
-                      Do you want to activate the subscription immediately or the earliest saturday?
+                      Do you want to change the payment method?
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={this.handleEditPaymentMethod.bind(this, 'immediate')} color="primary">Immediate</Button>
-                    <Button onClick={this.handleEditPaymentMethod.bind(this, 'saturday')} color="primary" autoFocus>Saturday</Button>
+
+                    <Button disabled={this.state.paymentMethod && this.state.paymentMethod == 'card'} onClick={this.handleEditPaymentMethod.bind(this, 'card')} color="primary">Card</Button>
+                    <Button disabled={this.state.paymentMethod && this.state.paymentMethod == 'cash'} onClick={this.handleEditPaymentMethod.bind(this, 'cash')} color="primary" autoFocus>Cash</Button>
+                    <Button disabled={this.state.paymentMethod && this.state.paymentMethod == 'interac'} onClick={this.handleEditPaymentMethod.bind(this, 'interac')} color="primary" autoFocus>Interac e-Transfer</Button>
+
                   </DialogActions>
+                </Dialog>
+
+                <Dialog
+                  open={this.state.dialogAddCard}
+                  onClose={this.closeAddCardDialog}
+                  aria-labelledby="responsive-dialog-title"
+                  onEntered={this.attachPaymentFormatHandlers}
+                >
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <DialogTitle id="responsive-dialog-title" style={{}}>{`Add card as ${this.props.customer.profile.name.first} ${this.props.customer.profile.name.last}'s payment method?`}</DialogTitle>
+                    <ClearIcon onClick={this.closeAddCardDialog} style={{ paddingRight: '24px' }} />
+                  </div>
+                  <DialogContent>
+                    <form
+                      id="add-card-form"
+                      ref={form => (this.form = form)}
+                      onSubmit={event => event.preventDefault()}
+                    >
+                      <Grid container>
+
+                        <Grid item xs={12}>
+                          <Input
+                            placeholder="Name on card"
+                            inputProps={{
+                              name: 'nameOnCard',
+                              id: 'nameOnCard',
+                              required: true,
+                            }}
+                            fullWidth
+                          />
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Input
+                            placeholder="Card number"
+                            inputProps={{
+                              name: 'cardNumber',
+                              id: 'cardNumber',
+                              required: true,
+
+                            }}
+                            fullWidth
+                          />
+                        </Grid>
+                      </Grid>
+                      <Grid container>
+                        <Grid item xs={4}>
+                          <Input
+                            placeholder="Expiration"
+                            inputProps={{
+                              name: 'expiry', id: 'expiry', required: true,
+                            }}
+                            fullWidth
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Input
+                            placeholder="CVC"
+                            inputProps={{
+                              name: 'cvc', id: 'cvc', required: true,
+                            }}
+                            fullWidth
+                          />
+                        </Grid>
+                        <Grid item xs={4}>
+                          <Input
+                            placeholder="Postal code"
+                            inputProps={{
+                              name: 'postal_code',
+                              id: 'postalCode',
+                              required: true,
+
+                            }}
+                            fullWidth
+                          />
+                        </Grid>
+                      </Grid>
+                      <Button
+                        disabled={this.state.submitLoading}
+                        raised
+                        className={`${buttonClassname}`}
+                        color="primary"
+                        type="submit"
+                        style={{ marginTop: '25px' }}
+                        onClick={() => this.handleSubmitStep()}
+                      >
+                        Add
+                        {this.state.submitLoading && (
+                          <CircularProgress
+                            size={24}
+                            className={this.props.classes.buttonProgress}
+                          />
+                        )}
+                      </Button>
+                    </form>
+                  </DialogContent>
+
                 </Dialog>
 
 
