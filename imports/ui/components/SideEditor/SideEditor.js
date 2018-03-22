@@ -5,52 +5,52 @@
   not a priority for now, but this is an itch that we should really scratch.
 */
 
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import Autosuggest from "react-autosuggest";
+import Autosuggest from 'react-autosuggest';
 
-import _ from "lodash";
+import _ from 'lodash';
 
-import { Meteor } from "meteor/meteor";
+import { Meteor } from 'meteor/meteor';
 
-import Button from "material-ui/Button";
-import { MenuItem } from "material-ui/Menu";
-import TextField from "material-ui/TextField";
-import Checkbox from "material-ui/Checkbox";
-import FormControlLabel from "material-ui/Form/FormControlLabel";
+import Button from 'material-ui/Button';
+import { MenuItem } from 'material-ui/Menu';
+import TextField from 'material-ui/TextField';
+import Checkbox from 'material-ui/Checkbox';
+import FormControlLabel from 'material-ui/Form/FormControlLabel';
 
 import Dialog, {
   DialogActions,
   DialogContent,
-  DialogContentText
-} from "material-ui/Dialog";
+  DialogContentText,
+} from 'material-ui/Dialog';
 
 import Table, {
   TableBody,
   TableCell,
   TableFooter,
   TableHead,
-  TableRow
-} from "material-ui/Table";
+  TableRow,
+} from 'material-ui/Table';
 
-import Chip from "material-ui/Chip";
-import Paper from "material-ui/Paper";
+import Chip from 'material-ui/Chip';
+import Paper from 'material-ui/Paper';
 
-import Grid from "material-ui/Grid";
-import Typography from "material-ui/Typography";
-import Divider from "material-ui/Divider";
-import Avatar from "material-ui/Avatar";
-import $ from "jquery";
+import Grid from 'material-ui/Grid';
+import Typography from 'material-ui/Typography';
+import Divider from 'material-ui/Divider';
+import Avatar from 'material-ui/Avatar';
+import $ from 'jquery';
 
-import { red } from "material-ui/colors";
-import ChevronLeft from "material-ui-icons/ChevronLeft";
+import { red } from 'material-ui/colors';
+import ChevronLeft from 'material-ui-icons/ChevronLeft';
 
-import Search from "material-ui-icons/Search";
-import Loading from "../Loading/Loading";
+import Search from 'material-ui-icons/Search';
+import Loading from '../Loading/Loading';
 
-import validate from "../../../modules/validate";
-import SideImages from "../../../api/SideImages/SideImages";
+import validate from '../../../modules/validate';
+import SideImages from '../../../api/SideImages/SideImages';
 
 const danger = red[700];
 
@@ -72,24 +72,25 @@ class SideEditor extends React.Component {
           this.props.document &&
           this.props.document.imageUrl
           ? this.props.document.imageUrl
-          : "",
+          : '',
 
-      value: "", // Autosuggest
-      valueMealType: this.props.plate ? this.props.plate.mealType : "Desserts",
-      valueInstructionActual: "None",
-      custom:
-        this.props.plate && !this.props.newPlate
-          ? this.props.plate.custom
-          : false,
+      value: '', // Autosuggest
+      valueMealType: this.props.plate ? this.props.plate.mealType : 'Desserts',
+      valueInstructionActual: 'None',
+      custom: this.props.plate && !this.props.newPlate
+        ? this.props.plate.custom
+        : false,
       suggestions: [],
       subIngredients:
         this.props.plate && this.props.plate.ingredients
-          ? _.sortBy(this.props.plate.ingredients, "title")
+          ? _.sortBy(this.props.plate.ingredients, 'title')
           : [],
       deleteDialogOpen: false,
       hasFormChanged: false,
-      imageFieldChanged: false
+      imageFieldChanged: false,
     };
+
+    this.renderImageUrl = this.renderImageUrl.bind(this);
   }
 
   componentDidMount() {
@@ -99,13 +100,13 @@ class SideEditor extends React.Component {
         error.insertAfter(
           $(element)
             .parent()
-            .parent()
+            .parent(),
         );
       },
 
       rules: {
         title: {
-          required: true
+          required: true,
         },
 
         // subtitle: {
@@ -117,17 +118,17 @@ class SideEditor extends React.Component {
         // },
 
         type: {
-          required: true
-        }
+          required: true,
+        },
       },
       messages: {
         title: {
-          required: "Name required."
-        }
+          required: 'Name required.',
+        },
       },
       submitHandler() {
         component.handleSubmit();
-      }
+      },
     });
   }
 
@@ -143,7 +144,7 @@ class SideEditor extends React.Component {
   // Use your imagination to render suggestions.
   onChange(event, { newValue }) {
     this.setState({
-      value: newValue
+      value: newValue,
     });
   }
 
@@ -152,11 +153,11 @@ class SideEditor extends React.Component {
 
     const fr = new FileReader();
 
-    fr.onload = el => {
+    fr.onload = (el) => {
       this.setState({
         plateImageSrc: el.target.result,
         imageFieldChanged: true,
-        hasFormChanged: true
+        hasFormChanged: true,
       });
     };
 
@@ -165,7 +166,7 @@ class SideEditor extends React.Component {
 
   onSuggestionSelected(
     event,
-    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
     const clonedSubIngredients = this.state.subIngredients
       ? this.state.subIngredients.slice()
@@ -175,7 +176,7 @@ class SideEditor extends React.Component {
 
     if (clonedSubIngredients.length > 0) {
       isThere = clonedSubIngredients.filter(
-        present => suggestion._id === present._id
+        present => suggestion._id === present._id,
       );
     }
 
@@ -187,7 +188,7 @@ class SideEditor extends React.Component {
 
     this.setState({
       subIngredients: clonedSubIngredients,
-      hasFormChanged: true
+      hasFormChanged: true,
     });
   }
 
@@ -195,14 +196,14 @@ class SideEditor extends React.Component {
   // You already implemented this logic above, so just use it.
   onSuggestionsFetchRequested({ value }) {
     this.setState({
-      suggestions: this.getSuggestions(value)
+      suggestions: this.getSuggestions(value),
     });
   }
 
   // Autosuggest will call this function every time you need to clear suggestions.
   onSuggestionsClearRequested() {
     this.setState({
-      suggestions: []
+      suggestions: [],
     });
   }
 
@@ -215,7 +216,7 @@ class SideEditor extends React.Component {
       ? []
       : this.props.potentialSubIngredients.filter(
         ingredient =>
-          ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
+          ingredient.title.toLowerCase().slice(0, inputLength) === inputValue,
       );
   }
 
@@ -230,24 +231,24 @@ class SideEditor extends React.Component {
     const { popTheSnackbar, history, plate } = this.props;
 
     const existingPlate = plate && plate._id;
-    localStorage.setItem("plateDeleted", plate.title);
+    localStorage.setItem('plateDeleted', plate.title);
     const plateDeletedMessage = `${localStorage.getItem(
-      "plateDeleted"
+      'plateDeleted',
     )} deleted from sides.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call("sides.remove", existingPlate, error => {
+    Meteor.call('sides.remove', existingPlate, (error) => {
       if (error) {
         popTheSnackbar({
-          message: error.reason
+          message: error.reason,
         });
       } else {
         popTheSnackbar({
-          message: plateDeletedMessage
+          message: plateDeletedMessage,
         });
 
-        history.push("/sides");
+        history.push('/sides');
       }
     });
   }
@@ -259,11 +260,11 @@ class SideEditor extends React.Component {
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
     const existingPlate = this.props.plate && this.props.plate._id;
-    const methodToCall = existingPlate ? "sides.update" : "sides.insert";
+    const methodToCall = existingPlate ? 'sides.update' : 'sides.insert';
 
     const plate = {
-      title: document.querySelector("#title").value.trim(),
-      subtitle: document.querySelector("#subtitle").value.trim(),
+      title: document.querySelector('#title').value.trim(),
+      subtitle: document.querySelector('#subtitle').value.trim(),
       mealType: this.state.valueMealType.trim(),
       custom: this.state.custom,
       ingredients: this.state.subIngredients,
@@ -272,24 +273,24 @@ class SideEditor extends React.Component {
           fat: $("[name='regular_fat']").val(),
           calories: $('[name="regular_calories"]').val(),
           proteins: $('[name="regular_proteins"]').val(),
-          carbs: $('[name="regular_carbs"]').val()
+          carbs: $('[name="regular_carbs"]').val(),
         },
         athletic: {
           calories: $('[name="athletic_calories"]').val(),
           proteins: $('[name="athletic_proteins"]').val(),
           carbs: $('[name="athletic_carbs"]').val(),
-          fat: $('[name="athletic_fat"]').val()
+          fat: $('[name="athletic_fat"]').val(),
         },
         bodybuilder: {
           calories: $('[name="bodybuilder_calories"]').val(),
           proteins: $('[name="bodybuilder_proteins"]').val(),
           carbs: $('[name="bodybuilder_carbs"]').val(),
-          fat: $('[name="bodybuilder_fat"]').val()
-        }
-      }
+          fat: $('[name="bodybuilder_fat"]').val(),
+        },
+      },
     };
 
-    if (this.state.valueInstructionActual !== "None") {
+    if (this.state.valueInstructionActual !== 'None') {
       const selectedInstruction = this.props.instructions.filter((e, i) => {
         if (this.state.valueInstructionActual === e.title) {
           return e._id;
@@ -306,17 +307,17 @@ class SideEditor extends React.Component {
     Meteor.call(methodToCall, plate, (error, plateId) => {
       if (error) {
         popTheSnackbar({
-          message: error.reason
+          message: error.reason,
         });
       } else {
         localStorage.setItem(
-          "plateForSnackbar",
-          plate.title || $('[name="title"]').val()
+          'plateForSnackbar',
+          plate.title || $('[name="title"]').val(),
         );
 
         const confirmation = existingPlate
-          ? `${localStorage.getItem("plateForSnackbar")} side updated.`
-          : `${localStorage.getItem("plateForSnackbar")} side added.`;
+          ? `${localStorage.getItem('plateForSnackbar')} side updated.`
+          : `${localStorage.getItem('plateForSnackbar')} side added.`;
 
         if (this.state.imageFieldChanged) {
           // if (existingPlate) {
@@ -344,7 +345,7 @@ class SideEditor extends React.Component {
               'sides.updateImageUrl',
               {
                 _id: plateId,
-                imageUrl: res.relative_url
+                imageUrl: res.relative_url,
               },
               (err, plateId) => {
                 if (err) {
@@ -364,11 +365,11 @@ class SideEditor extends React.Component {
         } else {
           popTheSnackbar({
             message: confirmation,
-            buttonText: "View",
-            buttonLink: `/sides/${plateId}/edit`
+            buttonText: 'View',
+            buttonLink: `/sides/${plateId}/edit`,
           });
 
-          history.push("/sides");
+          history.push('/sides');
         }
       }
     });
@@ -438,19 +439,19 @@ class SideEditor extends React.Component {
       >
         <Typography
           style={{
-            flex: "0 0 auto",
-            margin: "0",
-            padding: "24px 24px 20px 24px"
+            flex: '0 0 auto',
+            margin: '0',
+            padding: '24px 24px 20px 24px',
           }}
           className="title font-medium"
           type="title"
         >
-          Delete {this.props.plate ? this.props.plate.title.toLowerCase() : ""}?
+          Delete {this.props.plate ? this.props.plate.title.toLowerCase() : ''}?
         </Typography>
         <DialogContent>
           <DialogContentText className="subheading">
-            Are you sure you want to delete{" "}
-            {this.props.plate ? this.props.plate.title.toLowerCase() : ""}?
+            Are you sure you want to delete{' '}
+            {this.props.plate ? this.props.plate.title.toLowerCase() : ''}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -488,12 +489,12 @@ class SideEditor extends React.Component {
       <TextField
         className={styles.textField}
         value={value}
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         InputProps={{
           classes: {
-            input: styles.input
+            input: styles.input,
           },
-          ...other
+          ...other,
         }}
       />
     );
@@ -518,7 +519,7 @@ class SideEditor extends React.Component {
 
     this.setState({
       subIngredients: stateCopy,
-      hasFormChanged: true
+      hasFormChanged: true,
     });
   }
 
@@ -541,7 +542,7 @@ class SideEditor extends React.Component {
 
     if (this.props.allIngredients) {
       const avatarToReturn = this.props.allIngredients.find(
-        el => el._id === subIngredient
+        el => el._id === subIngredient,
       );
       return avatarToReturn.title.charAt(0);
     }
@@ -553,38 +554,38 @@ class SideEditor extends React.Component {
     const hasFormChanged = e.currentTarget.value.length > 0;
 
     this.setState({
-      hasFormChanged
+      hasFormChanged,
     });
   }
 
   changeTableField() {
     this.setState({
-      hasFormChanged: true
+      hasFormChanged: true,
     });
   }
 
   handleMealTypeChange(event, value) {
     this.setState({
       valueMealType: event.target.value,
-      hasFormChanged: true
+      hasFormChanged: true,
     });
   }
 
   handleInstructionChange(event, value) {
     this.setState({
       valueInstructionActual: event.target.value,
-      hasFormChanged: true
+      hasFormChanged: true,
     });
   }
 
   renderImageUrl() {
-    if (this.props.newPlate) {
+    if (this.props.newPlate || this.state.imageFieldChanged) {
       return this.state.plateImageSrc;
     } else if (this.props.document && this.props.document.imageUrl) {
       return `${Meteor.settings.public.S3BucketDomain}${this.state.plateImageSrc}`;
-    } else if (this.state.imageFieldChanged) {
-      return this.state.plateImageSrc;
     }
+
+    return '';
   }
 
 
@@ -593,65 +594,65 @@ class SideEditor extends React.Component {
 
     return !loading ? (
       <form
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         ref={form => (this.form = form)}
         onSubmit={event => event.preventDefault()}
       >
         <Grid container justify="center">
           <Grid item xs={12}>
             <Button
-              onClick={() => this.props.history.push("/sides")}
+              onClick={() => this.props.history.push('/sides')}
               className="button button-secondary button-secondary--top"
             >
               <Typography
                 type="subheading"
                 className="subheading font-medium"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  flexDirection: "row"
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexDirection: 'row',
                 }}
               >
-                <ChevronLeft style={{ marginRight: "4px" }} /> Sides
+                <ChevronLeft style={{ marginRight: '4px' }} /> Sides
               </Typography>
             </Button>
           </Grid>
         </Grid>
 
-        <Grid container style={{ marginBottom: "50px" }}>
+        <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={4}>
             <Typography
               type="headline"
               className="headline"
               style={{ fontWeight: 500 }}
             >
-              {plate && plate._id ? `${plate.title}` : "Add side"}
+              {plate && plate._id ? `${plate.title}` : 'Add side'}
             </Typography>
 
             {this.props.plate ? (
               <Typography
                 type="body1"
-                style={{ color: "rgba(0, 0, 0, 0.54)" }}
+                style={{ color: 'rgba(0, 0, 0, 0.54)' }}
                 className="body1"
               >
-                {" "}
-                SKU {plate.SKU ? plate.SKU : ""}{" "}
+                {' '}
+                SKU {plate.SKU ? plate.SKU : ''}{' '}
               </Typography>
             ) : (
-                ""
+                ''
               )}
           </Grid>
           <Grid item xs={8}>
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-end"
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
               }}
             >
               <Button
-                style={{ marginRight: "10px" }}
-                onClick={() => history.push("/sides")}
+                style={{ marginRight: '10px' }}
+                onClick={() => history.push('/sides')}
               >
                 Cancel
               </Button>
@@ -668,7 +669,7 @@ class SideEditor extends React.Component {
           </Grid>
         </Grid>
 
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
@@ -710,7 +711,7 @@ class SideEditor extends React.Component {
           </Grid>
         </Grid>
 
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
@@ -728,7 +729,7 @@ class SideEditor extends React.Component {
                     id="select-meal-type"
                     select
                     value={
-                      this.state.valueMealType ? this.state.valueMealType : ""
+                      this.state.valueMealType ? this.state.valueMealType : ''
                     }
                     label="Select a meal type"
                     onChange={this.handleMealTypeChange.bind(this)}
@@ -747,14 +748,14 @@ class SideEditor extends React.Component {
                   </TextField>
 
                   <FormControlLabel
-                    style={{ marginTop: "1em" }}
+                    style={{ marginTop: '1em' }}
                     control={
                       <Checkbox
                         checked={this.state.custom}
                         onChange={(event, checked) => {
                           this.setState({
                             custom: checked,
-                            hasFormChanged: true
+                            hasFormChanged: true,
                           });
                         }}
                         value="checked"
@@ -768,7 +769,7 @@ class SideEditor extends React.Component {
           </Grid>
         </Grid>
 
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
@@ -788,9 +789,9 @@ class SideEditor extends React.Component {
                     onChange={this.onFileLoad.bind(this)}
                   />
                   <img
-                    style={{ marginTop: "50px", display: "block" }}
-                    src={this.renderImageUrl.bind(this)}
-                    style={{ maxWidth: "100%" }}
+                    style={{ marginTop: '50px', display: 'block' }}
+                    src={this.renderImageUrl()}
+                    style={{ maxWidth: '100%' }}
                   />
                 </Paper>
               </Grid>
@@ -799,7 +800,7 @@ class SideEditor extends React.Component {
         </Grid>
         <Divider light className="divider--space-x" />
 
-        <Grid container justify="center" style={{ marginBottom: "75px" }}>
+        <Grid container justify="center" style={{ marginBottom: '75px' }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
@@ -819,50 +820,50 @@ class SideEditor extends React.Component {
                     theme={{
                       container: {
                         flexGrow: 1,
-                        position: "relative",
-                        marginBottom: "2em"
+                        position: 'relative',
+                        marginBottom: '2em',
                       },
                       suggestionsContainerOpen: {
-                        position: "absolute",
+                        position: 'absolute',
                         left: 0,
-                        right: 0
+                        right: 0,
                       },
                       suggestion: {
-                        display: "block"
+                        display: 'block',
                       },
                       suggestionsList: {
                         margin: 0,
                         padding: 0,
-                        listStyleType: "none"
-                      }
+                        listStyleType: 'none',
+                      },
                     }}
                     renderInputComponent={this.renderInput.bind(this)}
                     suggestions={this.state.suggestions}
                     onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                      this
+                      this,
                     )}
                     onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                      this
+                      this,
                     )}
                     onSuggestionSelected={this.onSuggestionSelected.bind(this)}
                     getSuggestionValue={this.getSuggestionValue.bind(this)}
                     renderSuggestion={this.renderSuggestion.bind(this)}
                     renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                      this
+                      this,
                     )}
                     focusInputOnSuggestionClick={false}
                     inputProps={{
-                      placeholder: "Search",
+                      placeholder: 'Search',
                       value: this.state.value,
                       onChange: this.onChange.bind(this),
-                      className: "autoinput"
+                      className: 'autoinput',
                     }}
                   />
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "center",
-                      flexWrap: "wrap"
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
                     }}
                   >
                     {this.state.subIngredients ? (
@@ -870,16 +871,16 @@ class SideEditor extends React.Component {
                         <Chip
                           avatar={
                             <Avatar>
-                              {" "}
-                              {this.getSubIngredientAvatar(subIngredient)}{" "}
+                              {' '}
+                              {this.getSubIngredientAvatar(subIngredient)}{' '}
                             </Avatar>
                           }
-                          style={{ marginRight: "8px", marginBottom: "8px" }}
+                          style={{ marginRight: '8px', marginBottom: '8px' }}
                           label={this.getSubIngredientTitle(subIngredient)}
                           key={i}
                           onDelete={this.handleSubIngredientChipDelete.bind(
                             this,
-                            subIngredient
+                            subIngredient,
                           )}
                         />
                       ))
@@ -895,7 +896,7 @@ class SideEditor extends React.Component {
 
         <Divider light className="divider--space-x" />
 
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
@@ -931,7 +932,7 @@ class SideEditor extends React.Component {
                         selected={
                           !this.props.newPlate
                             ? e._id === this.props.plate.instructionId
-                            : ""
+                            : ''
                         }
                         key={i + 2}
                         value={e.title}
@@ -948,7 +949,7 @@ class SideEditor extends React.Component {
 
         <Divider light className="divider--space-x" />
 
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
@@ -965,7 +966,7 @@ class SideEditor extends React.Component {
                     <TableHead>
                       <TableRow>
                         <TableCell />
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <Typography
                             type="subheading"
                             className="font-medium font-uppercase"
@@ -973,7 +974,7 @@ class SideEditor extends React.Component {
                             Calories
                           </Typography>
                         </TableCell>
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <Typography
                             type="subheading"
                             className="font-medium font-uppercase"
@@ -981,7 +982,7 @@ class SideEditor extends React.Component {
                             Proteins
                           </Typography>
                         </TableCell>
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <Typography
                             type="subheading"
                             className="font-medium font-uppercase"
@@ -989,7 +990,7 @@ class SideEditor extends React.Component {
                             Carbs
                           </Typography>
                         </TableCell>
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <Typography
                             type="subheading"
                             className="font-medium font-uppercase"
@@ -1004,98 +1005,98 @@ class SideEditor extends React.Component {
                         <TableCell>
                           <Typography
                             type="subheading"
-                            style={{ marginTop: "10px" }}
+                            style={{ marginTop: '10px' }}
                           >
                             Regular
                           </Typography>
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.regular.calories
                                 ? this.props.plate.nutritional.regular.calories
-                                : "0"
+                                : '0'
                             }
                             name="regular_calories"
                             onChange={this.changeTableField.bind(this)}
                           />
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.regular.proteins
                                 ? this.props.plate.nutritional.regular.proteins
-                                : "0"
+                                : '0'
                             }
                             name="regular_proteins"
                             onChange={this.changeTableField.bind(this)}
                           />
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.regular.carbs
                                 ? this.props.plate.nutritional.regular.carbs
-                                : "0"
+                                : '0'
                             }
                             name="regular_carbs"
                             onChange={this.changeTableField.bind(this)}
                           />
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.regular.fat
                                 ? this.props.plate.nutritional.regular.fat
-                                : "0"
+                                : '0'
                             }
                             name="regular_fat"
                             onChange={this.changeTableField.bind(this)}
@@ -1106,98 +1107,98 @@ class SideEditor extends React.Component {
                         <TableCell>
                           <Typography
                             type="subheading"
-                            style={{ marginTop: "10px" }}
+                            style={{ marginTop: '10px' }}
                           >
                             Athletic
                           </Typography>
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.athletic.calories
                                 ? this.props.plate.nutritional.athletic.calories
-                                : "0"
+                                : '0'
                             }
                             name="athletic_calories"
                             onChange={this.changeTableField.bind(this)}
                           />
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.athletic.proteins
                                 ? this.props.plate.nutritional.athletic.proteins
-                                : "0"
+                                : '0'
                             }
                             name="athletic_proteins"
                             onChange={this.changeTableField.bind(this)}
                           />
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.athletic.carbs
                                 ? this.props.plate.nutritional.athletic.carbs
-                                : "0"
+                                : '0'
                             }
                             name="athletic_carbs"
                             onChange={this.changeTableField.bind(this)}
                           />
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.athletic.fat
                                 ? this.props.plate.nutritional.athletic.fat
-                                : "0"
+                                : '0'
                             }
                             name="athletic_fat"
                             onChange={this.changeTableField.bind(this)}
@@ -1208,100 +1209,100 @@ class SideEditor extends React.Component {
                         <TableCell>
                           <Typography
                             type="subheading"
-                            style={{ marginTop: "10px" }}
+                            style={{ marginTop: '10px' }}
                           >
                             Bodybuilder
                           </Typography>
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.bodybuilder.calories
                                 ? this.props.plate.nutritional.bodybuilder
                                   .calories
-                                : "0"
+                                : '0'
                             }
                             name="bodybuilder_calories"
                             onChange={this.changeTableField.bind(this)}
                           />
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.bodybuilder.proteins
                                 ? this.props.plate.nutritional.bodybuilder
                                   .proteins
-                                : "0"
+                                : '0'
                             }
                             name="bodybuilder_proteins"
                             onChange={this.changeTableField.bind(this)}
                           />
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.bodybuilder.carbs
                                 ? this.props.plate.nutritional.bodybuilder.carbs
-                                : "0"
+                                : '0'
                             }
                             name="bodybuilder_carbs"
                             onChange={this.changeTableField.bind(this)}
                           />
                         </TableCell>
 
-                        <TableCell style={{ textAlign: "center" }}>
+                        <TableCell style={{ textAlign: 'center' }}>
                           <TextField
                             fullWidth
                             margin="normal"
                             style={{
-                              fontSize: "1rem",
-                              maxWidth: "100px",
-                              minWidth: "100px",
-                              textAlign: "center"
+                              fontSize: '1rem',
+                              maxWidth: '100px',
+                              minWidth: '100px',
+                              textAlign: 'center',
                             }}
-                            inputProps={{ type: "number" }}
+                            inputProps={{ type: 'number' }}
                             defaultValue={
                               this.props.plate &&
                                 this.props.plate.nutritional &&
                                 this.props.plate.nutritional.bodybuilder.fat
                                 ? this.props.plate.nutritional.bodybuilder.fat
-                                : "0"
+                                : '0'
                             }
                             name="bodybuilder_fat"
                             onChange={this.changeTableField.bind(this)}
@@ -1316,38 +1317,38 @@ class SideEditor extends React.Component {
           </Grid>
         </Grid>
 
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={4}>
                 {this.props.newPlate ? (
-                  ""
+                  ''
                 ) : (
                     <Button
-                      style={{ backgroundColor: danger, color: "#FFFFFF" }}
+                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
                       raised
                       onClick={
                         plate && plate._id
                           ? this.handleRemove.bind(this)
-                          : () => this.props.history.push("/sides")
+                          : () => this.props.history.push('/sides')
                       }
                     >
                       Delete
-                  </Button>
+                    </Button>
                   )}
               </Grid>
 
               <Grid item xs={8}>
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end"
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
                   }}
                 >
                   <Button
-                    style={{ marginRight: "10px" }}
-                    onClick={() => history.push("/sides")}
+                    style={{ marginRight: '10px' }}
+                    onClick={() => history.push('/sides')}
                   >
                     Cancel
                   </Button>
@@ -1379,7 +1380,7 @@ SideEditor.propTypes = {
   potentialSubIngredients: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
-  instructions: PropTypes.array.isRequired
+  instructions: PropTypes.array.isRequired,
 };
 
 export default SideEditor;

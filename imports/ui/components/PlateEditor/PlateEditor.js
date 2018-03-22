@@ -86,6 +86,8 @@ class PlateEditor extends React.Component {
       hasFormChanged: false,
       imageFieldChanged: false,
     };
+
+    this.renderImageUrl = this.renderImageUrl.bind(this);
   }
 
   componentDidMount() {
@@ -343,7 +345,7 @@ class PlateEditor extends React.Component {
               'plates.updateImageUrl',
               {
                 _id: plateId,
-                imageUrl: res.relative_url
+                imageUrl: res.relative_url,
               },
               (err, plateId) => {
                 if (err) {
@@ -578,13 +580,13 @@ class PlateEditor extends React.Component {
   }
 
   renderImageUrl() {
-    if (this.props.newPlate) {
+    if (this.props.newPlate || this.state.imageFieldChanged) {
       return this.state.plateImageSrc;
     } else if (this.props.document && this.props.document.imageUrl) {
       return `${Meteor.settings.public.S3BucketDomain}${this.state.plateImageSrc}`;
-    } else if (this.state.imageFieldChanged) {
-      return this.state.plateImageSrc;
     }
+
+    return '';
   }
 
   render() {
@@ -788,7 +790,7 @@ class PlateEditor extends React.Component {
                   />
                   <img
                     style={{ marginTop: '50px', display: 'block' }}
-                    src={this.renderImageUrl.bind(this)}
+                    src={this.renderImageUrl()}
                     style={{ maxWidth: '100%' }}
                   />
                 </Paper>
@@ -1332,7 +1334,7 @@ class PlateEditor extends React.Component {
                       }
                     >
                       Delete
-                    </Button>
+                  </Button>
                   )}
               </Grid>
 
