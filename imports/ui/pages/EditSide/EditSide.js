@@ -38,11 +38,6 @@ const EditSide = ({
           collection={Sides}
           joins={[
             {
-              localProperty: "imageId",
-              collection: SideImages,
-              joinAs: "image"
-            },
-            {
               localProperty: "instructionId",
               collection: InstructionsColl,
               joinAs: "joinedInstruction"
@@ -63,8 +58,8 @@ const EditSide = ({
       </Grid>
     </div>
   ) : (
-    <NotFound />
-  );
+      <NotFound />
+    );
 
 EditSide.defaultProps = {
   plate: null
@@ -81,7 +76,6 @@ export default createContainer(({ match }) => {
   const sideId = match.params._id;
   const subscription = Meteor.subscribe("ingredients");
   const subscription2 = Meteor.subscribe("sides.view", sideId);
-  const subscription3 = Meteor.subscribe("sideImages.all", {}, {});
   const subscription4 = Meteor.subscribe("instructions");
 
   return {
@@ -89,7 +83,6 @@ export default createContainer(({ match }) => {
     loading:
       !subscription.ready() &&
       !subscription2.ready() &&
-      !subscription3.ready() &&
       !subscription4.ready(),
     plate: Sides.findOne(sideId),
     potentialSubIngredients: Ingredients.find().fetch(),

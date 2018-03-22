@@ -39,6 +39,12 @@ Plates.schema = new SimpleSchema({
     optional: true,
   },
 
+  imageUrl: {
+    type: String,
+    label: 'URL of the plate image.',
+    optional: true,
+  },
+
   instructionId: {
     type: String,
     label: '_id of the instructions.',

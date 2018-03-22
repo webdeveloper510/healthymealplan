@@ -142,6 +142,27 @@ Meteor.methods({
     }
   },
 
+  "sides.updateImageUrl": function sidesUpdate(side) {
+    check(side, {
+      _id: String,
+      imageUrl: String
+    });
+
+    try {
+      const sideId = side._id;
+
+      Sides.update(sideId, {
+        $set: {
+          imageUrl: side.imageUrl
+        }
+      });
+
+      return sideId; // Return _id so we can redirect to document after update.
+    } catch (exception) {
+      throw new Meteor.Error("500", exception);
+    }
+  },
+
   "sides.updateImageId": function sidesUpdate(side) {
     check(side, {
       _id: String,

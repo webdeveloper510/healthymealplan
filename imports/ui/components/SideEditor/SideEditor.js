@@ -61,12 +61,19 @@ class SideEditor extends React.Component {
     super(props);
 
     this.state = {
+      // plateImageSrc:
+      //   this.props.newPlate == false &&
+      //     this.props.document &&
+      //     this.props.document.image
+      //     ? this.props.document.image.link()
+      //     : "",
       plateImageSrc:
         this.props.newPlate == false &&
           this.props.document &&
-          this.props.document.image
-          ? this.props.document.image.link()
+          this.props.document.imageUrl
+          ? this.props.document.imageUrl
           : "",
+
       value: "", // Autosuggest
       valueMealType: this.props.plate ? this.props.plate.mealType : "Desserts",
       valueInstructionActual: "None",
@@ -148,7 +155,8 @@ class SideEditor extends React.Component {
     fr.onload = el => {
       this.setState({
         plateImageSrc: el.target.result,
-        imageFieldChanged: true
+        imageFieldChanged: true,
+        hasFormChanged: true
       });
     };
 
@@ -311,20 +319,48 @@ class SideEditor extends React.Component {
           : `${localStorage.getItem("plateForSnackbar")} side added.`;
 
         if (this.state.imageFieldChanged) {
-          if (existingPlate) {
-            SideImages.remove({ _id: existingPlate.imageId });
-            this.uploadFile(
-              document.getElementById("plateImage").files[0],
-              plateId,
-              confirmation
+          // if (existingPlate) {
+          //   SideImages.remove({ _id: existingPlate.imageId });
+          //   this.uploadFile(
+          //     document.getElementById("plateImage").files[0],
+          //     plateId,
+          //     confirmation
+          //   );
+          // } else {
+          //   this.uploadFile(
+          //     document.getElementById("plateImage").files[0],
+          //     plateId,
+          //     confirmation
+          //   );
+          // }
+
+          S3.upload({
+            file: document.getElementById('plateImage').files[0],
+            path: 'images',
+          }, (err, res) => {
+            console.log(res);
+
+            Meteor.call(
+              'sides.updateImageUrl',
+              {
+                _id: plateId,
+                imageUrl: res.relative_url
+              },
+              (err, plateId) => {
+                if (err) {
+                  console.log(err);
+                } else {
+                  this.props.popTheSnackbar({
+                    message: confirmation,
+                    buttonText: 'View',
+                    buttonLink: `/sides/${plateId}/edit`,
+                  });
+
+                  this.props.history.push('/sides');
+                }
+              },
             );
-          } else {
-            this.uploadFile(
-              document.getElementById("plateImage").files[0],
-              plateId,
-              confirmation
-            );
-          }
+          });
         } else {
           popTheSnackbar({
             message: confirmation,
@@ -338,61 +374,61 @@ class SideEditor extends React.Component {
     });
   }
 
-  uploadFile(file, plateId, confirmation) {
-    // console.log(plateImage);
-    const upload = SideImages.insert(
-      {
-        file,
-        streams: "dynamic",
-        chunkSize: "dynamic"
-      },
-      false
-    );
+  // uploadFile(file, plateId, confirmation) {
+  //   // console.log(plateImage);
+  //   const upload = SideImages.insert(
+  //     {
+  //       file,
+  //       streams: "dynamic",
+  //       chunkSize: "dynamic"
+  //     },
+  //     false
+  //   );
 
-    upload.on("start", (err, file) => {
-      console.log("Started");
-      console.log(file);
-    });
+  //   upload.on("start", (err, file) => {
+  //     console.log("Started");
+  //     console.log(file);
+  //   });
 
-    upload.on("progress", (progress, fileObject) => {
-      console.log(progress);
-      console.log(fileObject);
-    });
+  //   upload.on("progress", (progress, fileObject) => {
+  //     console.log(progress);
+  //     console.log(fileObject);
+  //   });
 
-    upload.on("end", (err, fileObj) => {
-      console.log(fileObj);
-      console.log("ended");
-      console.log(upload);
+  //   upload.on("end", (err, fileObj) => {
+  //     console.log(fileObj);
+  //     console.log("ended");
+  //     console.log(upload);
 
-      // const data = {
-      //   // projectId,
-      //   fileId: upload.config.fileId,
-      // };
-      console.log(plateId);
+  //     // const data = {
+  //     //   // projectId,
+  //     //   fileId: upload.config.fileId,
+  //     // };
+  //     console.log(plateId);
 
-      Meteor.call(
-        "sides.updateImageId",
-        { _id: plateId, imageId: upload.config.fileId },
-        (err, plateId) => {
-          if (err) {
-            console.log(err);
-          } else {
-            this.props.popTheSnackbar({
-              message: confirmation,
-              buttonText: "View",
-              buttonLink: `/sides/${plateId}/edit`
-            });
+  //     Meteor.call(
+  //       "sides.updateImageId",
+  //       { _id: plateId, imageId: upload.config.fileId },
+  //       (err, plateId) => {
+  //         if (err) {
+  //           console.log(err);
+  //         } else {
+  //           this.props.popTheSnackbar({
+  //             message: confirmation,
+  //             buttonText: "View",
+  //             buttonLink: `/sides/${plateId}/edit`
+  //           });
 
-            this.props.history.push("/sides");
-          }
-        }
-      );
+  //           this.props.history.push("/sides");
+  //         }
+  //       }
+  //     );
 
-      // add a method call here which updates the plate with the image id
-    }); // on upload end
+  //     // add a method call here which updates the plate with the image id
+  //   }); // on upload end
 
-    upload.start();
-  }
+  //   upload.start();
+  // }
 
   renderDeleteDialog() {
     return (
@@ -540,6 +576,17 @@ class SideEditor extends React.Component {
       hasFormChanged: true
     });
   }
+
+  renderImageUrl() {
+    if (this.props.newPlate) {
+      return this.state.plateImageSrc;
+    } else if (this.props.document && this.props.document.imageUrl) {
+      return `${Meteor.settings.public.S3BucketDomain}${this.state.plateImageSrc}`;
+    } else if (this.state.imageFieldChanged) {
+      return this.state.plateImageSrc;
+    }
+  }
+
 
   render() {
     const { plate, history, loading } = this.props;
@@ -742,7 +789,7 @@ class SideEditor extends React.Component {
                   />
                   <img
                     style={{ marginTop: "50px", display: "block" }}
-                    src={this.state.plateImageSrc}
+                    src={this.renderImageUrl.bind(this)}
                     style={{ maxWidth: "100%" }}
                   />
                 </Paper>

@@ -163,6 +163,27 @@ Meteor.methods({
     }
   },
 
+  'plates.updateImageUrl': function platesUpdate(plate) {
+    check(plate, {
+      _id: String,
+      imageUrl: String,
+    });
+
+    try {
+      const plateId = plate._id;
+
+      Plates.update(plateId, {
+        $set: {
+          imageUrl: plate.imageUrl,
+        },
+      });
+
+      return plateId; // Return _id so we can redirect to document after update.
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
+
   'plates.remove': function platesRemove(plateId) {
     check(plateId, String);
 

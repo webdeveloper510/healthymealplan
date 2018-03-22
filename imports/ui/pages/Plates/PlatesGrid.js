@@ -193,7 +193,7 @@ class PlatesGrid extends React.Component {
                   <Card style={{ width: '100%' }}>
                     <CardMedia
                       style={styles.media}
-                      image={e.image ? e.image.link() : ''}
+                      image={e.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${e.imageUrl}` : e.image ? e.image : ''}
                       title="Contemplative Reptile"
                     />
                     <CardContent>
@@ -224,11 +224,11 @@ class PlatesGrid extends React.Component {
           Showing {this.props.count} of {this.props.plateCount} mains
         </Typography>
 
-        { this.props.hasMore ? <Button onClick={this.props.loadMore}>Load More</Button> : '' }
+        {this.props.hasMore ? <Button onClick={this.props.loadMore}>Load More</Button> : ''}
 
         <Dialog open={this.state.deleteDialogOpen} onClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-              Delete {this.state.selectedCheckboxesNumber} ingredients?
+            Delete {this.state.selectedCheckboxesNumber} ingredients?
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} mains?</DialogContentText>

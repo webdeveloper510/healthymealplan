@@ -3,13 +3,8 @@
     "filesURL": "/Healthy Meal Plan/data",
     "apiLoginKey": "47cmd9F3DJ",
     "clientKey": "73C59E6vwX3c5DzP8Z5M3dCbr5LrRpQV2wm93297ff4HcbPH562PtN2Aw6tkDAat",
-    "twilioAccountSid": "AC373a0b7bd7e166370ae5d68bc612e6ef"
-  },
-  "s3": {
-    "key": "AKIAIPJLKGXALP74YF7Q",
-    "secret": "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",
-    "bucket": "vittle-bucket",
-    "region": "ca-central-1"
+    "twilioAccountSid": "AC373a0b7bd7e166370ae5d68bc612e6ef",
+    "S3BucketDomain": "https://s3-ca-central-1.amazonaws.com/vittle-bucket"
   },
   "private": {
     "twilioAuthToken": "3c6f7d2d34dd42fa6ad02cc11b19bf4a",
