@@ -394,10 +394,6 @@ class DirectionsTable extends React.Component {
       }
     }
 
-
-
-
-
     doc.deletePage(1);
 
     doc.save(`Delivery_${this.props.currentSelectorDate}.pdf`);
@@ -469,52 +465,52 @@ class DirectionsTable extends React.Component {
             ))}
           </Tabs>
         </AppBar>
-      
 
-         <div style={{
-            background: '#FFF',
-            borderTopRightRadius: '2px',
-            borderTopLeftRadius: '2px',
-            marginTop: '3em',
-            padding: '16px 25px 1em',
-            boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
-            position: 'relative',
-          }}
-          >
-            <Input
-              className="input-box"
-              style={{ width: '100%', position: 'relative' }}
-              placeholder="Search directions"
-              onKeyUp={(e) => {this.setState({ searchBy: e.target.value })}}
-              // onKeyUp={this.searchByName.bind(this)}
-              inputProps={{
-                id: 'search-type-text',
-                'aria-label': 'Description',
-              }}
-            /> 
 
-            <SearchIcon
-              className="autoinput-icon autoinput-icon--search"
-              style={{ display: (this.state.searchBy.length > 0) ? 'none' : 'block', top: '33%', right: '1.8em !important' }}
-            />
+        <div style={{
+          background: '#FFF',
+          borderTopRightRadius: '2px',
+          borderTopLeftRadius: '2px',
+          marginTop: '3em',
+          padding: '16px 25px 1em',
+          boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
+          position: 'relative',
+        }}
+        >
+          <Input
+            className="input-box"
+            style={{ width: '100%', position: 'relative' }}
+            placeholder="Search directions"
+            onKeyUp={(e) => { this.setState({ searchBy: e.target.value }) }}
+            // onKeyUp={this.searchByName.bind(this)}
+            inputProps={{
+              id: 'search-type-text',
+              'aria-label': 'Description',
+            }}
+          />
 
-            <ClearIcon
-              className="autoinput-icon--clear"
-              onClick={this.clearSearchBox.bind(this)}
-              style={{
-                cursor: 'pointer',
-                display: (this.state.searchBy.length > 0) ? 'block' : 'none',
-              }}
-            />
+          <SearchIcon
+            className="autoinput-icon autoinput-icon--search"
+            style={{ display: (this.state.searchBy.length > 0) ? 'none' : 'block', top: '33%', right: '1.8em !important' }}
+          />
 
-          </div>
+          <ClearIcon
+            className="autoinput-icon--clear"
+            onClick={this.clearSearchBox.bind(this)}
+            style={{
+              cursor: 'pointer',
+              display: (this.state.searchBy.length > 0) ? 'block' : 'none',
+            }}
+          />
+
+        </div>
         <Paper elevation={2} className="table-container">
           <div style={{ padding: '20px' }}>
             <Button className="btn btn-primary" onClick={() => this.printLabels('nightBefore')} raised color="primary" style={{ float: 'right', marginLeft: '1em' }}>Print evening labels</Button>
             <Button className="btn btn-primary" onClick={() => this.printLabels('dayOf')} raised color="primary" style={{ float: 'right' }}>Print day of labels</Button>
           </div>
 
-        
+
           {this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container" style={{ backgroundColor: '#607d8b' }}>
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
@@ -587,10 +583,10 @@ class DirectionsTable extends React.Component {
 
             <TableBody>
               {!this.state.aggregateDataLoading && this.state.aggregateData.deliveries.filter(el => {
-                
-                if(this.state.currentTabValue != 'all' && el.routeId != this.state.currentTabValue){
+
+                if (this.state.currentTabValue != 'all' && el.routeId != this.state.currentTabValue) {
                   return false;
-                }else{
+                } else {
                   return true;
                 }
 
@@ -602,11 +598,11 @@ class DirectionsTable extends React.Component {
 
                 console.log(like)
 
-                if(this.state.searchBy != "" && !like.test(fullName)){
-                  
+                if (this.state.searchBy != "" && !like.test(fullName)) {
+
                   return false;
 
-                }else{
+                } else {
                   return true;
                 }
 

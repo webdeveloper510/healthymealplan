@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-
+import constants from './constants';
 const ApiContracts = require('authorizenet').APIContracts;
 const ApiControllers = require('authorizenet').APIControllers;
 
@@ -17,7 +17,13 @@ export default function getSubscription(subscriptionId, callback) {
   // console.log(JSON.stringify(getRequest.getJSON(), null, 2));
 
   const ctrl = new ApiControllers.ARBGetSubscriptionController(getRequest.getJSON());
-  ctrl.setEnvironment('https://api2.authorize.net/xml/v1/request.api');
+
+  if (process.env.NODE_ENV == 'development') {
+    ctrl.setEnvironment(constants.endpoint.sandbox);
+  } else {
+    ctrl.setEnvironment(constants.endpoint.production)
+  }
+
 
   ctrl.execute(() => {
     const apiResponse = ctrl.getResponse();

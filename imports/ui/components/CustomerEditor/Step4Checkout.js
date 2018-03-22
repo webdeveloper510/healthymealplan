@@ -1,68 +1,68 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import { Meteor } from "meteor/meteor";
+import { Meteor } from 'meteor/meteor';
 
-import Grid from "material-ui/Grid";
-import Button from "material-ui/Button";
-import { MenuItem } from "material-ui/Menu";
-import Input from "material-ui/Input";
-import TextField from "material-ui/TextField";
-import Paper from "material-ui/Paper";
-import Typography from "material-ui/Typography";
-import Radio, { RadioGroup } from "material-ui/Radio";
-import Geosuggest from "react-geosuggest";
-import "./GeoSuggest.scss";
+import Grid from 'material-ui/Grid';
+import Button from 'material-ui/Button';
+import { MenuItem } from 'material-ui/Menu';
+import Input from 'material-ui/Input';
+import TextField from 'material-ui/TextField';
+import Paper from 'material-ui/Paper';
+import Typography from 'material-ui/Typography';
+import Radio, { RadioGroup } from 'material-ui/Radio';
+import Geosuggest from 'react-geosuggest';
+import './GeoSuggest.scss';
 
-import Payment from "payment";
+import Payment from 'payment';
 
-import Checkbox from "material-ui/Checkbox";
+import Checkbox from 'material-ui/Checkbox';
 import {
   FormLabel,
   FormControl,
   FormControlLabel,
-  FormHelperText
-} from "material-ui/Form";
+  FormHelperText,
+} from 'material-ui/Form';
 
-import classNames from "classnames";
-import { withStyles } from "material-ui/styles";
-import { CircularProgress } from "material-ui/Progress";
-import green from "material-ui/colors/green";
+import classNames from 'classnames';
+import { withStyles } from 'material-ui/styles';
+import { CircularProgress } from 'material-ui/Progress';
+import green from 'material-ui/colors/green';
 
-import _ from "lodash";
-import $ from "jquery";
-import validate from "../../../modules/validate";
+import _ from 'lodash';
+import $ from 'jquery';
+import validate from '../../../modules/validate';
 
 const styles = theme => ({
   root: {
-    display: "flex",
-    alignItems: "center"
+    display: 'flex',
+    alignItems: 'center',
   },
   wrapper: {
     margin: theme.spacing.unit,
-    position: "relative"
+    position: 'relative',
   },
   buttonSuccess: {
     backgroundColor: green[500],
-    "&:hover": {
-      backgroundColor: green[700]
-    }
+    '&:hover': {
+      backgroundColor: green[700],
+    },
   },
   fabProgress: {
     color: green[500],
-    position: "absolute",
+    position: 'absolute',
     top: -6,
     left: -6,
-    zIndex: 1
+    zIndex: 1,
   },
   buttonProgress: {
     color: green[500],
-    position: "absolute",
-    top: "50%",
-    left: "50%",
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
     marginTop: -12,
-    marginLeft: -12
-  }
+    marginLeft: -12,
+  },
 });
 
 class Step4Checkout extends React.Component {
@@ -72,8 +72,8 @@ class Step4Checkout extends React.Component {
     this.state = {
       submitLoading: false,
       submitSuccess: false,
-      paymentMethod: "card",
-      taxExempt: false
+      paymentMethod: 'card',
+      taxExempt: false,
     };
   }
 
@@ -85,31 +85,43 @@ class Step4Checkout extends React.Component {
         error.insertAfter(
           $(element)
             .parent()
-            .parent()
+            .parent(),
         );
       },
 
       rules: {
         nameOnCard: {
-          required: true
+          required: true,
         },
 
-        postal_code: {
+        cardNumber: {
+          required: true,
+        },
+
+        expiry: {
+          required: true,
+        },
+
+        cvc: {
+          required: true,
+        },
+
+        billingPostalCode: {
           minlength: 6,
           maxlength: 6,
           cdnPostal: true,
-          required: true
-        }
+          required: true,
+        },
       },
 
       submitHandler() {
         component.handleSubmitStep();
-      }
+      },
     });
 
-    Payment.formatCardNumber(document.querySelector("#cardNumber"));
-    Payment.formatCardExpiry(document.querySelector("#expiry"));
-    Payment.formatCardCVC(document.querySelector("#cvc"));
+    Payment.formatCardNumber(document.querySelector('#cardNumber'));
+    Payment.formatCardExpiry(document.querySelector('#expiry'));
+    Payment.formatCardCVC(document.querySelector('#cvc'));
 
     /*
     * The best way to refactor the below bill calculator is to separate it
@@ -122,7 +134,7 @@ class Step4Checkout extends React.Component {
     if (nextProps.activeStep === 3) {
 
       const primaryCustomer = {
-        lifestyle: "",
+        lifestyle: '',
         breakfastPrice: 0,
         lunchPrice: 0,
         dinnerPrice: 0,
@@ -130,19 +142,19 @@ class Step4Checkout extends React.Component {
           totalQty: 0,
           regularQty: 0,
           athleticQty: 0,
-          bodybuilderQty: 0
+          bodybuilderQty: 0,
         },
         lunch: {
           totalQty: 0,
           regularQty: 0,
           athleticQty: 0,
-          bodybuilderQty: 0
+          bodybuilderQty: 0,
         },
         dinner: {
           totalQty: 0,
           regularQty: 0,
           athleticQty: 0,
-          bodybuilderQty: 0
+          bodybuilderQty: 0,
         },
         // coolerBag: this.props.customerInfo.coolerBag ? 20 : 0,
         coolerBag: 0,
@@ -158,13 +170,13 @@ class Step4Checkout extends React.Component {
         preferences: this.props.customerInfo.subIngredients,
         totalAthleticSurcharge: 0,
         totalBodybuilderSurcharge: 0,
-        deliverySurcharges: 0
+        deliverySurcharges: 0,
       };
 
       const secondaryCustomers = [];
 
       primaryCustomer.lifestyle = this.props.lifestyles.find(
-        elem => elem.title === this.props.customerInfo.lifestyle
+        elem => elem.title === this.props.customerInfo.lifestyle,
       );
 
       // calculating basePrices for Breakfast, lunch and dinner
@@ -182,20 +194,20 @@ class Step4Checkout extends React.Component {
             primaryCustomer.breakfast.totalQty +
             parseInt(e.breakfast.quantity, 10);
 
-          if (e.breakfast.portions == "regular") {
+          if (e.breakfast.portions == 'regular') {
             primaryCustomer.breakfast.regularQty += parseInt(
               e.breakfast.quantity,
-              10
+              10,
             );
-          } else if (e.breakfast.portions == "athletic") {
+          } else if (e.breakfast.portions == 'athletic') {
             primaryCustomer.breakfast.athleticQty += parseInt(
               e.breakfast.quantity,
-              10
+              10,
             );
-          } else if ((e.breakfast.portions = "bodybuilder")) {
+          } else if ((e.breakfast.portions = 'bodybuilder')) {
             primaryCustomer.breakfast.bodybuilderQty += parseInt(
               e.breakfast.quantity,
-              10
+              10,
             );
           }
 
@@ -206,14 +218,14 @@ class Step4Checkout extends React.Component {
           primaryCustomer.lunch.totalQty =
             primaryCustomer.lunch.totalQty + parseInt(e.lunch.quantity, 10);
 
-          if (e.lunch.portions == "regular") {
+          if (e.lunch.portions == 'regular') {
             primaryCustomer.lunch.regularQty += parseInt(e.lunch.quantity, 10);
-          } else if (e.lunch.portions == "athletic") {
+          } else if (e.lunch.portions == 'athletic') {
             primaryCustomer.lunch.athleticQty += parseInt(e.lunch.quantity, 10);
-          } else if ((e.lunch.portions = "bodybuilder")) {
+          } else if ((e.lunch.portions = 'bodybuilder')) {
             primaryCustomer.lunch.bodybuilderQty += parseInt(
               e.lunch.quantity,
-              10
+              10,
             );
           }
 
@@ -224,14 +236,14 @@ class Step4Checkout extends React.Component {
           primaryCustomer.dinner.totalQty =
             primaryCustomer.dinner.totalQty + parseInt(e.dinner.quantity, 10);
 
-          if (e.dinner.portions == "regular") {
+          if (e.dinner.portions == 'regular') {
             primaryCustomer.dinner.regularQty += parseInt(e.dinner.quantity, 10);
-          } else if (e.dinner.portions == "athletic") {
+          } else if (e.dinner.portions == 'athletic') {
             primaryCustomer.dinner.athleticQty += parseInt(e.dinner.quantity, 10);
-          } else if ((e.dinner.portions = "bodybuilder")) {
+          } else if ((e.dinner.portions = 'bodybuilder')) {
             primaryCustomer.dinner.bodybuilderQty += parseInt(
               e.dinner.quantity,
-              10
+              10,
             );
           }
 
@@ -253,7 +265,7 @@ class Step4Checkout extends React.Component {
         metCriteria += 1;
       }
 
-      console.log("met criteria after primary customer");
+      console.log('met criteria after primary customer');
       console.log(metCriteria);
 
       if (this.props.customerInfo.secondaryProfileCount > 0) {
@@ -282,7 +294,7 @@ class Step4Checkout extends React.Component {
         });
       }
 
-      console.log("Secondary customer totals");
+      console.log('Secondary customer totals');
       console.log(secondaryCustomerTotals);
 
       secondaryCustomerTotals.forEach((e, i) => {
@@ -291,7 +303,7 @@ class Step4Checkout extends React.Component {
         }
       });
 
-      console.log("met criteria after secondary customers");
+      console.log('met criteria after secondary customers');
       console.log(metCriteria);
 
       const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
@@ -317,10 +329,10 @@ class Step4Checkout extends React.Component {
 
       // discounted basePrice -- this is the actual base price to add up in the total
 
-      if (primaryCustomer.discount == "senior") {
+      if (primaryCustomer.discount == 'senior') {
         let discountAmount = 0;
 
-        if (primaryCustomer.lifestyle.discountOrExtraTypeSenior == "Percentage") {
+        if (primaryCustomer.lifestyle.discountOrExtraTypeSenior == 'Percentage') {
           discountAmount =
             primaryCustomer.lifestyle.discountSenior /
             100 *
@@ -328,7 +340,7 @@ class Step4Checkout extends React.Component {
         }
 
         if (
-          primaryCustomer.lifestyle.discountOrExtraTypeSenior == "Fixed amount"
+          primaryCustomer.lifestyle.discountOrExtraTypeSenior == 'Fixed amount'
         ) {
           discountAmount = primaryCustomer.lifestyle.discountSenior;
         }
@@ -336,11 +348,11 @@ class Step4Checkout extends React.Component {
         primaryCustomer.discountActual = discountAmount;
       }
 
-      if (primaryCustomer.discount == "student") {
+      if (primaryCustomer.discount == 'student') {
         let discountAmount = 0;
 
         if (
-          primaryCustomer.lifestyle.discountOrExtraTypeStudent == "Percentage"
+          primaryCustomer.lifestyle.discountOrExtraTypeStudent == 'Percentage'
         ) {
           discountAmount =
             primaryCustomer.lifestyle.discountStudent /
@@ -349,7 +361,7 @@ class Step4Checkout extends React.Component {
         }
 
         if (
-          primaryCustomer.lifestyle.discountOrExtraTypeStudent == "Fixed amount"
+          primaryCustomer.lifestyle.discountOrExtraTypeStudent == 'Fixed amount'
         ) {
           discountAmount = primaryCustomer.lifestyle.discountStudent;
         }
@@ -361,13 +373,13 @@ class Step4Checkout extends React.Component {
       if (primaryCustomer.restrictions.length > 0) {
         primaryCustomer.restrictions.forEach((e, i) => {
           primaryCustomer.restrictionsActual.push(
-            this.props.restrictions.find(elem => elem._id === e)
+            this.props.restrictions.find(elem => elem._id === e),
           );
         });
 
         primaryCustomer.restrictionsActual.forEach((e, i) => {
           console.log(e);
-          if (e.hasOwnProperty("extra")) {
+          if (e.hasOwnProperty('extra')) {
             let totalRestrictionsSurcharge = 0;
             console.log(e);
 
@@ -377,11 +389,11 @@ class Step4Checkout extends React.Component {
               primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
               primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
 
-            if (e.discountOrExtraType == "Percentage") {
+            if (e.discountOrExtraType == 'Percentage') {
               totalRestrictionsSurcharge = e.extra / 100 * totalBaseMealsCharge;
             }
 
-            if (e.discountOrExtraType == "Fixed amount") {
+            if (e.discountOrExtraType == 'Fixed amount') {
               totalRestrictionsSurcharge =
                 (primaryCustomer.breakfast.totalQty +
                   primaryCustomer.lunch.totalQty +
@@ -390,7 +402,7 @@ class Step4Checkout extends React.Component {
             }
 
             primaryCustomer.restrictionsSurcharges.push(
-              totalRestrictionsSurcharge
+              totalRestrictionsSurcharge,
             );
           } else {
             primaryCustomer.restrictionsSurcharges.push(0);
@@ -402,7 +414,7 @@ class Step4Checkout extends React.Component {
         primaryCustomer.specificRestrictions.forEach((e, i) => {
           console.log(e);
           primaryCustomer.specificRestrictionsActual.push(
-            this.props.ingredients.find(elem => elem._id === e._id)
+            this.props.ingredients.find(elem => elem._id === e._id),
           );
         });
 
@@ -446,7 +458,7 @@ class Step4Checkout extends React.Component {
 
         if (primaryCustomer.breakfast.athleticQty > 0) {
           if (
-            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == "Percentage"
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
           ) {
             const extraAthleticPerBreakfast =
               primaryCustomer.lifestyle.extraAthletic /
@@ -459,7 +471,7 @@ class Step4Checkout extends React.Component {
 
           if (
             primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
-            "Fixed amount"
+            'Fixed amount'
           ) {
             totalAthleticSurcharge +=
               primaryCustomer.breakfast.athleticQty *
@@ -469,7 +481,7 @@ class Step4Checkout extends React.Component {
 
         if (primaryCustomer.lunch.athleticQty > 0) {
           if (
-            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == "Percentage"
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
           ) {
             const extraAthleticPerLunch =
               primaryCustomer.lifestyle.extraAthletic /
@@ -482,7 +494,7 @@ class Step4Checkout extends React.Component {
 
           if (
             primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
-            "Fixed amount"
+            'Fixed amount'
           ) {
             totalAthleticSurcharge +=
               primaryCustomer.lunch.athleticQty *
@@ -492,7 +504,7 @@ class Step4Checkout extends React.Component {
 
         if (primaryCustomer.dinner.athleticQty > 0) {
           if (
-            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == "Percentage"
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
           ) {
             const extraAthleticPerDinner =
               primaryCustomer.lifestyle.extraAthletic /
@@ -505,7 +517,7 @@ class Step4Checkout extends React.Component {
 
           if (
             primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
-            "Fixed amount"
+            'Fixed amount'
           ) {
             totalAthleticSurcharge +=
               primaryCustomer.breakfast.athleticQty *
@@ -527,7 +539,7 @@ class Step4Checkout extends React.Component {
         if (primaryCustomer.breakfast.bodybuilderQty > 0) {
           if (
             primaryCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-            "Percentage"
+            'Percentage'
           ) {
             const extraBodybuilderPerBreakfast =
               primaryCustomer.lifestyle.extraBodybuilder /
@@ -541,7 +553,7 @@ class Step4Checkout extends React.Component {
 
           if (
             primaryCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-            "Fixed amount"
+            'Fixed amount'
           ) {
             totalBodybuilderSurcharge +=
               primaryCustomer.breakfast.athleticQty *
@@ -578,7 +590,7 @@ class Step4Checkout extends React.Component {
       if (this.props.customerInfo.secondaryProfileCount > 0) {
         this.props.customerInfo.secondaryProfiles.forEach((el, index) => {
           const currentCustomer = {
-            lifestyle: "",
+            lifestyle: '',
 
             breakfastPrice: 0,
             lunchPrice: 0,
@@ -587,19 +599,19 @@ class Step4Checkout extends React.Component {
               totalQty: 0,
               regularQty: 0,
               athleticQty: 0,
-              bodybuilderQty: 0
+              bodybuilderQty: 0,
             },
             lunch: {
               totalQty: 0,
               regularQty: 0,
               athleticQty: 0,
-              bodybuilderQty: 0
+              bodybuilderQty: 0,
             },
             dinner: {
               totalQty: 0,
               regularQty: 0,
               athleticQty: 0,
-              bodybuilderQty: 0
+              bodybuilderQty: 0,
             },
             deliveryCost: 0,
             discount: this.props.customerInfo.secondaryProfiles[index].discount,
@@ -615,12 +627,12 @@ class Step4Checkout extends React.Component {
             preferences: this.props.customerInfo.secondaryProfiles[index]
               .subIngredients,
             totalAthleticSurcharge: 0,
-            totalBodybuilderSurcharge: 0
+            totalBodybuilderSurcharge: 0,
           };
 
           // the lifestyle for the current secondarycustomer
           currentCustomer.lifestyle = this.props.lifestyles.find(
-            elem => elem.title === el.lifestyle
+            elem => elem.title === el.lifestyle,
           );
 
           // calculating basePrices for Breakfast, lunch and dinner
@@ -641,20 +653,20 @@ class Step4Checkout extends React.Component {
                 currentCustomer.breakfast.totalQty +
                 parseInt(e.breakfast.quantity, 10);
 
-              if (e.breakfast.portions == "regular") {
+              if (e.breakfast.portions == 'regular') {
                 currentCustomer.breakfast.regularQty += parseInt(
                   e.breakfast.quantity,
-                  10
+                  10,
                 );
-              } else if (e.breakfast.portions == "athletic") {
+              } else if (e.breakfast.portions == 'athletic') {
                 currentCustomer.breakfast.athleticQty += parseInt(
                   e.breakfast.quantity,
-                  10
+                  10,
                 );
-              } else if ((e.breakfast.portions = "bodybuilder")) {
+              } else if ((e.breakfast.portions = 'bodybuilder')) {
                 currentCustomer.breakfast.bodybuilderQty += parseInt(
                   e.breakfast.quantity,
-                  10
+                  10,
                 );
               }
             }
@@ -663,20 +675,20 @@ class Step4Checkout extends React.Component {
               currentCustomer.lunch.totalQty =
                 currentCustomer.lunch.totalQty + parseInt(e.lunch.quantity, 10);
 
-              if (e.lunch.portions == "regular") {
+              if (e.lunch.portions == 'regular') {
                 currentCustomer.lunch.regularQty += parseInt(
                   e.lunch.quantity,
-                  10
+                  10,
                 );
-              } else if (e.lunch.portions == "athletic") {
+              } else if (e.lunch.portions == 'athletic') {
                 currentCustomer.lunch.athleticQty += parseInt(
                   e.lunch.quantity,
-                  10
+                  10,
                 );
-              } else if ((e.lunch.portions = "bodybuilder")) {
+              } else if ((e.lunch.portions = 'bodybuilder')) {
                 currentCustomer.lunch.bodybuilderQty += parseInt(
                   e.lunch.quantity,
-                  10
+                  10,
                 );
               }
             }
@@ -685,20 +697,20 @@ class Step4Checkout extends React.Component {
               currentCustomer.dinner.totalQty =
                 currentCustomer.dinner.totalQty + parseInt(e.dinner.quantity, 10);
 
-              if (e.dinner.portions == "regular") {
+              if (e.dinner.portions == 'regular') {
                 currentCustomer.dinner.regularQty += parseInt(
                   e.dinner.quantity,
-                  10
+                  10,
                 );
-              } else if (e.dinner.portions == "athletic") {
+              } else if (e.dinner.portions == 'athletic') {
                 currentCustomer.dinner.athleticQty += parseInt(
                   e.dinner.quantity,
-                  10
+                  10,
                 );
-              } else if ((e.dinner.portions = "bodybuilder")) {
+              } else if ((e.dinner.portions = 'bodybuilder')) {
                 currentCustomer.dinner.bodybuilderQty += parseInt(
                   e.dinner.quantity,
-                  10
+                  10,
                 );
               }
             }
@@ -711,11 +723,11 @@ class Step4Checkout extends React.Component {
             currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
 
           // discounted basePrice -- this is the actual base price to add up in the total
-          if (currentCustomer.discount == "senior") {
+          if (currentCustomer.discount == 'senior') {
             let discountAmount = 0;
 
             if (
-              currentCustomer.lifestyle.discountOrExtraTypeSenior == "Percentage"
+              currentCustomer.lifestyle.discountOrExtraTypeSenior == 'Percentage'
             ) {
               discountAmount =
                 currentCustomer.lifestyle.discountSenior /
@@ -725,7 +737,7 @@ class Step4Checkout extends React.Component {
 
             if (
               currentCustomer.lifestyle.discountOrExtraTypeSenior ==
-              "Fixed amount"
+              'Fixed amount'
             ) {
               discountAmount = currentCustomer.lifestyle.discountSenior;
             }
@@ -733,11 +745,11 @@ class Step4Checkout extends React.Component {
             currentCustomer.discountActual = discountAmount;
           }
 
-          if (currentCustomer.discount == "student") {
+          if (currentCustomer.discount == 'student') {
             let discountAmount = 0;
 
             if (
-              currentCustomer.lifestyle.discountOrExtraTypeStudent == "Percentage"
+              currentCustomer.lifestyle.discountOrExtraTypeStudent == 'Percentage'
             ) {
               discountAmount =
                 currentCustomer.lifestyle.discountStudent /
@@ -747,7 +759,7 @@ class Step4Checkout extends React.Component {
 
             if (
               currentCustomer.lifestyle.discountOrExtraTypeStudent ==
-              "Fixed amount"
+              'Fixed amount'
             ) {
               discountAmount = currentCustomer.lifestyle.discountStudent;
             }
@@ -759,12 +771,12 @@ class Step4Checkout extends React.Component {
           if (currentCustomer.restrictions.length > 0) {
             currentCustomer.restrictions.forEach((e, i) => {
               currentCustomer.restrictionsActual.push(
-                this.props.restrictions.find(elem => elem._id === e)
+                this.props.restrictions.find(elem => elem._id === e),
               );
             });
 
             currentCustomer.restrictionsActual.forEach((e, i) => {
-              if (e.hasOwnProperty("extra")) {
+              if (e.hasOwnProperty('extra')) {
                 let totalRestrictionsSurcharge = 0;
                 console.log(e);
 
@@ -774,12 +786,12 @@ class Step4Checkout extends React.Component {
                   currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
                   currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
 
-                if (e.discountOrExtraType == "Percentage") {
+                if (e.discountOrExtraType == 'Percentage') {
                   totalRestrictionsSurcharge =
                     e.extra / 100 * totalBaseMealsCharge;
                 }
 
-                if (e.discountOrExtraType == "Fixed amount") {
+                if (e.discountOrExtraType == 'Fixed amount') {
                   totalRestrictionsSurcharge =
                     (currentCustomer.breakfast.totalQty +
                       currentCustomer.lunch.totalQty +
@@ -790,7 +802,7 @@ class Step4Checkout extends React.Component {
                 console.log(totalRestrictionsSurcharge);
 
                 currentCustomer.restrictionsSurcharges.push(
-                  totalRestrictionsSurcharge
+                  totalRestrictionsSurcharge,
                 );
               } else {
                 currentCustomer.restrictionsSurcharges.push(0);
@@ -803,7 +815,7 @@ class Step4Checkout extends React.Component {
           if (currentCustomer.specificRestrictions.length > 0) {
             currentCustomer.specificRestrictions.forEach((e, i) => {
               currentCustomer.specificRestrictionsActual.push(
-                this.props.ingredients.find(elem => elem._id === e._id)
+                this.props.ingredients.find(elem => elem._id === e._id),
               );
             });
 
@@ -853,7 +865,7 @@ class Step4Checkout extends React.Component {
             if (currentCustomer.breakfast.athleticQty > 0) {
               if (
                 currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-                "Percentage"
+                'Percentage'
               ) {
                 const extraAthleticPerBreakfast =
                   currentCustomer.lifestyle.extraAthletic /
@@ -867,7 +879,7 @@ class Step4Checkout extends React.Component {
 
               if (
                 currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-                "Fixed amount"
+                'Fixed amount'
               ) {
                 totalAthleticSurcharge +=
                   currentCustomer.breakfast.athleticQty *
@@ -878,7 +890,7 @@ class Step4Checkout extends React.Component {
             if (currentCustomer.lunch.athleticQty > 0) {
               if (
                 currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-                "Percentage"
+                'Percentage'
               ) {
                 const extraAthleticPerLunch =
                   currentCustomer.lifestyle.extraAthletic /
@@ -891,7 +903,7 @@ class Step4Checkout extends React.Component {
 
               if (
                 currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-                "Fixed amount"
+                'Fixed amount'
               ) {
                 totalAthleticSurcharge +=
                   currentCustomer.lunch.athleticQty *
@@ -902,7 +914,7 @@ class Step4Checkout extends React.Component {
             if (currentCustomer.dinner.athleticQty > 0) {
               if (
                 currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-                "Percentage"
+                'Percentage'
               ) {
                 const extraAthleticPerDinner =
                   currentCustomer.lifestyle.extraAthletic /
@@ -915,7 +927,7 @@ class Step4Checkout extends React.Component {
 
               if (
                 currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-                "Fixed amount"
+                'Fixed amount'
               ) {
                 totalAthleticSurcharge +=
                   currentCustomer.breakfast.athleticQty *
@@ -937,7 +949,7 @@ class Step4Checkout extends React.Component {
             if (currentCustomer.breakfast.bodybuilderQty > 0) {
               if (
                 currentCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-                "Percentage"
+                'Percentage'
               ) {
                 const extraBodybuilderPerBreakfast =
                   currentCustomer.lifestyle.extraBodybuilder /
@@ -951,7 +963,7 @@ class Step4Checkout extends React.Component {
 
               if (
                 currentCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-                "Fixed amount"
+                'Fixed amount'
               ) {
                 totalBodybuilderSurcharge +=
                   currentCustomer.breakfast.athleticQty *
@@ -1002,12 +1014,12 @@ class Step4Checkout extends React.Component {
       let surchargePerDelivery = 0;
 
       const selectedPostalCode = this.props.postalCodes.find(
-        el => el.title === this.props.customerInfo.postalCode.substring(0, 3)
+        el => el.title === this.props.customerInfo.postalCode.substring(0, 3),
       );
 
       console.log(selectedPostalCode);
 
-      if (selectedPostalCode.hasOwnProperty("extraSurcharge")) {
+      if (selectedPostalCode.hasOwnProperty('extraSurcharge')) {
         surchargePerDelivery = selectedPostalCode.extraSurcharge;
       }
 
@@ -1021,15 +1033,15 @@ class Step4Checkout extends React.Component {
         const daysMealSum =
           parseInt(
             this.props.customerInfo.completeSchedule[delivIndex].breakfast,
-            10
+            10,
           ) +
           parseInt(
             this.props.customerInfo.completeSchedule[delivIndex].lunch,
-            10
+            10,
           ) +
           parseInt(
             this.props.customerInfo.completeSchedule[delivIndex].dinner,
-            10
+            10,
           );
 
         const deliveryTypeSelected = this.props.customerInfo.deliveryType[
@@ -1038,90 +1050,90 @@ class Step4Checkout extends React.Component {
 
         // calculate surcharges
 
-        if (deliveryTypeSelected == "") {
+        if (deliveryTypeSelected == '') {
           continue;
         } else if (
-          deliveryTypeSelected == "dayOf" ||
-          deliveryTypeSelected == "nightBefore"
+          deliveryTypeSelected == 'dayOf' ||
+          deliveryTypeSelected == 'nightBefore'
         ) {
           primaryCustomer.deliverySurcharges += surchargePerDelivery;
         } else if (
-          //tuesday
-          deliveryTypeSelected == "sundayNight" ||
-          deliveryTypeSelected == "dayOfMonday"
+          // tuesday
+          deliveryTypeSelected == 'sundayNight' ||
+          deliveryTypeSelected == 'dayOfMonday'
         ) {
           primaryCustomer.deliverySurcharges += surchargePerDelivery;
         } else if (
-          //wednesday
-          deliveryTypeSelected == "sundayNight" ||
-          deliveryTypeSelected == "dayOfMonday" ||
-          deliveryTypeSelected == "nightBeforeMonday" ||
-          deliveryTypeSelected == "dayOfTuesday"
+          // wednesday
+          deliveryTypeSelected == 'sundayNight' ||
+          deliveryTypeSelected == 'dayOfMonday' ||
+          deliveryTypeSelected == 'nightBeforeMonday' ||
+          deliveryTypeSelected == 'dayOfTuesday'
         ) {
           primaryCustomer.deliverySurcharges += surchargePerDelivery;
         } else if (
-          //thursday
-          deliveryTypeSelected == "mondayNight" ||
-          deliveryTypeSelected == "dayOfTuesday" ||
-          deliveryTypeSelected == "nightBeforeTuesday" ||
-          deliveryTypeSelected == "dayOfWednesday"
+          // thursday
+          deliveryTypeSelected == 'mondayNight' ||
+          deliveryTypeSelected == 'dayOfTuesday' ||
+          deliveryTypeSelected == 'nightBeforeTuesday' ||
+          deliveryTypeSelected == 'dayOfWednesday'
         ) {
           primaryCustomer.deliverySurcharges += surchargePerDelivery;
         } else if (
-          //friday
-          deliveryTypeSelected == "tuesdayNight" ||
-          deliveryTypeSelected == "dayOfWednesday" ||
-          deliveryTypeSelected == "nightBeforeWednesday" ||
-          deliveryTypeSelected == "dayOfThursday"
+          // friday
+          deliveryTypeSelected == 'tuesdayNight' ||
+          deliveryTypeSelected == 'dayOfWednesday' ||
+          deliveryTypeSelected == 'nightBeforeWednesday' ||
+          deliveryTypeSelected == 'dayOfThursday'
         ) {
           primaryCustomer.deliverySurcharges += surchargePerDelivery;
         }
 
 
         // calculate actual delivery cost / delivery
-        if (deliveryTypeSelected == "") {
+        if (deliveryTypeSelected == '') {
           continue;
         } else if (
-          deliveryTypeSelected == "dayOf" ||
-          deliveryTypeSelected == "dayOfFriday" ||
-          deliveryTypeSelected == "dayOfThursday" ||
-          deliveryTypeSelected == "dayOfWednesday" ||
-          deliveryTypeSelected == "dayOfTuesday" ||
-          deliveryTypeSelected == "dayOfMonday"
+          deliveryTypeSelected == 'dayOf' ||
+          deliveryTypeSelected == 'dayOfFriday' ||
+          deliveryTypeSelected == 'dayOfThursday' ||
+          deliveryTypeSelected == 'dayOfWednesday' ||
+          deliveryTypeSelected == 'dayOfTuesday' ||
+          deliveryTypeSelected == 'dayOfMonday'
         ) {
           actualDeliveryCost += 2.5;
         } else if (
           daysMealSum == 1 &&
-          (deliveryTypeSelected == "nightBefore" ||
-            deliveryTypeSelected == "sundayNight" ||
-            deliveryTypeSelected == "mondayNight" ||
-            deliveryTypeSelected == "tuesdayNight" ||
-            deliveryTypeSelected == "nightBeforeMonday" ||
-            deliveryTypeSelected == "nightBeforeTuesday" ||
-            deliveryTypeSelected == "nightBeforeWednesday")
+          (deliveryTypeSelected == 'nightBefore' ||
+            deliveryTypeSelected == 'sundayNight' ||
+            deliveryTypeSelected == 'mondayNight' ||
+            deliveryTypeSelected == 'tuesdayNight' ||
+            deliveryTypeSelected == 'nightBeforeMonday' ||
+            deliveryTypeSelected == 'nightBeforeTuesday' ||
+            deliveryTypeSelected == 'nightBeforeWednesday')
         ) {
           actualDeliveryCost += 2.5;
         } else if (delivIndex == 5) {
-          //these explicit conditions because they depend on friday's/thursday's selections
+          // these explicit conditions because they depend on friday's/thursday's selections
           if (
             this.props.customerInfo.deliveryType[delivIndex - 1] ==
-            "dayOfThursday"
+            'dayOfThursday'
           ) {
-            if (deliveryTypeSelected == "nightBeforeThursday") {
+            if (deliveryTypeSelected == 'nightBeforeThursday') {
               actualDeliveryCost += 2.5;
 
-              //mixing surcharges here
+              // mixing surcharges here
               primaryCustomer.deliverySurcharges += surchargePerDelivery;
             }
           } else if (
             this.props.customerInfo.deliveryType[delivIndex - 1] ==
-            "dayOfPaired" &&
-            this.props.customerInfo.deliveryType[delivIndex - 2] == "dayOf"
+            'dayOfPaired' &&
+            this.props.customerInfo.deliveryType[delivIndex - 2] == 'dayOf'
           ) {
-            if (deliveryTypeSelected == "nightBeforeThursday") {
+            if (deliveryTypeSelected == 'nightBeforeThursday') {
               actualDeliveryCost += 2.5;
 
-              //mixing surcharges here
+              // mixing surcharges here
               primaryCustomer.deliverySurcharges += surchargePerDelivery;
             }
           }
@@ -1166,7 +1178,7 @@ class Step4Checkout extends React.Component {
 
       this.setState({
         primaryProfileBilling: primaryCustomer,
-        secondaryProfilesBilling: secondaryCustomers
+        secondaryProfilesBilling: secondaryCustomers,
       });
     }
   }
@@ -1198,6 +1210,10 @@ class Step4Checkout extends React.Component {
       .val()
       .trim();
 
+    // console.log(customerInfo);
+
+    // return;
+
     if (
       this.state.paymentMethod == "interac" ||
       this.state.paymentMethod == "cash"
@@ -1223,7 +1239,7 @@ class Step4Checkout extends React.Component {
         }
       });
 
-      return;
+
     }
 
     const authData = {};
@@ -1303,19 +1319,19 @@ class Step4Checkout extends React.Component {
 
   handleTaxExempt(event, checked) {
     this.setState({
-      taxExempt: checked
+      taxExempt: checked,
     });
   }
 
   handleChangeRadioPaymentMethod(event, value) {
     this.setState({
-      paymentMethod: value
+      paymentMethod: value,
     });
   }
 
   render() {
     const buttonClassname = classNames({
-      [this.props.classes.buttonSuccess]: this.state.submitSuccess
+      [this.props.classes.buttonSuccess]: this.state.submitSuccess,
     });
 
     return (
@@ -1327,7 +1343,7 @@ class Step4Checkout extends React.Component {
         <Grid
           container
           justify="center"
-          style={{ marginBottom: "50px", marginTop: "25px" }}
+          style={{ marginBottom: '50px', marginTop: '25px' }}
         >
           <Grid item xs={12}>
             <Grid container>
@@ -1347,9 +1363,9 @@ class Step4Checkout extends React.Component {
                           name="paymentMethod"
                           value={this.state.paymentMethod}
                           onChange={this.handleChangeRadioPaymentMethod.bind(
-                            this
+                            this,
                           )}
-                          style={{ flexDirection: "row" }}
+                          style={{ flexDirection: 'row' }}
                         >
                           <FormControlLabel
                             value="card"
@@ -1376,7 +1392,7 @@ class Step4Checkout extends React.Component {
 
                   <div
                     className={
-                      this.state.paymentMethod == "card" ? "show" : "hidden"
+                      this.state.paymentMethod == 'card' ? 'show' : 'hidden'
                     }
                   >
                     <Grid container>
@@ -1392,8 +1408,8 @@ class Step4Checkout extends React.Component {
                         <Input
                           placeholder="Name on card"
                           inputProps={{
-                            name: "nameOnCard",
-                            id: "nameOnCard"
+                            name: 'nameOnCard',
+                            id: 'nameOnCard',
                           }}
                           fullWidth
                         />
@@ -1402,8 +1418,8 @@ class Step4Checkout extends React.Component {
                         <Input
                           placeholder="Card number"
                           inputProps={{
-                            name: "cardNumber",
-                            id: "cardNumber"
+                            name: 'cardNumber',
+                            id: 'cardNumber',
                           }}
                           fullWidth
                         />
@@ -1413,14 +1429,14 @@ class Step4Checkout extends React.Component {
                       <Grid item xs={4}>
                         <Input
                           placeholder="Expiration"
-                          inputProps={{ name: "expiry", id: "expiry" }}
+                          inputProps={{ name: 'expiry', id: 'expiry' }}
                           fullWidth
                         />
                       </Grid>
                       <Grid item xs={4}>
                         <Input
                           placeholder="CVC"
-                          inputProps={{ name: "cvc", id: "cvc" }}
+                          inputProps={{ name: 'cvc', id: 'cvc' }}
                           fullWidth
                         />
                       </Grid>
@@ -1428,8 +1444,8 @@ class Step4Checkout extends React.Component {
                         <Input
                           placeholder="Postal code"
                           inputProps={{
-                            name: "postal_code",
-                            id: "postalCode"
+                            name: 'billingPostalCode',
+                            id: 'postalCode',
                           }}
                           fullWidth
                         />
@@ -1437,8 +1453,8 @@ class Step4Checkout extends React.Component {
                     </Grid>
                   </div>
 
-                  {this.state.paymentMethod == "interac" ||
-                    this.state.paymentMethod == "cash" ? (
+                  {this.state.paymentMethod == 'interac' ||
+                    this.state.paymentMethod == 'cash' ? (
                       <div>
                         <Grid container>
                           <Grid item xs={12} sm={6}>
@@ -1456,7 +1472,7 @@ class Step4Checkout extends React.Component {
                         </Grid>
                       </div>
                     ) : (
-                      ""
+                      ''
                     )}
                 </Paper>
               </Grid>
@@ -1466,14 +1482,14 @@ class Step4Checkout extends React.Component {
                     <Grid item xs={12} sm={12}>
                       <Typography
                         type="headline"
-                        style={{ marginBottom: "25px" }}
+                        style={{ marginBottom: '25px' }}
                       >
                         Overview
                       </Typography>
                       <Typography
                         type="title"
                         className="font-medium font-uppercase"
-                        style={{ marginTop: ".75em", marginBottom: ".75em" }}
+                        style={{ marginTop: '.75em', marginBottom: '.75em' }}
                       >
                         Meal Plan
                       </Typography>
@@ -1481,13 +1497,13 @@ class Step4Checkout extends React.Component {
                       <Typography
                         type="title"
                         style={{
-                          marginTop: ".75em",
-                          marginBottom: ".75em"
+                          marginTop: '.75em',
+                          marginBottom: '.75em',
                         }}
                       >
                         {this.state.primaryProfileBilling
                           ? this.state.primaryProfileBilling.lifestyle.title
-                          : ""}
+                          : ''}
                       </Typography>
 
                       <Grid container>
@@ -1500,13 +1516,13 @@ class Step4Checkout extends React.Component {
                                 .totalQty +
                               this.state.primaryProfileBilling.dinner
                                 .totalQty} meals`
-                              : ""}
+                              : ''}
                           </Typography>
                         </Grid>
                         <Grid item xs={6}>
                           <Typography
                             type="subheading"
-                            style={{ textAlign: "right" }}
+                            style={{ textAlign: 'right' }}
                           >
                             ${this.state.primaryProfileBilling
                               ? this.state.primaryProfileBilling.breakfast
@@ -1519,7 +1535,7 @@ class Step4Checkout extends React.Component {
                               this.state.primaryProfileBilling.dinner
                                 .totalQty *
                               this.state.primaryProfileBilling.dinnerPrice
-                              : ""}
+                              : ''}
                           </Typography>
                         </Grid>
                       </Grid>
@@ -1531,10 +1547,10 @@ class Step4Checkout extends React.Component {
                               <Typography
                                 type="body2"
                                 className="font-medium font-uppercase"
-                                style={{ marginTop: ".75em" }}
+                                style={{ marginTop: '.75em' }}
                               >
                                 Discount
-                            </Typography>
+                              </Typography>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                               <Typography type="subheading">
@@ -1544,23 +1560,23 @@ class Step4Checkout extends React.Component {
                                   this.state.primaryProfileBilling.discount.substr(
                                     1,
                                     this.state.primaryProfileBilling.discount
-                                      .length
+                                      .length,
                                   )}
                               </Typography>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                               <Typography
                                 type="subheading"
-                                style={{ textAlign: "right" }}
+                                style={{ textAlign: 'right' }}
                               >
                                 -${
                                   this.state.primaryProfileBilling.discountActual
-                                }{" "}
+                                }{' '}
                               </Typography>
                             </Grid>
                           </Grid>
                         ) : (
-                          ""
+                          ''
                         )}
 
                       {this.state.primaryProfileBilling &&
@@ -1572,13 +1588,13 @@ class Step4Checkout extends React.Component {
                             <Typography
                               type="body2"
                               className="font-medium font-uppercase"
-                              style={{ marginTop: ".75em" }}
+                              style={{ marginTop: '.75em' }}
                             >
                               Extra
-                          </Typography>
+                            </Typography>
                           </Grid>
                         ) : (
-                          ""
+                          ''
                         )}
 
                       {this.state.primaryProfileBilling &&
@@ -1591,29 +1607,29 @@ class Step4Checkout extends React.Component {
                             <Grid item xs={6}>
                               <Typography
                                 type="subheading"
-                                style={{ textAlign: "right" }}
+                                style={{ textAlign: 'right' }}
                               >
                                 ${
                                   this.state.primaryProfileBilling
                                     .totalAthleticSurcharge
-                                }{" "}
+                                }{' '}
                                 ({this.state.primaryProfileBilling.lifestyle
-                                  .discountOrExtraTypeAthletic == "Fixed amount"
-                                  ? "$"
-                                  : ""}
+                                  .discountOrExtraTypeAthletic == 'Fixed amount'
+                                  ? '$'
+                                  : ''}
                                 {
                                   this.state.primaryProfileBilling.lifestyle
                                     .extraAthletic
                                 }
                                 {this.state.primaryProfileBilling.lifestyle
-                                  .discountOrExtraTypeAthletic == "Percentage"
-                                  ? "%"
-                                  : ""})
-                            </Typography>
+                                  .discountOrExtraTypeAthletic == 'Percentage'
+                                  ? '%'
+                                  : ''})
+                              </Typography>
                             </Grid>
                           </Grid>
                         ) : (
-                          ""
+                          ''
                         )}
 
                       {this.state.primaryProfileBilling &&
@@ -1623,35 +1639,35 @@ class Step4Checkout extends React.Component {
                             <Grid item xs={12} sm={6}>
                               <Typography type="subheading">
                                 Bodybuilder
-                            </Typography>
+                              </Typography>
                             </Grid>
                             <Grid item xs={12} sm={6}>
                               <Typography
                                 type="subheading"
-                                style={{ textAlign: "right" }}
+                                style={{ textAlign: 'right' }}
                               >
                                 ${
                                   this.state.primaryProfileBilling
                                     .totalBodybuilderSurcharge
-                                }{" "}
+                                }{' '}
                                 ({this.state.primaryProfileBilling.lifestyle
                                   .discountOrExtraTypeBodybuilder ==
-                                  "Fixed amount"
-                                  ? "$"
-                                  : ""}
+                                  'Fixed amount'
+                                  ? '$'
+                                  : ''}
                                 {
                                   this.state.primaryProfileBilling.lifestyle
                                     .extraBodybuilder
                                 }
                                 {this.state.primaryProfileBilling.lifestyle
-                                  .discountOrExtraTypeBodybuilder == "Percentage"
-                                  ? "%"
-                                  : ""})
-                            </Typography>
+                                  .discountOrExtraTypeBodybuilder == 'Percentage'
+                                  ? '%'
+                                  : ''})
+                              </Typography>
                             </Grid>
                           </Grid>
                         ) : (
-                          ""
+                          ''
                         )}
 
                       {this.state.primaryProfileBilling &&
@@ -1661,8 +1677,8 @@ class Step4Checkout extends React.Component {
                             type="body2"
                             className="font-medium font-uppercase"
                             style={{
-                              marginTop: ".75em",
-                              marginBottom: ".75em"
+                              marginTop: '.75em',
+                              marginBottom: '.75em',
                             }}
                           >
                             Restrictions
@@ -1678,19 +1694,19 @@ class Step4Checkout extends React.Component {
                               <Grid item xs={12} sm={6}>
                                 <Typography type="subheading">
                                   {e.title} ({e.discountOrExtraType ==
-                                    "Fixed amount"
-                                    ? "$"
-                                    : ""}
+                                    'Fixed amount'
+                                    ? '$'
+                                    : ''}
                                   {e.extra}
-                                  {e.discountOrExtraType == "Percentage"
-                                    ? "%"
-                                    : ""})
-                                  </Typography>
+                                  {e.discountOrExtraType == 'Percentage'
+                                    ? '%'
+                                    : ''})
+                                </Typography>
                               </Grid>
                               <Grid item xs={12} sm={6}>
                                 <Typography
                                   type="subheading"
-                                  style={{ textAlign: "right" }}
+                                  style={{ textAlign: 'right' }}
                                 >
                                   ${
                                     this.state.primaryProfileBilling
@@ -1699,9 +1715,9 @@ class Step4Checkout extends React.Component {
                                 </Typography>
                               </Grid>
                             </Grid>
-                          )
+                          ),
                         )
-                        : ""}
+                        : ''}
 
                       {/* this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling
@@ -1743,8 +1759,8 @@ class Step4Checkout extends React.Component {
                             <Typography
                               type="title"
                               style={{
-                                marginTop: ".75em",
-                                marginBottom: ".75em"
+                                marginTop: '.75em',
+                                marginBottom: '.75em',
                               }}
                             >
                               {e.lifestyle.title}
@@ -1761,7 +1777,7 @@ class Step4Checkout extends React.Component {
                               <Grid item xs={6}>
                                 <Typography
                                   type="subheading"
-                                  style={{ textAlign: "right" }}
+                                  style={{ textAlign: 'right' }}
                                 >
                                   ${e.breakfast.totalQty * e.breakfastPrice +
                                     e.lunch.totalQty * e.lunchPrice +
@@ -1777,26 +1793,26 @@ class Step4Checkout extends React.Component {
                                     <Typography
                                       type="body2"
                                       className="font-medium font-uppercase"
-                                      style={{ marginTop: ".75em" }}
+                                      style={{ marginTop: '.75em' }}
                                     >
                                       Discount
-                                      </Typography>
+                                    </Typography>
                                   </Grid>
                                   <Grid item xs={12} sm={6}>
                                     <Typography type="subheading">
                                       {e.discount.charAt(0).toUpperCase() +
                                         e.discount.substr(
                                           1,
-                                          e.discount.length
+                                          e.discount.length,
                                         )}
                                     </Typography>
                                   </Grid>
                                   <Grid item xs={12} sm={6}>
                                     <Typography
                                       type="subheading"
-                                      style={{ textAlign: "right" }}
+                                      style={{ textAlign: 'right' }}
                                     >
-                                      -${e.discountActual}{" "}
+                                      -${e.discountActual}{' '}
                                     </Typography>
                                   </Grid>
                                 </Grid>
@@ -1808,13 +1824,13 @@ class Step4Checkout extends React.Component {
                                   <Typography
                                     type="body2"
                                     className="font-medium font-uppercase"
-                                    style={{ marginTop: ".75em" }}
+                                    style={{ marginTop: '.75em' }}
                                   >
                                     Extra
                                   </Typography>
                                 </Grid>
                               ) : (
-                                ""
+                                ''
                               )}
 
                             {e.totalAthleticSurcharge > 0 ? (
@@ -1822,29 +1838,29 @@ class Step4Checkout extends React.Component {
                                 <Grid item xs={6}>
                                   <Typography type="subheading">
                                     Athletic
-                                    </Typography>
+                                  </Typography>
                                 </Grid>
                                 <Grid item xs={6}>
                                   <Typography
                                     type="subheading"
-                                    style={{ textAlign: "right" }}
+                                    style={{ textAlign: 'right' }}
                                   >
                                     ${e.totalAthleticSurcharge} ({e.lifestyle
                                       .discountOrExtraTypeAthletic ==
-                                      "Fixed amount"
-                                      ? "$"
-                                      : ""}
+                                      'Fixed amount'
+                                      ? '$'
+                                      : ''}
                                     {e.lifestyle.extraAthletic}
                                     {e.lifestyle
                                       .discountOrExtraTypeAthletic ==
-                                      "Percentage"
-                                      ? "%"
-                                      : ""})
-                                    </Typography>
+                                      'Percentage'
+                                      ? '%'
+                                      : ''})
+                                  </Typography>
                                 </Grid>
                               </Grid>
                             ) : (
-                                ""
+                                ''
                               )}
 
                             {e.totalBodybuilderSurcharge > 0 ? (
@@ -1852,30 +1868,30 @@ class Step4Checkout extends React.Component {
                                 <Grid item sm={6} xs={12}>
                                   <Typography type="subheading">
                                     Bodybuilder
-                                    </Typography>
+                                  </Typography>
                                 </Grid>
                                 <Grid item sm={6} xs={12}>
                                   <Typography
                                     type="subheading"
-                                    style={{ textAlign: "right" }}
+                                    style={{ textAlign: 'right' }}
                                   >
                                     ${e.totalBodybuilderSurcharge} ({e
                                       .lifestyle
                                       .discountOrExtraTypeBodybuilder ==
-                                      "Fixed amount"
-                                      ? "$"
-                                      : ""}
+                                      'Fixed amount'
+                                      ? '$'
+                                      : ''}
                                     {e.lifestyle.extraBodybuilder}
                                     {e.lifestyle
                                       .discountOrExtraTypeBodybuilder ==
-                                      "Percentage"
-                                      ? "%"
-                                      : ""})
-                                    </Typography>
+                                      'Percentage'
+                                      ? '%'
+                                      : ''})
+                                  </Typography>
                                 </Grid>
                               </Grid>
                             ) : (
-                                ""
+                                ''
                               )}
 
                             {e.restrictionsActual.length > 0 && (
@@ -1883,12 +1899,12 @@ class Step4Checkout extends React.Component {
                                 type="body2"
                                 className="font-medium font-uppercase"
                                 style={{
-                                  marginTop: ".75em",
-                                  marginBottom: ".75em"
+                                  marginTop: '.75em',
+                                  marginBottom: '.75em',
                                 }}
                               >
                                 Restrictions
-                                </Typography>
+                              </Typography>
                             )}
 
                             {e.restrictionsActual.length > 0 &&
@@ -1897,19 +1913,19 @@ class Step4Checkout extends React.Component {
                                   <Grid item xs={12} sm={6}>
                                     <Typography type="subheading">
                                       {el.title} ({el.discountOrExtraType ==
-                                        "Fixed amount"
-                                        ? "$"
-                                        : ""}
+                                        'Fixed amount'
+                                        ? '$'
+                                        : ''}
                                       {el.extra}
-                                      {el.discountOrExtraType == "Percentage"
-                                        ? "%"
-                                        : ""})
-                                      </Typography>
+                                      {el.discountOrExtraType == 'Percentage'
+                                        ? '%'
+                                        : ''})
+                                    </Typography>
                                   </Grid>
                                   <Grid item xs={12} sm={6}>
                                     <Typography
                                       type="subheading"
-                                      style={{ textAlign: "right" }}
+                                      style={{ textAlign: 'right' }}
                                     >
                                       ${e.restrictionsSurcharges[ind]}
                                     </Typography>
@@ -1944,7 +1960,7 @@ class Step4Checkout extends React.Component {
                                 )) */}
                           </div>
                         ))
-                        : ""}
+                        : ''}
 
                       {/*  delivery and other stuff  */}
                       <Grid container>
@@ -1954,14 +1970,14 @@ class Step4Checkout extends React.Component {
                         <Grid item xs={6}>
                           <Typography
                             type="subheading"
-                            style={{ textAlign: "right" }}
+                            style={{ textAlign: 'right' }}
                           >
                             {this.state.primaryProfileBilling &&
                               this.state.primaryProfileBilling.deliveryCost > 0
                               ? `$${
                               this.state.primaryProfileBilling.deliveryCost
                               }`
-                              : "Free"}
+                              : 'Free'}
                           </Typography>
                         </Grid>
                       </Grid>
@@ -1978,8 +1994,8 @@ class Step4Checkout extends React.Component {
                                       el.title ===
                                       this.props.customerInfo.postalCode.substring(
                                         0,
-                                        3
-                                      )
+                                        3,
+                                      ),
                                   ).extraSurcharge
                                 })
                               </Typography>
@@ -1987,7 +2003,7 @@ class Step4Checkout extends React.Component {
                             <Grid item xs={6}>
                               <Typography
                                 type="subheading"
-                                style={{ textAlign: "right" }}
+                                style={{ textAlign: 'right' }}
                               >
                                 {this.state.primaryProfileBilling &&
                                   this.state.primaryProfileBilling
@@ -1996,7 +2012,7 @@ class Step4Checkout extends React.Component {
                                   this.state.primaryProfileBilling
                                     .deliverySurcharges
                                   }`
-                                  : ""}
+                                  : ''}
                               </Typography>
                             </Grid>
                           </Grid>
@@ -2013,7 +2029,7 @@ class Step4Checkout extends React.Component {
                             <Grid item xs={6}>
                               <Typography
                                 type="subheading"
-                                style={{ textAlign: "right" }}
+                                style={{ textAlign: 'right' }}
                               >
                                 {/* $20.00 */}
                                 $0
@@ -2025,7 +2041,7 @@ class Step4Checkout extends React.Component {
                       <Typography
                         type="title"
                         className="font-medium font-uppercase"
-                        style={{ marginTop: ".75em", marginBottom: ".75em" }}
+                        style={{ marginTop: '.75em', marginBottom: '.75em' }}
                       >
                         Price
                       </Typography>
@@ -2038,7 +2054,7 @@ class Step4Checkout extends React.Component {
                           <Grid item xs={12} sm={6}>
                             <Typography
                               type="subheading"
-                              style={{ textAlign: "right" }}
+                              style={{ textAlign: 'right' }}
                             >
                               ${this.state.primaryProfileBilling &&
                                 this.state.primaryProfileBilling.taxes}
@@ -2046,7 +2062,7 @@ class Step4Checkout extends React.Component {
                           </Grid>
                         </Grid>
                       ) : (
-                          ""
+                          ''
                         )}
                       <Grid container>
                         <Grid item xs={12} sm={6}>
@@ -2056,8 +2072,8 @@ class Step4Checkout extends React.Component {
                           <Typography
                             type="display1"
                             style={{
-                              textAlign: "right",
-                              color: "#000"
+                              textAlign: 'right',
+                              color: '#000',
                             }}
                           >
                             {this.state.taxExempt
@@ -2083,9 +2099,9 @@ class Step4Checkout extends React.Component {
 
         <div
           style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between"
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
           }}
         >
           <Button color="primary" onClick={this.props.handleBack}>
@@ -2116,7 +2132,7 @@ Step4Checkout.defaultProps = {
   popTheSnackbar: PropTypes.func.isRequired,
   classes: PropTypes.object.isRequired,
   handleNext: PropTypes.func.isRequired,
-  handleBack: PropTypes.func.isRequired
+  handleBack: PropTypes.func.isRequired,
 };
 
 export default withStyles(styles)(Step4Checkout);

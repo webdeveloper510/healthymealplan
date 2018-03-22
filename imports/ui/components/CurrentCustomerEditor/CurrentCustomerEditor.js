@@ -187,25 +187,24 @@ class CurrentCustomerEditor extends React.Component {
 
       secondaryCollapses: [false, false, false, false, false, false],
       secondaryProfileCount: this.props.customer && this.props.customer.associatedProfiles > 0 ? this.props.customer.associatedProfiles : 0,
-      secondaryProfilesData: this.props.customer && this.props.lifestyles
-        && this.props.secondaryAccounts ? this.props.secondaryAccounts.map((e) => {
-          return {
-            _id: e._id,
-            first_name: e.profile.name.first,
-            last_name: e.profile.name.last ? e.profile.name.last : '',
-            subIngredients: e.preferences,
-            specificRestrictions: e.specificRestrictions,
-            lifestyle: this.props.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
-            isLifestyleCustom: this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom,
-            discount: e.discount,
-            restrictions: [],
-            activeMealScheduleStep: 0,
-            deleteDialogOpen: false,
-            scheduleReal: e.schedule,
-            platingNotes: e.platingNotes ? e.platingNotes : '',
-            adultOrChild: e.adultOrChild,
-          }
-        }) : [],
+      secondaryProfilesData: this.props.customer && this.props.lifestyles && this.props.secondaryAccounts ? this.props.secondaryAccounts.map((e) => {
+        return {
+          _id: e._id,
+          first_name: e.profile.name.first,
+          last_name: e.profile.name.last ? e.profile.name.last : '',
+          subIngredients: e.preferences,
+          specificRestrictions: e.specificRestrictions,
+          lifestyle: this.props.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
+          isLifestyleCustom: this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom,
+          discount: e.discount,
+          restrictions: e.restrictions, //fix here
+          activeMealScheduleStep: 0,
+          deleteDialogOpen: false,
+          scheduleReal: e.schedule,
+          platingNotes: e.platingNotes ? e.platingNotes : '',
+          adultOrChild: e.adultOrChild,
+        }
+      }) : [],
 
 
       // Step 3: Delivery

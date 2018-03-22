@@ -1,4 +1,5 @@
 import { Meteor } from 'meteor/meteor';
+import constants from './constants';
 
 const ApiContracts = require('authorizenet').APIContracts;
 const ApiControllers = require('authorizenet').APIControllers;
@@ -19,7 +20,11 @@ export default function getCustomerPaymentProfile(customerProfileId, customerPay
   // pretty print reques
 
   let ctrl = new ApiControllers.GetCustomerProfileController(getRequest.getJSON());
-  ctrl.setEnvironment('https://api2.authorize.net/xml/v1/request.api');
+  if (process.env.NODE_ENV == 'development') {
+    ctrl.setEnvironment(constants.endpoint.sandbox);
+  } else {
+    ctrl.setEnvironment(constants.endpoint.production)
+  }
 
   ctrl.execute(() => {
 

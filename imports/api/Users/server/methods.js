@@ -131,8 +131,8 @@ Meteor.methods({
     Meteor.users.update({
       _id: data.id,
     }, {
-        $set: toUpdate,
-      });
+      $set: toUpdate,
+    });
 
 
     // console.log(data);
@@ -290,11 +290,11 @@ Meteor.methods({
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-        $set: {
-          completeSchedule: data.completeSchedule,
-          delivery: newDeliveryType,
-        },
-      });
+      $set: {
+        completeSchedule: data.completeSchedule,
+        delivery: newDeliveryType,
+      },
+    });
 
   },
 
@@ -715,15 +715,16 @@ Meteor.methods({
     }
   },
 
-  'customers.step5': function customerStep5(opaqueData, customerInfo) {
+  'customers.step4': function customerStep5(opaqueData, customerInfo) {
     check(opaqueData, {
       dataDescriptor: String,
       dataValue: String,
     });
 
+    check(customerInfo, Object);
+
     const subscriptionIdToSave = Random.id();
 
-    check(customerInfo, Object);
 
     console.log(customerInfo);
 
@@ -1483,10 +1484,10 @@ Meteor.methods({
     check(type, String);
     check(userId, String);
 
-    const user = Meteor.users.findOne({ _id: userId })
+    const user = Meteor.users.findOne({ _id: userId });
     const subscription = Subscriptions.findOne({ customerId: user._id });
 
-    if (subscription.paymentMethod == "card") {
+    if (subscription.paymentMethod == 'card') {
 
       const syncCancelSubscription = Meteor.wrapAsync(cancelSubscription);
 
@@ -1516,10 +1517,10 @@ Meteor.methods({
         Subscriptions.update({
           _id: subscription._id,
         }, {
-            $set: {
-              paymentMethod: type
-            }
-          });
+          $set: {
+            paymentMethod: type,
+          },
+        });
       } catch (error) {
         console.log(error);
         throw new Meteor.Error(500, error);
