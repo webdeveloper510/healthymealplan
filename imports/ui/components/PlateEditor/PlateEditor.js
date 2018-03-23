@@ -152,17 +152,21 @@ class PlateEditor extends React.Component {
   onFileLoad(e) {
     // console.log(e.target.files[0]);
 
-    const fr = new FileReader();
 
-    fr.onload = (el) => {
+    const reader = new FileReader();
+    const file = e.target.files[0];
+
+    reader.addEventListener('load', () => {
       this.setState({
-        plateImageSrc: el.target.result,
+        plateImageSrc: reader.result,
         imageFieldChanged: true,
         hasFormChanged: true,
       });
-    };
+    })
 
-    fr.readAsDataURL(e.target.files[0]);
+    if (file) {
+      reader.readAsDataURL(file);
+    }
   }
 
   onSuggestionSelected(
@@ -259,6 +263,8 @@ class PlateEditor extends React.Component {
   }
 
   handleSubmit() {
+    console.log('handling submit');
+
     const { history, popTheSnackbar } = this.props;
     const existingPlate = this.props.plate && this.props.plate._id;
     const methodToCall = existingPlate ? 'plates.update' : 'plates.insert';
@@ -320,117 +326,49 @@ class PlateEditor extends React.Component {
           ? `${localStorage.getItem('plateForSnackbar')} main course updated.`
           : `${localStorage.getItem('plateForSnackbar')} main course added.`;
 
-        if (this.state.imageFieldChanged) {
-          // if (existingPlate) {
-          //   PlateImages.remove({ _id: existingPlate.imageId });
-          //   this.uploadFile(
-          //     document.getElementById('plateImage').files[0],
-          //     plateId,
-          //     confirmation,
-          //   );
-          // } else {
-          //   // this.uploadFile(
-          //   //   document.getElementById('plateImage').files[0],
-          //   //   plateId,
-          //   //   confirmation,
-          //   // );
+        // if (this.state.imageFieldChanged) {
+        //   S3.upload({
+        //     file: document.getElementById('plateImage').files[0],
+        //     path: 'images',
+        //   }, (err, res) => {
+        //     console.log('Err');
+        //     console.log(err);
+        //     console.log('Res');
+        //     console.log(res);
 
-          S3.upload({
-            file: document.getElementById('plateImage').files[0],
-            path: 'images',
-          }, (err, res) => {
-            console.log(res);
+        //     Meteor.call(
+        //       'plates.updateImageUrl',
+        //       {
+        //         _id: plateId,
+        //         imageUrl: res.relative_url,
+        //       },
+        //       (err, plateId) => {
+        //         if (err) {
+        //           console.log(err);
+        //         } else {
+        //           this.props.popTheSnackbar({
+        //             message: confirmation,
+        //             buttonText: 'View',
+        //             buttonLink: `/plates/${plateId}/edit`,
+        //           });
 
-            Meteor.call(
-              'plates.updateImageUrl',
-              {
-                _id: plateId,
-                imageUrl: res.relative_url,
-              },
-              (err, plateId) => {
-                if (err) {
-                  console.log(err);
-                } else {
-                  this.props.popTheSnackbar({
-                    message: confirmation,
-                    buttonText: 'View',
-                    buttonLink: `/plates/${plateId}/edit`,
-                  });
+        //           this.props.history.push('/plates');
+        //         }
+        //       },
+        //     );
+        //   });
+        // } else {
+        this.props.popTheSnackbar({
+          message: confirmation,
+          buttonText: 'View',
+          buttonLink: `/plates/${plateId}/edit`,
+        });
 
-                  this.props.history.push('/plates');
-                }
-              },
-            );
-          });
-          // }
-        } else {
-          popTheSnackbar({
-            message: confirmation,
-            buttonText: 'View',
-            buttonLink: `/plates/${plateId}/edit`,
-          });
-
-          history.push('/plates');
-        }
+        this.props.history.push('/plates');
+        // }
       }
     });
   }
-
-  // uploadFile(file, plateId, confirmation) {
-  //   // console.log(plateImage);
-  //   const upload = PlateImages.insert(
-  //     {
-  //       file,
-  //       streams: 'dynamic',
-  //       chunkSize: 'dynamic',
-  //     },
-  //     false,
-  //   );
-
-  //   upload.on('start', (err, file) => {
-  //     console.log('Started');
-  //     console.log(file);
-  //   });
-
-  //   upload.on('progress', (progress, fileObject) => {
-  //     console.log(progress);
-  //     console.log(fileObject);
-  //   });
-
-  //   upload.on('end', (err, fileObj) => {
-  //     console.log(fileObj);
-  //     console.log('ended');
-  //     console.log(upload);
-
-  //     // const data = {
-  //     //   // projectId,
-  //     //   fileId: upload.config.fileId,
-  //     // };
-  //     console.log(plateId);
-
-  //     Meteor.call(
-  //       'plates.updateImageId',
-  //       { _id: plateId, imageId: upload.config.fileId },
-  //       (err, plateId) => {
-  //         if (err) {
-  //           console.log(err);
-  //         } else {
-  //           this.props.popTheSnackbar({
-  //             message: confirmation,
-  //             buttonText: 'View',
-  //             buttonLink: `/plates/${plateId}/edit`,
-  //           });
-
-  //           this.props.history.push('/plates');
-  //         }
-  //       },
-  //     );
-
-  //     // add a method call here which updates the plate with the image id
-  //   }); // on upload end
-
-  //   upload.start();
-  // }
 
   renderDeleteDialog() {
     return (
@@ -657,7 +595,7 @@ class PlateEditor extends React.Component {
                 Cancel
               </Button>
               <Button
-                disabled={!this.state.hasFormChanged}
+                disabled={!this.state.hasFormChanged || !this.state.imageFieldChanged}
                 className="btn btn-primary"
                 raised
                 type="submit"

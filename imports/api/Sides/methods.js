@@ -183,6 +183,7 @@ Meteor.methods({
       throw new Meteor.Error("500", exception);
     }
   },
+
   "sides.remove": function sidesRemove(sideId) {
     check(sideId, String);
 
