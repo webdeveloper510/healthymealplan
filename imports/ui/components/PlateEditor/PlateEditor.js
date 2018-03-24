@@ -29,6 +29,11 @@ import Table, {
   TableRow,
 } from 'material-ui/Table';
 
+import classNames from 'classnames';
+import { withStyles } from 'material-ui/styles';
+import { CircularProgress } from 'material-ui/Progress';
+import green from 'material-ui/colors/green';
+
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -55,7 +60,38 @@ import PlateImages from '../../../api/PlateImages/PlateImages';
 
 const danger = red[700];
 
-const styles = theme => ({});
+
+const styles = theme => ({
+  root: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  wrapper: {
+    margin: theme.spacing.unit,
+    position: 'relative',
+  },
+  buttonSuccess: {
+    backgroundColor: green[500],
+    '&:hover': {
+      backgroundColor: green[700],
+    },
+  },
+  fabProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: -6,
+    left: -6,
+    zIndex: 1,
+  },
+  buttonProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  },
+});
 
 class PlateEditor extends React.Component {
   constructor(props) {
@@ -85,6 +121,9 @@ class PlateEditor extends React.Component {
       deleteDialogOpen: false,
       hasFormChanged: false,
       imageFieldChanged: false,
+
+      submitLoading: false,
+      submitSuccess: false,
     };
 
     this.renderImageUrl = this.renderImageUrl.bind(this);
@@ -271,6 +310,11 @@ class PlateEditor extends React.Component {
   handleSubmit() {
     console.log('handling submit');
 
+    this.setState({
+      submitSuccess: false,
+      submitLoading: true,
+    });
+
     const { history, popTheSnackbar } = this.props;
     const existingPlate = this.props.plate && this.props.plate._id;
     const methodToCall = existingPlate ? 'plates.update' : 'plates.insert';
@@ -319,6 +363,12 @@ class PlateEditor extends React.Component {
 
     Meteor.call(methodToCall, plate, (error, plateId) => {
       if (error) {
+
+        this.setState({
+          submitSuccess: false,
+          submitLoading: false,
+        });
+
         popTheSnackbar({
           message: error.reason,
         });
@@ -342,28 +392,60 @@ class PlateEditor extends React.Component {
             console.log('Res');
             console.log(res);
 
-            Meteor.call(
-              'plates.updateImageUrl',
-              {
-                _id: plateId,
-                imageUrl: res.relative_url,
-              },
-              (err, plateId) => {
-                if (err) {
-                  console.log(err);
-                } else {
-                  this.props.popTheSnackbar({
-                    message: confirmation,
-                    buttonText: 'View',
-                    buttonLink: `/plates/${plateId}/edit`,
-                  });
+            if (err) {
+              this.props.popTheSnackbar({
+                message: 'There was a problem uploading the image.',
+              });
 
-                  this.props.history.push('/plates');
-                }
-              },
-            );
+              this.setState({
+                submitSuccess: false,
+                submitLoading: false,
+              });
+            } else {
+
+              Meteor.call(
+                'plates.updateImageUrl',
+                {
+                  _id: plateId,
+                  imageUrl: res.relative_url,
+                },
+                (err, plateId) => {
+                  if (err) {
+                    this.props.popTheSnackbar({
+                      message: 'There was a problem updating the image ID.',
+                    });
+
+                    this.setState({
+                      submitSuccess: false,
+                      submitLoading: false,
+                    });
+                  } else {
+
+                    this.setState({
+                      submitSuccess: true,
+                      submitLoading: false,
+                    });
+
+                    this.props.popTheSnackbar({
+                      message: confirmation,
+                      buttonText: 'View',
+                      buttonLink: `/plates/${plateId}/edit`,
+                    });
+
+                    this.props.history.push('/plates');
+                  }
+                },
+              );
+            }
           });
+
         } else {
+
+          this.setState({
+            submitSuccess: true,
+            submitLoading: false,
+          });
+
           this.props.popTheSnackbar({
             message: confirmation,
             buttonText: 'View',
@@ -536,6 +618,10 @@ class PlateEditor extends React.Component {
   render() {
     const { plate, history, loading } = this.props;
 
+    const buttonClassname = classNames({
+      [this.props.classes.buttonSuccess]: this.state.submitSuccess,
+    });
+
     return !loading ? (
       <form
         id="plate-editor"
@@ -602,7 +688,7 @@ class PlateEditor extends React.Component {
                 Cancel
               </Button>
               <Button
-                disabled={!this.state.hasFormChanged}
+                disabled={!this.state.hasFormChanged || this.state.submitLoading}
                 className="btn btn-primary"
                 raised
                 type="submit"
@@ -610,6 +696,12 @@ class PlateEditor extends React.Component {
                 onClick={() => this.handleSubmitNew()}
               >
                 Save
+                {this.state.submitLoading && (
+                  <CircularProgress
+                    size={24}
+                    className={this.props.classes.buttonProgress}
+                  />
+                )}
               </Button>
             </div>
           </Grid>
@@ -1299,7 +1391,7 @@ class PlateEditor extends React.Component {
                     Cancel
                   </Button>
                   <Button
-                    disabled={!this.state.hasFormChanged}
+                    disabled={!this.state.hasFormChanged || this.state.submitLoading}
                     type="submit"
                     className="btn btn-primary"
                     raised
@@ -1307,6 +1399,13 @@ class PlateEditor extends React.Component {
                     onClick={() => this.handleSubmitNew()}
                   >
                     Save
+
+                    {this.state.submitLoading && (
+                      <CircularProgress
+                        size={24}
+                        className={this.props.classes.buttonProgress}
+                      />
+                    )}
                   </Button>
                 </div>
               </Grid>
@@ -1332,4 +1431,4 @@ PlateEditor.propTypes = {
   loading: PropTypes.bool.isRequired,
 };
 
-export default PlateEditor;
+export default withStyles(styles)(PlateEditor);

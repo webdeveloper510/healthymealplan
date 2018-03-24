@@ -34,6 +34,11 @@ import Table, {
   TableRow,
 } from 'material-ui/Table';
 
+import classNames from 'classnames';
+import { withStyles } from 'material-ui/styles';
+import { CircularProgress } from 'material-ui/Progress';
+import green from 'material-ui/colors/green';
+
 import Chip from 'material-ui/Chip';
 import Paper from 'material-ui/Paper';
 
@@ -54,7 +59,38 @@ import SideImages from '../../../api/SideImages/SideImages';
 
 const danger = red[700];
 
-const styles = theme => ({});
+
+const styles = theme => ({
+  root: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+  wrapper: {
+    margin: theme.spacing.unit,
+    position: 'relative',
+  },
+  buttonSuccess: {
+    backgroundColor: green[500],
+    '&:hover': {
+      backgroundColor: green[700],
+    },
+  },
+  fabProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: -6,
+    left: -6,
+    zIndex: 1,
+  },
+  buttonProgress: {
+    color: green[500],
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginTop: -12,
+    marginLeft: -12,
+  },
+});
 
 class SideEditor extends React.Component {
   constructor(props) {
@@ -88,6 +124,9 @@ class SideEditor extends React.Component {
       deleteDialogOpen: false,
       hasFormChanged: false,
       imageFieldChanged: false,
+
+      submitLoading: false,
+      submitSuccess: false,
     };
 
     this.renderImageUrl = this.renderImageUrl.bind(this);
@@ -272,6 +311,11 @@ class SideEditor extends React.Component {
     const existingPlate = this.props.plate && this.props.plate._id;
     const methodToCall = existingPlate ? 'sides.update' : 'sides.insert';
 
+    this.setState({
+      submitSuccess: false,
+      submitLoading: true,
+    });
+
     const plate = {
       title: document.querySelector('#title').value.trim(),
       subtitle: document.querySelector('#subtitle').value.trim(),
@@ -317,6 +361,12 @@ class SideEditor extends React.Component {
     Meteor.call(methodToCall, plate, (error, plateId) => {
       console.log('Inside methid');
       if (error) {
+
+        this.setState({
+          submitSuccess: false,
+          submitLoading: false,
+        });
+
         this.props.popTheSnackbar({
           message: error.reason,
         });
@@ -336,32 +386,65 @@ class SideEditor extends React.Component {
           S3.upload({
             file: document.getElementById('plateImage').files[0],
             path: 'images',
-          }, (err, res) => {
-            console.log(err);
-            console.log(res);
+          }, (e, res) => {
+            // console.log(res);
 
-            Meteor.call(
-              'sides.updateImageUrl',
-              {
-                _id: plateId,
-                imageUrl: res.relative_url,
-              },
-              (err, plateId) => {
-                if (err) {
-                  console.log(err);
-                } else {
-                  this.props.popTheSnackbar({
-                    message: confirmation,
-                    buttonText: 'View',
-                    buttonLink: `/sides/${plateId}/edit`,
-                  });
+            if (e) {
+              this.props.popTheSnackbar({
+                message: 'There was a problem uploading the image.',
+              });
 
-                  this.props.history.push('/sides');
-                }
-              },
-            );
+              this.setState({
+                submitSuccess: false,
+                submitLoading: false,
+              });
+            } else {
+
+              Meteor.call(
+                'sides.updateImageUrl',
+                {
+                  _id: plateId,
+                  imageUrl: res.relative_url,
+                },
+                (err, plateId) => {
+                  if (err) {
+
+                    this.props.popTheSnackbar({
+                      message: 'There was a problem updating the image ID.',
+                    });
+
+                    this.setState({
+                      submitSuccess: false,
+                      submitLoading: false,
+                    });
+
+                  } else {
+                    this.setState({
+                      submitSuccess: true,
+                      submitLoading: false,
+                    });
+
+                    this.props.popTheSnackbar({
+                      message: confirmation,
+                      buttonText: 'View',
+                      buttonLink: `/sides/${plateId}/edit`,
+                    });
+
+                    this.props.history.push('/sides');
+                  }
+                },
+              );
+            }
           });
+
+
         } else {
+
+          this.setState({
+            submitSuccess: true,
+            submitLoading: false,
+          });
+
           this.props.popTheSnackbar({
             message: confirmation,
             buttonText: 'View',
@@ -535,6 +618,10 @@ class SideEditor extends React.Component {
   render() {
     const { plate, history, loading } = this.props;
 
+    const buttonClassname = classNames({
+      [this.props.classes.buttonSuccess]: this.state.submitSuccess,
+    });
+
     return !loading ? (
       <form
         id="side-editor"
@@ -601,15 +688,21 @@ class SideEditor extends React.Component {
                 Cancel
               </Button>
               <Button
-                disabled={!this.state.hasFormChanged}
-                className="btn btn-primary"
+                disabled={!this.state.hasFormChanged || this.state.submitLoading}
                 raised
+                className="btn btn-primary"
                 type="submit"
                 color="contrast"
                 onClick={() => this.handleSubmitNew()}
 
               >
                 Save
+                {this.state.submitLoading && (
+                  <CircularProgress
+                    size={24}
+                    className={this.props.classes.buttonProgress}
+                  />
+                )}
               </Button>
             </div>
           </Grid>
@@ -1299,7 +1392,7 @@ class SideEditor extends React.Component {
                     Cancel
                   </Button>
                   <Button
-                    disabled={!this.state.hasFormChanged}
+                    disabled={!this.state.hasFormChanged || this.state.submitLoading}
                     type="submit"
                     className="btn btn-primary"
                     raised
@@ -1307,6 +1400,13 @@ class SideEditor extends React.Component {
                     onClick={() => this.handleSubmitNew()}
                   >
                     Save
+
+                     {this.state.submitLoading && (
+                      <CircularProgress
+                        size={24}
+                        className={this.props.classes.buttonProgress}
+                      />
+                    )}
                   </Button>
                 </div>
               </Grid>
@@ -1330,4 +1430,4 @@ SideEditor.propTypes = {
   instructions: PropTypes.array.isRequired,
 };
 
-export default SideEditor;
+export default withStyles(styles)(SideEditor); 
