@@ -68,8 +68,8 @@ EditPlate.defaultProps = {
 EditPlate.propTypes = {
   plate: PropTypes.object,
   history: PropTypes.object.isRequired,
-  potentialSubIngredients: PropTypes.isRequired,
-  popTheSnackbar: PropTypes.func.isRequired
+  potentialSubIngredients: PropTypes.array.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 export default createContainer(({ match }) => {

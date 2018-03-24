@@ -262,6 +262,12 @@ class PlateEditor extends React.Component {
     this.deleteDialogHandleClickOpen();
   }
 
+  handleSubmitNew() {
+    if ($('#plate-editor').valid()) {
+      this.handleSubmit();
+    }
+  }
+
   handleSubmit() {
     console.log('handling submit');
 
@@ -326,46 +332,46 @@ class PlateEditor extends React.Component {
           ? `${localStorage.getItem('plateForSnackbar')} main course updated.`
           : `${localStorage.getItem('plateForSnackbar')} main course added.`;
 
-        // if (this.state.imageFieldChanged) {
-        //   S3.upload({
-        //     file: document.getElementById('plateImage').files[0],
-        //     path: 'images',
-        //   }, (err, res) => {
-        //     console.log('Err');
-        //     console.log(err);
-        //     console.log('Res');
-        //     console.log(res);
+        if (this.state.imageFieldChanged) {
+          S3.upload({
+            file: document.getElementById('plateImage').files[0],
+            path: 'images',
+          }, (err, res) => {
+            console.log('Err');
+            console.log(err);
+            console.log('Res');
+            console.log(res);
 
-        //     Meteor.call(
-        //       'plates.updateImageUrl',
-        //       {
-        //         _id: plateId,
-        //         imageUrl: res.relative_url,
-        //       },
-        //       (err, plateId) => {
-        //         if (err) {
-        //           console.log(err);
-        //         } else {
-        //           this.props.popTheSnackbar({
-        //             message: confirmation,
-        //             buttonText: 'View',
-        //             buttonLink: `/plates/${plateId}/edit`,
-        //           });
+            Meteor.call(
+              'plates.updateImageUrl',
+              {
+                _id: plateId,
+                imageUrl: res.relative_url,
+              },
+              (err, plateId) => {
+                if (err) {
+                  console.log(err);
+                } else {
+                  this.props.popTheSnackbar({
+                    message: confirmation,
+                    buttonText: 'View',
+                    buttonLink: `/plates/${plateId}/edit`,
+                  });
 
-        //           this.props.history.push('/plates');
-        //         }
-        //       },
-        //     );
-        //   });
-        // } else {
-        this.props.popTheSnackbar({
-          message: confirmation,
-          buttonText: 'View',
-          buttonLink: `/plates/${plateId}/edit`,
-        });
+                  this.props.history.push('/plates');
+                }
+              },
+            );
+          });
+        } else {
+          this.props.popTheSnackbar({
+            message: confirmation,
+            buttonText: 'View',
+            buttonLink: `/plates/${plateId}/edit`,
+          });
 
-        this.props.history.push('/plates');
-        // }
+          this.props.history.push('/plates');
+        }
       }
     });
   }
@@ -532,6 +538,7 @@ class PlateEditor extends React.Component {
 
     return !loading ? (
       <form
+        id="plate-editor"
         style={{ width: '100%' }}
         ref={form => (this.form = form)}
         onSubmit={event => event.preventDefault()}
@@ -595,11 +602,12 @@ class PlateEditor extends React.Component {
                 Cancel
               </Button>
               <Button
-                disabled={!this.state.hasFormChanged || !this.state.imageFieldChanged}
+                disabled={!this.state.hasFormChanged}
                 className="btn btn-primary"
                 raised
                 type="submit"
                 color="contrast"
+                onClick={() => this.handleSubmitNew()}
               >
                 Save
               </Button>
@@ -1296,6 +1304,7 @@ class PlateEditor extends React.Component {
                     className="btn btn-primary"
                     raised
                     color="contrast"
+                    onClick={() => this.handleSubmitNew()}
                   >
                     Save
                   </Button>

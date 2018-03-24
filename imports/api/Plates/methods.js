@@ -12,7 +12,7 @@ Meteor.methods({
       title: String,
       subtitle: String,
       mealType: String,
-      custom: Boolean,
+      custom: Match.Maybe(Boolean),
       instructionId: Match.Maybe(String),
       ingredients: Array,
       nutritional: Object,
@@ -86,7 +86,7 @@ Meteor.methods({
       subtitle: String,
       instructionId: Match.Maybe(String),
       mealType: String,
-      custom: Boolean,
+      custom: Match.Maybe(Boolean),
       ingredients: Array,
       nutritional: Object,
     });

@@ -159,7 +159,7 @@ class SideEditor extends React.Component {
         imageFieldChanged: true,
         hasFormChanged: true,
       });
-    })
+    });
 
     if (file) {
       reader.readAsDataURL(file);
@@ -259,7 +259,15 @@ class SideEditor extends React.Component {
     this.deleteDialogHandleClickOpen();
   }
 
+  handleSubmitNew() {
+    if ($('#side-editor').valid()) {
+      this.handleSubmit();
+    }
+  }
+
+
   handleSubmit() {
+    console.log('Reaching submit handle');
     const { history, popTheSnackbar } = this.props;
     const existingPlate = this.props.plate && this.props.plate._id;
     const methodToCall = existingPlate ? 'sides.update' : 'sides.insert';
@@ -307,14 +315,13 @@ class SideEditor extends React.Component {
     console.log(plate);
 
     Meteor.call(methodToCall, plate, (error, plateId) => {
-
-      console.log("Inside methid")
+      console.log('Inside methid');
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
         });
       } else {
-        console.log(plateId)
+        console.log(plateId);
 
         localStorage.setItem(
           'plateForSnackbar',
@@ -325,44 +332,44 @@ class SideEditor extends React.Component {
           ? `${localStorage.getItem('plateForSnackbar')} side updated.`
           : `${localStorage.getItem('plateForSnackbar')} side added.`;
 
-        // if (this.state.imageFieldChanged) {
+        if (this.state.imageFieldChanged) {
+          S3.upload({
+            file: document.getElementById('plateImage').files[0],
+            path: 'images',
+          }, (err, res) => {
+            console.log(err);
+            console.log(res);
 
-        // S3.upload({
-        //   file: document.getElementById('plateImage').files[0],
-        //   path: 'images',
-        // }, (err, res) => {
-        //   console.log(res);
+            Meteor.call(
+              'sides.updateImageUrl',
+              {
+                _id: plateId,
+                imageUrl: res.relative_url,
+              },
+              (err, plateId) => {
+                if (err) {
+                  console.log(err);
+                } else {
+                  this.props.popTheSnackbar({
+                    message: confirmation,
+                    buttonText: 'View',
+                    buttonLink: `/sides/${plateId}/edit`,
+                  });
 
-        //   Meteor.call(
-        //     'sides.updateImageUrl',
-        //     {
-        //       _id: plateId,
-        //       imageUrl: res.relative_url,
-        //     },
-        //     (err, plateId) => {
-        //       if (err) {
-        //         console.log(err);
-        //       } else {
-        //         this.props.popTheSnackbar({
-        //           message: confirmation,
-        //           buttonText: 'View',
-        //           buttonLink: `/sides/${plateId}/edit`,
-        //         });
+                  this.props.history.push('/sides');
+                }
+              },
+            );
+          });
+        } else {
+          this.props.popTheSnackbar({
+            message: confirmation,
+            buttonText: 'View',
+            buttonLink: `/sides/${plateId}/edit`,
+          });
 
-        //         this.props.history.push('/sides');
-        //       }
-        //     },
-        //   );
-        // });
-        // } else {
-        this.props.popTheSnackbar({
-          message: confirmation,
-          buttonText: 'View',
-          buttonLink: `/sides/${plateId}/edit`,
-        });
-
-        this.props.history.push('/sides');
-        // }
+          this.props.history.push('/sides');
+        }
       }
     });
   }
@@ -530,6 +537,7 @@ class SideEditor extends React.Component {
 
     return !loading ? (
       <form
+        id="side-editor"
         style={{ width: '100%' }}
         ref={form => (this.form = form)}
         onSubmit={event => event.preventDefault()}
@@ -593,11 +601,13 @@ class SideEditor extends React.Component {
                 Cancel
               </Button>
               <Button
-                disabled={!this.state.hasFormChanged || !this.state.imageFieldChanged}
+                disabled={!this.state.hasFormChanged}
                 className="btn btn-primary"
                 raised
                 type="submit"
                 color="contrast"
+                onClick={() => this.handleSubmitNew()}
+
               >
                 Save
               </Button>
@@ -1294,6 +1304,7 @@ class SideEditor extends React.Component {
                     className="btn btn-primary"
                     raised
                     color="contrast"
+                    onClick={() => this.handleSubmitNew()}
                   >
                     Save
                   </Button>

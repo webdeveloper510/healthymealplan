@@ -1,20 +1,20 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import { createContainer } from "meteor/react-meteor-data";
-import { Meteor } from "meteor/meteor";
-import Containers from "meteor/utilities:react-list-container";
+import { createContainer } from 'meteor/react-meteor-data';
+import { Meteor } from 'meteor/meteor';
+import Containers from 'meteor/utilities:react-list-container';
 
-import Grid from "material-ui/Grid";
+import Grid from 'material-ui/Grid';
 
-import InstructionsColl from "../../../api/Instructions/Instructions";
-import Ingredients from "../../../api/Ingredients/Ingredients";
-import Sides from "../../../api/Sides/Sides";
-import SideImages from "../../../api/SideImages/SideImages";
+import InstructionsColl from '../../../api/Instructions/Instructions';
+import Ingredients from '../../../api/Ingredients/Ingredients';
+import Sides from '../../../api/Sides/Sides';
+import SideImages from '../../../api/SideImages/SideImages';
 
-import SideEditor from "../../components/SideEditor/SideEditor";
+import SideEditor from '../../components/SideEditor/SideEditor';
 
-import NotFound from "../NotFound/NotFound";
+import NotFound from '../NotFound/NotFound';
 
 const DocumentContainer = Containers.DocumentContainer;
 
@@ -26,9 +26,9 @@ const EditSide = ({
   popTheSnackbar,
   newPlate,
   match,
-  loading
+  loading,
 }) =>
-  plate ? (
+  (plate ? (
     <div>
       <Grid
         container
@@ -38,10 +38,10 @@ const EditSide = ({
           collection={Sides}
           joins={[
             {
-              localProperty: "instructionId",
+              localProperty: 'instructionId',
               collection: InstructionsColl,
-              joinAs: "joinedInstruction"
-            }
+              joinAs: 'joinedInstruction',
+            },
           ]}
           selector={{ _id: match.params._id }}
         >
@@ -59,24 +59,24 @@ const EditSide = ({
     </div>
   ) : (
       <NotFound />
-    );
+    ));
 
 EditSide.defaultProps = {
-  plate: null
+  plate: null,
 };
 
 EditSide.propTypes = {
   plate: PropTypes.object,
   history: PropTypes.object.isRequired,
-  potentialSubIngredients: PropTypes.isRequired,
-  popTheSnackbar: PropTypes.func.isRequired
+  potentialSubIngredients: PropTypes.array.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 export default createContainer(({ match }) => {
   const sideId = match.params._id;
-  const subscription = Meteor.subscribe("ingredients");
-  const subscription2 = Meteor.subscribe("sides.view", sideId);
-  const subscription4 = Meteor.subscribe("instructions");
+  const subscription = Meteor.subscribe('ingredients');
+  const subscription2 = Meteor.subscribe('sides.view', sideId);
+  const subscription4 = Meteor.subscribe('instructions');
 
   return {
     newPlate: false,
@@ -87,6 +87,6 @@ export default createContainer(({ match }) => {
     plate: Sides.findOne(sideId),
     potentialSubIngredients: Ingredients.find().fetch(),
     match,
-    instructions: InstructionsColl.find().fetch()
+    instructions: InstructionsColl.find().fetch(),
   };
 }, EditSide);

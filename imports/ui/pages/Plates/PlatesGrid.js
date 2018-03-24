@@ -177,8 +177,6 @@ class PlatesGrid extends React.Component {
   }
 
   render() {
-    console.log(this.props);
-
     return (
       <div style={{ width: '100%' }}>
 
@@ -189,11 +187,11 @@ class PlatesGrid extends React.Component {
               // const isSelected = this.isCheckboxSelected(e._id);
 
               (
-                <Grid item xs={12} sm={6} md={4} lg={4} style={{ minWidth: '320px' }}>
+                <Grid item xs={12} sm={6} md={4} lg={4} style={{ minWidth: '320px' }} key={i}>
                   <Card style={{ width: '100%' }}>
                     <CardMedia
                       style={styles.media}
-                      image={e.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${e.imageUrl}` : e.image ? e.image : ''}
+                      image={e.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${e.imageUrl}` : e.image ? e.image : 'https://via.placeholder.com/600x600?text=+'}
                       title="Contemplative Reptile"
                     />
                     <CardContent>
