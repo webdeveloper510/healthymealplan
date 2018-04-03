@@ -50,8 +50,8 @@ import './DirectionsTable.scss';
 function renderDeliveryLabelData(doc, delivery, formalType, multiple = false, multipleCurrent = 0, multipleTotal = 0) {
   doc.addPage();
 
-  // doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
-  doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
+  doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+  // doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
 
   if (multiple) {
     doc.setFontSize(10); // name
@@ -110,7 +110,7 @@ class DirectionsTable extends React.Component {
       aggregateData: null,
       aggregateDataLoading: true,
 
-      currentTabValue: "all",
+      currentTabValue: 'all',
 
       searchBy: '',
     };
@@ -362,7 +362,6 @@ class DirectionsTable extends React.Component {
         const element = deliveriesByRoute[key];
 
         element.forEach((e, i) => {
-
           let mealTotal = 0;
 
           e.meals.forEach((meal) => {
@@ -373,24 +372,16 @@ class DirectionsTable extends React.Component {
 
 
           if (mealTotal > 3) {
-
             const perBag = 3;
             const totalBags = Math.ceil(mealTotal / perBag);
 
             for (let index = 1; index <= totalBags; index++) {
-
-              renderDeliveryLabelData(doc, e, formalType, multiple = true, index, totalBags)
-
+              renderDeliveryLabelData(doc, e, formalType, multiple = true, index, totalBags);
             }
-
-
           } else {
-
-            renderDeliveryLabelData(doc, e, formalType, multiple = false)
-
+            renderDeliveryLabelData(doc, e, formalType, multiple = false);
           }
         });
-
       }
     }
 
@@ -457,7 +448,7 @@ class DirectionsTable extends React.Component {
     return (
       <div>
 
-        <AppBar position="static" className="appbar--no-background appbar--no-shadow" style={{ margin: "25px 0" }}>
+        <AppBar position="static" className="appbar--no-background appbar--no-shadow" style={{ margin: '25px 0' }}>
           <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
             <Tab label="All" value="all" />
             {this.props.routes && this.props.routes.map((e, i) => (
@@ -481,7 +472,7 @@ class DirectionsTable extends React.Component {
             className="input-box"
             style={{ width: '100%', position: 'relative' }}
             placeholder="Search directions"
-            onKeyUp={(e) => { this.setState({ searchBy: e.target.value }) }}
+            onKeyUp={(e) => { this.setState({ searchBy: e.target.value }); }}
             // onKeyUp={this.searchByName.bind(this)}
             inputProps={{
               id: 'search-type-text',
@@ -582,30 +573,24 @@ class DirectionsTable extends React.Component {
             </TableHead>
 
             <TableBody>
-              {!this.state.aggregateDataLoading && this.state.aggregateData.deliveries.filter(el => {
-
+              {!this.state.aggregateDataLoading && this.state.aggregateData.deliveries.filter((el) => {
                 if (this.state.currentTabValue != 'all' && el.routeId != this.state.currentTabValue) {
                   return false;
-                } else {
+                } 
                   return true;
-                }
+                
+              }).filter((el) => {
+                const fullName = `${el.customer.profile.name.first} ${el.customer.profile.name.last}`;
 
-              }).filter(el => {
+                const like = new RegExp(this.state.searchBy, 'gi');
 
-                const fullName = el.customer.profile.name.first + " " + el.customer.profile.name.last;
+                console.log(like);
 
-                const like = new RegExp(this.state.searchBy, "gi");
-
-                console.log(like)
-
-                if (this.state.searchBy != "" && !like.test(fullName)) {
-
+                if (this.state.searchBy != '' && !like.test(fullName)) {
                   return false;
-
-                } else {
+                } 
                   return true;
-                }
-
+                
               }).map((e, i) => {
                 const inDeliveries = this.checkInDeliveries(e);
                 const rowId = inDeliveries != undefined ? inDeliveries._id : e._id;

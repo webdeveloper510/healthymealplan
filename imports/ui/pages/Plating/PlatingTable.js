@@ -69,16 +69,16 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   doc.addPage();
 
   // VITTLE LOGO
-  // doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+  doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
 
   // HMP LOGO
-  doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
+  // doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
 
   // plating day + 1
   doc.setFontStyle('normal');
   doc.setFontSize(9);
   const day = moment(currentSelectorDate).add(1, 'd').format('M/D/YYYY');
-  doc.text(day, 3.2, 0.55);
+  doc.text(day, 3.2, 0.38);
 
 
   // total meals for this customer
@@ -94,7 +94,7 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
     userData.athleticDinner +
     userData.bodybuilderDinner;
 
-  doc.text(`${totalMeals}`, 0.25, 0.55);
+  doc.text(`${totalMeals}`, 0.25, 0.38);
 
   // name
   doc.setFontStyle('bold');
@@ -157,15 +157,14 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   }
 
   if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
-
     doc.setFontStyle('normal');
     doc.setFontSize(8);
 
     // calories
-    let currentMealPortionCalories = "0";
-    let currentMealPortionProteins = "0";
-    let currentMealPortionCarbs = "0";
-    let currentMealPortionFat = "0";
+    let currentMealPortionCalories = '0';
+    let currentMealPortionProteins = '0';
+    let currentMealPortionCarbs = '0';
+    let currentMealPortionFat = '0';
 
     if (currentPlate.plate.nutritional[mealPortion].calories > 0) {
       currentMealPortionCalories = currentPlate.plate.nutritional[mealPortion].calories;
@@ -383,36 +382,36 @@ class PlatingTable extends React.Component {
       && (user[this.state.mealTitle.toLowerCase()] > 0 ||
         user[`athletic${this.state.mealTitle}`] > 0 ||
         user[`bodybuilder${this.state.mealTitle}`] > 0)).sort((a, b) => {
-          let totalRestrictionsA = 0;
-          let totalRestrictionsB = 0;
+      let totalRestrictionsA = 0;
+      let totalRestrictionsB = 0;
 
-          if (a.specificRestrictions) {
-            totalRestrictionsA += a.specificRestrictions.length;
-          }
+      if (a.specificRestrictions) {
+        totalRestrictionsA += a.specificRestrictions.length;
+      }
 
-          if (a.restrictions) {
-            totalRestrictionsA += a.restrictions.length;
-          }
+      if (a.restrictions) {
+        totalRestrictionsA += a.restrictions.length;
+      }
 
-          if (a.preferences) {
-            totalRestrictionsA += a.preferences.length;
-          }
+      if (a.preferences) {
+        totalRestrictionsA += a.preferences.length;
+      }
 
 
-          if (b.specificRestrictions) {
-            totalRestrictionsB += b.specificRestrictions.length;
-          }
+      if (b.specificRestrictions) {
+        totalRestrictionsB += b.specificRestrictions.length;
+      }
 
-          if (b.restrictions) {
-            totalRestrictionsB += b.restrictions.length;
-          }
+      if (b.restrictions) {
+        totalRestrictionsB += b.restrictions.length;
+      }
 
-          if (b.preferences) {
-            totalRestrictionsB += b.preferences.length;
-          }
+      if (b.preferences) {
+        totalRestrictionsB += b.preferences.length;
+      }
 
-          return totalRestrictionsB - totalRestrictionsA;
-        });
+      return totalRestrictionsB - totalRestrictionsA;
+    });
 
     const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
     const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
@@ -585,66 +584,66 @@ class PlatingTable extends React.Component {
       (user[this.state.mealTitle.toLowerCase()] > 0 ||
         user[`athletic${this.state.mealTitle}`] > 0 ||
         user[`bodybuilder${this.state.mealTitle}`] > 0)).sort((a, b) => {
-          let totalRestrictionsA = 0;
-          let totalRestrictionsB = 0;
+      let totalRestrictionsA = 0;
+      let totalRestrictionsB = 0;
 
-          if (a.specificRestrictions) {
-            totalRestrictionsA += a.specificRestrictions.length;
-          }
+      if (a.specificRestrictions) {
+        totalRestrictionsA += a.specificRestrictions.length;
+      }
 
-          if (a.restrictions) {
-            totalRestrictionsA += a.restrictions.length;
-          }
+      if (a.restrictions) {
+        totalRestrictionsA += a.restrictions.length;
+      }
 
-          if (a.preferences) {
-            totalRestrictionsA += a.preferences.length;
-          }
-
-
-          if (b.specificRestrictions) {
-            totalRestrictionsB += b.specificRestrictions.length;
-          }
-
-          if (b.restrictions) {
-            totalRestrictionsB += b.restrictions.length;
-          }
-
-          if (b.preferences) {
-            totalRestrictionsB += b.preferences.length;
-          }
-
-          return totalRestrictionsB - totalRestrictionsA;
-        }).map((n) => {
-          const mealType = this.state.mealTitle.toLowerCase();
-          const mealTypeNormal = this.state.mealTitle;
-
-          let mealText = '';
-
-          if (n[mealType] > 0) {
-            mealText += `Regular x${n[`${mealType}`]}`;
-          }
-
-          if (n[`athletic${mealTypeNormal}`] > 0) {
-            mealText += `${mealText.length > 0 ? ' ' : ''}Athletic x${n[`athletic${mealTypeNormal}`]}`;
-          }
-
-          if (n[`bodybuilder${mealTypeNormal}`] > 0) {
-            mealText += `${mealText.length > 0 ? ' ' : ''}Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}`;
-          }
+      if (a.preferences) {
+        totalRestrictionsA += a.preferences.length;
+      }
 
 
-          rows.push([
-            n.name,
-            n.lifestyleName,
-            n.platingNotes && n.platingNotes.length > 0 ? n.platingNotes : '',
-            mealText,
-            n.preferences ? n.preferences.map(pref => pref.title).join(', ') : '',
-            n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title).join(', ') : '',
-            n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title).join(', ') : '',
-            n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title).join(', ') : '',
-            n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title).join(', ') : '',
-          ]);
-        });
+      if (b.specificRestrictions) {
+        totalRestrictionsB += b.specificRestrictions.length;
+      }
+
+      if (b.restrictions) {
+        totalRestrictionsB += b.restrictions.length;
+      }
+
+      if (b.preferences) {
+        totalRestrictionsB += b.preferences.length;
+      }
+
+      return totalRestrictionsB - totalRestrictionsA;
+    }).map((n) => {
+      const mealType = this.state.mealTitle.toLowerCase();
+      const mealTypeNormal = this.state.mealTitle;
+
+      let mealText = '';
+
+      if (n[mealType] > 0) {
+        mealText += `Regular x${n[`${mealType}`]}`;
+      }
+
+      if (n[`athletic${mealTypeNormal}`] > 0) {
+        mealText += `${mealText.length > 0 ? ' ' : ''}Athletic x${n[`athletic${mealTypeNormal}`]}`;
+      }
+
+      if (n[`bodybuilder${mealTypeNormal}`] > 0) {
+        mealText += `${mealText.length > 0 ? ' ' : ''}Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}`;
+      }
+
+
+      rows.push([
+        n.name,
+        n.lifestyleName,
+        n.platingNotes && n.platingNotes.length > 0 ? n.platingNotes : '',
+        mealText,
+        n.preferences ? n.preferences.map(pref => pref.title).join(', ') : '',
+        n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title).join(', ') : '',
+        n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title).join(', ') : '',
+        n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title).join(', ') : '',
+        n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title).join(', ') : '',
+      ]);
+    });
 
 
     const doc = new jsPDF({
@@ -837,8 +836,8 @@ class PlatingTable extends React.Component {
                     )));
                 })
               ) : (
-                  <CircularProgress />
-                )}
+                <CircularProgress />
+              )}
 
             </TableBody>
 
@@ -916,59 +915,59 @@ class PlatingTable extends React.Component {
                     (user[this.state.mealTitle.toLowerCase()] > 0 ||
                       user[`athletic${this.state.mealTitle}`] > 0 ||
                       user[`bodybuilder${this.state.mealTitle}`] > 0)).sort((a, b) => {
-                        let totalRestrictionsA = 0;
-                        let totalRestrictionsB = 0;
+                    let totalRestrictionsA = 0;
+                    let totalRestrictionsB = 0;
 
-                        if (a.specificRestrictions) {
-                          totalRestrictionsA += a.specificRestrictions.length;
-                        }
+                    if (a.specificRestrictions) {
+                      totalRestrictionsA += a.specificRestrictions.length;
+                    }
 
-                        if (a.restrictions) {
-                          totalRestrictionsA += a.restrictions.length;
-                        }
+                    if (a.restrictions) {
+                      totalRestrictionsA += a.restrictions.length;
+                    }
 
-                        if (a.preferences) {
-                          totalRestrictionsA += a.preferences.length;
-                        }
+                    if (a.preferences) {
+                      totalRestrictionsA += a.preferences.length;
+                    }
 
 
-                        if (b.specificRestrictions) {
-                          totalRestrictionsB += b.specificRestrictions.length;
-                        }
+                    if (b.specificRestrictions) {
+                      totalRestrictionsB += b.specificRestrictions.length;
+                    }
 
-                        if (b.restrictions) {
-                          totalRestrictionsB += b.restrictions.length;
-                        }
+                    if (b.restrictions) {
+                      totalRestrictionsB += b.restrictions.length;
+                    }
 
-                        if (b.preferences) {
-                          totalRestrictionsB += b.preferences.length;
-                        }
+                    if (b.preferences) {
+                      totalRestrictionsB += b.preferences.length;
+                    }
 
-                        return totalRestrictionsB - totalRestrictionsA;
-                      }).map((n) => {
-                        const mealType = this.state.mealTitle.toLowerCase();
-                        const mealTypeNormal = this.state.mealTitle;
+                    return totalRestrictionsB - totalRestrictionsA;
+                  }).map((n) => {
+                    const mealType = this.state.mealTitle.toLowerCase();
+                    const mealTypeNormal = this.state.mealTitle;
 
-                        return (
-                          <TableRow key={Random.id()}>
-                            <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.platingNotes && n.platingNotes.length > 0 ? n.platingNotes : ''}</Typography></TableCell>
-                            <TableCell>
-                              <Typography type="subheading">
-                                {n[mealType] > 0 ? `Regular x${n[`${mealType}`]}` : ''}
-                                {n[`athletic${mealTypeNormal}`] > 0 ? `Athletic x${n[`athletic${mealTypeNormal}`]}` : ''}
-                                {n[`bodybuilder${mealTypeNormal}`] > 0 ? `Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}` : ''}
-                              </Typography>
-                            </TableCell>
-                            <TableCell><Typography type="subheading">{n.preferences ? n.preferences.map(pref => pref.title).join(', ') : ''}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
-                            <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
-                          </TableRow>
-                        );
-                      })}
+                    return (
+                      <TableRow key={Random.id()}>
+                        <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
+                        <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
+                        <TableCell><Typography type="subheading">{n.platingNotes && n.platingNotes.length > 0 ? n.platingNotes : ''}</Typography></TableCell>
+                        <TableCell>
+                          <Typography type="subheading">
+                            {n[mealType] > 0 ? `Regular x${n[`${mealType}`]}` : ''}
+                            {n[`athletic${mealTypeNormal}`] > 0 ? `Athletic x${n[`athletic${mealTypeNormal}`]}` : ''}
+                            {n[`bodybuilder${mealTypeNormal}`] > 0 ? `Bodybuilder x${n[`bodybuilder${mealTypeNormal}`]}` : ''}
+                          </Typography>
+                        </TableCell>
+                        <TableCell><Typography type="subheading">{n.preferences ? n.preferences.map(pref => pref.title).join(', ') : ''}</Typography></TableCell>
+                        <TableCell><Typography type="subheading">{n.specificRestrictions ? n.specificRestrictions.map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
+                        <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'allergy').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
+                        <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'dietary').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
+                        <TableCell><Typography type="subheading">{n.restrictions != null ? n.restrictions.filter(e => e.restrictionType === 'religious').map(restriction => restriction.title).join(', ') : ''}</Typography></TableCell>
+                      </TableRow>
+                    );
+                  })}
               </TableBody>
             </Table>
           </Paper>
