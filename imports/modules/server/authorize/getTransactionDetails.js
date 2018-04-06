@@ -25,7 +25,7 @@ export default function getTransactionDetails(transactionId, callback) {
   if (process.env.NODE_ENV == 'development') {
     ctrl.setEnvironment(constants.endpoint.sandbox);
   } else {
-    ctrl.setEnvironment(constants.endpoint.production)
+    ctrl.setEnvironment(constants.endpoint.production);
   }
 
 

@@ -2,6 +2,8 @@ import './accounts';
 import './api';
 import './email';
 
+import Jobs from '../../api/Jobs/Jobs'
+
 import './jobs';
 import './jobs/setSubscriptionActive';
 import './jobs/setSubscriptionActiveCard';

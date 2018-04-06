@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import constants from './constants';
+
 const ApiContracts = require('authorizenet').APIContracts;
 const ApiControllers = require('authorizenet').APIControllers;
 
@@ -35,6 +36,7 @@ export default function createCustomerProfile(
   const customerAddress = new ApiContracts.CustomerAddressType();
   customerAddress.setFirstName(customer.nameOnCard);
   customerAddress.setLastName('-');
+  customerAddress.setAddress(customer.streetAddress);
   customerAddress.setZip(customer.postalCode);
 
   const customerPaymentProfileType = new ApiContracts.CustomerPaymentProfileType();
@@ -68,7 +70,7 @@ export default function createCustomerProfile(
   if (process.env.NODE_ENV == 'development') {
     ctrl.setEnvironment(constants.endpoint.sandbox);
   } else {
-    ctrl.setEnvironment(constants.endpoint.production)
+    ctrl.setEnvironment(constants.endpoint.production);
   }
 
 
@@ -88,24 +90,24 @@ export default function createCustomerProfile(
         ApiContracts.MessageTypeEnum.OK
       ) {
         console.log(
-          'Successfully created a customer profile with id: ' +
-          response.getCustomerProfileId(),
+          `Successfully created a customer profile with id: ${
+            response.getCustomerProfileId()}`,
         );
       } else {
-        console.log('Result Code: ' + response.getMessages().getResultCode());
+        console.log(`Result Code: ${response.getMessages().getResultCode()}`);
         console.log(
-          'Error Code: ' +
-          response
-            .getMessages()
-            .getMessage()[0]
-            .getCode(),
+          `Error Code: ${
+            response
+              .getMessages()
+              .getMessage()[0]
+              .getCode()}`,
         );
         console.log(
-          'Error message: ' +
-          response
-            .getMessages()
-            .getMessage()[0]
-            .getText(),
+          `Error message: ${
+            response
+              .getMessages()
+              .getMessage()[0]
+              .getText()}`,
         );
 
         err = {
