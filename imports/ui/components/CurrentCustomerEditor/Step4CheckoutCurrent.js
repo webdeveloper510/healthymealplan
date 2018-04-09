@@ -1059,7 +1059,7 @@ class Step4CheckoutCurrent extends React.Component {
     let surchargePerDelivery = 0;
 
     const selectedPostalCode = this.props.postalCodes.find(
-      el => el.title === this.props.customer.postalCode.substring(0, 3),
+      el => el.title === this.props.customer.postalCode.substring(0, 3).toUpperCase(),
     );
 
     console.log(selectedPostalCode);
