@@ -133,8 +133,8 @@ Meteor.methods({
     Meteor.users.update({
       _id: data.id,
     }, {
-        $set: toUpdate,
-      });
+      $set: toUpdate,
+    });
 
 
     // console.log(data);
@@ -260,7 +260,7 @@ Meteor.methods({
       });
     }
 
-    console.log("Secondaries to remove");
+    console.log('Secondaries to remove');
 
     console.log(data.secondaryProfilesRemoved);
 
@@ -315,13 +315,13 @@ Meteor.methods({
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-        $set: {
-          completeSchedule: data.completeSchedule,
-          delivery: newDeliveryType,
-          amount: billing.actualTotal,
-          subscriptionItems: billing.lineItems,
-        },
-      });
+      $set: {
+        completeSchedule: data.completeSchedule,
+        delivery: newDeliveryType,
+        amount: billing.actualTotal,
+        subscriptionItems: billing.lineItems,
+      },
+    });
 
   },
 
@@ -869,9 +869,7 @@ Meteor.methods({
       );
     }
 
-    if (process.env.NODE_ENV == 'development') {
-      Meteor._sleepForMs(10000);
-    }
+    Meteor._sleepForMs(10000);
 
     // totaling
     let actualTotal = customerInfo.primaryProfileBilling.groupTotal;
@@ -1548,10 +1546,10 @@ Meteor.methods({
         Subscriptions.update({
           _id: subscription._id,
         }, {
-            $set: {
-              paymentMethod: type,
-            },
-          });
+          $set: {
+            paymentMethod: type,
+          },
+        });
       } catch (error) {
         console.log(error);
         throw new Meteor.Error(500, error);
