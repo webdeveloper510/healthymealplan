@@ -10,6 +10,8 @@ import { Accounts } from 'meteor/accounts-base';
 import editProfile from './edit-profile';
 import rateLimit from '../../../modules/rate-limit';
 
+import calculateSubscriptionCost from '../../../modules/server/billing/calculateSubscriptionCost';
+
 import createSubscriptionFromCustomerProfile from '../../../modules/server/authorize/createSubscriptionFromCustomerProfile';
 import cancelSubscription from '../../../modules/server/authorize/cancelSubscription';
 import getSubscription from '../../../modules/server/authorize/getSubscription';
@@ -131,36 +133,15 @@ Meteor.methods({
     Meteor.users.update({
       _id: data.id,
     }, {
-      $set: toUpdate,
-    });
+        $set: toUpdate,
+      });
 
 
     // console.log(data);
 
   },
 
-  'edit.customer.step2': function editStep2(data) {
-
-    // check(data, {
-    //   id: String,
-    //   restrictions: Array,
-    //   specificRestrictions: Array,
-    //   subIngredients: Array,
-    //   platingNotes: String,
-    //   deliveryNotes: String,
-    //   secondary: Match.Optional(Boolean)
-    // });
-
-    // Meteor.users.update({ _id: data.id },{
-    //   $set: {
-    //     restrictions: data.restrictions,
-    //     specificRestrictions: data.specificRestrictions,
-    //     preferences: data.subIngredients,
-    //     platingNotes: data.platingNotes,
-    //     'address.notes': data.deliveryNotes
-    //   }
-    // });
-
+  'edit.customer.generateBillData': function editGenerateBillData(data) {
 
     check(data, {
       id: String,
@@ -179,9 +160,43 @@ Meteor.methods({
       scheduleReal: Array,
       notifications: Object,
       coolerBag: Boolean,
+      secondaryProfilesRemoved: Array,
     });
 
+    const billing = calculateSubscriptionCost(data);
+
+    // console.log(billing);
+
+    return billing;
+
+  },
+
+  'edit.customer.step2': function editStep2(data) {
+
+    check(data, {
+      id: String,
+      address: Object,
+      lifestyle: String,
+      discount: String,
+      restrictions: Array,
+      specificRestrictions: Array,
+      subIngredients: Array,
+      platingNotes: String,
+      secondary: Match.Optional(Boolean),
+      completeSchedule: Array,
+      secondaryProfiles: Array,
+      subscriptionId: String,
+      delivery: Array,
+      scheduleReal: Array,
+      notifications: Object,
+      coolerBag: Boolean,
+      secondaryProfilesRemoved: Array,
+    });
+
+    const billing = calculateSubscriptionCost(data);
+
     // console.log(data);
+    // console.log(billing);
 
     // return;
 
@@ -245,6 +260,14 @@ Meteor.methods({
       });
     }
 
+    console.log("Secondaries to remove");
+
+    console.log(data.secondaryProfilesRemoved);
+
+    if (data.secondaryProfilesRemoved.length > 0) {
+      Meteor.users.remove({ _id: { $in: data.secondaryProfilesRemoved } });
+    }
+
     const secondaryAccounts = Meteor.users.find({
       primaryAccount: data.id,
     }).fetch();
@@ -256,6 +279,8 @@ Meteor.methods({
     secondaryAccounts.forEach((e) => {
       secondaryAccountIds.push(e._id);
     });
+
+    console.log(secondaryAccounts);
 
 
     Meteor.users.update({ _id: data.id }, {
@@ -290,11 +315,13 @@ Meteor.methods({
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-      $set: {
-        completeSchedule: data.completeSchedule,
-        delivery: newDeliveryType,
-      },
-    });
+        $set: {
+          completeSchedule: data.completeSchedule,
+          delivery: newDeliveryType,
+          amount: billing.actualTotal,
+          subscriptionItems: billing.lineItems,
+        },
+      });
 
   },
 
@@ -715,7 +742,7 @@ Meteor.methods({
     }
   },
 
-  'customers.step4': function customerStep5(opaqueData, customerInfo) {
+  'customers.step5': function customerStep5(opaqueData, customerInfo) {
     check(opaqueData, {
       dataDescriptor: String,
       dataValue: String,
@@ -743,6 +770,7 @@ Meteor.methods({
         id: customerInfo.id,
         postalCode: customerInfo.billingPostalCode,
         nameOnCard: customerInfo.nameOnCard,
+        streetAddress: customerInfo.billingStreetAddress,
       },
     );
 
@@ -841,8 +869,9 @@ Meteor.methods({
       );
     }
 
-    Meteor._sleepForMs(10000);
-
+    if (process.env.NODE_ENV == 'development') {
+      Meteor._sleepForMs(10000);
+    }
 
     // totaling
     let actualTotal = customerInfo.primaryProfileBilling.groupTotal;
@@ -1204,7 +1233,9 @@ Meteor.methods({
           },
         );
 
-        job.priority('normal').delay(60 * 500).save(); // Commit it to the server
+        // job.priority('normal').delay(60 * 500).save(); // Commit it to the server
+        job.priority('normal').delay(saturday).save(); // Commit it to the server
+
       }
 
     } else if (subscription.paymentMethod == 'cash' || subscription.paymentMethod == 'interac') {
@@ -1517,10 +1548,10 @@ Meteor.methods({
         Subscriptions.update({
           _id: subscription._id,
         }, {
-          $set: {
-            paymentMethod: type,
-          },
-        });
+            $set: {
+              paymentMethod: type,
+            },
+          });
       } catch (error) {
         console.log(error);
         throw new Meteor.Error(500, error);

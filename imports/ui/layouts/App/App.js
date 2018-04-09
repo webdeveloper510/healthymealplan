@@ -58,6 +58,7 @@ import EditCustomer from '../../pages/EditCustomer/EditCustomer';
 
 import Directions from '../../pages/Directions/Directions';
 
+import NewDiscount from '../../pages/NewDiscount/NewDiscount';
 
 import Restrictions from '../../pages/Restrictions/Restrictions';
 import NewRestriction from '../../pages/NewRestriction/NewRestriction';
@@ -539,6 +540,15 @@ class App extends React.Component {
                       {...this.props}
                     />
 
+
+                    <Authenticated
+                      exact
+                      path="/customers/new/:_id"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={NewCustomer}
+                      {...this.props}
+                    />
+
                     <Authenticated
                       exact
                       path="/customers/:_id/edit"
@@ -552,6 +562,14 @@ class App extends React.Component {
                       path="/directions"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Directions}
+                      {...this.props}
+                    />
+
+                    <Authenticated
+                      exact
+                      path="/discounts/new"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={NewDiscount}
                       {...this.props}
                     />
 

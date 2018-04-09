@@ -13,29 +13,33 @@ const worker = Job.processJobs(
     // do anything with the job data here.
     // when done, call job.done() or job.fail()
 
-    // console.log('setSubscriptionActive Starts');
+    console.log('setSubscriptionActive Starts');
 
     const syncGetTransactionDetails = Meteor.wrapAsync(getTransactionDetails);
 
     const transaction = syncGetTransactionDetails(job.data.id);
 
+    // console.log(transaction)
+
     if (!transaction) {
       job.fail('No transaction found');
-      return false;
     } else if (transaction.transaction.responseCode != '1') {
       job.fail(
         'Transaction responseCode' + transaction.transaction.responseCode,
       );
-      return false;
+    } else if (transaction.transaction.customer == undefined) {
+      job.fail('No customer found on transaction');
+    } else if (transaction.transaction.hasOwnProperty('customer') && transaction.transaction.customer.id == undefined) {
+      job.fail('No customer found on transaction ID');
     }
 
     const subscription = Subscriptions.findOne({
       customerId: transaction.transaction.customer.id,
     });
 
-    console.log('SUBSCRIPTION:');
+    // console.log('SUBSCRIPTION:');
 
-    console.log(subscription);
+    // console.log(subscription);
 
     if (subscription && subscription.status != 'active') {
       try {
@@ -56,8 +60,7 @@ const worker = Job.processJobs(
           ' - ' +
           ' failed.',
         );
-        job.fail(error); // when failing
-        return false;
+        job.fail("Failed when setting subscription active"); // when failing
       }
 
       try {
@@ -73,8 +76,7 @@ const worker = Job.processJobs(
           subscription._id +
           ' failed.',
         );
-        job.fail(error); // when failing
-        return false;
+        job.fail("Failed when creating invoice"); // when failing
       }
     } else if (subscription && subscription.status == 'active') {
       try {
@@ -90,8 +92,7 @@ const worker = Job.processJobs(
           subscription._id +
           ' failed.',
         );
-        job.fail(error); // when failing
-        return false;
+        job.fail("Failed when creating invoice"); // when failing
       }
     }
 

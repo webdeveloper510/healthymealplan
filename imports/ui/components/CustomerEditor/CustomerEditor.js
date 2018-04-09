@@ -47,6 +47,9 @@ import Step4Checkout from './Step4Checkout';
 import moment from 'moment';
 import assign from 'lodash/assign';
 
+import Loading from '../Loading/Loading';
+
+
 import $ from 'jquery';
 
 // const primary = teal[500];
@@ -91,14 +94,14 @@ class CustomerEditor extends React.Component {
       // selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
       hasFormChanged: false,
-      activeStep: 0,
+      activeStep: !this.props.loading && this.props.abandoned && this.props.abandonedCustomer ? 1 : 0,
       customerInfo: {
-        id: '',
-        firstName: '',
-        lastName: '',
-        email: '',
-        postalCode: '',
-        phoneNumber: '',
+        id: !this.props.loading && this.props.abandoned && this.props.abandonedCustomer.length > 0 ? this.props.abandonedCustomer[0]._id : '',
+        firstName: !this.props.loading && this.props.abandoned && this.props.abandonedCustomer.length > 0 && this.props.abandonedCustomer[0].profile ? this.props.abandonedCustomer[0].profile.name.first : '',
+        lastName: !this.props.loading && this.props.abandoned && this.props.abandonedCustomer.length > 0 && this.props.abandonedCustomer[0].profile && this.props.abandonedCustomer[0].profile.name.last ? this.props.abandonedCustomer[0].profile.name.last : '',
+        email: !this.props.loading && this.props.abandoned && this.props.abandonedCustomer.length > 0 && this.props.abandonedCustomer[0].emails ? this.props.abandonedCustomer[0].emails[0].address : '',
+        postalCode: !this.props.loading && this.props.abandoned && this.props.abandonedCustomer.length > 0 ? this.props.abandonedCustomer[0].postalCode : '',
+        phoneNumber: !this.props.loading && this.props.abandoned && this.props.abandonedCustomer.length > 0 ? this.props.abandonedCustomer[0].phone : '',
         adultOrChild: '',
 
         // step3
@@ -341,80 +344,85 @@ class CustomerEditor extends React.Component {
     const steps = getSteps();
     const { activeStep } = this.state;
 
-    return (
-      <div style={{ width: '100%' }}>
-        <Grid container justify="center">
-          <Grid item xs={12}>
-            <Button
-              onClick={() => this.props.history.push('/customers')}
-              className="button button-secondary button-secondary--top"
-            >
+    if (!this.props.loading) {
+
+      return (
+        <div style={{ width: '100%' }}>
+          <Grid container justify="center">
+            <Grid item xs={12}>
+              <Button
+                onClick={() => this.props.history.push('/customers')}
+                className="button button-secondary button-secondary--top"
+              >
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    flexDirection: 'row',
+                  }}
+                >
+                  <ChevronLeft style={{ marginRight: '4px' }} /> Customers
+                </Typography>
+              </Button>
+            </Grid>
+          </Grid>
+
+          <Grid container style={{ marginBottom: '50px' }}>
+            <Grid item xs={4}>
               <Typography
-                type="subheading"
-                className="subheading font-medium"
+                type="headline"
+                className="headline"
+                style={{ fontWeight: 500 }}
+              >
+                Add customer
+              </Typography>
+            </Grid>
+            <Grid item xs={8}>
+              <div
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  flexDirection: 'row',
+                  justifyContent: 'flex-end',
                 }}
               >
-                <ChevronLeft style={{ marginRight: '4px' }} /> Customers
-              </Typography>
-            </Button>
+                <Button
+                  style={{ marginRight: '10px' }}
+                  onClick={() => this.props.history.push('/customers')}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  disabled={!this.state.hasFormChanged}
+                  className="btn btn-primary"
+                  raised
+                  type="submit"
+                  color="contrast"
+                >
+                  Save
+                </Button>
+              </div>
+            </Grid>
           </Grid>
-        </Grid>
 
-        <Grid container style={{ marginBottom: '50px' }}>
-          <Grid item xs={4}>
-            <Typography
-              type="headline"
-              className="headline"
-              style={{ fontWeight: 500 }}
-            >
-              Add customer
-            </Typography>
-          </Grid>
-          <Grid item xs={8}>
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'flex-end',
-              }}
-            >
-              <Button
-                style={{ marginRight: '10px' }}
-                onClick={() => this.props.history.push('/customers')}
-              >
-                Cancel
-              </Button>
-              <Button
-                disabled={!this.state.hasFormChanged}
-                className="btn btn-primary"
-                raised
-                type="submit"
-                color="contrast"
-              >
-                Save
-              </Button>
-            </div>
-          </Grid>
-        </Grid>
+          <Stepper className="customerStepsStepper" activeStep={activeStep}>
+            {steps.map((label, index) => {
+              const props = {};
+              return (
+                <Step key={label} {...props}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              );
+            })}
+          </Stepper>
 
-        <Stepper className="customerStepsStepper" activeStep={activeStep}>
-          {steps.map((label, index) => {
-            const props = {};
-            return (
-              <Step key={label} {...props}>
-                <StepLabel>{label}</StepLabel>
-              </Step>
-            );
-          })}
-        </Stepper>
+          {this.getStepContent(activeStep)}
+        </div>
+      );
+    }
+    return (<Loading />);
 
-        {this.getStepContent(activeStep)}
-      </div>
-    );
   }
 }
 

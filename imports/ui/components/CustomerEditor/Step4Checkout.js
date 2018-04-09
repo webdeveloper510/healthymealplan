@@ -93,11 +93,9 @@ class Step4Checkout extends React.Component {
         nameOnCard: {
           required: true,
         },
-
         cardNumber: {
           required: true,
         },
-
         expiry: {
           required: true,
         },
@@ -112,6 +110,9 @@ class Step4Checkout extends React.Component {
           cdnPostal: true,
           required: true,
         },
+        billingStreetAddress: {
+          required: true,
+        }
       },
 
       submitHandler() {
@@ -1014,7 +1015,7 @@ class Step4Checkout extends React.Component {
       let surchargePerDelivery = 0;
 
       const selectedPostalCode = this.props.postalCodes.find(
-        el => el.title === this.props.customerInfo.postalCode.substring(0, 3),
+        el => el.title === this.props.customerInfo.postalCode.substring(0, 3).toUpperCase(),
       );
 
       console.log(selectedPostalCode);
@@ -1206,9 +1207,11 @@ class Step4Checkout extends React.Component {
     customerInfo.nameOnCard = $('[name="nameOnCard"]')
       .val()
       .trim();
-    customerInfo.billingPostalCode = $('[name="postal_code"]')
+    customerInfo.billingPostalCode = $('[name="billingPostalCode"]')
       .val()
       .trim();
+
+    customerInfo.billingStreetAddress = $('#billingStreetAddress').val().trim();
 
     // console.log(customerInfo);
 
@@ -1445,11 +1448,24 @@ class Step4Checkout extends React.Component {
                           placeholder="Postal code"
                           inputProps={{
                             name: 'billingPostalCode',
-                            id: 'postalCode',
+                            id: 'billingPostalCode',
                           }}
                           fullWidth
                         />
                       </Grid>
+                    </Grid>
+                    <Grid container>
+                      <Grid item xs={12}>
+                        <Input
+                          placeholder="Street address"
+                          inputProps={{
+                            name: 'billingStreetAddress',
+                            id: 'billingStreetAddress',
+                          }}
+                          fullWidth
+                        />
+                      </Grid>
+
                     </Grid>
                   </div>
 

@@ -1619,15 +1619,15 @@ class Step4CheckoutCurrent extends React.Component {
 
                 <Grid item xs={12}>
                   <Typography type="headline" style={{ margin: '25px 0', display: 'flex', alignItems: 'center' }}>Subscription
-                    <Chip style={{ marginLeft: '10px' }} label={this.props.subscription.status.toUpperCase()} /></Typography>
+                    <Chip style={{ marginLeft: '10px' }} label={this.props.subscription && this.props.subscription.status.toUpperCase()} /></Typography>
 
                 </Grid>
 
                 <Grid item xs={12}>
-                  <Typography type="subheading">Customer since {moment(this.props.customer.subscriptionStartDateRaw).format('YYYY-MM-DD')}</Typography>
+                  <Typography type="subheading">Customer since {moment(this.props.customer.subscriptionStartDateRaw && this.props.customer.subscriptionStartDateRaw).format('YYYY-MM-DD')}</Typography>
 
                   <div style={{ margin: '20px 0' }}>
-                    {(this.props.subscription.status == 'paused' || this.props.subscription.status == 'active') && (
+                    {this.props.subscription && (this.props.subscription.status == 'paused' || this.props.subscription.status == 'active') && (
                       <Button color="secondary" raised onClick={this.openCancelSubscriptionDialog}>Cancel subscription</Button>
                     )}
 
@@ -1657,7 +1657,6 @@ class Step4CheckoutCurrent extends React.Component {
                   </DialogActions>
                 </Dialog>
 
-
                 <Dialog
                   open={this.state.dialogActivateSubscription}
                   onClose={this.closeActivateSubscriptionDialog}
@@ -1677,7 +1676,6 @@ class Step4CheckoutCurrent extends React.Component {
                     <Button onClick={this.handleActivateSubscription.bind(this, 'saturday')} color="primary" autoFocus>Saturday</Button>
                   </DialogActions>
                 </Dialog>
-
 
                 <Dialog
                   open={this.state.dialogEditPaymentMethod}

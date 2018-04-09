@@ -12,7 +12,7 @@ import Restrictions from '../../../api/Restrictions/Restrictions';
 import Ingredients from '../../../api/Ingredients/Ingredients';
 import PostalCodes from '../../../api/PostalCodes/PostalCodes';
 
-const EditCustomer = ({ customer, history, subscription, secondaryAccounts, popTheSnackbar, postalCodes, lifestyles, restrictions, potentialSubIngredients }) => (customer ? (
+const EditCustomer = ({ customer, history, subscription, secondaryAccounts, popTheSnackbar, postalCodes, lifestyles, restrictions, potentialSubIngredients, loading }) => (customer ? (
   <div className="EditCurrentCustomer">
     <Grid container className="EditCategory SideContent SideContent--spacer-2x--horizontal">
       <CurrentCustomerEditor
@@ -24,7 +24,9 @@ const EditCustomer = ({ customer, history, subscription, secondaryAccounts, popT
         secondaryAccounts={secondaryAccounts}
         subscription={subscription}
         customer={customer}
-        history={history} />
+        history={history}
+        loading={loading}
+      />
     </Grid>
   </div>
 ) : <NotFound />);
@@ -55,7 +57,7 @@ export default createContainer(({ match }) => {
   return {
     loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready() && !subscription6.ready() && !subscription7.ready(),
     customer: Meteor.users.findOne(customerId),
-    subscription: Subscriptions.findOne({ customerId: customerId }),
+    subscription: Subscriptions.findOne({ customerId }),
     secondaryAccounts: Meteor.users.find({ secondary: true, primaryAccount: customerId }).fetch(),
     lifestyles: Lifestyles.find().fetch(),
     restrictions: Restrictions.find().fetch(),

@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
-import constants from "./constants";
+import constants from './constants';
+
 const ApiContracts = require('authorizenet').APIContracts;
 const ApiControllers = require('authorizenet').APIControllers;
 
@@ -53,9 +54,8 @@ export default function createSubscriptionFromCustomerProfile(
   if (process.env.NODE_ENV == 'development') {
     ctrl.setEnvironment(constants.endpoint.sandbox);
   } else {
-    ctrl.setEnvironment(constants.endpoint.production)
+    ctrl.setEnvironment(constants.endpoint.production);
   }
-
 
   ctrl.execute(() => {
     const apiResponse = ctrl.getResponse();
@@ -75,33 +75,33 @@ export default function createSubscriptionFromCustomerProfile(
         console.log(`Subscription Id : ${response.getSubscriptionId()}`);
         console.log(
           `Message Code : ${
-          response
-            .getMessages()
-            .getMessage()[0]
-            .getCode()}`,
+            response
+              .getMessages()
+              .getMessage()[0]
+              .getCode()}`,
         );
         console.log(
           `Message Text : ${
-          response
-            .getMessages()
-            .getMessage()[0]
-            .getText()}`,
+            response
+              .getMessages()
+              .getMessage()[0]
+              .getText()}`,
         );
       } else {
         console.log(`Result Code: ${response.getMessages().getResultCode()}`);
         console.log(
           `Error Code: ${
-          response
-            .getMessages()
-            .getMessage()[0]
-            .getCode()}`,
+            response
+              .getMessages()
+              .getMessage()[0]
+              .getCode()}`,
         );
         console.log(
           `Error message: ${
-          response
-            .getMessages()
-            .getMessage()[0]
-            .getText()}`,
+            response
+              .getMessages()
+              .getMessage()[0]
+              .getText()}`,
         );
 
         err = {
