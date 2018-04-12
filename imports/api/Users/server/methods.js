@@ -24,6 +24,7 @@ import Subscriptions from '../../Subscriptions/Subscriptions';
 import Lifestyles from '../../Lifestyles/Lifestyles';
 
 import Jobs from '../../Jobs/Jobs';
+import updateSubscription from '../../../modules/server/authorize/updateSubscription';
 
 moment.tz.setDefault('America/Toronto');
 
@@ -133,8 +134,8 @@ Meteor.methods({
     Meteor.users.update({
       _id: data.id,
     }, {
-      $set: toUpdate,
-    });
+        $set: toUpdate,
+      });
 
 
     // console.log(data);
@@ -164,8 +165,6 @@ Meteor.methods({
     });
 
     const billing = calculateSubscriptionCost(data);
-
-    // console.log(billing);
 
     return billing;
 
@@ -198,7 +197,82 @@ Meteor.methods({
     // console.log(data);
     // console.log(billing);
 
-    // return;
+    let friday = '';
+
+    // if we haven't yet passed the day of the week that I need:
+    if (moment().isoWeekday() <= 5) {
+      // then just give me this week's instance of that day
+      friday = moment().isoWeekday(5).hour(23).minute(30)
+        .toDate();
+    } else {
+      // otherwise, give me next week's instance of that day
+      friday = moment().add(1, 'weeks').isoWeekday(5).hour(23)
+        .minute(30)
+        .toDate();
+    }
+
+
+    const sub = Subscriptions.findOne({ customerId: data.id });
+
+    if (sub.paymentMethod == 'card') {
+
+      console.log('Payment method is card and the subscription is paused');
+
+
+      const syncGetSubscription = Meteor.wrapAsync(getSubscription);
+
+      const getSubscriptionRes = syncGetSubscription(sub.authorizeSubscriptionId);
+
+      console.log(getSubscriptionRes);
+
+      if (getSubscriptionRes.messages.resultCode != 'Ok') {
+        throw new Meteor.Error(500, 'There was a problem fetching the subscription [Authorize.Net]');
+      }
+
+      const subscriptionStartDate = getSubscriptionRes.subscription.paymentSchedule.startDate;
+      const subscriptionTotalOccurrences = getSubscriptionRes.subscription.paymentSchedule.totalOccurrences;
+
+      console.log(moment(subscriptionStartDate).hour(23).minute(30));
+      console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
+
+      // this changes subscription amount immediately if first charge hasn't happened
+      if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))) {
+
+        console.log("Subscription hasn't been charged");
+
+        const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
+
+        const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
+
+        if (updateSubscriptionRes.messages.resultCode != 'Ok') {
+          throw new Meteor.Error(500, 'There was a problem updating the subscription [Authorize.Net]');
+        }
+
+      } else {
+
+        const jobExists = Jobs.findOne({ type: 'editSubscriptionJob', 'data.id': data.id, status: 'waiting' });
+
+        if (jobExists) {
+          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for updation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+        }
+
+        const job = new Job(
+          Jobs,
+          'editSubscriptionJob', // type of job
+          {
+            ...data,
+          },
+        );
+
+        job.priority('normal').after(friday).save(); // Commit it to the server
+
+        return {
+          subUpdateScheduled: true,
+        };
+
+      }
+
+    }
 
     if (data.secondaryProfiles && data.secondaryProfiles.length > 0) {
 
@@ -252,9 +326,7 @@ Meteor.methods({
             platingNotes: e.platingNotes,
             roles: ['customer'],
             schedule: e.scheduleReal,
-            platingNotes: e.platingNotes,
             adultOrChild: e.adultOrChild,
-
           });
         }
       });
@@ -315,13 +387,13 @@ Meteor.methods({
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-      $set: {
-        completeSchedule: data.completeSchedule,
-        delivery: newDeliveryType,
-        amount: billing.actualTotal,
-        subscriptionItems: billing.lineItems,
-      },
-    });
+        $set: {
+          completeSchedule: data.completeSchedule,
+          delivery: newDeliveryType,
+          amount: billing.actualTotal,
+          subscriptionItems: billing.lineItems,
+        },
+      });
 
   },
 
@@ -1301,7 +1373,7 @@ Meteor.methods({
     const subscription = Subscriptions.findOne({ customerId });
 
     if (!subscription) {
-      throw new Meteor.Error('500', 'No subscription found to cancel.');
+      throw new Meteor.Error('500', 'No subscription found.');
     }
 
     if (subscription && subscription.status === 'active') {
@@ -1546,10 +1618,10 @@ Meteor.methods({
         Subscriptions.update({
           _id: subscription._id,
         }, {
-          $set: {
-            paymentMethod: type,
-          },
-        });
+            $set: {
+              paymentMethod: type,
+            },
+          });
       } catch (error) {
         console.log(error);
         throw new Meteor.Error(500, error);

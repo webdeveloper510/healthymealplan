@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "start": "meteor run --settings settings-development.json",
-    "prod": "",
+    "prod": "meteor run --settings settings-production.json",
     "test": "jest"
   },
   "dependencies": {

@@ -4,7 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import sendEmail from '../../../modules/server/send-email';
 
 export default (options) => {
-  const applicationName = 'Healthy Meal Plan';
+  const applicationName = 'Vittle';
   const firstName = options.firstName;
   const emailAddress = options.email;
   const totalMeals = options.totalMeals;
@@ -14,8 +14,8 @@ export default (options) => {
 
   return sendEmail({
     to: emailAddress,
-    from: `${applicationName} <support@healthymealplan.ca>`,
-    subject: 'Your Healthy Meal Plan order has been delivered',
+    from: `${applicationName} <support@vittle.ca>`,
+    subject: 'Your Vittle has been delivered',
     template: 'delivery-successful',
     templateVars: {
       applicationName,

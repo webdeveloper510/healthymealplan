@@ -683,9 +683,17 @@ class CurrentCustomerEditor extends React.Component {
           submitLoading: false,
           secondTime: false,
         }, () => {
-          this.props.popTheSnackbar({
-            message: 'Customer details updated successfully.',
-          });
+
+          if(res.subUpdateScheduled){
+            this.props.popTheSnackbar({
+              message: 'Customer details update scheduled for friday night.',
+            });
+          }else{
+            this.props.popTheSnackbar({
+              message: 'Customer details updated successfully.',
+            });
+          }
+       
         });
       }
     });
