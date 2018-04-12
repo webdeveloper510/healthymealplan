@@ -684,7 +684,7 @@ class CurrentCustomerEditor extends React.Component {
           secondTime: false,
         }, () => {
 
-          if(res.subUpdateScheduled){
+          if(typeof res == "object" && res.hasOwnProperty('subUpdateScheduled')){
             this.props.popTheSnackbar({
               message: 'Customer details update scheduled for friday night.',
             });
