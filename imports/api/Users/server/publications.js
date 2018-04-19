@@ -22,17 +22,16 @@ Meteor.publish('users.customers', (query, selector) => {
   check(query, Match.Maybe(Object));
   check(selector, Match.Maybe(Object));
 
-  // query.roles = ['customer'];
-  // selector.fields = {
-  //   emails: 1,
-  //   profile: 1,
-  //   services: 1,
-  // }
-
   return Meteor.users.find({ roles: ['customer'] });
 });
 
+Meteor.publish('users.customers.primary', (query, selector) => {
+  check(query, Match.Maybe(Object));
+  check(selector, Match.Maybe(Object));
 
+
+  return Meteor.users.find({ roles: ['customer'], primaryAccount: { $exists: false } });
+});
 
 Meteor.publish('user.customer.single', (customerId) => {
   check(customerId, String);
