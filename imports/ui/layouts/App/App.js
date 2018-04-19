@@ -58,7 +58,9 @@ import EditCustomer from '../../pages/EditCustomer/EditCustomer';
 
 import Directions from '../../pages/Directions/Directions';
 
+import Discounts from '../../pages/Discounts/Discounts';
 import NewDiscount from '../../pages/NewDiscount/NewDiscount';
+import EditDiscount from '../../pages/EditDiscount/EditDiscount';
 
 import Restrictions from '../../pages/Restrictions/Restrictions';
 import NewRestriction from '../../pages/NewRestriction/NewRestriction';
@@ -120,8 +122,6 @@ import ResetPassword from '../../pages/ResetPassword/ResetPassword';
 import Profile from '../../pages/Profile/Profile';
 import NotFound from '../../pages/NotFound/NotFound';
 // import Footer from '../../components/Footer/Footer';
-import Terms from '../../pages/Terms/Terms';
-import Privacy from '../../pages/Privacy/Privacy';
 
 import './App.scss';
 
@@ -327,8 +327,8 @@ class App extends React.Component {
                     </Button>
                   </Link>
                 ) : (
-                  ''
-                ),
+                    ''
+                  ),
                 <IconButton
                   key="close"
                   aria-label="Close"
@@ -410,8 +410,8 @@ class App extends React.Component {
                   </Toolbar>
                 </AppBar>
               ) : (
-                ''
-              )}
+                  ''
+                )}
               {this.props.authenticated ? (
                 <div style={{ backgroundColor: '#FFFFFF' }}>
                   <Hidden lgUp>
@@ -491,8 +491,8 @@ class App extends React.Component {
                   </Hidden>
                 </div>
               ) : (
-                ''
-              )}
+                  ''
+                )}
 
               <main
                 className={
@@ -565,6 +565,16 @@ class App extends React.Component {
                       {...this.props}
                     />
 
+
+                    <Authenticated
+                      exact
+                      path="/discounts"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={Discounts}
+                      {...this.props}
+                    />
+
+
                     <Authenticated
                       exact
                       path="/discounts/new"
@@ -572,6 +582,15 @@ class App extends React.Component {
                       component={NewDiscount}
                       {...this.props}
                     />
+
+                    <Authenticated
+                      exact
+                      path="/discounts/:_id/edit"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={EditDiscount}
+                      {...this.props}
+                    />
+
 
                     <Authenticated
                       exact
@@ -877,18 +896,13 @@ class App extends React.Component {
                       path="/reset-password/:token"
                       component={ResetPassword}
                     />
-                    <Route name="terms" path="/terms" component={Terms} />
-                    <Route
-                      name="privacy"
-                      path="/privacy"
-                      component={Privacy}
-                    />
+
                     <Route component={NotFound} />
                   </Switch>
 
                 ) : (
-                  ''
-                )}
+                    ''
+                  )}
               </main>
             </div>
           </div>

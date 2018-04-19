@@ -25,54 +25,71 @@ Discounts.schema = new SimpleSchema({
   },
   discountType: {
     type: String,
-    label: "The type of the discount, percentage or fixed amount",
+    label: 'The type of the discount, percentage or fixed amount',
   },
   discountValue: {
     type: String,
-    label: "The type of the discount, percentage or fixed amount",
+    label: 'The type of the discount, percentage or fixed amount',
   },
   appliesToType: {
     type: String,
-    label: "Entire order, specific plans",
-    optional: true,
+    label: 'Entire order, specific plans',
   },
   appliesToValue: {
     type: String,
-    label: "",
-    optional: true,
+    label: '',
+  },
+  appliesToRestrictionsAndExtras: {
+    type: Boolean,
+    label: 'If restrictions and extras are included in discount price off',
+  },
+  appliesToExistingDiscounts: {
+    type: Boolean,
+    label: 'If existing discounts are taken into account before applying the discount',
   },
   minimumRequirementType: {
     type: String,
-    label: "None, minimum purchase amount or min quantity of items",
-    optional: true,
+    label: 'None, minimum purchase amount or min quantity of items',
   },
   minimumRequirementValue: {
     type: String,
-    label: "",
+    label: '',
     optional: true,
   },
-  customerEligiblityType: {
+  customerEligibilityType: {
     type: String,
-    label: "Applies to everyone or a specific customer",
-    optional: true,
+    label: 'Applies to everyone or a specific customer',
   },
   customerEligibilityValue: {
-    type: String,
-    label: "",
+    type: SimpleSchema.oneOf(Array, String),
+    label: 'Customer eligibility value',
     optional: true,
+  },
+  'customerEligibilityValue.$': {
+    type: String,
   },
   usageLimitType: {
     type: String,
-    label: "Single use per customer or multi-use",
+    label: 'Single use per customer or multi-use',
     optional: true,
   },
   usageLimitValue: {
     type: String,
-    label: "Single use per customer or multi-use value",
+    label: 'Single use per customer or multi-use value',
     optional: true,
   },
-  createdBy: {
+  status: {
     type: String,
+    label: 'Current status of the discount code.',
+  },
+  startDate: {
+    type: Date,
+    label: 'Start date of the discount code',
+  },
+  endDate: {
+    type: Date,
+    label: 'End date of the discount code',
+    optional: true,
   },
   createdAt: {
     type: String,

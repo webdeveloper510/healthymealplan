@@ -7,17 +7,18 @@ import { Meteor } from 'meteor/meteor';
 import Grid from 'material-ui/Grid';
 
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
+import Sides from '../../../api/Sides/Sides';
 
-import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 import DiscountEditor from '../../components/DiscountEditor/DiscountEditor';
 
-const NewDiscount = ({ history, newDiscount, popTheSnackbar, restrictions, lifestyles }) => (
+const NewDiscount = ({ history, newDiscount, popTheSnackbar, customers, lifestyles, sides }) => (
   <div>
     <Grid container className="NewDiscount SideContent SideContent--spacer-2x--horizontal">
       <DiscountEditor
         newDiscount={newDiscount}
-        restrictions={restrictions}
+        customers={customers}
         lifestyles={lifestyles}
+        sides={sides}
         history={history}
         popTheSnackbar={popTheSnackbar}
       />
@@ -27,20 +28,23 @@ const NewDiscount = ({ history, newDiscount, popTheSnackbar, restrictions, lifes
 
 NewDiscount.propTypes = {
   history: PropTypes.object.isRequired,
-  restrictions: PropTypes.array.isRequired,
+  customers: PropTypes.array.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
   newDiscount: PropTypes.bool.isRequired,
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe('users.customers');
+  const subscription = Meteor.subscribe('users.customers.primary');
   const subscription2 = Meteor.subscribe('lifestyles');
+  const subscription3 = Meteor.subscribe('sides');
 
   return {
     newDiscount: true,
-    loading: !subscription.ready() && subscription2.ready(),
-    restrictions: Meteor.users.find({ roles: ["customer"] }).fetch(),
+    loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready(),
+    customers: Meteor.users.find({ roles: ["customer"], subscriptionId: { $exists: true } }).fetch(),
     lifestyles: Lifestyles.find().fetch(),
+    sides: Sides.find().fetch(),
+
   };
 }, NewDiscount);
 

@@ -18,6 +18,6 @@ Meteor.publish('discounts.view', (categoryId) => {
 });
 
 Meteor.publish('discounts-all-count', function categoryCount() {
-  Counts.publish(this, 'discounts', Discounts.find());
+  Counts.publish(this, 'discounts-count', Discounts.find());
 });
 

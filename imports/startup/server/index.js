@@ -15,6 +15,9 @@ import './jobs/setSubscriptionCancelledCardJob';
 import './jobs/setSubscriptionActiveCardJob';
 import './jobs/editSubscriptionJob';
 
+import './jobs/enableDiscountJob';
+import './jobs/disableDiscountJob';
+
 import '../../modules/server/authorize/webhooks/';
 
 S3 = {};

@@ -17,15 +17,19 @@ import Dialog, {
   DialogContentText,
 } from 'material-ui/Dialog';
 
+import Chip from 'material-ui/Chip';
+
 import $ from 'jquery';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
-
+import moment from 'moment';
 import Loading from '../../components/Loading/Loading';
 
-class LifestylesTable extends React.Component {
+import './DiscountsTable.scss';
+
+class DiscountsTable extends React.Component {
   constructor(props) {
     super(props);
 
@@ -37,7 +41,6 @@ class LifestylesTable extends React.Component {
   }
 
   rowSelected(e, event, checked) {
-
     const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
     $(`.${selectedRowId}`).toggleClass('row-selected');
     let currentlySelectedCheckboxes;
@@ -92,19 +95,18 @@ class LifestylesTable extends React.Component {
   }
 
   deleteSelectedRows() {
+    localStorage.setItem('DiscountsTableDeleted', this.state.selectedCheckboxesNumber);
 
-    localStorage.setItem('LifestylesTableDeleted', this.state.selectedCheckboxesNumber);
+    const discountIds = this.state.selectedCheckboxes;
 
-    const lifestyleIds = this.state.selectedCheckboxes;
-
-    Meteor.call('lifestyles.batchRemove', lifestyleIds, (error) => {
+    Meteor.call('discounts.batchRemove', discountIds, (error) => {
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
         });
       } else {
         this.props.popTheSnackbar({
-          message: `${localStorage.getItem('LifestylesTableDeleted')} lifestyles deleted.`,
+          message: `${localStorage.getItem('DiscountsTableDeleted')} discounts deleted.`,
         });
       }
     });
@@ -114,20 +116,18 @@ class LifestylesTable extends React.Component {
       selectedCheckboxesNumber: 0,
       deleteDialogOpen: false,
     });
-
   }
 
 
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No lifestyle found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
+        <p style={{ padding: '25px' }} className="subheading">No discount found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
       );
     }
   }
 
   isCheckboxSelected(id) {
-
     if (this.state.selectedCheckboxes.length) {
       if (this.state.selectedCheckboxes.indexOf(id) !== -1) {
         return true;
@@ -145,36 +145,19 @@ class LifestylesTable extends React.Component {
     this.setState({ deleteDialogOpen: false });
   }
 
-  renderExtraAthletic(e) {
-    if (e.extraAthletic) {
-      return `${e.discountOrExtraTypeAthletic == 'Fixed amount' ? '$' : ''}${e.extraAthletic}${e.discountOrExtraTypeAthletic == 'Percentage' ? '%' : ''}`;
-    }
-    return <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>;
-  }
-
-  renderDiscountStudent(e) {
-    if (e.discountStudent) {
-      return `${e.discountOrExtraTypeStudent == 'Fixed amount' ? '$' : ''}${e.discountStudent}${e.discountOrExtraTypeStudent == 'Percentage' ? '%' : ''}`;
-    }
-    return <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>;
-  }
-
-  renderDiscountSenior(e) {
-    if (e.discountSenior) {
-      return `${e.discountOrExtraTypeSenior == 'Fixed amount' ? '$' : ''}${e.discountSenior}${e.discountOrExtraTypeSenior == 'Percentage' ? '%' : ''}`;
-    }
-    return <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>N/A</Typography>;
+  renderDiscountValue(e) {
+    return `${e.discountType == 'Fixed amount' ? '$' : ''}${e.discountValue}${e.discountType == 'Percentage' ? '%' : ''}`;
   }
 
 
   render() {
     return (
       <div>
-        <Paper elevation={2} className="table-container">
+        <Paper elevation={2} className="table-container table-discounts">
           {this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container">
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
-                {this.state.selectedCheckboxesNumber} lifestyle{this.state.selectedCheckboxes.length > 1 ? ('s') : ''} selected
+                {this.state.selectedCheckboxesNumber} discount{this.state.selectedCheckboxes.length > 1 ? ('s') : ''} selected
               </Typography>
               <Button style={{ color: '#FFF' }} onClick={this.deleteDialogHandleClickOpen.bind(this)}>Delete</Button>
             </div>
@@ -189,32 +172,21 @@ class LifestylesTable extends React.Component {
                   <TableCell padding="checkbox" style={{ width: '7%' }}>
                     <Checkbox onChange={this.selectAllRows.bind(this)} />
                   </TableCell>
-                  <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                    <Typography className="body2" type="body2">SKU</Typography>
-                  </TableCell>
-                  <TableCell padding="none" style={{ width: '22%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Lifestyle</Typography>
-                  </TableCell>
-                  <TableCell padding="none" style={{ width: '9%' }}>
-                    <Typography className="body2" type="body2">Breakfast</Typography>
-                  </TableCell>
-                  <TableCell padding="none" style={{ width: '9%' }}>
-                    <Typography className="body2" type="body2">Lunch</Typography>
-                  </TableCell>
-                  <TableCell padding="none" style={{ width: '9%' }}>
-                    <Typography className="body2" type="body2">Dinner</Typography>
+                  <TableCell padding="none" style={{ width: '42%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Code</Typography>
                   </TableCell>
 
-                  <TableCell padding="none" style={{ width: '9%' }}>
-                    <Typography className="body2" type="body2">Athletic</Typography>
+                  <TableCell padding="none" style={{ width: '17%' }}>
+                    <Typography className="body2" type="body2">Status</Typography>
                   </TableCell>
 
-                  <TableCell padding="none" style={{ width: '9%' }}>
-                    <Typography className="body2" type="body2">Student</Typography>
+                  <TableCell padding="none" style={{ width: '17%' }}>
+                    <Typography className="body2" type="body2">Start</Typography>
                   </TableCell>
 
-                  <TableCell padding="none" style={{ width: '9%' }}>
-                    <Typography className="body2" type="body2">Senior</Typography>
+
+                  <TableCell padding="none" style={{ width: '17%' }}>
+                    <Typography className="body2" type="body2">End</Typography>
                   </TableCell>
 
                 </TableRow>
@@ -237,140 +209,63 @@ class LifestylesTable extends React.Component {
                       />
                     </TableCell>
 
-                    <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}>
-                      <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
-                    </TableCell>
-
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '22%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '42%' }}
                       padding="none"
-                      onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
+                      onClick={() => this.props.history.push(`/discounts/${e._id}/edit`)}
                     >
 
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
                         {e.title}
                       </Typography>
-                      <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                        {e.joinedRestrictions ?
-                          (
-                            e.joinedRestrictions.length > 1 ? (
-                              `${e.joinedRestrictions.length} restrictions`
-                            ) : (`${e.joinedRestrictions.length} restriction`)
-                          )
-
-                          : ''}
+                      <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                        {this.renderDiscountValue(e)} off {e.appliesToType == 'whole' ? 'whole order' : e.appliesToType == 'lifestyle' && e.appliesToValue == 'All' ? `${e.appliesToValue} lifestyles` : e.appliesToType == 'lifestyle' ? e.appliesToValue : ''}
                       </Typography>
 
+                      {e.appliesToRestrictionsAndExtras ? (
+                        <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                          Applies to restrictions and extras
+                        </Typography>) : ''}
+
+
+                      {e.minimumRequirementType != 'none' ? (
+                        <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                          Minimum {e.minimumRequirementType == 'purchaseAmount' ? `amount of $${e.minimumRequirementValue}` : e.minimumRequirementType == 'minQuantity' ? `quantity of ${e.minimumRequirementValue}` : ''}
+                        </Typography>) : ''}
+                    </TableCell>
+
+
+                    <TableCell
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '17%' }}
+                      padding="none"
+                      onClick={() => this.props.history.push(`/discounts/${e._id}/edit`)}
+                    >
+                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                        <Chip label={e.status} className={e.status == 'active' ? 'status status--delivered' : 
+                        e.status == 'scheduled' ?  'status status--in-transit' : 
+                        e.status == "expired" ? 'status status--not-delivered' : ''} />
+                      </Typography>
+                    </TableCell>
+
+
+                    <TableCell
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '17%' }}
+                      padding="none"
+                      onClick={() => this.props.history.push(`/discounts/${e._id}/edit`)}
+                    >
+                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                        {moment(e.startDate).format('YYYY-MM-DD')}
+                      </Typography>
                     </TableCell>
 
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '17%' }}
                       padding="none"
-                      onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
+                      onClick={() => this.props.history.push(`/discounts/${e._id}/edit`)}
                     >
-
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                        ${e.prices.breakfast[0]}
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          Individual
-                          </Typography>
+                        {e.endDate ? moment(e.endDate).format('YYYY-MM-DD') : '-'}
                       </Typography>
-
-
-                    </TableCell>
-
-                    <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
-                      padding="none"
-                      onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
-                    >
-
-                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                        ${e.prices.lunch[0]}
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          Individual
-                          </Typography>
-                      </Typography>
-
-
-                    </TableCell>
-
-                    <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
-                      padding="none"
-                      onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
-                    >
-
-                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                        ${e.prices.dinner[0]}
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          Individual
-                          </Typography>
-                      </Typography>
-
-
-                    </TableCell>
-
-                    <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
-                      padding="none"
-                      onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
-                    >
-
-                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-
-                        {this.renderExtraAthletic(e)}
-
-                        {e.extraAthletic ?
-
-                          <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>Extra</Typography>
-                          : ''
-                        }
-
-                      </Typography>
-
-                    </TableCell>
-
-                    <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
-                      padding="none"
-                      onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
-                    >
-
-                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-
-                        {this.renderDiscountStudent(e)}
-
-                        {e.discountStudent ?
-
-                          <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>Discount</Typography>
-                          : ''
-                        }
-
-                      </Typography>
-
-
-                    </TableCell>
-
-                    <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '9%' }}
-                      padding="none"
-                      onClick={() => this.props.history.push(`/lifestyles/${e._id}/edit`)}
-                    >
-
-                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-
-                        {this.renderDiscountSenior(e)}
-
-                        {e.discountSenior ?
-
-                          <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>Discount</Typography>
-                          : ''
-                        }
-
-                      </Typography>
-
-
                     </TableCell>
 
                   </TableRow>
@@ -386,7 +281,7 @@ class LifestylesTable extends React.Component {
               <TableRow>
                 <TableCell>
                   <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                    {this.props.count} of {this.props.lifestyleCount} lifestyles
+                    {this.props.count} of {this.props.lifestyleCount} discounts
                   </Typography>
                 </TableCell>
                 <TableCell />
@@ -402,10 +297,10 @@ class LifestylesTable extends React.Component {
         </Paper>
         <Dialog open={this.state.deleteDialogOpen} onClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-            Delete {this.state.selectedCheckboxesNumber} lifestyle{this.state.selectedCheckboxes.length > 1 ? 's' : ''}?
+            Delete {this.state.selectedCheckboxesNumber} discount{this.state.selectedCheckboxes.length > 1 ? 's' : ''}?
           </Typography>
           <DialogContent>
-            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} lifestyles?</DialogContentText>
+            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} discounts?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
@@ -421,7 +316,7 @@ class LifestylesTable extends React.Component {
   }
 }
 
-LifestylesTable.propTypes = {
+DiscountsTable.propTypes = {
   // results: PropType.isRequired,
   history: PropTypes.func.isRequired,
   hasMore: PropTypes.bool.isRequired,
@@ -433,10 +328,10 @@ LifestylesTable.propTypes = {
 
 
 export default createContainer(() => {
-  const lifestyleCountSub = Meteor.subscribe('lifestyles-all-count');
+  const lifestyleCountSub = Meteor.subscribe('discounts-all-count');
 
   return {
     // ingredientTypes: IngredientsWithTypes.find().fetch(),
-    lifestyleCount: Counts.get('lifestyles-count'),
+    lifestyleCount: Counts.get('discounts-count'),
   };
-}, LifestylesTable);
+}, DiscountsTable);

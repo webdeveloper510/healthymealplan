@@ -17,6 +17,7 @@ import Tabs, { Tab } from 'material-ui/Tabs';
 
 import DiscountsCollection from '../../../api/Discounts/Discounts';
 import RestrictionsCollection from '../../../api/Restrictions/Restrictions';
+import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 
 import Loading from '../../components/Loading/Loading';
 import DiscountsTable from './DiscountsTable';
@@ -34,6 +35,8 @@ class Discounts extends React.Component {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
       options: { sort: { SKU: -1 } },
+      searchByKey: '',
+
       searchSelector: '',
       currentTabValue: 0,
     };
@@ -41,12 +44,12 @@ class Discounts extends React.Component {
 
   searchByName() {
     this.setState({
-      searchSelector: $('#search-lifestyles-text').val(),
+      searchSelector: $('#search-discount-text').val(),
     });
   }
 
   clearSearchBox() {
-    $('#search-lifestyles-text').val('');
+    $('#search-discount-text').val('');
 
     this.setState({
       searchSelector: {},
@@ -80,6 +83,22 @@ class Discounts extends React.Component {
     });
   }
 
+  searchByKey(status = '', key = '') {
+    if (key.length && status.length) {
+      const searchSelector = {};
+
+      searchSelector[status] = key;
+
+      this.setState({
+        searchByKey: searchSelector,
+      });
+    } else {
+      this.setState({
+        searchByKey: '',
+      });
+    }
+  }
+
   handleTabChange(event, value) {
     this.setState({ currentTabValue: value });
   }
@@ -94,17 +113,20 @@ class Discounts extends React.Component {
 
           <Grid container className="clearfix">
             <Grid item xs={6}>
-              <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }}>Lifestyles</Typography>
+              <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }}>Discounts</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Button className="btn btn-primary" onClick={() => history.push('/lifestyles/new')} raised color="primary" style={{ float: 'right' }}>Add lifestyle</Button>
+              <Button className="btn btn-primary" onClick={() => history.push('/discounts/new')} raised color="primary" style={{ float: 'right' }}>Add discount</Button>
             </Grid>
           </Grid>
 
           <div style={{ marginTop: '25px' }}>
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
               <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
-                <Tab label="All" />
+                <Tab label="All" onClick={() => this.searchByKey('', '')} />
+                <Tab label="Active" onClick={() => this.searchByKey('status', 'active')} />
+                <Tab label="Scheduled" onClick={() => this.searchByKey('status', 'scheduled')} />
+                <Tab label="Expired" onClick={() => this.searchByKey('status', 'expired')} />
               </Tabs>
             </AppBar>
           </div>
@@ -138,10 +160,10 @@ class Discounts extends React.Component {
             <Input
               className="input-box"
               style={{ width: '100%', position: 'relative' }}
-              placeholder="Search lifestyles"
+              placeholder="Search discounts"
               onKeyUp={this.searchByName.bind(this)}
               inputProps={{
-                id: 'search-lifestyles-text',
+                id: 'search-discount-text',
                 'aria-label': 'Description',
               }}
             />
@@ -149,21 +171,29 @@ class Discounts extends React.Component {
           <ListContainer
             limit={50}
             collection={DiscountsCollection}
-            publication="lifestyles"
+            publication="discounts"
             joins={[
               {
-                localProperty: 'restrictions',
-                collection: RestrictionsCollection,
-                joinAs: 'joinedRestrictions',
+                localProperty: 'customerEligibilityValue',
+                collection: Meteor.users,
+                joinAs: 'joinedCustomers',
+              },
+              {
+                foreignProperty: 'discountApplied',
+                collection: Subscriptions,
+                joinAs: 'discountUsed',
               },
             ]}
             options={this.state.options}
-            selector={{
-              $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-              { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }],
+            selector={typeof (this.state.searchByKey) === 'object' ? this.state.searchByKey : {
+              [this.state.searchByKey[0]]: this.state.searchByKey[0],
+              $and: [{
+                $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+                { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }]
+              }]
             }}
           >
-            <LifestylesTable
+            <DiscountsTable
               popTheSnackbar={this.props.popTheSnackbar}
               searchTerm={this.state.searchSelector}
               rowsLimit={this.state.rowsVisible}
