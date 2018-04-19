@@ -348,11 +348,16 @@ class DiscountEditor extends React.Component {
       ? 'discounts.update'
       : 'discounts.insert';
 
-    const customerEligibilityValueClone = this.state.customerEligibilityValue.slice();
-    const everyonePresent = customerEligibilityValueClone.findIndex(el => el == "everyone");
 
-    if (everyonePresent != -1) {
-      customerEligibilityValueClone.splice(everyonePresent, 1);
+
+    const customerEligibilityValueClone = this.state.customerEligibilityValue.slice();
+
+    if (this.state.customerEligibilityType == "specific") {
+      const everyonePresent = customerEligibilityValueClone.findIndex(el => el == "everyone");
+
+      if (everyonePresent != -1) {
+        customerEligibilityValueClone.splice(everyonePresent, 1);
+      }
     }
 
     const discount = {
@@ -373,7 +378,7 @@ class DiscountEditor extends React.Component {
       customerEligibilityType: this.state.customerEligibilityType,
       customerEligibilityValue: this.state.customerEligibilityType == 'specific' ? customerEligibilityValueClone.map((e) => {
         const foundCustomer = this.props.customers.find(el => el._id == e);
-        console.log(foundCustomer);
+
         return foundCustomer._id;
 
       }) : 'everyone',
@@ -1195,7 +1200,7 @@ class DiscountEditor extends React.Component {
                                 marginTop: '25px',
                               }}
                             >
-                              {!this.props.loading ? (
+                              {!this.props.loading && this.state.customerEligibilityType == "specific" && this.state.customerEligibilityValue.length > 0 ? (
                                 _.filter(this.props.customers, (u) => this.state.customerEligibilityValue.find(e => e == u._id) != undefined).map((e, i) => (
                                   <Chip
                                     avatar={<Avatar> {this.getTypeAvatar(e)} </Avatar>}

@@ -41,7 +41,7 @@ export default createContainer(() => {
   return {
     newDiscount: true,
     loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready(),
-    customers: Meteor.users.find({ roles: ["customer"], subscriptionId: { $exists: true } }).fetch(),
+    customers: Meteor.users.find({ roles: ["customer"] }).fetch(),
     lifestyles: Lifestyles.find().fetch(),
     sides: Sides.find().fetch(),
 
