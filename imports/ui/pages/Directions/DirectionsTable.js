@@ -371,8 +371,8 @@ class DirectionsTable extends React.Component {
           });
 
 
-          if (mealTotal > 3) {
-            const perBag = 3;
+          if (mealTotal > 4) {
+            const perBag = 4;
             const totalBags = Math.ceil(mealTotal / perBag);
 
             for (let index = 1; index <= totalBags; index++) {
