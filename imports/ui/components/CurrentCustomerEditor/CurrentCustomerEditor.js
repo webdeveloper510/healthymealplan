@@ -12,6 +12,7 @@ import Autosuggest from 'react-autosuggest';
 import _ from 'lodash';
 
 import { Meteor } from 'meteor/meteor';
+import { Accounts } from 'meteor/accounts-base';
 
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
@@ -21,7 +22,7 @@ import Radio, { RadioGroup } from 'material-ui/Radio';
 import Checkbox from 'material-ui/Checkbox';
 import Stepper, { Step, StepLabel } from 'material-ui/Stepper';
 import TextField from 'material-ui/TextField';
-// import Select from 'material-ui/Select';
+import Select from 'material-ui/Select';
 // import Input, { InputLabel } from 'material-ui/Input';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
@@ -140,7 +141,8 @@ class CurrentCustomerEditor extends React.Component {
       currentTab: 0,
       activeMealScheduleStep: 0,
 
-
+      birthDay: props.customer.profile.hasOwnProperty('birthday') ? props.customer.profile.birthday.day : '',
+      birthMonth: props.customer.profile.hasOwnProperty('birthday') ? props.customer.profile.birthday.month : '',
       // Step 2 - Plan
       value: '',
       suggestions: [],
@@ -293,6 +295,7 @@ class CurrentCustomerEditor extends React.Component {
 
     this.handleClose = this.handleClose.bind(this);
 
+    this.handleResetPassword = this.handleResetPassword.bind(this);
   }
 
   componentDidMount() {
@@ -333,6 +336,18 @@ class CurrentCustomerEditor extends React.Component {
           cdnPostal: true,
           required: this.props.customer.secondary === undefined,
         },
+        birthMonth: {
+          number: true,
+          maxlength: 2,
+          max: 12,
+          min: 1,
+      },
+        birthDay: {
+          number: true,
+          maxlength: 2,
+          max: 31,
+          min: 1,
+        }
       },
       submitHandler() {
         component.saveFirstStep();
@@ -340,6 +355,39 @@ class CurrentCustomerEditor extends React.Component {
     });
   }
 
+  handleResetPassword(){
+
+    this.setState({
+      submitLoading: true,
+      submitSuccess: false,
+    })
+
+    console.log(this.props.customer._id)
+
+    Meteor.call('users.resetPassword', this.props.customer._id, (err, res) => {
+      if(err){
+        this.setState({
+          submitLoading: false,
+          submitSuccess: false,
+        })
+
+        this.props.popTheSnackbar({
+          message: 'There was a problem sending the reset password email.'
+        })
+    
+      } else{
+        this.setState({
+          submitLoading: false,
+          submitSuccess: false,
+        })
+        
+        this.props.popTheSnackbar({
+          message: 'Successfully sent a reset password email.'
+        })
+      }
+    })
+  }
+  
   componentWillUpdate(nextProps, nextState) {
     if (nextState.currentTab == 1) {
       validate(this.secondForm, {
@@ -430,6 +478,8 @@ class CurrentCustomerEditor extends React.Component {
       lastName: $('[name="last_name"]').val().trim(),
       postalCode: $('[name="postal_code"]').val().trim(),
       phoneNumber: $('[name="phoneNumber"]').val().trim(),
+      birthDay: $('[name="birthDay"]').val().trim(),
+      birthMonth: $('[name="birthMonth"]').val().trim(),
     };
 
     if (this.props.customer.secondary) {
@@ -632,7 +682,7 @@ class CurrentCustomerEditor extends React.Component {
 
     console.log(step2Data);
 
-    if(!this.state.secondTime){
+    if (!this.state.secondTime) {
 
       Meteor.call('edit.customer.generateBillData', step2Data, (err, res) => {
 
@@ -684,11 +734,11 @@ class CurrentCustomerEditor extends React.Component {
           secondTime: false,
         }, () => {
 
-          if(typeof res == "object" && res.hasOwnProperty('subUpdateScheduled')){
+          if (typeof res == "object" && res.hasOwnProperty('subUpdateScheduled')) {
             this.props.popTheSnackbar({
               message: 'Customer details update scheduled for friday night.',
             });
-          }else{
+          } else {
             this.props.popTheSnackbar({
               message: 'Customer details updated successfully.',
             });
@@ -1471,7 +1521,7 @@ class CurrentCustomerEditor extends React.Component {
 
     const secondaryProfilesRemovedCopy = this.state.secondaryProfilesRemoved.slice();
 
-    if(toBeRemoved[0].hasOwnProperty('_id')){
+    if (toBeRemoved[0].hasOwnProperty('_id')) {
       secondaryProfilesRemovedCopy.push(toBeRemoved[0]._id);
     }
     console.log(toBeRemoved);
@@ -6517,6 +6567,80 @@ class CurrentCustomerEditor extends React.Component {
                         />
                       </Grid>
                     </Grid>
+
+                    <Grid container>
+                      <Grid item xs={12}>
+                        <Typography type="body2">Birthday</Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        {/* <Select
+                          id="birthMonth"
+                          label="Month"
+                          name="birthMonth"
+                          fullWidth
+                          value={this.state.birthMonth}
+                          native
+                          onChange={this.handleChange}
+                        >
+                        
+                          {this.renderMonths()}
+                        </Select> */}
+                        <TextField 
+                          id="birthMonth"
+                          label="Month"
+                          name="birthMonth"
+                          fullWidth
+                          defaultValue={this.state.birthMonth}
+                          maxlength="2"
+                          type="number"
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        {/* <Select
+                          id="birthDay"
+                          label="Day"
+                          name="birthDay"
+                          fullWidth
+                          value={this.state.birthDay}
+                          native
+                          onChange={this.handleChange}
+                        >
+                          {this.renderDays()}
+                        </Select> */}
+
+                        <TextField 
+                           id="birthDay"
+                           label="Day"
+                           name="birthDay"
+                           fullWidth
+                           defaultValue={this.state.birthDay}
+                           maxlength="2"
+                           type="number"
+                        />
+                      </Grid>
+                    </Grid>
+                    {!customer.secondary && (
+                    <Grid container>
+                        <Grid item xs={12}>
+                          <Button
+                            style={{ marginTop: '25px' }}
+                            disabled={this.state.submitLoading}
+                            raised
+                            className={`${buttonClassname}`}
+                            color="primary"
+                            onClick={this.handleResetPassword}
+                          >
+                            Reset password
+                            {this.state.submitLoading && (
+                              <CircularProgress
+                                size={24}
+                                className={this.props.classes.buttonProgress}
+                              />
+                            )}
+                          </Button>
+                        </Grid>
+                      </Grid>
+                      )}
                   </Paper>
 
                   <Button
