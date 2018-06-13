@@ -99,6 +99,8 @@ Meteor.methods({
       email: Match.Optional(String),
       secondary: Match.Optional(Boolean),
       phoneNumber: String,
+      birthDay: Match.Optional(String),
+      birthMonth: Match.Optional(String),
       username: Match.Optional(String),
     });
 
@@ -130,6 +132,11 @@ Meteor.methods({
       toUpdate.phone = data.phoneNumber;
     }
 
+    if(data.birthDay.length > 0 && data.birthMonth.length > 0){
+      toUpdate['profile.birthday.day'] = data.birthDay;
+      toUpdate['profile.birthday.month'] = data.birthMonth;
+    }
+
 
     Meteor.users.update({
       _id: data.id,
@@ -137,9 +144,15 @@ Meteor.methods({
         $set: toUpdate,
       });
 
-
     // console.log(data);
+  },
 
+  'users.resetPassword': function handleResetPassword(id){
+
+    check(id, String);
+
+    return Accounts.sendResetPasswordEmail(id);
+    
   },
 
   'edit.customer.generateBillData': function editGenerateBillData(data) {

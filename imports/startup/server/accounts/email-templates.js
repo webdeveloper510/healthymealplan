@@ -39,6 +39,7 @@ emailTemplates.resetPassword = {
     return `[${name}] Reset Your Password`;
   },
   html(user, url) {
+
     return templateToHTML(getPrivateFile('email-templates/reset-password.html'), {
       firstName: user.profile.name.first,
       applicationName: name,
@@ -56,4 +57,8 @@ emailTemplates.resetPassword = {
       resetUrl: urlWithoutHash,
     });
   },
+};
+
+Accounts.urls.resetPassword = function (token) {
+  return `https://www.vittle.ca/reset-password/${  token}`;
 };
