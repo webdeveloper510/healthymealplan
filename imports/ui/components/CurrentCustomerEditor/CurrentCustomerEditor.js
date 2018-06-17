@@ -6621,7 +6621,19 @@ class CurrentCustomerEditor extends React.Component {
                         
                           {this.renderMonths()}
                         </Select> */}
+
                         <TextField 
+                            fullWidth
+                          id="birthMonth"
+                            select
+                            value={this.state.birthMonth}
+                          label="Month"
+                            onChange={this.handleSelectChange.bind(this)}
+                          name="birthMonth"
+                          >
+                            {this.renderMonths()}
+                          </TextField>
+                        {/* <TextField 
                           id="birthMonth"
                           label="Month"
                           name="birthMonth"
@@ -6629,22 +6641,23 @@ class CurrentCustomerEditor extends React.Component {
                           defaultValue={this.state.birthMonth}
                           maxlength="2"
                           type="number"
-                        />
+                        /> */}
                       </Grid>
                       <Grid item xs={12} sm={6}>
-                        {/* <Select
+                          <TextField
+                            fullWidth
                           id="birthDay"
+                            select
+                            value={this.state.birthDay}
                           label="Day"
+                            onChange={this.handleSelectChange.bind(this)}
+                            SelectProps={{ native: false }}
                           name="birthDay"
-                          fullWidth
-                          value={this.state.birthDay}
-                          native
-                          onChange={this.handleChange}
                         >
                           {this.renderDays()}
-                        </Select> */}
+                          </TextField>
 
-                        <TextField 
+                        {/* <TextField 
                            id="birthDay"
                            label="Day"
                            name="birthDay"
@@ -6652,7 +6665,7 @@ class CurrentCustomerEditor extends React.Component {
                            defaultValue={this.state.birthDay}
                            maxlength="2"
                            type="number"
-                        />
+                        /> */}
                       </Grid>
                     </Grid>
                     {!customer.secondary && (
@@ -6660,14 +6673,14 @@ class CurrentCustomerEditor extends React.Component {
                         <Grid item xs={12}>
                           <Button
                             style={{ marginTop: '25px' }}
-                            disabled={this.state.submitLoading}
+                            disabled={this.state.submitLoadingReset}
                             raised
                             className={`${buttonClassname}`}
                             color="primary"
                             onClick={this.handleResetPassword}
                           >
                             Reset password
-                            {this.state.submitLoading && (
+                            {this.state.submitLoadingReset && (
                               <CircularProgress
                                 size={24}
                                 className={this.props.classes.buttonProgress}
