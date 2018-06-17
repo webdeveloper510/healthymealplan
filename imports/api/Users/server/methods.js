@@ -99,8 +99,8 @@ Meteor.methods({
       email: Match.Optional(String),
       secondary: Match.Optional(Boolean),
       phoneNumber: String,
-      birthDay: Match.Optional(String),
-      birthMonth: Match.Optional(String),
+      birthDay: Match.Optional(Match.OneOf(String, Number)),
+      birthMonth: Match.Optional(Match.OneOf(String, Number)),
       username: Match.Optional(String),
     });
 
@@ -132,9 +132,12 @@ Meteor.methods({
       toUpdate.phone = data.phoneNumber;
     }
 
-    if(data.birthDay.length > 0 && data.birthMonth.length > 0){
+    if(typeof data.birthDay == 'number' && typeof data.birthMonth == "number"){
       toUpdate['profile.birthday.day'] = data.birthDay;
       toUpdate['profile.birthday.month'] = data.birthMonth;
+    }else{
+      toUpdate['profile.birthday.day'] = '';
+      toUpdate['profile.birthday.month'] = '';
     }
 
 
@@ -421,25 +424,40 @@ Meteor.methods({
       firstName: String,
       lastName: String,
       phoneNumber: String,
+      birthDay: Match.Optional(Match.OneOf(String, Number)),
+      birthMonth: Match.Optional(Match.OneOf(String, Number)),
     });
 
-    const postalCodeExists = PostalCodes.find({
+    const postalCodeExists = PostalCodes.findOne({
       title: data.postalCode.substr(0, 3).toUpperCase(),
-    }).fetch();
+    });
 
-    // console.log(postalCodeExists);
+    console.log(postalCodeExists);
+
+    if(!postalCodeExists) {
+      throw new Meteor.Error('postal-code-not-found', 'Postal code does not exist.')
+    }
 
     let userId;
+    let profile = {
+      name: {
+        first: data.firstName,
+        last: data.lastName,
+      },
+    };
+    
+    if('birthDay' in data  && 'birthMonth' in data){
+      profile['birthday'] =  {
+        day: data.birthDay,
+        month: data.birthMonth,
+      };
+      
+    }
 
     try {
       userId = Accounts.createUser({
         email: data.email,
-        profile: {
-          name: {
-            first: data.firstName,
-            last: data.lastName,
-          },
-        },
+        profile: profile
       });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
@@ -452,18 +470,13 @@ Meteor.methods({
       {
         $set: {
           postalCode: data.postalCode.toUpperCase(),
-          postalCodeId: postalCodeExists.length ? postalCodeExists[0]._id : null,
+          postalCodeId: postalCodeExists._id,
           status: 'abandoned',
           phone: data.phoneNumber,
           adultOrChild: 'adult',
         },
       },
     );
-
-    if (postalCodeExists.length == 0) {
-      // console.log(postalCodeExists);
-      throw new Meteor.Error(400, 'Delivery not available in that area.');
-    }
 
     return userId;
   },

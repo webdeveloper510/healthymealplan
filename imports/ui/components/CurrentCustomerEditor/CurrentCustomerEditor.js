@@ -141,8 +141,8 @@ class CurrentCustomerEditor extends React.Component {
       currentTab: 0,
       activeMealScheduleStep: 0,
 
-      birthDay: props.customer.profile.hasOwnProperty('birthday') ? props.customer.profile.birthday.day : '',
-      birthMonth: props.customer.profile.hasOwnProperty('birthday') ? props.customer.profile.birthday.month : '',
+      birthDay: props.customer.profile.hasOwnProperty('birthday') ? parseInt(props.customer.profile.birthday.day, 10) : '',
+      birthMonth: props.customer.profile.hasOwnProperty('birthday') ? parseInt(props.customer.profile.birthday.month, 10) : '',
       // Step 2 - Plan
       value: '',
       suggestions: [],
@@ -279,6 +279,9 @@ class CurrentCustomerEditor extends React.Component {
       submitLoading: false,
       submitSuccess: false,
 
+      submitLoadingReset: false,
+      submitSuccessReset: false,
+
 
       secondTime: false, //Step2 modal save
 
@@ -296,6 +299,37 @@ class CurrentCustomerEditor extends React.Component {
     this.handleClose = this.handleClose.bind(this);
 
     this.handleResetPassword = this.handleResetPassword.bind(this);
+  }
+
+  handleSelectChange(event) {
+    this.setState({
+      [event.target.name]: event.target.value,
+      hasFormChanged: true,
+    });
+  }
+  
+  renderMonths() {
+    const options = [];
+
+    options.push(<MenuItem key={0} value=""></MenuItem>);
+
+    for (let i = 1; i <= 12; i++) {
+      options.push(<MenuItem key={i} value={i}>{moment().month(i - 1).format('MMMM')}</MenuItem>);
+    }
+
+    return options.map(e => e);
+  }
+
+  renderDays() {
+    const options = [];
+
+    options.push(<MenuItem key={0} value=""></MenuItem>);
+
+    for (let i = 1; i <= 31; i++) {
+      options.push(<MenuItem key={i} value={i}>{i}</MenuItem>);
+    }
+
+    return options.map(e => e);
   }
 
   componentDidMount() {
@@ -358,8 +392,8 @@ class CurrentCustomerEditor extends React.Component {
   handleResetPassword(){
 
     this.setState({
-      submitLoading: true,
-      submitSuccess: false,
+      submitLoadingReset: true,
+      submitSuccessReset: false,
     })
 
     console.log(this.props.customer._id)
@@ -367,8 +401,8 @@ class CurrentCustomerEditor extends React.Component {
     Meteor.call('users.resetPassword', this.props.customer._id, (err, res) => {
       if(err){
         this.setState({
-          submitLoading: false,
-          submitSuccess: false,
+          submitLoadingReset: false,
+          submitSuccessReset: false,
         })
 
         this.props.popTheSnackbar({
@@ -377,8 +411,8 @@ class CurrentCustomerEditor extends React.Component {
     
       } else{
         this.setState({
-          submitLoading: false,
-          submitSuccess: false,
+          submitLoadingReset: false,
+          submitSuccessReset: false,
         })
         
         this.props.popTheSnackbar({
@@ -478,9 +512,11 @@ class CurrentCustomerEditor extends React.Component {
       lastName: $('[name="last_name"]').val().trim(),
       postalCode: $('[name="postal_code"]').val().trim(),
       phoneNumber: $('[name="phoneNumber"]').val().trim(),
-      birthDay: $('[name="birthDay"]').val().trim(),
-      birthMonth: $('[name="birthMonth"]').val().trim(),
+      birthDay: this.state.birthDay,
+      birthMonth: this.state.birthMonth,
     };
+
+
 
     if (this.props.customer.secondary) {
       step1Data.username = $('[name="username"]').val().trim();

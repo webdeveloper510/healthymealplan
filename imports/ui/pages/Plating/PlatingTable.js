@@ -21,6 +21,7 @@ import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import CloseIcon from 'material-ui-icons/Close';
+import CakeIcon from 'material-ui-icons/Cake';
 
 import $ from 'jquery';
 
@@ -43,6 +44,7 @@ import autotable from 'jspdf-autotable';
 
 import vittlebase64 from '../../../modules/vittlelogobase64';
 import hmpbase64 from '../../../modules/hmplogobase64';
+import cakeImage from '../../../modules/cakebase64';
 
 import groupBy from 'lodash/groupBy';
 import orderBy from 'lodash/orderBy';
@@ -81,12 +83,37 @@ function sortByLastName(a, b) {
   return 1;
 }
 
+function renderBirthdayCake(birthday, returnBool) {
+
+  if (returnBool == false && birthday == null) {
+    return '';
+  } else if (returnBool == true && birthday == null) {
+    return false;
+  }
+
+  const day = parseInt(moment().format('D'), 10);
+  const month = parseInt(moment().format('M'), 10);
+
+  if (day == parseInt(birthday.day, 10) && month == parseInt(birthday.month, 10)) {
+    if (returnBool == false) {
+      return <CakeIcon />;
+    } else {
+      return true;
+    }
+  }
+}
 
 function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPortion, currentSelectorDate) {
   doc.addPage();
 
   // VITTLE LOGO
   doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+
+  console.log(renderBirthdayCake(userData.birthday, true));
+
+  if (renderBirthdayCake(userData.birthday, true)) {
+    doc.addImage(cakeImage, 'PNG', 0.48, 0.18, 0.2, 0.2);
+  }
 
   // HMP LOGO
   // doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
@@ -328,6 +355,7 @@ class PlatingTable extends React.Component {
 
     this.printPopupSummary = this.printPopupSummary.bind(this);
     this.printLabels = this.printLabels.bind(this);
+    // this.renderBirthdayCake = this.renderBirthdayCake.bind(this);
 
     this.usersWithoutRestrictions = this.usersWithoutRestrictions.bind(this);
   }
@@ -746,6 +774,20 @@ class PlatingTable extends React.Component {
     doc.save(`Plating_summary_${this.state.lifestyleTitle}_${this.state.mealTitle}_${moment(this.state.currentSelectorDate).format('dddd, MMMM D')}.pdf`);
   }
 
+  // renderBirthdayCake(birthday) {
+
+  //   if (birthday == null) {
+  //     return '';
+  //   }
+
+  //   const day = parseInt(moment().format('D'), 10);
+  //   const month = parseInt(moment().format('M'), 10);
+
+  //   if (day == parseInt(birthday.day, 10) && month == parseInt(birthday.month, 10)) {
+  //     return <CakeIcon />;
+  //   }
+  // }
+
   render() {
     return (
       <div>
@@ -935,7 +977,6 @@ class PlatingTable extends React.Component {
                 Regular {this.usersWithoutRestrictions().regularWithoutRestrictionsCount} {' '}
                 Athletic {this.usersWithoutRestrictions().athleticWithoutRestrictionsCount} {' '}
                 Bodybuilder {this.usersWithoutRestrictions().bodybuilderWithoutRestrictionsCount}
-
               </Typography>
             </div>
           </AppBar>
@@ -993,10 +1034,11 @@ class PlatingTable extends React.Component {
                       }).map((n) => {
                         const mealType = this.state.mealTitle.toLowerCase();
                         const mealTypeNormal = this.state.mealTitle;
+                        const cake = renderBirthdayCake(n.birthday, false);
 
                         return (
                           <TableRow key={Random.id()}>
-                            <TableCell><Typography type="subheading">{n.name}</Typography></TableCell>
+                            <TableCell><Typography type="subheading">{n.name}{cake}</Typography></TableCell>
                             <TableCell><Typography type="subheading">{n.lifestyleName}</Typography></TableCell>
                             <TableCell><Typography type="subheading">{n.platingNotes && n.platingNotes.length > 0 ? n.platingNotes : ''}</Typography></TableCell>
                             <TableCell>
@@ -1019,7 +1061,7 @@ class PlatingTable extends React.Component {
           </Paper>
         </Dialog>
 
-      </div >
+      </div>
     );
   }
 }

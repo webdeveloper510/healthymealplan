@@ -17,6 +17,7 @@ import green from 'material-ui/colors/green';
 
 import $ from 'jquery';
 import validate from '../../../modules/validate';
+import moment from 'moment';
 
 const styles = theme => ({
   root: {
@@ -57,6 +58,8 @@ class Step1Eligibility extends React.Component {
     this.state = {
       submitLoading: false,
       submitSuccess: false,
+      birthDay: '',
+      birthMonth: ''
     };
 
     this.handleSubmitStep = this.handleSubmitStep.bind(this);
@@ -112,33 +115,59 @@ class Step1Eligibility extends React.Component {
     });
   }
 
+  handleSelectChange(event) {
+    this.setState({
+      [event.target.name]: event.target.value,
+      hasFormChanged: true,
+    });
+  }
+
+  renderMonths() {
+    const options = [];
+
+    options.push(<MenuItem key={0} value=""></MenuItem>);
+
+    for (let i = 1; i <= 12; i++) {
+      options.push(<MenuItem key={i} value={i}>{moment().month(i - 1).format('MMMM')}</MenuItem>);
+    }
+
+    return options.map(e => e);
+  }
+
+  renderDays() {
+    const options = [];
+
+    options.push(<MenuItem key={0} value=""></MenuItem>);
+
+    for (let i = 1; i <= 31; i++) {
+      options.push(<MenuItem key={i} value={i}>{i}</MenuItem>);
+    }
+
+    return options.map(e => e);
+  }
+
   handleSubmitStep() {
     this.setState({
       submitSuccess: false,
       submitLoading: true,
     });
 
-    console.log('handleSubmitStep');
+    let dataToSave = {
+      firstName: $('[name="first_name"]').val().trim(),
+      lastName: $('[name="last_name"]').val().trim(),
+      postalCode: $('[name="postal_code"]').val().trim(),
+      email: $('[name="email"]').val().trim(),
+      phoneNumber: $('[name="phoneNumber"]').val().trim(),
+    };
+
+    if (this.state.birthDay != "" && this.state.birthMonth != null) {
+      dataToSave.birthDay = parseInt(this.state.birthDay, 10);
+      dataToSave.birthMonth = parseInt(this.state.birthMonth, 10);
+    }
 
     Meteor.call(
       'customers.step1',
-      {
-        firstName: $('[name="first_name"]')
-          .val()
-          .trim(),
-        lastName: $('[name="last_name"]')
-          .val()
-          .trim(),
-        postalCode: $('[name="postal_code"]')
-          .val()
-          .trim(),
-        email: $('[name="email"]')
-          .val()
-          .trim(),
-        phoneNumber: $('[name="phoneNumber"]')
-          .val()
-          .trim(),
-      },
+      dataToSave,
       (err, userId) => {
         if (!err) {
           this.setState({
@@ -148,22 +177,7 @@ class Step1Eligibility extends React.Component {
 
           this.props.saveValues({
             id: userId,
-            firstName: $('[name="first_name"]')
-              .val()
-              .trim(),
-            lastName: $('[name="last_name"]')
-              .val()
-              .trim(),
-            email: $('[name="email"]')
-              .val()
-              .trim(),
-            postalCode: $('[name="postal_code"]')
-              .val()
-              .trim(),
-
-            phoneNumber: $('[name="phoneNumber"]')
-              .val()
-              .trim(),
+            ...dataToSave
           });
 
           this.props.handleNext();
@@ -278,6 +292,38 @@ class Step1Eligibility extends React.Component {
                       />
                     </Grid>
                   </Grid>
+
+                  <Grid container>
+                    <Grid item xs={12}><Typography type="body1">Birthday</Typography></Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        id="birthMonth"
+                        select
+                        value={this.state.birthMonth}
+                        label="Month"
+                        onChange={this.handleSelectChange.bind(this)}
+                        name="birthMonth"
+                      >
+                        {this.renderMonths()}
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        id="birthDay"
+                        select
+                        value={this.state.birthDay}
+                        label="Day"
+                        onChange={this.handleSelectChange.bind(this)}
+                        SelectProps={{ native: false }}
+                        name="birthDay"
+                      >
+                        {this.renderDays()}
+                      </TextField>
+                    </Grid>
+                  </Grid>
+
                 </Paper>
               </Grid>
             </Grid>

@@ -70,6 +70,7 @@ Meteor.methods({
             _id: 1,
             profile: {
               name: 1,
+              birthday: 1,
             },
             secondary: 1,
             primaryAccount: 1,
