@@ -10,8 +10,6 @@ const worker = Job.processJobs(
   'setSubscriptionActiveCardJob',
   (job, cb) => {
     const insertData = job.data;
-    console.log("Job started");
-
     // do anything with the job data here.
     // when done, call job.done() or job.fail()
     const subscription = Subscriptions.findOne({ customerId: insertData.customerId });
@@ -27,37 +25,27 @@ const worker = Job.processJobs(
       );
 
       if (syncCreateSubscriptionFromCustomerProfileRes.messages.resultCode == 'Ok') {
-
         const newAuthSubId = syncCreateSubscriptionFromCustomerProfileRes.subscriptionId;
 
         Subscriptions.update({ customerId: insertData.customerId },
           {
             $set: {
-              status: 'paused',
-              authorizeSubscriptionId: newAuthSubId,
+              status: 'active',
+              authorizeSubscriptionId: newAuthSubId, // when done successfully
               amount: insertData.subscriptionAmount,
-            }
+            },
           });
-
-        console.log("Job finished");
       } else {
-        console.log("Job failed");
-
         job.fail(syncCreateSubscriptionFromCustomerProfileRes.messages.message[0].text); // when failing
       }
     } catch (error) {
       console.log(error);
-      job.log(
-        `setSubscriptionActiveCardJob for customer: ${
-        insertData.customerId
-        } with subscription - ${
-        insertData.subscriptionId
-        } failed.`,
-      );
+
+      job.log(`setSubscriptionActiveCardJob for customer: ${insertData.customerId} with subscription - ${insertData.subscriptionId} failed.`);
       job.fail(error); // when failing
     }
 
-    job.done(); // when done successfully
+    job.done();
 
     // Be sure to invoke the callback
     // when work on this job has finished
