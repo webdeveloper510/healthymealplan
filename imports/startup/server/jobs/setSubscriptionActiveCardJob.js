@@ -30,7 +30,7 @@ const worker = Job.processJobs(
         Subscriptions.update({ customerId: insertData.customerId },
           {
             $set: {
-              status: 'active',
+              status: 'paused',
               authorizeSubscriptionId: newAuthSubId, // when done successfully
               amount: insertData.subscriptionAmount,
             },
