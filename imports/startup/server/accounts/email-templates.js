@@ -5,7 +5,7 @@ import templateToHTML from '../../../modules/server/handlebars-email-to-html';
 import templateToText from '../../../modules/server/handlebars-email-to-text';
 
 const name = 'Vittle';
-const email = '<support@vitle.ca>';
+const email = '<support@vittle.ca>';
 const from = `${name} ${email}`;
 const emailTemplates = Accounts.emailTemplates;
 
@@ -60,5 +60,5 @@ emailTemplates.resetPassword = {
 };
 
 Accounts.urls.resetPassword = function (token) {
-  return `https://www.vittle.ca/reset-password/${  token}`;
+  return `https://www.vittle.ca/reset-password/${token}`;
 };
