@@ -30,6 +30,7 @@ import moment from 'moment';
 
 import sumBy from 'lodash/sumBy';
 import Autosuggest from 'react-autosuggest';
+import CloseIcon from 'material-ui-icons/Close';
 
 import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
@@ -269,6 +270,10 @@ class MealPlannerTable extends React.Component {
     return (<Typography type="subheading">{plateToReturn.plate.title}</Typography>);
   }
 
+  getAssignedPlateId(results, lifestyleId, mealId, date) {
+    const plateToReturn = results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === date);
+    return plateToReturn._id;
+  }
 
   renderInput(inputProps) {
     const { value, ...other } = inputProps;
@@ -305,7 +310,7 @@ class MealPlannerTable extends React.Component {
       : this.props.plates.filter(
         plate =>
           plate.title.toLowerCase().slice(0, inputLength) === inputValue,
-      );
+      )
   }
 
   getSuggestionValue(suggestion) {
@@ -345,6 +350,19 @@ class MealPlannerTable extends React.Component {
     });
   }
 
+  removeMealPlanner(id) {
+    Meteor.call('mealPlanner.remove', id, (err, res) => {
+      if (err) {
+        this.props.popTheSnackbar({
+          message: err.reason,
+        });
+      } else {
+        this.props.popTheSnackbar({
+          message: 'Meal has been removed.',
+        });
+      }
+    });
+  }
 
   render() {
     return (
@@ -400,10 +418,16 @@ class MealPlannerTable extends React.Component {
                     >
                       {this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ? (
                         <div>
-                          {this.renderPresentPlate(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate)}
-                          <Button onClick={() => this.openReassignDialog(lifestyle._id, meal._id,
-                            this.getPlannerId(this.props.results, lifestyle._id, meal._id))}
-                          >Reassign</Button>
+                          <div>{this.renderPresentPlate(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate)}</div>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <Button onClick={() => this.openReassignDialog(lifestyle._id, meal._id,
+                              this.getPlannerId(this.props.results, lifestyle._id, meal._id))}
+                            >
+                              Reassign
+                            </Button>
+
+                            <CloseIcon onClick={() => this.removeMealPlanner(this.getAssignedPlateId(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate))} />
+                          </div>
                         </div>
                       ) : (
                         <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
@@ -429,7 +453,7 @@ class MealPlannerTable extends React.Component {
           </Table>
         </Paper>
 
-        <Dialog open={this.state.assignDialogOpen} onClose={this.closeAssignDialog}>
+        <Dialog maxWidth="md" fullWidth fullScreen open={this.state.assignDialogOpen} onClose={this.closeAssignDialog}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
             Assign main for {this.state.assignResult ? this.state.assignResult.lifestyle.title : ''}{' '}{this.state.assignResult ? this.state.assignResult.meal.title : ''}
           </Typography>
@@ -486,13 +510,13 @@ class MealPlannerTable extends React.Component {
             <Button onClick={this.closeAssignDialog} color="default">
               Cancel
             </Button>
-            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleMealAssignment} color="accent">
+            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleMealAssignment} color="primary">
               Assign
             </Button>
           </DialogActions>
         </Dialog>
 
-        <Dialog open={this.state.reassignDialogOpen} onClose={this.closeReassignDialog}>
+        <Dialog fullScreen open={this.state.reassignDialogOpen} onClose={this.closeReassignDialog}>
           <Typography
             style={{
               flex: '0 0 auto',
@@ -560,7 +584,7 @@ class MealPlannerTable extends React.Component {
             <Button onClick={this.closeReassignDialog} color="default">
               Cancel
             </Button>
-            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleMealReassignment} color="accent">
+            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleMealReassignment} color="primary">
               Reassign
             </Button>
           </DialogActions>

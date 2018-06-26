@@ -8,7 +8,6 @@ import moment from 'moment';
 
 Meteor.methods({
   'mealPlanner.insert': function mealPlannerInsert(date, lifestyle, meal, plate) {
-
     check(date, String);
     check(lifestyle, String);
     check(meal, String);
@@ -27,8 +26,6 @@ Meteor.methods({
   },
 
   'mealPlanner.update': function mealPlannerUpdate(forDate, reassignPlannerId, plateIdNew) {
-    // check(lifestyleId, String);
-    // check(mealId, String);
     check(forDate, String);
     check(plateIdNew, String);
     check(reassignPlannerId, String);
@@ -42,6 +39,15 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
+  'mealPlanner.remove': function mealPlannerUpdate(mealPlannerId) {
+    check(mealPlannerId, String);
+
+    try {
+      MealPlanner.remove({ _id: mealPlannerId });
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
 
 });
 
@@ -49,6 +55,7 @@ rateLimit({
   methods: [
     'mealPlanner.insert',
     'mealPlanner.update',
+    'mealPlanner.remove',
     'mealPlanner.batchUpdate',
   ],
   limit: 5,
