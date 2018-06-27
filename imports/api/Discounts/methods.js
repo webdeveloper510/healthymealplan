@@ -4,8 +4,11 @@ import { Match } from 'meteor/check';
 import { Random } from 'meteor/random';
 
 import Discounts from './Discounts';
-import rateLimit from '../../modules/rate-limit';
+import Subscriptions from '../Subscriptions/Subscriptions';
 import Jobs from '../Jobs/Jobs';
+import rateLimit from '../../modules/rate-limit';
+
+
 
 import moment from 'moment';
 
@@ -257,9 +260,57 @@ Meteor.methods({
 
     const updated = Discounts.update({ _id: discountId }, { $set: { status: 'expired' } });
 
-    console.log(updated);
+    const jobExists = Jobs.find({ 'data._id': { $in: discountId } }).fetch();
+
+    if (jobExists.length >= 1) {
+      Jobs.remove({ _id: { $in: jobExists.map(e => e._id) } });
+    }
 
     return updated;
+  },
+
+  'discounts.verify': function verifyDiscountCode(discountDetails) {
+
+    check(discountDetails, {
+      discountTitle: String,
+      customerId: Match.Optional(String)
+    });
+
+    const discount = Discounts.findOne({ title: discountDetails.discountTitle });
+
+    if (discount == null) {
+      throw new Meteor.Error(404, 'Discount code not found')
+    }
+
+    if (discount.status != "active") {
+      throw new Meteor.Error(401, 'The discount code has been expired');
+    }
+
+    const discountCodeUsed = Subscriptions.find({ discountApplied: discount._id }).fetch();
+
+    if (discount.hasOwnProperty('usageLimitType')) {
+      if (discount.usageLimitType == "numberOfTimes") {
+        if (discountCodeUsed.length >= discount.usageLimitType) {
+          throw new Meteor.Error(401, 'The discount code limit has been exceeded')
+        }
+      }
+    }
+
+    if (discountDetails.hasOwnProperty('customerId') && discountDetails.customerId != null) {
+      const user = Meteor.users.findOne({ _id: discountDetails.customerId });
+
+
+      if (discount.hasOwnProperty('customerEligibilityType')) {
+        if (discount.customerEligibilityType == "specific") {
+          if (discount.customerEligibilityValue == discountDetails.customerId) {
+            throw new Meteor.Error(401, 'The discount code limit has been exceeded')
+          }
+        }
+      }
+    }
+
+
+    return true;
   },
 });
 
@@ -269,6 +320,7 @@ rateLimit({
     'discounts.update',
     'discounts.remove',
     'discounts.batchRemove',
+    'discounts.verify',
   ],
   limit: 5,
   timeRange: 1000,

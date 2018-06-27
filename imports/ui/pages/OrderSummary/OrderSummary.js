@@ -19,7 +19,7 @@ class OrderSummary extends React.Component {
 
   render() {
     return (
-      <div style={{ padding: "24px  48px" }}>
+      <div style={{ padding: '24px  48px' }}>
         <Grid container>
           <Grid item xs={12} sm={12}>
             <Typography
@@ -27,14 +27,14 @@ class OrderSummary extends React.Component {
               style={{ marginBottom: '25px' }}
             >
               Overview
-                      </Typography>
+            </Typography>
             <Typography
               type="title"
               className="font-medium font-uppercase"
               style={{ marginTop: '.75em', marginBottom: '.75em' }}
             >
               Meal Plan
-                      </Typography>
+            </Typography>
 
             <Typography
               type="title"
@@ -92,7 +92,7 @@ class OrderSummary extends React.Component {
                       style={{ marginTop: '.75em' }}
                     >
                       Discount
-                              </Typography>
+                    </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Typography type="subheading">
@@ -116,6 +116,7 @@ class OrderSummary extends React.Component {
                       }{' '}
                     </Typography>
                   </Grid>
+
                 </Grid>
               ) : (
                 ''
@@ -133,7 +134,7 @@ class OrderSummary extends React.Component {
                     style={{ marginTop: '.75em' }}
                   >
                     Extra
-                            </Typography>
+                  </Typography>
                 </Grid>
               ) : (
                 ''
@@ -167,7 +168,7 @@ class OrderSummary extends React.Component {
                         .discountOrExtraTypeAthletic == 'Percentage'
                         ? '%'
                         : ''})
-                              </Typography>
+                    </Typography>
                   </Grid>
                 </Grid>
               ) : (
@@ -181,7 +182,7 @@ class OrderSummary extends React.Component {
                   <Grid item xs={12} sm={6}>
                     <Typography type="subheading">
                       Bodybuilder
-                              </Typography>
+                    </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
                     <Typography
@@ -205,7 +206,7 @@ class OrderSummary extends React.Component {
                         .discountOrExtraTypeBodybuilder == 'Percentage'
                         ? '%'
                         : ''})
-                              </Typography>
+                    </Typography>
                   </Grid>
                 </Grid>
               ) : (
@@ -224,7 +225,7 @@ class OrderSummary extends React.Component {
                   }}
                 >
                   Restrictions
-                          </Typography>
+                </Typography>
               )}
 
             {this.state.primaryProfileBilling &&
@@ -243,7 +244,7 @@ class OrderSummary extends React.Component {
                         {e.discountOrExtraType == 'Percentage'
                           ? '%'
                           : ''})
-                                </Typography>
+                      </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
                       <Typography
@@ -338,7 +339,7 @@ class OrderSummary extends React.Component {
                             style={{ marginTop: '.75em' }}
                           >
                             Discount
-                                    </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Typography type="subheading">
@@ -369,7 +370,7 @@ class OrderSummary extends React.Component {
                           style={{ marginTop: '.75em' }}
                         >
                           Extra
-                                  </Typography>
+                        </Typography>
                       </Grid>
                     ) : (
                       ''
@@ -380,7 +381,7 @@ class OrderSummary extends React.Component {
                       <Grid item xs={6}>
                         <Typography type="subheading">
                           Athletic
-                                  </Typography>
+                        </Typography>
                       </Grid>
                       <Grid item xs={6}>
                         <Typography
@@ -398,7 +399,7 @@ class OrderSummary extends React.Component {
                             'Percentage'
                             ? '%'
                             : ''})
-                                  </Typography>
+                        </Typography>
                       </Grid>
                     </Grid>
                   ) : (
@@ -410,7 +411,7 @@ class OrderSummary extends React.Component {
                       <Grid item sm={6} xs={12}>
                         <Typography type="subheading">
                           Bodybuilder
-                                  </Typography>
+                        </Typography>
                       </Grid>
                       <Grid item sm={6} xs={12}>
                         <Typography
@@ -429,7 +430,7 @@ class OrderSummary extends React.Component {
                             'Percentage'
                             ? '%'
                             : ''})
-                                  </Typography>
+                        </Typography>
                       </Grid>
                     </Grid>
                   ) : (
@@ -446,7 +447,7 @@ class OrderSummary extends React.Component {
                       }}
                     >
                       Restrictions
-                              </Typography>
+                    </Typography>
                   )}
 
                   {e.restrictionsActual.length > 0 &&
@@ -462,7 +463,7 @@ class OrderSummary extends React.Component {
                             {el.discountOrExtraType == 'Percentage'
                               ? '%'
                               : ''})
-                                    </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
                           <Typography
@@ -540,7 +541,7 @@ class OrderSummary extends React.Component {
                             ),
                         ).extraSurcharge
                       })
-                              </Typography>
+                    </Typography>
                   </Grid>
                   <Grid item xs={6}>
                     <Typography
@@ -560,13 +561,38 @@ class OrderSummary extends React.Component {
                 </Grid>
               )}
 
+            {this.state.primaryProfileBilling.discountTotal > 0 && (
+              <div style={{ marginTop: '25px' }}>
+                <Grid container>
+                  <Grid item xs={12}>
+                    <Typography type="title">Discount</Typography>
+                  </Grid>
+                </Grid>
+                <Grid container>
+                  <Grid item xs={12} sm={6}>
+                    <Typography type="body2">
+                      {this.props.discounts.find(e => this.props.discountSelected == e.title || this.props.discountSelected == e._id).title}
+                    </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={6}>
+                    <Typography
+                      type="subheading"
+                      style={{ textAlign: 'right' }}
+                    >
+                      -${this.state.primaryProfileBilling.discountTotal}
+                    </Typography>
+                  </Grid>
+                </Grid>
+              </div>
+            )}
+
             {this.state.primaryProfileBilling &&
               this.state.primaryProfileBilling.coolerBag > 0 && (
                 <Grid container>
                   <Grid item xs={6}>
                     <Typography type="subheading">
                       Cooler bag
-                              </Typography>
+                    </Typography>
                   </Grid>
                   <Grid item xs={6}>
                     <Typography
@@ -575,7 +601,7 @@ class OrderSummary extends React.Component {
                     >
                       {/* $20.00 */}
                       $0
-                              </Typography>
+                    </Typography>
                   </Grid>
                 </Grid>
               )}
@@ -586,7 +612,7 @@ class OrderSummary extends React.Component {
               style={{ marginTop: '.75em', marginBottom: '.75em' }}
             >
               Price
-                      </Typography>
+            </Typography>
 
             {!this.state.taxExempt ? (
               <Grid container>

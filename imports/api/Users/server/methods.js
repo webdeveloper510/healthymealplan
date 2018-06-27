@@ -21,6 +21,7 @@ import createCustomerProfile from '../../../modules/server/authorize/createCusto
 
 import PostalCodes from '../../PostalCodes/PostalCodes';
 import Subscriptions from '../../Subscriptions/Subscriptions';
+import Discounts from '../../Discounts/Discounts';
 import Lifestyles from '../../Lifestyles/Lifestyles';
 
 import Jobs from '../../Jobs/Jobs';
@@ -132,10 +133,10 @@ Meteor.methods({
       toUpdate.phone = data.phoneNumber;
     }
 
-    if(typeof data.birthDay == 'number' && typeof data.birthMonth == "number"){
+    if (typeof data.birthDay === 'number' && typeof data.birthMonth === 'number') {
       toUpdate['profile.birthday.day'] = data.birthDay;
       toUpdate['profile.birthday.month'] = data.birthMonth;
-    }else{
+    } else {
       toUpdate['profile.birthday.day'] = '';
       toUpdate['profile.birthday.month'] = '';
     }
@@ -150,12 +151,12 @@ Meteor.methods({
     // console.log(data);
   },
 
-  'users.resetPassword': function handleResetPassword(id){
+  'users.resetPassword': function handleResetPassword(id) {
 
     check(id, String);
 
     return Accounts.sendResetPasswordEmail(id);
-    
+
   },
 
   'edit.customer.generateBillData': function editGenerateBillData(data) {
@@ -165,6 +166,7 @@ Meteor.methods({
       address: Object,
       lifestyle: String,
       discount: String,
+      discountCode: Match.Optional(String),
       restrictions: Array,
       specificRestrictions: Array,
       subIngredients: Array,
@@ -186,6 +188,66 @@ Meteor.methods({
 
   },
 
+  'customer.getBillingData': function (customerId, discountCode) {
+    check(customerId, String);
+    check(discountCode, Match.Optional(String));
+
+    const primaryUser = Meteor.users.findOne({ _id: customerId });
+    const sub = Subscriptions.findOne({ customerId });
+    let discountCodeToSend = '';
+
+    if (sub.hasOwnProperty('discountApplied')) {
+      discountCodeToSend = sub.discountApplied;
+    }
+
+    if (discountCode) {
+      discountCodeToSend = discountCode;
+    }
+
+    console.log(discountCodeToSend)
+
+    const data = {
+      id: primaryUser._id,
+      address: primaryUser.address,
+      lifestyle: primaryUser.lifestyle,
+      discount: primaryUser.discount,
+      discountCode: discountCodeToSend,
+      restrictions: primaryUser.restrictions,
+      specificRestrictions: primaryUser.specificRestrictions,
+      subIngredients: primaryUser.preferences,
+      platingNotes: primaryUser.platingNotes,
+      secondary: false,
+      completeSchedule: sub.completeSchedule,
+      secondaryProfiles: [],
+      subscriptionId: sub._id,
+      delivery: sub.delivery,
+      scheduleReal: primaryUser.schedule,
+      notifications: primaryUser.notifications,
+      coolerBag: primaryUser.coolerBag,
+      secondaryProfilesRemoved: [],
+    };
+
+    if (primaryUser.associatedProfiles > 0) {
+      data.secondary = true;
+      const secondaries = Meteor.users.find({ primaryAccount: customerId }).fetch();
+
+      secondaries.forEach((e, i) => {
+        data.secondaryProfiles.push({
+          lifestyle: e.lifestyle,
+          scheduleReal: e.schedule,
+          subIngredients: e.preferences,
+          restrictions: e.restrictions,
+          specificRestrictions: e.specificRestrictions,
+          discount: e.discount,
+        });
+      });
+    }
+
+    const billing = calculateSubscriptionCost(data);
+
+    return billing;
+  },
+
   'edit.customer.step2': function editStep2(data) {
 
     check(data, {
@@ -193,6 +255,7 @@ Meteor.methods({
       address: Object,
       lifestyle: String,
       discount: String,
+      discountCode: Match.Optional(String),
       restrictions: Array,
       specificRestrictions: Array,
       subIngredients: Array,
@@ -226,7 +289,6 @@ Meteor.methods({
         .minute(30)
         .toDate();
     }
-
 
     const sub = Subscriptions.findOne({ customerId: data.id });
 
@@ -413,7 +475,150 @@ Meteor.methods({
 
   },
 
-  'customer.removeSecondaryProfile': function removeSecondaryProfile(data) {
+  'edit.customer.step4': function editStep2(data) {
+
+    check(data, {
+      id: String,
+      discountCode: String,
+    });
+
+    const primaryUser = Meteor.users.findOne({ _id: data.id });
+    const sub = Subscriptions.findOne({ customerId: data.id });
+
+    const discountCodeActual = Discounts.findOne({ title: data.discountCode });
+    let discountCodeToSend = '';
+
+    if (sub.hasOwnProperty('discountApplied')) {
+      discountCodeToSend = sub.discountApplied;
+    }
+
+    if (data.discountCode) {
+      discountCodeToSend = data.discountCode;
+    }
+
+    const billingData = {
+      id: primaryUser._id,
+      address: primaryUser.address,
+      lifestyle: primaryUser.lifestyle,
+      discount: primaryUser.discount,
+      discountCode: discountCodeToSend,
+      restrictions: primaryUser.restrictions,
+      specificRestrictions: primaryUser.specificRestrictions,
+      subIngredients: primaryUser.preferences,
+      platingNotes: primaryUser.platingNotes,
+      secondary: false,
+      completeSchedule: sub.completeSchedule,
+      secondaryProfiles: [],
+      subscriptionId: sub._id,
+      delivery: sub.delivery,
+      scheduleReal: primaryUser.schedule,
+      notifications: primaryUser.notifications,
+      coolerBag: primaryUser.coolerBag,
+      secondaryProfilesRemoved: [],
+    };
+
+    if (primaryUser.associatedProfiles > 0) {
+      billingData.secondary = true;
+      const secondaries = Meteor.users.find({ primaryAccount: data.id }).fetch();
+
+      secondaries.forEach((e, i) => {
+        billingData.secondaryProfiles.push({
+          lifestyle: e.lifestyle,
+          scheduleReal: e.schedule,
+          subIngredients: e.preferences,
+          restrictions: e.restrictions,
+          specificRestrictions: e.specificRestrictions,
+          discount: e.discount,
+        });
+      });
+    }
+
+    const billing = calculateSubscriptionCost(billingData);
+
+    // console.log(data);
+    // console.log(billing);
+
+    let friday = '';
+
+    // if we haven't yet passed the day of the week that I need:
+    if (moment().isoWeekday() <= 5) {
+      // then just give me this week's instance of that day
+      friday = moment().isoWeekday(5).hour(23).minute(30)
+        .toDate();
+    } else {
+      // otherwise, give me next week's instance of that day
+      friday = moment().add(1, 'weeks').isoWeekday(5).hour(23)
+        .minute(30)
+        .toDate();
+    }
+
+    if (sub.paymentMethod == 'card') {
+
+      console.log('Payment method is card and the subscription is paused');
+
+
+      const syncGetSubscription = Meteor.wrapAsync(getSubscription);
+
+      const getSubscriptionRes = syncGetSubscription(sub.authorizeSubscriptionId);
+
+      console.log(getSubscriptionRes);
+
+      if (getSubscriptionRes.messages.resultCode != 'Ok') {
+        throw new Meteor.Error(500, 'There was a problem fetching the subscription [Authorize.Net]');
+      }
+
+      const subscriptionStartDate = getSubscriptionRes.subscription.paymentSchedule.startDate;
+      const subscriptionTotalOccurrences = getSubscriptionRes.subscription.paymentSchedule.totalOccurrences;
+
+      console.log(moment(subscriptionStartDate).hour(23).minute(30));
+      console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
+
+      // this changes subscription amount immediately if first charge hasn't happened
+      if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))) {
+
+        console.log("Subscription hasn't been charged");
+
+        const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
+
+        const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
+
+        if (updateSubscriptionRes.messages.resultCode != 'Ok') {
+          throw new Meteor.Error(500, 'There was a problem updating the subscription [Authorize.Net]');
+        }
+
+      } else {
+
+        const jobExists = Jobs.findOne({ type: 'editSubscriptionJobStep4', 'data.id': data.id, status: 'waiting' });
+
+        if (jobExists) {
+          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for updation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+        }
+
+        const job = new Job(
+          Jobs,
+          'editSubscriptionJobStep4', // type of job
+          {
+            ...data,
+          },
+        );
+
+        job.priority('normal').after(friday).save(); // Commit it to the server
+
+        return {
+          subUpdateScheduled: true,
+        };
+      }
+    }
+
+    Subscriptions.update({
+      customerId: data.id,
+    }, {
+        $set: {
+          amount: billing.actualTotal,
+          subscriptionItems: billing.lineItems,
+          discountApplied: discountCodeActual._id,
+        },
+      });
 
   },
 
@@ -434,30 +639,30 @@ Meteor.methods({
 
     console.log(postalCodeExists);
 
-    if(!postalCodeExists) {
-      throw new Meteor.Error('postal-code-not-found', 'Postal code does not exist.')
+    if (!postalCodeExists) {
+      throw new Meteor.Error('postal-code-not-found', 'Postal code does not exist.');
     }
 
     let userId;
-    let profile = {
+    const profile = {
       name: {
         first: data.firstName,
         last: data.lastName,
       },
     };
-    
-    if('birthDay' in data  && 'birthMonth' in data){
-      profile['birthday'] =  {
+
+    if ('birthDay' in data && 'birthMonth' in data) {
+      profile.birthday = {
         day: data.birthDay,
         month: data.birthMonth,
       };
-      
+
     }
 
     try {
       userId = Accounts.createUser({
         email: data.email,
-        profile: profile
+        profile,
       });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
@@ -790,7 +995,6 @@ Meteor.methods({
       }
 
       return e;
-
 
     });
 
@@ -1238,7 +1442,6 @@ Meteor.methods({
     check(subscriptionId, String);
 
     const syncGetSubscription = Meteor.wrapAsync(getSubscription);
-
     const getSubscriptionRes = syncGetSubscription(subscriptionId);
 
     return getSubscriptionRes;
@@ -1251,9 +1454,7 @@ Meteor.methods({
     check(paymentProfileId, String);
     check(customerProfileId, String);
 
-
     const syncGetCustomerPaymentProfile = Meteor.wrapAsync(getCustomerPaymentProfile);
-
     const getCustomerPaymentProfileRes = syncGetCustomerPaymentProfile(customerProfileId, paymentProfileId);
 
     return getCustomerPaymentProfileRes;
@@ -1330,7 +1531,7 @@ Meteor.methods({
         );
 
         // job.priority('normal').delay(60 * 500).save(); // Commit it to the server
-        job.priority('normal').delay(saturday).save(); // Commit it to the server
+        job.priority('normal').after(saturday).save(); // Commit it to the server
 
       }
 
@@ -1550,6 +1751,7 @@ Meteor.methods({
         id: userChange._id,
         postalCode: billingInfo.billingPostalCode,
         nameOnCard: billingInfo.nameOnCard,
+        streetAddress: billingInfo.billingStreetAddress,
       },
     );
 
@@ -1638,9 +1840,7 @@ Meteor.methods({
 
     } else {
 
-
       try {
-
         Subscriptions.update({
           _id: subscription._id,
         }, {

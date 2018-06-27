@@ -17,7 +17,7 @@ const worker = Job.processJobs(
     // do anything with the job data here.
     // when done, call job.done() or job.fail()
 
-    console.log("Inside editSubscriptionJob");
+    console.log('Inside editSubscriptionJob');
 
 
     const billing = calculateSubscriptionCost(data);
@@ -29,12 +29,10 @@ const worker = Job.processJobs(
     const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
 
     if (updateSubscriptionRes.messages.resultCode != 'Ok') {
-
-      job.fail("Could not update subscription on [Authorize.net]")
-
+      job.fail('Could not update subscription on [Authorize.net]');
     }
 
-    console.log("Inside editSubscriptionJob: Updated subscription on authorize end");
+    console.log('Inside editSubscriptionJob: Updated subscription on authorize end');
 
 
     if (data.secondaryProfiles && data.secondaryProfiles.length > 0) {
@@ -53,7 +51,7 @@ const worker = Job.processJobs(
               primaryAccount: data.id,
               subscriptionId: data.subscriptionId,
 
-              lifestyle: Lifestyles.findOne({ title: e.lifestyle })._id,
+              lifestyle: Lifestyles.findOne({ $or: [{ title: e.lifestyle }, { _id: e.lifestyle }] })._id,
               discount: e.discount,
               restrictions: e.restrictions,
               specificRestrictions: e.specificRestrictions,
@@ -141,15 +139,15 @@ const worker = Job.processJobs(
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-        $set: {
-          completeSchedule: data.completeSchedule,
-          delivery: newDeliveryType,
-          amount: billing.actualTotal,
-          subscriptionItems: billing.lineItems,
-        },
-      });
+      $set: {
+        completeSchedule: data.completeSchedule,
+        delivery: newDeliveryType,
+        amount: billing.actualTotal,
+        subscriptionItems: billing.lineItems,
+      },
+    });
 
-    console.log("Inside editSubscriptionJob: Updated subscription on Vittle");
+    console.log('Inside editSubscriptionJob: Updated subscription on Vittle');
 
 
     job.done(); // when done successfully

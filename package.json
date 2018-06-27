@@ -4,7 +4,8 @@
   "scripts": {
     "start": "meteor run --settings settings-development.json",
     "prod": "meteor run --settings settings-production.json",
-    "test": "jest"
+    "test": "jest",
+    "start4": "meteor run --settings settings-development.json --port 4000"
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.39",
@@ -39,6 +40,7 @@
     "prop-types": "^15.5.10",
     "react": "^15.6.2",
     "react-addons-update": "^15.6.2",
+    "react-autobind": "^1.0.6",
     "react-autosuggest": "^9.3.2",
     "react-children": "0.0.2",
     "react-dom": "^15.6.2",

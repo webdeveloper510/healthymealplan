@@ -94,6 +94,12 @@ Subscriptions.schema = new SimpleSchema({
     label: 'Customer is tax exempt.',
   },
 
+  discountApplied: {
+    type: String,
+    label: 'The id of the discount applied to the subscription',
+    optional: true,
+  },
+
   subscriptionItems: {
     type: Array,
     label: 'This will contain each profiles` line items',

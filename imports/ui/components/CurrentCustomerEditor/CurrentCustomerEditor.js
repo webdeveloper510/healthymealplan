@@ -159,6 +159,7 @@ class CurrentCustomerEditor extends React.Component {
         this.props.lifestyles.find(e => e._id == this.props.customer.lifestyle).custom ?
         this.props.lifestyles.find(e => e._id == this.props.customer.lifestyle).custom : false,
 
+        discountCode: !this.props.loading && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '', 
       discount: !this.props.loading && this.props.customer && this.props.customer.discount
         ? this.props.customer.discount
         : 'none',
@@ -224,7 +225,7 @@ class CurrentCustomerEditor extends React.Component {
         }
       }) : [],
       secondaryProfilesRemoved: [],
-
+      
       orderSummaryDialogOpen: false,
 
 
@@ -264,8 +265,7 @@ class CurrentCustomerEditor extends React.Component {
           email: false,
           sms: false
         },
-
-
+        
       activeDeliveryScheduleStep: 0,
 
       completeSchedule: this.props.subscription ? this.props.subscription.completeSchedule : [],
@@ -285,6 +285,7 @@ class CurrentCustomerEditor extends React.Component {
 
       secondTime: false, //Step2 modal save
 
+      discountApplied: this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '',
 
       primaryProfileBilling: null,
       secondaryProfilesBilling: null,
@@ -375,7 +376,7 @@ class CurrentCustomerEditor extends React.Component {
           maxlength: 2,
           max: 12,
           min: 1,
-      },
+        },
         birthDay: {
           number: true,
           maxlength: 2,
@@ -699,6 +700,7 @@ class CurrentCustomerEditor extends React.Component {
       specificRestrictions: this.state.specificRestrictions,
       lifestyle: this.props.lifestyles.find(e => e.title === this.state.lifestyle)._id,
       discount: this.state.discount,
+      discountCode: this.state.discountCode,
       restrictions: this.state.restrictions,
       scheduleReal: this.state.scheduleReal,
       platingNotes: this.state.platingNotes,
@@ -750,7 +752,7 @@ class CurrentCustomerEditor extends React.Component {
       return;
     }
 
-    console.log("Calling this func second time");
+    // console.log("Calling this func second time");
 
     Meteor.call('edit.customer.step2', step2Data, (err, res) => {
       if (err) {
@@ -779,7 +781,7 @@ class CurrentCustomerEditor extends React.Component {
               message: 'Customer details updated successfully.',
             });
           }
-       
+
         });
       }
     });
@@ -6622,14 +6624,14 @@ class CurrentCustomerEditor extends React.Component {
                           {this.renderMonths()}
                         </Select> */}
 
-                        <TextField 
+                        <TextField
                             fullWidth
-                          id="birthMonth"
+                            id="birthMonth"
                             select
                             value={this.state.birthMonth}
-                          label="Month"
+                            label="Month"
                             onChange={this.handleSelectChange.bind(this)}
-                          name="birthMonth"
+                            name="birthMonth"
                           >
                             {this.renderMonths()}
                           </TextField>
@@ -6646,15 +6648,15 @@ class CurrentCustomerEditor extends React.Component {
                       <Grid item xs={12} sm={6}>
                           <TextField
                             fullWidth
-                          id="birthDay"
+                            id="birthDay"
                             select
                             value={this.state.birthDay}
-                          label="Day"
+                            label="Day"
                             onChange={this.handleSelectChange.bind(this)}
                             SelectProps={{ native: false }}
-                          name="birthDay"
-                        >
-                          {this.renderDays()}
+                            name="birthDay"
+                          >
+                            {this.renderDays()}
                           </TextField>
 
                         {/* <TextField 
@@ -8619,6 +8621,8 @@ class CurrentCustomerEditor extends React.Component {
                     secondaryProfilesBilling={this.state.secondaryProfilesBilling}
                     postalCodes={this.props.postalCodes}
                     customerInfo={this.props.customer}
+                    discounts={this.props.discounts}
+                    subscription={this.props.subscription}
                   />
                 </Dialog>
               </div>
@@ -8636,6 +8640,33 @@ class CurrentCustomerEditor extends React.Component {
                 ingredients={this.props.potentialSubIngredients}
                 postalCodes={this.props.postalCodes}
                 history={this.props.history}
+                discounts={this.props.discounts}
+                // step2Data={{
+                //   id: this.props.customer._id,
+                //   address: this.props.customer.address,
+                //   subscriptionId: this.props.subscription ? this.props.subscription._id : '',
+                //   subIngredients: this.state.subIngredients,
+                //   specificRestrictions: this.state.specificRestrictions,
+                //   lifestyle: this.props.lifestyles.find(e => e.title === this.state.lifestyle)._id,
+                //   discount: this.state.discount,
+                //   discountCode: this.state.discountCode,
+                //   restrictions: this.state.restrictions,
+                //   scheduleReal: this.state.scheduleReal,
+                //   platingNotes: this.state.platingNotes,
+                //   secondary: this.props.customer.secondary != undefined,
+                //   secondaryProfiles: this.state.secondaryProfilesData,
+                //   secondaryProfilesRemoved: this.state.secondaryProfilesRemoved,
+                //   completeSchedule: this.state.completeSchedule,
+                //   delivery: this.state.deliveryType,
+                //   coolerBag: this.state.coolerBag,
+                //   notifications: {
+                //     delivery: {
+                //       sms: this.state.deliveryNotifcations.sms,
+                //       email: this.state.deliveryNotifcations.email
+                //     }
+                //   }
+                // }}
+
               />
             ) : this.state.currentTab === 2 ? (
               <Typography type="subheading">

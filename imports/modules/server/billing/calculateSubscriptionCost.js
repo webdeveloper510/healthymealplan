@@ -3,6 +3,7 @@ import Restrictions from '../../../api/Restrictions/Restrictions';
 import PostalCodes from '../../../api/PostalCodes/PostalCodes';
 import Ingredients from '../../../api/Ingredients/Ingredients';
 import Subscriptions from '../../../api/Subscriptions/Subscriptions';
+import Discounts from '../../../api/Discounts/Discounts';
 
 import createSubscriptionLineItems from './createSubscriptionLineItems';
 
@@ -10,9 +11,7 @@ import sum from 'lodash/sum';
 import sumBy from 'lodash/sumBy';
 
 export default function calculateSubscriptionCost(customerInfo) {
-  // console.log(customerInfo);
-
-  const sub = Subscriptions.findOne({ customerId: customerInfo.id })
+  const sub = Subscriptions.findOne({ customerId: customerInfo.id });
 
   const primaryCustomer = {
     lifestyle: '',
@@ -40,8 +39,13 @@ export default function calculateSubscriptionCost(customerInfo) {
     // coolerBag: customerInfo.coolerBag ? 20 : 0,
     coolerBag: 0,
     deliveryCost: 0,
+
     discount: customerInfo.discount,
     discountActual: 0,
+
+    discountCodeApplies: false,
+    dicsountCodeAmount: 0,
+
     restrictions: customerInfo.restrictions,
     restrictionsActual: [],
     restrictionsSurcharges: [],
@@ -49,12 +53,35 @@ export default function calculateSubscriptionCost(customerInfo) {
     specificRestrictionsActual: [],
     specificRestrictionsSurcharges: [],
     preferences: customerInfo.subIngredients,
+
     totalAthleticSurcharge: 0,
     totalBodybuilderSurcharge: 0,
     deliverySurcharges: 0,
   };
 
   const secondaryCustomers = [];
+
+  let discountCodePresent = false;
+  let discountCodeApplied = null;
+
+  if (sub.hasOwnProperty('discountApplied') || customerInfo.hasOwnProperty('discountCode')) {
+    discountCodePresent = true;
+  }
+
+  if (discountCodePresent) {
+    if (sub.hasOwnProperty('discountApplied')) {
+      discountCodeApplied = Discounts.findOne({ _id: sub.discountApplied });
+    }
+
+    if (customerInfo.discountCode != '') {
+      discountCodeApplied = Discounts.findOne({ $or: [{ title: customerInfo.discountCode }, { _id: customerInfo.discountCode }] });
+    }
+
+    primaryCustomer.discountCodeApplied = discountCodeApplied;
+  }
+
+  // console.log('Yes');
+  // console.log(primaryCustomer.discountCodeApplied);
 
   primaryCustomer.lifestyle = Lifestyles.findOne({ _id: customerInfo.lifestyle });
   // calculating basePrices for Breakfast, lunch and dinner
@@ -464,6 +491,36 @@ export default function calculateSubscriptionCost(customerInfo) {
 
   // console.log(primaryCustomer);
 
+  if (discountCodeApplied != null) {
+    let discountCodeAmount = 0;
+
+    if (discountCodeApplied.appliesToType == 'whole' ||
+      (discountCodeApplied.appliesToType == 'lifestyle' && discountCodeApplied.appliesToValue == 'All') ||
+      (discountCodeApplied.appliesToType == 'lifestyle' && discountCodeApplied.appliesToValue == primaryCustomer.lifestyle._id)) {
+      let subTotal = primaryCustomer.baseMealPriceTotal;
+
+      if (discountCodeApplied.appliesToRestrictionsAndExtras) {
+        subTotal += primaryCustomer.totalAthleticSurcharge +
+          primaryCustomer.totalBodybuilderSurcharge +
+          sum(primaryCustomer.restrictionsSurcharges) +
+          sum(primaryCustomer.specificRestrictionsSurcharges);
+      }
+
+
+      if (discountCodeApplied.discountType == 'Percentage') {
+        discountCodeAmount = (discountCodeApplied.discountValue / 100) * subTotal;
+      } else if (discountCodeApplied.discountType == 'Fixed amount') {
+        discountCodeAmount = discountCodeApplied.discountValue;
+      }
+
+      if (primaryCustomer.discountActual > 0 && discountCodeApplied.appliesToExistingDiscounts == false) {
+        discountCodeAmount = 0;
+      }
+    }
+
+    primaryCustomer.discountCodeAmount = discountCodeAmount;
+  }
+
   // all of the above for all the secondary profiles
   if (customerInfo.secondaryProfiles.length > 0) {
     customerInfo.secondaryProfiles.forEach((el, index) => {
@@ -492,8 +549,13 @@ export default function calculateSubscriptionCost(customerInfo) {
           bodybuilderQty: 0,
         },
         deliveryCost: 0,
+
         discount: customerInfo.secondaryProfiles[index].discount,
         discountActual: 0,
+
+        discountCodeApplies: false,
+        discountCodeAmount: 0,
+
         restrictions: customerInfo.secondaryProfiles[index]
           .restrictions,
         restrictionsActual: [],
@@ -509,7 +571,7 @@ export default function calculateSubscriptionCost(customerInfo) {
       };
 
       // the lifestyle for the current secondarycustomer
-      currentCustomer.lifestyle = Lifestyles.findOne({ title: el.lifestyle });
+      currentCustomer.lifestyle = Lifestyles.findOne({ $or: [{ title: el.lifestyle }, { _id: el.lifestyle }] });
 
       // calculating basePrices for Breakfast, lunch and dinner
       // const numberOfProfiles = this.props.customerInfo.secondaryProfileCount;
@@ -870,6 +932,39 @@ export default function calculateSubscriptionCost(customerInfo) {
         currentCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
       }
 
+      if (discountCodeApplied != null) {
+        // console.log(discountCodeApplied);
+
+        let discountCodeAmount = 0;
+
+        if (discountCodeApplied.appliesToType == 'whole' ||
+          (discountCodeApplied.appliesToType == 'lifestyle' && discountCodeApplied.appliesToValue == 'All') ||
+          (discountCodeApplied.appliesToType == 'lifestyle' && discountCodeApplied.appliesToValue == currentCustomer.lifestyle._id)) {
+          let subTotal = currentCustomer.baseMealPriceTotal;
+
+          if (discountCodeApplied.appliesToRestrictionsAndExtras) {
+            subTotal += currentCustomer.totalAthleticSurcharge +
+              currentCustomer.totalBodybuilderSurcharge +
+              sum(currentCustomer.restrictionsSurcharges) +
+              sum(currentCustomer.specificRestrictionsSurcharges);
+          }
+
+
+          if (discountCodeApplied.discountType == 'Percentage') {
+            discountCodeAmount = (discountCodeApplied.discountValue / 100) * subTotal;
+          } else if (discountCodeApplied.discountType == 'Fixed amount') {
+            discountCodeAmount = discountCodeApplied.discountValue;
+          }
+
+
+          if (currentCustomer.discountActual > 0 && discountCodeApplied.appliesToExistingDiscounts == false) {
+            discountCodeAmount = 0;
+          }
+        }
+
+        currentCustomer.discountCodeAmount = discountCodeAmount;
+      }
+
       currentCustomer.totalCost =
         currentCustomer.baseMealPriceTotal +
         currentCustomer.totalAthleticSurcharge +
@@ -878,6 +973,10 @@ export default function calculateSubscriptionCost(customerInfo) {
         sum(currentCustomer.specificRestrictionsSurcharges);
 
       currentCustomer.totalCost -= currentCustomer.discountActual;
+
+      if (currentCustomer.discountCodeAmount > 0) {
+        currentCustomer.totalCost -= currentCustomer.discountCodeAmount;
+      }
 
       // console.log(currentCustomer);
 
@@ -1029,6 +1128,12 @@ export default function calculateSubscriptionCost(customerInfo) {
 
   primaryCustomer.totalCost -= primaryCustomer.discountActual;
 
+  if (primaryCustomer.discountCodeAmount > 0) {
+    primaryCustomer.totalCost -= primaryCustomer.discountCodeAmount;
+  }
+
+  primaryCustomer.discountTotal = primaryCustomer.discountCodeAmount;
+
   primaryCustomer.taxes = 0.13 * (primaryCustomer.totalCost + sumBy(secondaryCustomers, e => e.totalCost));
 
   let secondaryGroupCost = 0;
@@ -1036,6 +1141,7 @@ export default function calculateSubscriptionCost(customerInfo) {
   if (customerInfo.secondaryProfiles.length > 0) {
     secondaryCustomers.forEach((e, i) => {
       secondaryGroupCost += e.totalCost;
+      primaryCustomer.discountTotal += e.discountCodeAmount;
     });
   }
 
@@ -1063,12 +1169,10 @@ export default function calculateSubscriptionCost(customerInfo) {
     sub.taxExempt,
     customerInfo.delivery);
 
-  const billingItems = {
+  return {
     primaryProfileBilling: primaryCustomer,
     secondaryProfilesBilling: secondaryCustomers,
     actualTotal,
     lineItems,
   };
-
-  return billingItems;
 }

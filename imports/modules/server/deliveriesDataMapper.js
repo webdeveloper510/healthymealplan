@@ -1,7 +1,7 @@
 
 import moment from 'moment';
 import { Random } from 'meteor/random';
-import Deliveries from '../../api/Deliveries/Deliveries'
+import Deliveries from '../../api/Deliveries/Deliveries';
 
 function addMealsForTheDay(day) {
   let sum = 0;
@@ -27,7 +27,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
   // 0 = sunday 6 = saturday
   this.deliveryDay = moment(currentDay).day();
 
-  console.log(this.deliveryDay);
+  // console.log(this.deliveryDay);
 
   aggregation.forEach((el, i) => {
     // console.log('Current subscription');
@@ -44,6 +44,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
     // console.log(`customer for ${i}`);
     // console.log(el.customer[0]);
 
+
     const customer = el.customer[0];
     const primaryCustomerName = customer.profile.name ? `${customer.profile.name.first} ${customer.profile.name.last ? customer.profile.name.last : ''}` : '';
     const primarySchedule = customer.schedule;
@@ -55,6 +56,8 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
     const secondaryCustomerNames = containsSecondaries ? secondaryAccounts.map(e => (e.profile.name ? `${e.profile.name.first} ${e.profile.name.last ? e.profile.name.last : ''}` : '')) : null;
 
     const route = el.route[0];
+    // console.log(primaryCustomerName);
+    // console.log(el.route[0]._id);
 
 
     // console.log(`Customer ${i}`);
@@ -229,7 +232,6 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             // set cooking as sunday
           }
         } else if (e === 'dayOf') {
-
           delivery.title = 'dayOf';
           delivery.onDate = currentDay;
 
@@ -345,7 +347,6 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
           // set cooking for sunday
         }
-
       } // monday
 
       if (index === 1) {
@@ -463,7 +464,6 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
           if (nextDay === 'dayOfPaired' && dayAfterTomorrow === 'dayOfPaired') {
             if (this.deliveryDay == 2) {
-
               daysPaired.push(2);
               daysPaired.push(3);
               // set delivery for tuesday, wednesday and thursday as tuesday day

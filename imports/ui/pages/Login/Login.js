@@ -98,7 +98,7 @@ class Login extends React.Component {
                       offset: 100,
                       text: 'Log In with an Email Address',
                     }}
-                  /> 
+                  />
                 </Grid>
                   </Grid> */}
             <form ref={form => (this.form = form)} onSubmit={event => event.preventDefault()}>

@@ -16,7 +16,6 @@ import { Meteor } from 'meteor/meteor';
 
 import { Random } from 'meteor/random';
 
-
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
@@ -573,13 +572,13 @@ class DiscountEditor extends React.Component {
   enableDiscount() {
     console.log(this.props.discount._id);
 
-    Meteor.call('discounts.enable', this.props.discount._id, (err, res) => {
-      console.log(res);
-    });
+    Meteor.call('discounts.enable', this.props.discount._id);
   }
 
   disableDiscount() {
+    console.log(this.props.discount._id);
 
+    Meteor.call('discounts.disable', this.props.discount._id);
   }
 
   render() {

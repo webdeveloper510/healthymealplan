@@ -37,6 +37,13 @@ export default function createSubscriptionLineItems(
     };
   }
 
+  if (primaryProfileBilling.discountCodeAmount > 0) {
+    primaryProfileLineItems.discountCode = {
+      title: primaryProfileBilling.discountCodeApplied.title,
+      amount: primaryProfileBilling.discountCodeAmount,
+    };
+  }
+
   if (primaryProfileBilling.totalAthleticSurcharge > 0) {
     primaryProfileLineItems.extraAthletic = {
       title: 'Athletic',
@@ -117,7 +124,7 @@ export default function createSubscriptionLineItems(
       };
 
       if (secondaryProfilesBilling[i].discountActual > 0) {
-        primaryProfileLineItems.discount = {
+        currentProfileLineItems.discount = {
           title:
             secondaryProfilesBilling[i].discount
               .charAt(0)
@@ -130,10 +137,19 @@ export default function createSubscriptionLineItems(
         };
       }
 
+
+      if (secondaryProfilesBilling[i].discountCodeAmount > 0) {
+        currentProfileLineItems.discountCode = {
+          title: primaryProfileBilling.discountCodeApplied.title,
+          amount: secondaryProfilesBilling[i].discountCodeAmount,
+        };
+      }
+
+
       if (
         secondaryProfilesBilling[i].totalAthleticSurcharge > 0
       ) {
-        primaryProfileLineItems.extraAthletic = {
+        currentProfileLineItems.extraAthletic = {
           title: 'Athletic',
           amount:
             secondaryProfilesBilling[i].totalAthleticSurcharge,
@@ -148,7 +164,7 @@ export default function createSubscriptionLineItems(
       if (
         secondaryProfilesBilling[i].totalBodybuilderSurcharge > 0
       ) {
-        primaryProfileLineItems.extraBodybuilder = {
+        currentProfileLineItems.extraBodybuilder = {
           title: 'Bodybuilder',
           amount:
             secondaryProfilesBilling[i]
@@ -167,7 +183,7 @@ export default function createSubscriptionLineItems(
       ) {
         secondaryProfilesBilling[i].restrictionsActual.forEach(
           (restriction, restrictionIndex) => {
-            primaryProfileLineItems.restrictions.push({
+            currentProfileLineItems.restrictions.push({
               title: restriction.title,
               extra: restriction.extra,
               type: restriction.discountOrExtraType,
