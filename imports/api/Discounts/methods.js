@@ -302,8 +302,8 @@ Meteor.methods({
 
       if (discount.hasOwnProperty('customerEligibilityType')) {
         if (discount.customerEligibilityType == "specific") {
-          if (discount.customerEligibilityValue == discountDetails.customerId) {
-            throw new Meteor.Error(401, 'The discount code limit has been exceeded')
+          if (discount.customerEligibilityValue.findIndex(e => e == discountDetails.customerId)) {
+            throw new Meteor.Error(401, 'The discount code doesn\'t apply to this customer')
           }
         }
       }
