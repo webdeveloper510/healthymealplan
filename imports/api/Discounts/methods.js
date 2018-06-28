@@ -277,6 +277,7 @@ Meteor.methods({
     });
 
     const discount = Discounts.findOne({ title: discountDetails.discountTitle });
+    const discountCodeUsed = Subscriptions.find({ discountApplied: discount._id }).fetch();
 
     if (discount == null) {
       throw new Meteor.Error(404, 'Discount code not found')
@@ -285,8 +286,6 @@ Meteor.methods({
     if (discount.status != "active") {
       throw new Meteor.Error(401, 'The discount code has been expired');
     }
-
-    const discountCodeUsed = Subscriptions.find({ discountApplied: discount._id }).fetch();
 
     if (discount.hasOwnProperty('usageLimitType')) {
       if (discount.usageLimitType == "numberOfTimes") {
@@ -301,7 +300,7 @@ Meteor.methods({
 
       if (discount.hasOwnProperty('customerEligibilityType')) {
         if (discount.customerEligibilityType == "specific") {
-          if (discount.customerEligibilityValue.findIndex(e => e == discountDetails.customerId) != -1) {
+          if (discount.customerEligibilityValue.findIndex(e => e == discountDetails.customerId) == -1) {
             throw new Meteor.Error(401, 'The discount code doesn\'t apply to this customer')
           }
         }
