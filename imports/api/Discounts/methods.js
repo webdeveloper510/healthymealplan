@@ -299,10 +299,9 @@ Meteor.methods({
     if (discountDetails.hasOwnProperty('customerId') && discountDetails.customerId != null) {
       const user = Meteor.users.findOne({ _id: discountDetails.customerId });
 
-
       if (discount.hasOwnProperty('customerEligibilityType')) {
         if (discount.customerEligibilityType == "specific") {
-          if (discount.customerEligibilityValue.findIndex(e => e == discountDetails.customerId)) {
+          if (discount.customerEligibilityValue.findIndex(e => e == discountDetails.customerId) != -1) {
             throw new Meteor.Error(401, 'The discount code doesn\'t apply to this customer')
           }
         }

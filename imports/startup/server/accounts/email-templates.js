@@ -60,5 +60,7 @@ emailTemplates.resetPassword = {
 };
 
 Accounts.urls.resetPassword = function (token) {
+  // return `https:/localhost:3000/reset-password/${token}`;
+
   return `https://www.vittle.ca/reset-password/${token}`;
 };

@@ -159,7 +159,8 @@ class CurrentCustomerEditor extends React.Component {
         this.props.lifestyles.find(e => e._id == this.props.customer.lifestyle).custom ?
         this.props.lifestyles.find(e => e._id == this.props.customer.lifestyle).custom : false,
 
-        discountCode: !this.props.loading && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '', 
+      discountCode: !this.props.loading && this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '', 
+      
       discount: !this.props.loading && this.props.customer && this.props.customer.discount
         ? this.props.customer.discount
         : 'none',
@@ -781,6 +782,10 @@ class CurrentCustomerEditor extends React.Component {
               message: 'Customer details updated successfully.',
             });
           }
+
+          this.setState({
+            orderSummaryDialogOpen: false
+          })
 
         });
       }
@@ -8622,6 +8627,7 @@ class CurrentCustomerEditor extends React.Component {
                     postalCodes={this.props.postalCodes}
                     customerInfo={this.props.customer}
                     discounts={this.props.discounts}
+                    discountSelected={this.state.discountCode}
                     subscription={this.props.subscription}
                   />
                 </Dialog>

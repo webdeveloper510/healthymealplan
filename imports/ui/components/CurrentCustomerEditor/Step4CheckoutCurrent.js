@@ -116,7 +116,7 @@ class Step4CheckoutCurrent extends React.Component {
       summaryLoaded: false,
 
       paymentMethod: this.props.customer && this.props.subscription ? this.props.subscription.paymentMethod : '',
-      taxExempt: false,
+      taxExempt: this.props.customer && this.props.subscription ? this.props.subscription.taxExempt : '',
 
 
       paymentProfileDetails: null,
@@ -134,6 +134,7 @@ class Step4CheckoutCurrent extends React.Component {
       discountSelected: '',
       discountApplied: this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '',
       secondTime: '',
+      removeDiscount: false,
 
       discountDeleteDialog: false,
       orderSummaryDialogOpen: false,
@@ -144,34 +145,6 @@ class Step4CheckoutCurrent extends React.Component {
     };
 
     autoBind(this);
-
-    // this.editPaymentMethod = this.editPaymentMethod.bind(this);
-
-    // this.openCancelSubscriptionDialog = this.openCancelSubscriptionDialog.bind(this);
-    // this.closeCancelSubscriptionDialog = this.closeCancelSubscriptionDialog.bind(this);
-
-    // this.openActivateSubscriptionDialog = this.openActivateSubscriptionDialog.bind(this);
-    // this.closeActivateSubscriptionDialog = this.closeActivateSubscriptionDialog.bind(this);
-
-    // this.openEditPaymentMethodDialog = this.openEditPaymentMethodDialog.bind(this);
-    // this.closeEditPaymentMethodDialog = this.closeEditPaymentMethodDialog.bind(this);
-
-
-    // this.closeDiscountDeleteDialog = this.closeDiscountDeleteDialog.bind(this);
-    // this.closeAddCardDialog = this.closeAddCardDialog.bind(this);
-
-
-    // this.openDiscountDeleteDialog = this.openDiscountDeleteDialog.bind(this);
-    // this.closeDiscountDeleteDialog = this.closeDiscountDeleteDialog.bind(this);
-    // this.handleApplyDiscount = this.handleApplyDiscount.bind(this);
-    // this.handleRemoveDiscount = this.handleRemoveDiscount.bind(this);
-    // this.handleRestrictionChipDeleteActual = this.handleRestrictionChipDeleteActual.bind(this);
-
-    // this.attachPaymentFormatHandlers = this.attachPaymentFormatHandlers.bind(this);
-    // this.handleSubmitStep = this.handleSubmitStep.bind(this);
-    // this.handleClose = this.handleClose.bind(this);
-
-    // this.openOrderSummaryDialog = this.openOrderSummaryDialog.bind(this);
   }
 
   componentDidMount() {
@@ -239,1166 +212,6 @@ class Step4CheckoutCurrent extends React.Component {
       });
     }
 
-
-    // const primaryCustomer = {
-    //   lifestyle: '',
-    //   breakfastPrice: 0,
-    //   lunchPrice: 0,
-    //   dinnerPrice: 0,
-    //   breakfast: {
-    //     totalQty: 0,
-    //     regularQty: 0,
-    //     athleticQty: 0,
-    //     bodybuilderQty: 0,
-    //   },
-    //   lunch: {
-    //     totalQty: 0,
-    //     regularQty: 0,
-    //     athleticQty: 0,
-    //     bodybuilderQty: 0,
-    //   },
-    //   dinner: {
-    //     totalQty: 0,
-    //     regularQty: 0,
-    //     athleticQty: 0,
-    //     bodybuilderQty: 0,
-    //   },
-    //   // coolerBag: this.props.customerInfo.coolerBag ? 20 : 0,
-    //   coolerBag: 0,
-    //   deliveryCost: 0,
-
-    //   discount: this.props.customer.discount,
-    //   discountActual: 0,
-
-    //   restrictions: this.props.customer.restrictions,
-    //   restrictionsActual: [],
-    //   restrictionsSurcharges: [],
-    //   specificRestrictions: this.props.customer.specificRestrictions,
-    //   specificRestrictionsActual: [],
-    //   specificRestrictionsSurcharges: [],
-    //   preferences: this.props.customer.preferences,
-    //   totalAthleticSurcharge: 0,
-    //   totalBodybuilderSurcharge: 0,
-
-    //   deliverySurcharges: 0,
-
-    //   discountCodeApplies: false,
-    //   discountCodeAmount: 0,
-    // };
-
-    // const secondaryCustomers = [];
-
-    // const discountCodePresent = this.props.subscription.discountApplied != '';
-    // let discountCodeApplied = null;
-
-    // if (discountCodePresent) {
-    //   discountCodeApplied = this.props.discounts.find(e => e._id === this.props.subscription.discountApplied);
-    // }
-
-    // primaryCustomer.lifestyle = this.props.lifestyles.find(
-    //   elem => elem._id === this.props.customer.lifestyle,
-    // );
-
-
-    // // calculating basePrices for Breakfast, lunch and dinner
-
-    // let metCriteria = 0;
-    // const customerScheduleTotals = [];
-    // const secondaryCustomerTotals = [];
-
-    // // calculating total quantities and extra quantities and regular quantites
-    // this.props.customer.schedule.forEach((e, i) => {
-    //   let thisDaysQty = 0;
-
-    //   if (e.breakfast.active) {
-    //     primaryCustomer.breakfast.totalQty =
-    //       primaryCustomer.breakfast.totalQty +
-    //       parseInt(e.breakfast.quantity, 10);
-
-    //     if (e.breakfast.portions == 'regular') {
-    //       primaryCustomer.breakfast.regularQty += parseInt(
-    //         e.breakfast.quantity,
-    //         10,
-    //       );
-    //     } else if (e.breakfast.portions == 'athletic') {
-    //       primaryCustomer.breakfast.athleticQty += parseInt(
-    //         e.breakfast.quantity,
-    //         10,
-    //       );
-    //     } else if ((e.breakfast.portions = 'bodybuilder')) {
-    //       primaryCustomer.breakfast.bodybuilderQty += parseInt(
-    //         e.breakfast.quantity,
-    //         10,
-    //       );
-    //     }
-
-    //     thisDaysQty += parseInt(e.breakfast.quantity, 10);
-    //   }
-
-    //   if (e.lunch.active) {
-    //     primaryCustomer.lunch.totalQty =
-    //       primaryCustomer.lunch.totalQty + parseInt(e.lunch.quantity, 10);
-
-    //     if (e.lunch.portions == 'regular') {
-    //       primaryCustomer.lunch.regularQty += parseInt(e.lunch.quantity, 10);
-    //     } else if (e.lunch.portions == 'athletic') {
-    //       primaryCustomer.lunch.athleticQty += parseInt(e.lunch.quantity, 10);
-    //     } else if ((e.lunch.portions = 'bodybuilder')) {
-    //       primaryCustomer.lunch.bodybuilderQty += parseInt(
-    //         e.lunch.quantity,
-    //         10,
-    //       );
-    //     }
-
-    //     thisDaysQty += parseInt(e.lunch.quantity, 10);
-    //   }
-
-    //   if (e.dinner.active) {
-    //     primaryCustomer.dinner.totalQty =
-    //       primaryCustomer.dinner.totalQty + parseInt(e.dinner.quantity, 10);
-
-    //     if (e.dinner.portions == 'regular') {
-    //       primaryCustomer.dinner.regularQty += parseInt(e.dinner.quantity, 10);
-    //     } else if (e.dinner.portions == 'athletic') {
-    //       primaryCustomer.dinner.athleticQty += parseInt(e.dinner.quantity, 10);
-    //     } else if ((e.dinner.portions = 'bodybuilder')) {
-    //       primaryCustomer.dinner.bodybuilderQty += parseInt(
-    //         e.dinner.quantity,
-    //         10,
-    //       );
-    //     }
-
-    //     thisDaysQty += parseInt(e.dinner.quantity, 10);
-    //   }
-
-    //   customerScheduleTotals.push(thisDaysQty);
-    // });
-
-    // console.log(customerScheduleTotals);
-
-    // if (
-    //   customerScheduleTotals[0] >= 2 &&
-    //   customerScheduleTotals[1] >= 2 &&
-    //   customerScheduleTotals[2] >= 2 &&
-    //   customerScheduleTotals[3] >= 2 &&
-    //   customerScheduleTotals[4] >= 2
-    // ) {
-    //   metCriteria += 1;
-    // }
-
-    // console.log('met criteria after primary customer');
-    // console.log(metCriteria);
-
-    // if (this.props.customer.associatedProfiles > 0) {
-    //   this.props.secondaryAccounts.forEach((el, index) => {
-    //     let currentProfileQtys;
-
-    //     currentProfileQtys = el.schedule.map((e, i) => {
-    //       let thisDaysQty = 0;
-
-    //       if (e.breakfast.active) {
-    //         thisDaysQty += parseInt(e.breakfast.quantity, 10);
-    //       }
-
-    //       if (e.lunch.active) {
-    //         thisDaysQty += parseInt(e.lunch.quantity, 10);
-    //       }
-
-    //       if (e.dinner.active) {
-    //         thisDaysQty += parseInt(e.dinner.quantity, 10);
-    //       }
-
-    //       return thisDaysQty;
-    //     });
-
-    //     secondaryCustomerTotals.push(currentProfileQtys);
-    //   });
-    // }
-
-    // console.log('Secondary customer totals');
-    // console.log(secondaryCustomerTotals);
-
-    // secondaryCustomerTotals.forEach((e, i) => {
-    //   if (e[0] >= 2 && e[1] >= 2 && e[2] >= 2 && e[3] >= 2 && e[4] >= 2) {
-    //     metCriteria += 1;
-    //   }
-    // });
-
-    // console.log('met criteria after secondary customers');
-    // console.log(metCriteria);
-
-    // if (metCriteria > 0) {
-    //   metCriteria -= 1;
-    // }
-
-    // primaryCustomer.breakfastPrice =
-    //   primaryCustomer.lifestyle.prices.breakfast[metCriteria];
-
-    // primaryCustomer.lunchPrice =
-    //   primaryCustomer.lifestyle.prices.lunch[metCriteria];
-
-    // primaryCustomer.dinnerPrice =
-    //   primaryCustomer.lifestyle.prices.dinner[metCriteria];
-
-    // // total base price based on per meal type base price, (before restrictions and extras and discounts)
-    // primaryCustomer.baseMealPriceTotal =
-    //   primaryCustomer.breakfast.totalQty * primaryCustomer.breakfastPrice +
-    //   primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-    //   primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
-
-    // // discounted basePrice -- this is the actual base price to add up in the total
-
-    // if (primaryCustomer.discount == 'senior') {
-    //   let discountAmount = 0;
-
-    //   if (primaryCustomer.lifestyle.discountOrExtraTypeSenior == 'Percentage') {
-    //     discountAmount =
-    //       primaryCustomer.lifestyle.discountSenior /
-    //       100 *
-    //       primaryCustomer.baseMealPriceTotal;
-    //   }
-
-    //   if (
-    //     primaryCustomer.lifestyle.discountOrExtraTypeSenior == 'Fixed amount'
-    //   ) {
-    //     discountAmount = primaryCustomer.lifestyle.discountSenior;
-    //   }
-
-    //   primaryCustomer.discountActual = discountAmount;
-    // }
-
-    // if (primaryCustomer.discount == 'student') {
-    //   let discountAmount = 0;
-
-    //   if (
-    //     primaryCustomer.lifestyle.discountOrExtraTypeStudent == 'Percentage'
-    //   ) {
-    //     discountAmount =
-    //       primaryCustomer.lifestyle.discountStudent /
-    //       100 *
-    //       primaryCustomer.baseMealPriceTotal;
-    //   }
-
-    //   if (
-    //     primaryCustomer.lifestyle.discountOrExtraTypeStudent == 'Fixed amount'
-    //   ) {
-    //     discountAmount = primaryCustomer.lifestyle.discountStudent;
-    //   }
-
-    //   primaryCustomer.discountActual = discountAmount;
-    // }
-
-
-    // // calculating restrictions and specificRestrictions surcharges
-    // if (primaryCustomer.restrictions.length > 0) {
-    //   primaryCustomer.restrictions.forEach((e, i) => {
-    //     primaryCustomer.restrictionsActual.push(
-    //       this.props.restrictions.find(elem => elem._id === e),
-    //     );
-    //   });
-
-    //   primaryCustomer.restrictionsActual.forEach((e, i) => {
-    //     console.log(e);
-    //     if (e.hasOwnProperty('extra')) {
-    //       let totalRestrictionsSurcharge = 0;
-    //       console.log(e);
-
-    //       const totalBaseMealsCharge =
-    //         primaryCustomer.breakfast.totalQty *
-    //         primaryCustomer.breakfastPrice +
-    //         primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-    //         primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
-
-    //       if (e.discountOrExtraType == 'Percentage') {
-    //         totalRestrictionsSurcharge = e.extra / 100 * totalBaseMealsCharge;
-    //       }
-
-    //       if (e.discountOrExtraType == 'Fixed amount') {
-    //         totalRestrictionsSurcharge =
-    //           (primaryCustomer.breakfast.totalQty +
-    //             primaryCustomer.lunch.totalQty +
-    //             primaryCustomer.dinner.totalQty) *
-    //           e.extra;
-    //       }
-
-    //       primaryCustomer.restrictionsSurcharges.push(
-    //         totalRestrictionsSurcharge,
-    //       );
-    //     } else {
-    //       primaryCustomer.restrictionsSurcharges.push(0);
-    //     }
-    //   });
-    // }
-
-    // if (primaryCustomer.specificRestrictions.length > 0) {
-    //   primaryCustomer.specificRestrictions.forEach((e, i) => {
-    //     console.log(e);
-    //     primaryCustomer.specificRestrictionsActual.push(
-    //       this.props.ingredients.find(elem => elem._id === e._id),
-    //     );
-    //   });
-
-    //   // primaryCustomer.specificRestrictionsActual.forEach((e, i) => {
-    //   //   if (e.hasOwnProperty("extra")) {
-    //   //     let totalSurcharges = 0;
-    //   //     console.log(e);
-
-    //   //     const totalBaseMealsCharge =
-    //   //       primaryCustomer.breakfast.totalQty *
-    //   //         primaryCustomer.breakfastPrice +
-    //   //       primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-    //   //       primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
-
-    //   //     if (e.discountOrExtraType == "Percentage") {
-    //   //       totalSurcharges = e.extra / 100 * totalBaseMealsCharge;
-    //   //     }
-
-    //   //     if (e.discountOrExtraType == "Fixed amount") {
-    //   //       totalSurcharges =
-    //   //         (primaryCustomer.breakfast.totalQty +
-    //   //           primaryCustomer.lunch.totalQty +
-    //   //           primaryCustomer.dinner.totalQty) *
-    //   //         e.extra;
-    //   //     }
-
-    //   //     primaryCustomer.specificRestrictionsSurcharges.push(totalSurcharges);
-    //   //   } else {
-    //   //     primaryCustomer.specificRestrictionsSurcharges.push(0);
-    //   //   }
-    //   // });
-    // }
-
-    // // calculating athletic surcharge for all meals
-    // if (
-    //   primaryCustomer.breakfast.athleticQty > 0 ||
-    //   primaryCustomer.lunch.athleticQty > 0 ||
-    //   primaryCustomer.dinner.athleticQty > 0
-    // ) {
-    //   let totalAthleticSurcharge = 0;
-
-    //   if (primaryCustomer.breakfast.athleticQty > 0) {
-    //     if (
-    //       primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
-    //     ) {
-    //       const extraAthleticPerBreakfast =
-    //         primaryCustomer.lifestyle.extraAthletic /
-    //         100 *
-    //         primaryCustomer.breakfastPrice;
-
-    //       totalAthleticSurcharge +=
-    //         primaryCustomer.breakfast.athleticQty * extraAthleticPerBreakfast;
-    //     }
-
-    //     if (
-    //       primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
-    //       'Fixed amount'
-    //     ) {
-    //       totalAthleticSurcharge +=
-    //         primaryCustomer.breakfast.athleticQty *
-    //         primaryCustomer.lifestyle.extraAthletic;
-    //     }
-    //   }
-
-    //   if (primaryCustomer.lunch.athleticQty > 0) {
-    //     if (
-    //       primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
-    //     ) {
-    //       const extraAthleticPerLunch =
-    //         primaryCustomer.lifestyle.extraAthletic /
-    //         100 *
-    //         primaryCustomer.lunchPrice;
-
-    //       totalAthleticSurcharge +=
-    //         primaryCustomer.lunch.athleticQty * extraAthleticPerLunch;
-    //     }
-
-    //     if (
-    //       primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
-    //       'Fixed amount'
-    //     ) {
-    //       totalAthleticSurcharge +=
-    //         primaryCustomer.lunch.athleticQty *
-    //         primaryCustomer.lifestyle.extraAthletic;
-    //     }
-    //   }
-
-    //   if (primaryCustomer.dinner.athleticQty > 0) {
-    //     if (
-    //       primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
-    //     ) {
-    //       const extraAthleticPerDinner =
-    //         primaryCustomer.lifestyle.extraAthletic /
-    //         100 *
-    //         primaryCustomer.dinnerPrice;
-
-    //       totalAthleticSurcharge +=
-    //         primaryCustomer.dinner.athleticQty * extraAthleticPerDinner;
-    //     }
-
-    //     if (
-    //       primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
-    //       'Fixed amount'
-    //     ) {
-    //       totalAthleticSurcharge +=
-    //         primaryCustomer.breakfast.athleticQty *
-    //         primaryCustomer.lifestyle.extraAthletic;
-    //     }
-    //   }
-
-    //   primaryCustomer.totalAthleticSurcharge = totalAthleticSurcharge;
-    // }
-
-    // // calculating bodybuilder surcharge for all meals
-    // if (
-    //   primaryCustomer.breakfast.bodybuilderQty > 0 ||
-    //   primaryCustomer.lunch.bodybuilderQty > 0 ||
-    //   primaryCustomer.dinner.bodybuilderQty > 0
-    // ) {
-    //   let totalBodybuilderSurcharge = 0;
-
-    //   if (primaryCustomer.breakfast.bodybuilderQty > 0) {
-    //     if (
-    //       primaryCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-    //       'Percentage'
-    //     ) {
-    //       const extraBodybuilderPerBreakfast =
-    //         primaryCustomer.lifestyle.extraBodybuilder /
-    //         100 *
-    //         primaryCustomer.breakfastPrice;
-
-    //       totalBodybuilderSurcharge +=
-    //         primaryCustomer.breakfast.bodybuilderQty *
-    //         extraBodybuilderPerBreakfast;
-    //     }
-
-    //     if (
-    //       primaryCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-    //       'Fixed amount'
-    //     ) {
-    //       totalBodybuilderSurcharge +=
-    //         primaryCustomer.breakfast.athleticQty *
-    //         primaryCustomer.lifestyle.extraBodybuilder;
-    //     }
-    //   }
-
-    //   if (primaryCustomer.lunch.bodybuilderQty > 0) {
-    //     const extraBodybuilderPerLunch =
-    //       primaryCustomer.lifestyle.extraBodybuilder /
-    //       100 *
-    //       primaryCustomer.lunchPrice;
-
-    //     totalBodybuilderSurcharge +=
-    //       primaryCustomer.lunch.bodybuilderQty * extraBodybuilderPerLunch;
-    //   }
-
-    //   if (primaryCustomer.dinner.bodybuilderQty > 0) {
-    //     const extraBodybuilderPerDinner =
-    //       primaryCustomer.lifestyle.extraBodybuilder /
-    //       100 *
-    //       primaryCustomer.dinnerPrice;
-
-    //     totalBodybuilderSurcharge +=
-    //       primaryCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
-    //   }
-
-    //   primaryCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
-    // }
-
-    // // DISCOUNT CODE
-
-    // // other verification is done before applying
-
-    // if (discountCodeApplied != null) {
-
-    //   console.log(discountCodeApplied);
-
-    //   let discountCodeAmount = 0;
-
-    //   if (discountCodeApplied.appliesToType == 'whole' ||
-    //     (discountCodeApplied.appliesToType == 'lifestyle' && discountCodeApplied.appliesToValue == 'All') ||
-    //     (discountCodeApplied.appliesToType == 'lifestyle' && discountCodeApplied.appliesToValue == primaryCustomer.lifestyle._id)) {
-    //     console.log('Applies to whole order');
-
-
-    //     let subTotal = primaryCustomer.baseMealPriceTotal;
-
-    //     if (discountCodeApplied.appliesToRestrictionsAndExtras) {
-    //       subTotal += primaryCustomer.totalAthleticSurcharge +
-    //         primaryCustomer.totalBodybuilderSurcharge +
-    //         _.sum(primaryCustomer.restrictionsSurcharges) +
-    //         _.sum(primaryCustomer.specificRestrictionsSurcharges);
-    //     }
-
-
-    //     if (discountCodeApplied.discountType == 'Percentage') {
-
-    //       discountCodeAmount = (discountCodeApplied.discountValue / 100) * subTotal;
-
-    //     } else if (discountCodeApplied.discountType == 'Fixed amount') {
-    //       discountCodeAmount = discountCodeApplied.discountValue;
-    //     }
-
-
-    //     if (primaryCustomer.discountActual > 0 && discountCodeApplied.appliesToExistingDiscounts == false) {
-    //       discountCodeAmount = 0;
-    //     }
-
-    //   }
-
-    //   primaryCustomer.discountCodeAmount = discountCodeAmount;
-
-    // }
-
-    // // calculate amount
-
-
-    // // all of the above for all the secondary profiles
-    // if (this.props.customer.associatedProfiles > 0) {
-    //   this.props.secondaryAccounts.forEach((el, index) => {
-    //     const currentCustomer = {
-    //       lifestyle: '',
-
-    //       breakfastPrice: 0,
-    //       lunchPrice: 0,
-    //       dinnerPrice: 0,
-    //       breakfast: {
-    //         totalQty: 0,
-    //         regularQty: 0,
-    //         athleticQty: 0,
-    //         bodybuilderQty: 0,
-    //       },
-    //       lunch: {
-    //         totalQty: 0,
-    //         regularQty: 0,
-    //         athleticQty: 0,
-    //         bodybuilderQty: 0,
-    //       },
-    //       dinner: {
-    //         totalQty: 0,
-    //         regularQty: 0,
-    //         athleticQty: 0,
-    //         bodybuilderQty: 0,
-    //       },
-    //       deliveryCost: 0,
-    //       discount: this.props.secondaryAccounts[index].discount,
-    //       discountActual: 0,
-    //       restrictions: this.props.secondaryAccounts[index]
-    //         .restrictions,
-    //       restrictionsActual: [],
-    //       restrictionsSurcharges: [],
-    //       specificRestrictions: this.props.secondaryAccounts[index]
-    //         .specificRestrictions,
-    //       specificRestrictionsActual: [],
-    //       specificRestrictionsSurcharges: [],
-    //       preferences: this.props.secondaryAccounts[index]
-    //         .preferences,
-    //       totalAthleticSurcharge: 0,
-    //       totalBodybuilderSurcharge: 0,
-
-
-    //       discountCodeApplies: false,
-    //       discountCodeAmount: 0,
-    //     };
-
-    //     // the lifestyle for the current secondarycustomer
-    //     currentCustomer.lifestyle = this.props.lifestyles.find(
-    //       elem => elem._id === el.lifestyle,
-    //     );
-
-    //     // calculating basePrices for Breakfast, lunch and dinner
-
-    //     currentCustomer.breakfastPrice =
-    //       currentCustomer.lifestyle.prices.breakfast[metCriteria];
-
-    //     currentCustomer.lunchPrice =
-    //       currentCustomer.lifestyle.prices.lunch[metCriteria];
-
-    //     currentCustomer.dinnerPrice =
-    //       currentCustomer.lifestyle.prices.dinner[metCriteria];
-
-    //     el.schedule.forEach((e, i) => {
-    //       if (e.breakfast.active) {
-    //         currentCustomer.breakfast.totalQty =
-    //           currentCustomer.breakfast.totalQty +
-    //           parseInt(e.breakfast.quantity, 10);
-
-    //         if (e.breakfast.portions == 'regular') {
-    //           currentCustomer.breakfast.regularQty += parseInt(
-    //             e.breakfast.quantity,
-    //             10,
-    //           );
-    //         } else if (e.breakfast.portions == 'athletic') {
-    //           currentCustomer.breakfast.athleticQty += parseInt(
-    //             e.breakfast.quantity,
-    //             10,
-    //           );
-    //         } else if ((e.breakfast.portions = 'bodybuilder')) {
-    //           currentCustomer.breakfast.bodybuilderQty += parseInt(
-    //             e.breakfast.quantity,
-    //             10,
-    //           );
-    //         }
-    //       }
-
-    //       if (e.lunch.active) {
-    //         currentCustomer.lunch.totalQty =
-    //           currentCustomer.lunch.totalQty + parseInt(e.lunch.quantity, 10);
-
-    //         if (e.lunch.portions == 'regular') {
-    //           currentCustomer.lunch.regularQty += parseInt(
-    //             e.lunch.quantity,
-    //             10,
-    //           );
-    //         } else if (e.lunch.portions == 'athletic') {
-    //           currentCustomer.lunch.athleticQty += parseInt(
-    //             e.lunch.quantity,
-    //             10,
-    //           );
-    //         } else if ((e.lunch.portions = 'bodybuilder')) {
-    //           currentCustomer.lunch.bodybuilderQty += parseInt(
-    //             e.lunch.quantity,
-    //             10,
-    //           );
-    //         }
-    //       }
-
-    //       if (e.dinner.active) {
-    //         currentCustomer.dinner.totalQty =
-    //           currentCustomer.dinner.totalQty + parseInt(e.dinner.quantity, 10);
-
-    //         if (e.dinner.portions == 'regular') {
-    //           currentCustomer.dinner.regularQty += parseInt(
-    //             e.dinner.quantity,
-    //             10,
-    //           );
-    //         } else if (e.dinner.portions == 'athletic') {
-    //           currentCustomer.dinner.athleticQty += parseInt(
-    //             e.dinner.quantity,
-    //             10,
-    //           );
-    //         } else if ((e.dinner.portions = 'bodybuilder')) {
-    //           currentCustomer.dinner.bodybuilderQty += parseInt(
-    //             e.dinner.quantity,
-    //             10,
-    //           );
-    //         }
-    //       }
-    //     });
-
-    //     // total base price based on per meal type base price, (before restrictions and extras and discounts)
-    //     currentCustomer.baseMealPriceTotal =
-    //       currentCustomer.breakfast.totalQty * currentCustomer.breakfastPrice +
-    //       currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-    //       currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
-
-    //     // discounted basePrice -- this is the actual base price to add up in the total
-    //     if (currentCustomer.discount == 'senior') {
-    //       let discountAmount = 0;
-
-    //       if (
-    //         currentCustomer.lifestyle.discountOrExtraTypeSenior == 'Percentage'
-    //       ) {
-    //         discountAmount =
-    //           currentCustomer.lifestyle.discountSenior /
-    //           100 *
-    //           currentCustomer.baseMealPriceTotal;
-    //       }
-
-    //       if (
-    //         currentCustomer.lifestyle.discountOrExtraTypeSenior ==
-    //         'Fixed amount'
-    //       ) {
-    //         discountAmount = currentCustomer.lifestyle.discountSenior;
-    //       }
-
-    //       currentCustomer.discountActual = discountAmount;
-    //     }
-
-    //     if (currentCustomer.discount == 'student') {
-    //       let discountAmount = 0;
-
-    //       if (
-    //         currentCustomer.lifestyle.discountOrExtraTypeStudent == 'Percentage'
-    //       ) {
-    //         discountAmount =
-    //           currentCustomer.lifestyle.discountStudent /
-    //           100 *
-    //           currentCustomer.baseMealPriceTotal;
-    //       }
-
-    //       if (
-    //         currentCustomer.lifestyle.discountOrExtraTypeStudent ==
-    //         'Fixed amount'
-    //       ) {
-    //         discountAmount = currentCustomer.lifestyle.discountStudent;
-    //       }
-
-    //       currentCustomer.discountActual = discountAmount;
-    //     }
-
-    //     // calculating restrictions and specificRestrictions surcharges
-    //     if (currentCustomer.restrictions.length > 0) {
-    //       currentCustomer.restrictions.forEach((e, i) => {
-    //         currentCustomer.restrictionsActual.push(
-    //           this.props.restrictions.find(elem => elem._id === e),
-    //         );
-    //       });
-
-    //       currentCustomer.restrictionsActual.forEach((e, i) => {
-    //         if (e.hasOwnProperty('extra')) {
-    //           let totalRestrictionsSurcharge = 0;
-    //           console.log(e);
-
-    //           const totalBaseMealsCharge =
-    //             currentCustomer.breakfast.totalQty *
-    //             currentCustomer.breakfastPrice +
-    //             currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-    //             currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
-
-    //           if (e.discountOrExtraType == 'Percentage') {
-    //             totalRestrictionsSurcharge =
-    //               e.extra / 100 * totalBaseMealsCharge;
-    //           }
-
-    //           if (e.discountOrExtraType == 'Fixed amount') {
-    //             totalRestrictionsSurcharge =
-    //               (currentCustomer.breakfast.totalQty +
-    //                 currentCustomer.lunch.totalQty +
-    //                 currentCustomer.dinner.totalQty) *
-    //               e.extra;
-    //           }
-
-    //           console.log(totalRestrictionsSurcharge);
-
-    //           currentCustomer.restrictionsSurcharges.push(
-    //             totalRestrictionsSurcharge,
-    //           );
-    //         } else {
-    //           currentCustomer.restrictionsSurcharges.push(0);
-    //         }
-    //       });
-    //     }
-
-    //     console.log(currentCustomer.restrictionsSurcharges);
-
-    //     if (currentCustomer.specificRestrictions.length > 0) {
-    //       currentCustomer.specificRestrictions.forEach((e, i) => {
-    //         currentCustomer.specificRestrictionsActual.push(
-    //           this.props.ingredients.find(elem => elem._id === e._id),
-    //         );
-    //       });
-
-    //       // currentCustomer.specificRestrictionsActual.forEach((e, i) => {
-    //       //   if (e.hasOwnProperty("extra")) {
-    //       //     let totalRestrictionsSurcharge = 0;
-    //       //     console.log(e);
-
-    //       //     const totalBaseMealsCharge =
-    //       //       currentCustomer.breakfast.totalQty *
-    //       //         currentCustomer.breakfastPrice +
-    //       //       currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-    //       //       currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
-
-    //       //     if (e.discountOrExtraType == "Percentage") {
-    //       //       totalRestrictionsSurcharge =
-    //       //         e.extra / 100 * totalBaseMealsCharge;
-    //       //     }
-
-    //       //     if (e.discountOrExtraType == "Fixed amount") {
-    //       //       totalRestrictionsSurcharge =
-    //       //         (currentCustomer.breakfast.totalQty +
-    //       //           currentCustomer.lunch.totalQty +
-    //       //           currentCustomer.dinner.totalQty) *
-    //       //         e.extra;
-    //       //     }
-
-    //       //     console.log(totalRestrictionsSurcharge);
-
-    //       //     currentCustomer.specificRestrictionsSurcharges.push(
-    //       //       totalRestrictionsSurcharge
-    //       //     );
-    //       //   } else {
-    //       //     currentCustomer.specificrestrictionsSurcharges.push(0);
-    //       //   }
-    //       // });
-    //     }
-
-    //     // calculating athletic surcharge for all meals
-    //     if (
-    //       currentCustomer.breakfast.athleticQty > 0 ||
-    //       currentCustomer.lunch.athleticQty > 0 ||
-    //       currentCustomer.dinner.athleticQty > 0
-    //     ) {
-    //       let totalAthleticSurcharge = 0;
-
-    //       if (currentCustomer.breakfast.athleticQty > 0) {
-    //         if (
-    //           currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-    //           'Percentage'
-    //         ) {
-    //           const extraAthleticPerBreakfast =
-    //             currentCustomer.lifestyle.extraAthletic /
-    //             100 *
-    //             currentCustomer.breakfastPrice;
-
-    //           totalAthleticSurcharge +=
-    //             currentCustomer.breakfast.athleticQty *
-    //             extraAthleticPerBreakfast;
-    //         }
-
-    //         if (
-    //           currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-    //           'Fixed amount'
-    //         ) {
-    //           totalAthleticSurcharge +=
-    //             currentCustomer.breakfast.athleticQty *
-    //             currentCustomer.lifestyle.extraAthletic;
-    //         }
-    //       }
-
-    //       if (currentCustomer.lunch.athleticQty > 0) {
-    //         if (
-    //           currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-    //           'Percentage'
-    //         ) {
-    //           const extraAthleticPerLunch =
-    //             currentCustomer.lifestyle.extraAthletic /
-    //             100 *
-    //             currentCustomer.lunchPrice;
-
-    //           totalAthleticSurcharge +=
-    //             currentCustomer.lunch.athleticQty * extraAthleticPerLunch;
-    //         }
-
-    //         if (
-    //           currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-    //           'Fixed amount'
-    //         ) {
-    //           totalAthleticSurcharge +=
-    //             currentCustomer.lunch.athleticQty *
-    //             currentCustomer.lifestyle.extraAthletic;
-    //         }
-    //       }
-
-    //       if (currentCustomer.dinner.athleticQty > 0) {
-    //         if (
-    //           currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-    //           'Percentage'
-    //         ) {
-    //           const extraAthleticPerDinner =
-    //             currentCustomer.lifestyle.extraAthletic /
-    //             100 *
-    //             currentCustomer.dinnerPrice;
-
-    //           totalAthleticSurcharge +=
-    //             currentCustomer.dinner.athleticQty * extraAthleticPerDinner;
-    //         }
-
-    //         if (
-    //           currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
-    //           'Fixed amount'
-    //         ) {
-    //           totalAthleticSurcharge +=
-    //             currentCustomer.breakfast.athleticQty *
-    //             currentCustomer.lifestyle.extraAthletic;
-    //         }
-    //       }
-
-    //       currentCustomer.totalAthleticSurcharge = totalAthleticSurcharge;
-    //     }
-
-    //     // calculating bodybuilder surcharge for all meals
-    //     if (
-    //       currentCustomer.breakfast.bodybuilderQty > 0 ||
-    //       currentCustomer.lunch.bodybuilderQty > 0 ||
-    //       currentCustomer.dinner.bodybuilderQty > 0
-    //     ) {
-    //       let totalBodybuilderSurcharge = 0;
-
-    //       if (currentCustomer.breakfast.bodybuilderQty > 0) {
-    //         if (
-    //           currentCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-    //           'Percentage'
-    //         ) {
-    //           const extraBodybuilderPerBreakfast =
-    //             currentCustomer.lifestyle.extraBodybuilder /
-    //             100 *
-    //             currentCustomer.breakfastPrice;
-
-    //           totalBodybuilderSurcharge +=
-    //             currentCustomer.breakfast.bodybuilderQty *
-    //             extraBodybuilderPerBreakfast;
-    //         }
-
-    //         if (
-    //           currentCustomer.lifestyle.discountOrExtraTypeBodybuilder ==
-    //           'Fixed amount'
-    //         ) {
-    //           totalBodybuilderSurcharge +=
-    //             currentCustomer.breakfast.athleticQty *
-    //             currentCustomer.lifestyle.extraBodybuilder;
-    //         }
-    //       }
-
-    //       if (currentCustomer.lunch.bodybuilderQty > 0) {
-    //         const extraBodybuilderPerLunch =
-    //           currentCustomer.lifestyle.extraBodybuilder /
-    //           100 *
-    //           currentCustomer.lunchPrice;
-
-    //         totalBodybuilderSurcharge +=
-    //           currentCustomer.lunch.bodybuilderQty * extraBodybuilderPerLunch;
-    //       }
-
-    //       if (currentCustomer.dinner.bodybuilderQty > 0) {
-    //         const extraBodybuilderPerDinner =
-    //           currentCustomer.lifestyle.extraBodybuilder /
-    //           100 *
-    //           currentCustomer.dinnerPrice;
-
-    //         totalBodybuilderSurcharge +=
-    //           currentCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
-    //       }
-
-    //       currentCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
-    //     }
-
-    //     // discount code
-    //     if (discountCodeApplied != null) {
-
-    //       // console.log(discountCodeApplied);
-
-    //       let discountCodeAmount = 0;
-
-    //       if (discountCodeApplied.appliesToType == 'whole' ||
-    //         (discountCodeApplied.appliesToType == 'lifestyle' && discountCodeApplied.appliesToValue == 'All') ||
-    //         (discountCodeApplied.appliesToType == 'lifestyle' && discountCodeApplied.appliesToValue == currentCustomer.lifestyle._id)) {
-
-    //         let subTotal = currentCustomer.baseMealPriceTotal;
-
-    //         if (discountCodeApplied.appliesToRestrictionsAndExtras) {
-    //           subTotal += currentCustomer.totalAthleticSurcharge +
-    //             currentCustomer.totalBodybuilderSurcharge +
-    //             _.sum(currentCustomer.restrictionsSurcharges) +
-    //             _.sum(currentCustomer.specificRestrictionsSurcharges);
-    //         }
-
-
-    //         if (discountCodeApplied.discountType == 'Percentage') {
-
-    //           discountCodeAmount = (discountCodeApplied.discountValue / 100) * subTotal;
-
-    //         } else if (discountCodeApplied.discountType == 'Fixed amount') {
-    //           discountCodeAmount = discountCodeApplied.discountValue;
-    //         }
-
-
-    //         if (currentCustomer.discountActual > 0 && discountCodeApplied.appliesToExistingDiscounts == false) {
-    //           discountCodeAmount = 0;
-    //         }
-
-    //       }
-
-    //       currentCustomer.discountCodeAmount = discountCodeAmount;
-
-    //     }
-
-    //     currentCustomer.totalCost =
-    //       currentCustomer.baseMealPriceTotal +
-    //       currentCustomer.totalAthleticSurcharge +
-    //       currentCustomer.totalBodybuilderSurcharge +
-    //       _.sum(currentCustomer.restrictionsSurcharges) +
-    //       _.sum(currentCustomer.specificRestrictionsSurcharges);
-
-    //     console.log(currentCustomer.totalCost);
-
-    //     currentCustomer.totalCost -= currentCustomer.discountActual;
-
-    //     if (currentCustomer.discountCodeAmount > 0) {
-    //       currentCustomer.totalCost -= currentCustomer.discountCodeAmount;
-    //     }
-
-    //     console.log(currentCustomer.totalCost);
-    //     // console.log(currentCustomer);
-
-    //     // push
-    //     secondaryCustomers.push(currentCustomer);
-    //   });
-    // }
-
-    // let actualDeliveryCost = 0;
-    // let surchargePerDelivery = 0;
-
-    // const selectedPostalCode = this.props.postalCodes.find(
-    //   el => el.title === this.props.customer.postalCode.substring(0, 3).toUpperCase(),
-    // );
-
-    // console.log(selectedPostalCode);
-
-    // if (selectedPostalCode.hasOwnProperty('extraSurcharge')) {
-    //   surchargePerDelivery = selectedPostalCode.extraSurcharge;
-    // }
-
-    // console.log(surchargePerDelivery);
-
-    // for (
-    //   let delivIndex = 0;
-    //   delivIndex < this.props.subscription.delivery.length;
-    //   delivIndex++
-    // ) {
-    //   const daysMealSum =
-    //     parseInt(
-    //       this.props.subscription.completeSchedule[delivIndex].breakfast,
-    //       10,
-    //     ) +
-    //     parseInt(
-    //       this.props.subscription.completeSchedule[delivIndex].lunch,
-    //       10,
-    //     ) +
-    //     parseInt(
-    //       this.props.subscription.completeSchedule[delivIndex].dinner,
-    //       10,
-    //     );
-
-    //   const deliveryTypeSelected = this.props.subscription.delivery[
-    //     delivIndex
-    //   ];
-
-    //   // calculate surcharges
-
-    //   if (deliveryTypeSelected == '') {
-    //     continue;
-    //   } else if (
-    //     deliveryTypeSelected == 'dayOf' ||
-    //     deliveryTypeSelected == 'nightBefore'
-    //   ) {
-    //     primaryCustomer.deliverySurcharges += surchargePerDelivery;
-    //   } else if (
-    //     // tuesday
-    //     deliveryTypeSelected == 'sundayNight' ||
-    //     deliveryTypeSelected == 'dayOfMonday'
-    //   ) {
-    //     primaryCustomer.deliverySurcharges += surchargePerDelivery;
-    //   } else if (
-    //     // wednesday
-    //     deliveryTypeSelected == 'sundayNight' ||
-    //     deliveryTypeSelected == 'dayOfMonday' ||
-    //     deliveryTypeSelected == 'nightBeforeMonday' ||
-    //     deliveryTypeSelected == 'dayOfTuesday'
-    //   ) {
-    //     primaryCustomer.deliverySurcharges += surchargePerDelivery;
-    //   } else if (
-    //     // thursday
-    //     deliveryTypeSelected == 'mondayNight' ||
-    //     deliveryTypeSelected == 'dayOfTuesday' ||
-    //     deliveryTypeSelected == 'nightBeforeTuesday' ||
-    //     deliveryTypeSelected == 'dayOfWednesday'
-    //   ) {
-    //     primaryCustomer.deliverySurcharges += surchargePerDelivery;
-    //   } else if (
-    //     // friday
-    //     deliveryTypeSelected == 'tuesdayNight' ||
-    //     deliveryTypeSelected == 'dayOfWednesday' ||
-    //     deliveryTypeSelected == 'nightBeforeWednesday' ||
-    //     deliveryTypeSelected == 'dayOfThursday'
-    //   ) {
-    //     primaryCustomer.deliverySurcharges += surchargePerDelivery;
-    //   }
-    //   // calculate actual delivery cost / delivery
-    //   if (deliveryTypeSelected == '') {
-    //     continue;
-    //   } else if (
-    //     deliveryTypeSelected == 'dayOf' ||
-    //     deliveryTypeSelected == 'dayOfFriday' ||
-    //     deliveryTypeSelected == 'dayOfThursday' ||
-    //     deliveryTypeSelected == 'dayOfWednesday' ||
-    //     deliveryTypeSelected == 'dayOfTuesday' ||
-    //     deliveryTypeSelected == 'dayOfMonday'
-    //   ) {
-    //     actualDeliveryCost += 2.5;
-    //   } else if (
-    //     daysMealSum == 1 &&
-    //     (deliveryTypeSelected == 'nightBefore' ||
-    //       deliveryTypeSelected == 'sundayNight' ||
-    //       deliveryTypeSelected == 'mondayNight' ||
-    //       deliveryTypeSelected == 'tuesdayNight' ||
-    //       deliveryTypeSelected == 'nightBeforeMonday' ||
-    //       deliveryTypeSelected == 'nightBeforeTuesday' ||
-    //       deliveryTypeSelected == 'nightBeforeWednesday')
-    //   ) {
-    //     actualDeliveryCost += 2.5;
-    //   } else if (delivIndex == 5) {
-    //     // these explicit conditions because they depend on friday's/thursday's selections
-    //     if (
-    //       this.props.subscription.delivery[delivIndex - 1] ==
-    //       'dayOfThursday'
-    //     ) {
-    //       if (deliveryTypeSelected == 'nightBeforeThursday') {
-    //         actualDeliveryCost += 2.5;
-
-    //         // mixing surcharges here
-    //         primaryCustomer.deliverySurcharges += surchargePerDelivery;
-    //       }
-    //     } else if (
-    //       this.props.subscription.delivery[delivIndex - 1] ==
-    //       'dayOfPaired' &&
-    //       this.props.subscription.delivery[delivIndex - 2] == 'dayOf'
-    //     ) {
-    //       if (deliveryTypeSelected == 'nightBeforeThursday') {
-    //         actualDeliveryCost += 2.5;
-
-    //         // mixing surcharges here
-    //         primaryCustomer.deliverySurcharges += surchargePerDelivery;
-    //       }
-    //     }
-    //   } // else if 5
-    // }
-
-    // // calculate delivery surcharges
-
-    // primaryCustomer.deliveryCost = actualDeliveryCost;
-
-    // primaryCustomer.totalCost =
-    //   primaryCustomer.baseMealPriceTotal +
-    //   primaryCustomer.totalAthleticSurcharge +
-    //   primaryCustomer.totalBodybuilderSurcharge +
-    //   primaryCustomer.coolerBag +
-    //   _.sum(primaryCustomer.restrictionsSurcharges) +
-    //   _.sum(primaryCustomer.specificRestrictionsSurcharges) +
-    //   primaryCustomer.deliveryCost + primaryCustomer.deliverySurcharges;
-
-    // primaryCustomer.totalCost -= primaryCustomer.discountActual;
-
-    // if (primaryCustomer.discountCodeAmount > 0) {
-    //   primaryCustomer.totalCost -= primaryCustomer.discountCodeAmount;
-    // }
-
-    // primaryCustomer.taxes =
-    //   0.13 *
-    //   (primaryCustomer.totalCost +
-    //     _.sumBy(secondaryCustomers, e => e.totalCost));
-
-    // let secondaryGroupCost = 0;
-
-    // if (this.props.customer.associatedProfiles > 0) {
-    //   secondaryCustomers.forEach((e, i) => {
-
-    //     secondaryGroupCost += e.totalCost;
-
-    //   });
-    // }
-
-    // primaryCustomer.secondaryGroupTotal = secondaryGroupCost;
-
-    // primaryCustomer.groupTotal =
-    //   secondaryGroupCost + primaryCustomer.totalCost + primaryCustomer.taxes;
-
-
-    // primaryCustomer.taxes = parseFloat(primaryCustomer.taxes.toFixed(2));
-    // primaryCustomer.groupTotal = parseFloat(primaryCustomer.groupTotal.toFixed(2));
-
-    // console.log(primaryCustomer);
-
     Meteor.call('customer.getBillingData', this.props.customer._id, (err, res) => {
       if (err) {
         console.log(err);
@@ -1414,16 +227,6 @@ class Step4CheckoutCurrent extends React.Component {
         });
       }
     });
-
-    // this.setState({
-    //   primaryProfileBilling: primaryCustomer,
-    //   secondaryProfilesBilling: secondaryCustomers,
-    // });
-
-    // Payment.formatCardNumber(document.querySelector('#cardNumber'));
-    // Payment.formatCardExpiry(document.querySelector('#expiry'));
-    // Payment.formatCardCVC(document.querySelector('#cvc'));
-
   }
 
   attachPaymentFormatHandlers() {
@@ -1823,9 +626,11 @@ class Step4CheckoutCurrent extends React.Component {
               message: 'Discount added successfully.',
             });
 
+
             this.setState({
-              openSummaryDialog: false,
-            })
+              orderSummaryDialogOpen: false,
+            });
+
           }
 
         });
@@ -1836,6 +641,49 @@ class Step4CheckoutCurrent extends React.Component {
   // this methods removes the discount and opens up the subscription update dialog (similar to step 2)
   handleRemoveDiscount() {
 
+    const discountDetails = {
+      discountCode: this.state.discountSelected,
+      id: this.props.customer._id,
+      removeDiscount: true,
+    };
+
+    Meteor.call('edit.customer.step4', discountDetails, (err, res) => {
+      if (err) {
+        this.setState({
+          submitSuccess: false,
+          submitLoading: false,
+          secondTime: false,
+        }, () => {
+          this.props.popTheSnackbar({
+            message: err.reason,
+          });
+        });
+      } else {
+        this.setState({
+          submitSuccess: true,
+          submitLoading: false,
+          secondTime: false,
+        }, () => {
+
+          if (typeof res === 'object' && res.hasOwnProperty('subUpdateScheduled')) {
+            this.props.popTheSnackbar({
+              message: 'Customer details update scheduled for friday night.',
+            });
+          } else {
+            this.props.popTheSnackbar({
+              message: 'Discount added successfully.',
+            });
+
+
+            this.setState({
+              orderSummaryDialogOpen: false,
+            });
+
+          }
+
+        });
+      }
+    });
   }
 
   handleRestrictionChipDelete(type) {
@@ -1847,11 +695,11 @@ class Step4CheckoutCurrent extends React.Component {
     this.setState({
       discountApplied: '',
       hasFormChanged: true,
+      removeDiscount: true,
     });
 
-
     this.closeDiscountDeleteDialog();
-    this.handleRemoveDiscount();
+    this.openOrderSummaryDialog();
   }
 
   getTypeAvatar(discount) {
@@ -2079,6 +927,24 @@ class Step4CheckoutCurrent extends React.Component {
                   ) : ''}
                 </Grid>
 
+                {this.state.paymentMethod == 'interac' ||
+                  this.state.paymentMethod == 'cash' && (
+                    <Grid container>
+                      <Grid item xs={12} sm={6}>
+                        <FormControlLabel
+                          control={
+                            <Checkbox
+                              value="taxExempt"
+                              checked={this.state.taxExempt}
+                            />
+                          }
+                          onChange={this.handleTaxExempt.bind(this)}
+                          label="Customer is tax exempt"
+                        />
+                      </Grid>
+                    </Grid>
+                  )}
+
                 <Grid item xs={12}>
                   <Typography type="headline" style={{ margin: '25px 0', display: 'flex', alignItems: 'center' }}>Subscription
                     <Chip style={{ marginLeft: '10px' }} label={this.props.subscription && this.props.subscription.status.toUpperCase()} /></Typography>
@@ -2193,8 +1059,8 @@ class Step4CheckoutCurrent extends React.Component {
                         />
                       ))
                     ) : (
-                      <Chip className="chip--bordered" label="Discount code" />
-                    )}
+                        <Chip className="chip--bordered" label="Discount code" />
+                      )}
                   </div>
                 </Grid>
 
@@ -2390,128 +1256,10 @@ class Step4CheckoutCurrent extends React.Component {
                       </Button>
                     </form>
                   </DialogContent>
-
                 </Dialog>
-
-
-                {/* <Grid item xs={12}>
-                      <FormControl component="fieldset">
-                        <RadioGroup
-                          aria-label="payment-method"
-                          name="paymentMethod"
-                          value={this.state.paymentMethod}
-                          onChange={this.handleChangeRadioPaymentMethod.bind(
-                            this,
-                          )}
-                          style={{ flexDirection: 'row' }}
-                        >
-                          <FormControlLabel
-                            value="card"
-                            control={<Radio />}
-                            label="Credit card"
-                            checked
-                            selected
-                          />
-                          <FormControlLabel
-                            value="interac"
-                            control={<Radio />}
-                            label="Interac e-transfer"
-                          />
-
-                          <FormControlLabel
-                            value="cash"
-                            control={<Radio />}
-                            label="Cash"
-                          />
-                        </RadioGroup>
-                      </FormControl>
-                    </Grid> */}
               </Grid>
 
-              {/* <div
-                    className={
-                      this.state.paymentMethod == 'card' ? 'show' : 'hidden'
-                    }
-                  >
-                    <Grid container>
-                      <Grid item xs={12}>
-                        <Typography
-                          type="subheading"
-                          className="font-uppercase"
-                        >
-                          Payment
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Input
-                          placeholder="Name on card"
-                          inputProps={{
-                            name: 'nameOnCard',
-                            id: 'nameOnCard',
-                          }}
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <Input
-                          placeholder="Card number"
-                          inputProps={{
-                            name: 'cardNumber',
-                            id: 'cardNumber',
-                          }}
-                          fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                    <Grid container>
-                      <Grid item xs={4}>
-                        <Input
-                          placeholder="Expiration"
-                          inputProps={{ name: 'expiry', id: 'expiry' }}
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={4}>
-                        <Input
-                          placeholder="CVC"
-                          inputProps={{ name: 'cvc', id: 'cvc' }}
-                          fullWidth
-                        />
-                      </Grid>
-                      <Grid item xs={4}>
-                        <Input
-                          placeholder="Postal code"
-                          inputProps={{
-                            name: 'postal_code',
-                            id: 'postalCode',
-                          }}
-                          fullWidth
-                        />
-                      </Grid>
-                    </Grid>
-                  </div> */}
 
-              {/* {this.state.paymentMethod == 'interac' ||
-                    this.state.paymentMethod == 'cash' ? (
-                      <div>
-                        <Grid container>
-                          <Grid item xs={12} sm={6}>
-                            <FormControlLabel
-                              control={
-                                <Checkbox
-                                  value="taxExempt"
-                                  checked={this.state.taxExempt}
-                                />
-                              }
-                              onChange={this.handleTaxExempt.bind(this)}
-                              label="Customer is tax exempt"
-                            />
-                          </Grid>
-                        </Grid>
-                      </div>
-                    ) : (
-                      ''
-                    )} */}
             </Paper>
           </Grid>
           <Grid item xs={12} sm={5}>
@@ -2613,63 +1361,18 @@ class Step4CheckoutCurrent extends React.Component {
                               }{' '}
                             </Typography>
                           </Grid>
-                          {/* <Grid item xs={12} sm={6}>
-                            <Typography type="subheading">
-                              {this.props.discounts.find(e => this.props.subscription.discountApplied == e._id).title}
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <Typography
-                              type="subheading"
-                              style={{ textAlign: 'right' }}
-                            >
-                              -${
-                                this.state.primaryProfileBilling.discountCodeAmount
-                              }{' '}
-                            </Typography>
-                          </Grid> */}
 
                         </Grid>
                       ) : (
                         ''
                       )}
 
-
-                    {/* {this.state.primaryProfileBilling && (this.state.primaryProfileBilling.discountActual == 0 && this.state.primaryProfileBilling.discountCodeAmount > 0) ? (
-                      <Grid container>
-                        <Grid item xs={12}>
-                          <Typography
-                            type="body2"
-                            className="font-medium font-uppercase"
-                            style={{ marginTop: '.75em' }}
-                          >
-                            Discount
-                        </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Typography type="subheading">
-                            {this.props.discounts.find(e => this.props.subscription.discountApplied == e._id).title}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            type="subheading"
-                            style={{ textAlign: 'right' }}
-                          >
-                            -${
-                              this.state.primaryProfileBilling.discountCodeAmount
-                            }{' '}
-                          </Typography>
-                        </Grid>
-                      </Grid>
-                    ) : ''} */}
-
                     {this.state.primaryProfileBilling &&
                       (this.state.primaryProfileBilling.totalAthleticSurcharge >
                         0 ||
                         this.state.primaryProfileBilling
                           .totalBodybuilderSurcharge > 0) ? (
-                            <Grid item xs={12}>
+                        <Grid item xs={12}>
                           <Typography
                             type="body2"
                             className="font-medium font-uppercase"
@@ -2720,7 +1423,7 @@ class Step4CheckoutCurrent extends React.Component {
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling
                         .totalBodybuilderSurcharge > 0 ? (
-                          <Grid container>
+                        <Grid container>
                           <Grid item xs={12} sm={6}>
                             <Typography type="subheading">
                               Bodybuilder
@@ -2900,56 +1603,9 @@ class Step4CheckoutCurrent extends React.Component {
                                     -${e.discountActual}{' '}
                                   </Typography>
                                 </Grid>
-                                {/* {e.discountCodeAmount > 0 && (
-                                  <div>
-                                    <Grid item xs={12} sm={6}>
-                                      <Typography type="subheading">
-                                        {this.props.discounts.find(disc => this.props.subscription.discountApplied == disc._id).title}
-
-                                      </Typography>
-                                    </Grid>
-                                    <Grid item xs={12} sm={6}>
-                                      <Typography
-                                        type="subheading"
-                                        style={{ textAlign: 'right' }}
-                                      >
-                                        -${e.discountCodeAmount}{' '}
-                                      </Typography>
-                                    </Grid>
-                                  </div>
-                                )} */}
 
                               </Grid>
                             )}
-
-                          {/* {e.discountActual == 0 &&
-                            e.discountCodeAmount > 0 && (
-                              <Grid container>
-                                <Grid item xs={12}>
-                                  <Typography
-                                    type="body2"
-                                    className="font-medium font-uppercase"
-                                    style={{ marginTop: '.75em' }}
-                                  >
-                                    Discount
-                                </Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <Typography type="subheading">
-                                    {this.props.discounts.find(disc => this.props.subscription.discountApplied == disc._id).title}
-
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <Typography
-                                    type="subheading"
-                                    style={{ textAlign: 'right' }}
-                                  >
-                                    -${e.discountCodeAmount}{' '}
-                                  </Typography>
-                                </Grid>
-                              </Grid>
-                            )} */}
 
                           {e.totalAthleticSurcharge > 0 ||
                             e.totalBodybuilderSurcharge > 0 ? (
@@ -2993,8 +1649,8 @@ class Step4CheckoutCurrent extends React.Component {
                               </Grid>
                             </Grid>
                           ) : (
-                            ''
-                          )}
+                              ''
+                            )}
 
                           {e.totalBodybuilderSurcharge > 0 ? (
                             <Grid container>
@@ -3024,8 +1680,8 @@ class Step4CheckoutCurrent extends React.Component {
                               </Grid>
                             </Grid>
                           ) : (
-                            ''
-                          )}
+                              ''
+                            )}
 
                           {e.restrictionsActual.length > 0 && (
                             <Typography
@@ -3108,7 +1764,7 @@ class Step4CheckoutCurrent extends React.Component {
                           {this.state.primaryProfileBilling &&
                             this.state.primaryProfileBilling.deliveryCost > 0
                             ? `$${
-                              this.state.primaryProfileBilling.deliveryCost
+                            this.state.primaryProfileBilling.deliveryCost
                             }`
                             : 'Free'}
                         </Typography>
@@ -3142,8 +1798,8 @@ class Step4CheckoutCurrent extends React.Component {
                                 this.state.primaryProfileBilling
                                   .deliverySurcharges > 0
                                 ? `$${
-                                  this.state.primaryProfileBilling
-                                    .deliverySurcharges
+                                this.state.primaryProfileBilling
+                                  .deliverySurcharges
                                 }`
                                 : ''}
                             </Typography>
@@ -3221,8 +1877,8 @@ class Step4CheckoutCurrent extends React.Component {
                         </Grid>
                       </Grid>
                     ) : (
-                      ''
-                    )}
+                        ''
+                      )}
                     <Grid container>
                       <Grid item xs={12} sm={6}>
                         <Typography type="title">Total</Typography>
@@ -3242,7 +1898,7 @@ class Step4CheckoutCurrent extends React.Component {
                             this.state.primaryProfileBilling.taxes}/week`
                             : this.state.primaryProfileBilling &&
                             `$${
-                              this.state.primaryProfileBilling.groupTotal
+                            this.state.primaryProfileBilling.groupTotal
                             }/week`}
                         </Typography>
                       </Grid>

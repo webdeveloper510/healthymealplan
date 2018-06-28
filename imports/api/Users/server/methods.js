@@ -1713,13 +1713,9 @@ Meteor.methods({
   changePaymentMethod(userId, opaqueData, subscriptionAmount, billingInfo) {
 
     let saturday = '';
-
-    // if we haven't yet passed the day of the week that I need:
     if (moment().isoWeekday() <= 6) {
-      // then just give me this week's instance of that day
       saturday = moment().isoWeekday(6).toDate();
     } else {
-      // otherwise, give me next week's instance of that day
       saturday = moment().add(1, 'weeks').isoWeekday(6).toDate();
     }
 
