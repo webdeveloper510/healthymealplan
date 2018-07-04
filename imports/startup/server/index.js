@@ -14,6 +14,7 @@ import './jobs/setSubscriptionActiveJob';
 import './jobs/setSubscriptionCancelledCardJob';
 import './jobs/setSubscriptionActiveCardJob';
 import './jobs/editSubscriptionJob';
+import './jobs/editSubscriptionJobNonCard';
 
 import './jobs/enableDiscountJob';
 import './jobs/disableDiscountJob';

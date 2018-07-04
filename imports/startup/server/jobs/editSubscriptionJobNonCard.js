@@ -6,6 +6,8 @@ import { Random } from 'meteor/random';
 import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
 
+import calculateSubscriptionCost from '../../../modules/server/billing/calculateSubscriptionCost';
+
 const worker = Job.processJobs(
   'coreJobQueue',
   'editSubscriptionJobNonCard',
@@ -61,7 +63,7 @@ const worker = Job.processJobs(
             primaryAccount: data.id,
             subscriptionId: data.subscriptionId,
             username: Random.id(),
-            lifestyle: Lifestyles.findOne({ title: e.lifestyle })._id,
+            lifestyle: Lifestyles.findOne({ $or: [{ title: e.lifestyle }, { _id: e.lifestyle }] })._id,
             discount: e.discount,
             restrictions: e.restrictions,
             specificRestrictions: e.specificRestrictions,
