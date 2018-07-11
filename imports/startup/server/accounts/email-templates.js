@@ -5,8 +5,8 @@ import templateToHTML from '../../../modules/server/handlebars-email-to-html';
 import templateToText from '../../../modules/server/handlebars-email-to-text';
 
 const name = 'Vittle';
-const email = '<support@vittle.ca>';
-const from = `${name} ${email}`;
+const email = '<support@mg.vittle.ca>';
+const from = 'support@mg.vittle.ca';
 const emailTemplates = Accounts.emailTemplates;
 
 emailTemplates.siteName = name;
@@ -22,6 +22,9 @@ emailTemplates.verifyEmail = {
       firstName: user.profile.name.first,
       verifyUrl: url.replace('#/', ''),
     });
+  },
+  headers: {
+    'List-Unsubscribe': '<%unsubscribe_url%>',
   },
   text(user, url) {
     const urlWithoutHash = url.replace('#/', '');
@@ -46,6 +49,9 @@ emailTemplates.resetPassword = {
       emailAddress: user.emails[0].address,
       resetUrl: url.replace('#/', ''),
     });
+  },
+  headers: {
+    'List-Unsubscribe': '<%unsubscribe_url%>',
   },
   text(user, url) {
     const urlWithoutHash = url.replace('#/', '');
