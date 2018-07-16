@@ -35,8 +35,7 @@ import Button from 'material-ui/Button';
 
 import Loading from '../../components/Loading/Loading';
 import './CustomerTable.scss';
-import TablePagination from './TablePagination';
-
+import moment from 'moment';
 
 class CustomersTable extends React.Component {
   constructor(props) {
@@ -377,7 +376,7 @@ class CustomersTable extends React.Component {
                       <Typography type="body2" className="body2" style={{ textTransform: 'capitalize' }}>
                         {e.secondary == undefined ? (
                           <div>
-                            {e.profile.online ? 'Online' : e.profile.lastLogin}
+                            {e.profile.online ? 'Online' : e.profile.lastLogin ? moment(e.profile.lastLogin).format('MMMM Mo, YYYY') : ''}
                           </div>
                         ) : ''}
                       </Typography>
