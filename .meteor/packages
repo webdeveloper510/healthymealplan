@@ -41,3 +41,7 @@ meteorhacks:picker
 meteorhacks:aggregate
 lepozepo:s3
 force-ssl
+session
+#reywood:publish-composite
+#jcbernack:reactive-aggregate
+ostrio:user-status

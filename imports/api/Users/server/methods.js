@@ -145,8 +145,8 @@ Meteor.methods({
     Meteor.users.update({
       _id: data.id,
     }, {
-        $set: toUpdate,
-      });
+      $set: toUpdate,
+    });
 
     // console.log(data);
   },
@@ -204,7 +204,7 @@ Meteor.methods({
       discountCodeToSend = discountCode;
     }
 
-    console.log(discountCodeToSend)
+    console.log(discountCodeToSend);
 
     const data = {
       id: primaryUser._id,
@@ -465,13 +465,13 @@ Meteor.methods({
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-        $set: {
-          completeSchedule: data.completeSchedule,
-          delivery: newDeliveryType,
-          amount: billing.actualTotal,
-          subscriptionItems: billing.lineItems,
-        },
-      });
+      $set: {
+        completeSchedule: data.completeSchedule,
+        delivery: newDeliveryType,
+        amount: billing.actualTotal,
+        subscriptionItems: billing.lineItems,
+      },
+    });
 
   },
 
@@ -613,12 +613,12 @@ Meteor.methods({
     Subscriptions.update({
       customerId: data.id,
     }, {
-        $set: {
-          amount: billing.actualTotal,
-          subscriptionItems: billing.lineItems,
-          discountApplied: discountCodeActual._id,
-        },
-      });
+      $set: {
+        amount: billing.actualTotal,
+        subscriptionItems: billing.lineItems,
+        discountApplied: discountCodeActual._id,
+      },
+    });
 
   },
 
@@ -1469,15 +1469,13 @@ Meteor.methods({
     let saturday = '';
 
     // if we haven't yet passed the day of the week that I need:
-    if (moment().isoWeekday() <= 6) {
+    if (moment().isoWeekday() <= 5) {
       // then just give me this week's instance of that day
       saturday = moment().isoWeekday(6).toDate();
     } else {
       // otherwise, give me next week's instance of that day
       saturday = moment().add(1, 'weeks').isoWeekday(6).toDate();
     }
-
-    console.log(saturday);
 
     const subscription = Subscriptions.findOne({ customerId });
 
@@ -1587,15 +1585,13 @@ Meteor.methods({
     let saturday = '';
 
     // if we haven't yet passed the day of the week that I need:
-    if (moment().isoWeekday() <= 6) {
+    if (moment().isoWeekday() <= 5) {
       // then just give me this week's instance of that day
       saturday = moment().isoWeekday(6).toDate();
     } else {
       // otherwise, give me next week's instance of that day
       saturday = moment().add(1, 'weeks').isoWeekday(6).toDate();
     }
-
-    console.log(saturday);
 
     const subscription = Subscriptions.findOne({ customerId });
 
@@ -1713,7 +1709,7 @@ Meteor.methods({
   changePaymentMethod(userId, opaqueData, subscriptionAmount, billingInfo) {
 
     let saturday = '';
-    if (moment().isoWeekday() <= 6) {
+    if (moment().isoWeekday() <= 5) {
       saturday = moment().isoWeekday(6).toDate();
     } else {
       saturday = moment().add(1, 'weeks').isoWeekday(6).toDate();
@@ -1840,10 +1836,10 @@ Meteor.methods({
         Subscriptions.update({
           _id: subscription._id,
         }, {
-            $set: {
-              paymentMethod: type,
-            },
-          });
+          $set: {
+            paymentMethod: type,
+          },
+        });
       } catch (error) {
         console.log(error);
         throw new Meteor.Error(500, error);

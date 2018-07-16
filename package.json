@@ -5,7 +5,8 @@
     "start": "meteor run --settings settings-development.json",
     "prod": "meteor run --settings settings-production.json",
     "test": "jest",
-    "start4": "meteor run --settings settings-development.json --port 4000"
+    "start3000": "meteor run --settings .\\settings-development.json --port 3000",
+    "start4000": "meteor run --settings settings-development.json --port 4000"
   },
   "dependencies": {
     "@babel/runtime": "^7.0.0-beta.39",
@@ -34,6 +35,7 @@
     "material-ui": "^1.0.0-beta.29",
     "material-ui-icons": "^1.0.0-beta.14",
     "meteor-node-stubs": "^0.2.11",
+    "meteor-publish-join": "^1.1.5",
     "moment": "^2.20.1",
     "moment-timezone": "^0.5.14",
     "payment": "^2.3.0",

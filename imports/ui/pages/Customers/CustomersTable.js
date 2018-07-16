@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import React from 'react';
 import { createContainer } from 'meteor/react-meteor-data';
 import PropTypes from 'prop-types';
-
+import autoBind from 'react-autobind';
 import Table, {
   TableBody,
   TableCell,
@@ -12,18 +12,31 @@ import Table, {
 } from 'material-ui/Table';
 
 import Dialog, {
+  DialogTitle,
   DialogActions,
   DialogContent,
   DialogContentText,
 } from 'material-ui/Dialog';
+import List, { ListItem, ListItemText } from 'material-ui/List';
+// import ListItem from 'material-ui/List';
+// import ListItemText from 'material-ui/List';
+import Chip from 'material-ui/Chip';
+
+// import { Menu, MenuItem } from 'material-ui/Menu';
+import Menu from 'material-ui/Menu';
+import MenuItem from 'material-ui/Menu';
+import IconButton from 'material-ui/IconButton';
+import MoreVert from 'material-ui-icons/MoreVert';
 
 import $ from 'jquery';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
-import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
 
 import Loading from '../../components/Loading/Loading';
+import './CustomerTable.scss';
+import TablePagination from './TablePagination';
+
 
 class CustomersTable extends React.Component {
   constructor(props) {
@@ -35,7 +48,11 @@ class CustomersTable extends React.Component {
       selectedCustomerId: '',
       selectedCheckboxesNumber: 0,
       deleteDialogOpen: false,
+
+      anchorEl: false,
     };
+
+    autoBind(this);
   }
 
   rowSelected(e, event, checked) {
@@ -169,28 +186,31 @@ class CustomersTable extends React.Component {
     this.setState({ deleteDialogOpen: false });
   }
 
-
   getStatusClass(e) {
-    const statusToReturn = '';
-
-
     if (e.joinedSubscription == undefined) {
       return 'status status--abandoned';
     }
 
     if (e.joinedSubscription.status == 'active') {
-      return 'status status--delivered';
+      return 'status status--active';
     }
 
     if (e.joinedSubscription.status == 'paused') {
-      return 'status status--delayed';
+      return 'status status--paused';
     }
 
     if (e.joinedSubscription.status == 'cancelled') {
-      return 'status status--not-delivered';
+      return 'status status--cancelled';
     }
   }
 
+  handleClick(event, id) {
+    this.setState({ [id]: true });
+  }
+
+  handleClose(event, id) {
+    this.setState({ [id]: false });
+  }
 
   handleDeleteCustomer(customerId) {
     this.deleteDialogHandleRequestClose();
@@ -212,69 +232,69 @@ class CustomersTable extends React.Component {
     return (
       <div>
         <Paper elevation={2} className="table-container">
-          {this.state.selectedCheckboxes.length > 0 ? (
-            <div className="table-container--delete-rows-container">
-              <Typography
-                style={{ color: '#fff' }}
-                className="subheading"
-                type="subheading"
-              >
-                {this.state.selectedCheckboxesNumber} lifestyle{this.state
-                  .selectedCheckboxes.length > 1
-                  ? 's'
-                  : ''}{' '}
-                selected
-              </Typography>
-              <Button
-                style={{ color: '#FFF' }}
-                onClick={this.deleteDialogHandleClickOpen.bind(this)}
-              >
-                Delete
-              </Button>
-            </div>
-          ) : (
-              ''
-            )}
           <Table className="table-container" style={{ tableLayout: 'fixed' }}>
-            {this.props.count > 0 ? (
-              <TableHead>
-                <TableRow>
+            <TableHead>
+              <TableRow>
 
-                  <TableCell
-                    style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.33%' }}
-                    onClick={() => this.props.sortByOptions('profile.name.first')}
-                  >
-                    <Typography className="body2" type="body2">
-                      Name
-                    </Typography>
-                  </TableCell>
+                <TableCell
+                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '33.33%' }}
+                  onClick={() => this.props.sortByOptions('profile.name.first')}
+                >
+                  <Typography className="body2" type="body2">
+                    Name
+                  </Typography>
+                </TableCell>
 
-                  <TableCell
-                    style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.33%' }}
-                    onClick={() => this.props.sortByOptions('SKU')}
-                  >
-                    <Typography className="body2" type="body2">
-                      Plan
-                    </Typography>
-                  </TableCell>
-                  {/* <TableCell
-                    style={{ paddingTop: '10px', paddingBottom: '10px', width: '25%' }}
-                    onClick={() => this.props.sortByOptions('subscription.status')}
-                  >
-                    <Typography className="body2" type="body2">
-                      Status
-                    </Typography>
-                  </TableCell> */}
-                  <TableCell
-                    style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.34%' }}
-                  />
-                </TableRow>
-              </TableHead>
-            ) : (
-                ''
-              )}
+                <TableCell
+                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '25%' }}
+                  onClick={() => this.props.sortByOptions('joinedLifestyle.title')}
+                >
+                  <Typography className="body2" type="body2">
+                    Plan
+                  </Typography>
+                </TableCell>
+                <TableCell
+                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                  onClick={() => this.props.sortByOptions('joinedSubscription.paymentMethod')}
+                >
+                  <Typography className="body2" type="body2">
+                    Payment
+                  </Typography>
+                </TableCell>
+
+                <TableCell
+                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                  onClick={() => this.props.sortByOptions('joinedSubscription.amount')}
+
+                >
+                  <Typography className="body2" type="body2">
+                    Amount
+                  </Typography>
+                </TableCell>
+                <TableCell
+                  style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                >
+                  <Typography className="body2" type="body2">
+                    Activity
+                  </Typography>
+                </TableCell>
+                <TableCell
+                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                  onClick={() => this.props.sortByOptions('joinedSubscription.status')}
+                >
+                  <Typography className="body2" type="body2">
+                    Status
+                  </Typography>
+                </TableCell>
+
+                <TableCell
+                  style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                />
+              </TableRow>
+            </TableHead>
+
             <TableBody>
-              {this.props.results.map((e, i) => {
+              {this.props.results != undefined && this.props.results.map((e, i) => {
                 let name = '';
 
                 if (e.profile && e.profile.name) {
@@ -289,7 +309,7 @@ class CustomersTable extends React.Component {
 
 
                 return (
-                  <TableRow hover className={`${e._id} ${statusClass}`} key={e._id}>
+                  <TableRow hover className={`${e._id}`} key={e._id}>
 
                     <TableCell
 
@@ -297,55 +317,121 @@ class CustomersTable extends React.Component {
                       onClick={() => this.props.history.push(`/customers/${e._id}/edit`)}
                     >
                       <Typography type="subheading">
-                        <span className="status-circle" />
+                        {/* <span className="status-circle" /> */}
                         {name}
                       </Typography>
-                      <Typography style={{ marginLeft: '18px' }} type="body2">
+                      <Typography type="body2">
                         {e.associatedProfiles
                           ? `${e.associatedProfiles} profile`
                           : ''}
                         {e.associatedProfiles && e.associatedProfiles > 1
                           ? 's'
                           : ''}
+                        {e.primaryAccount && 'Secondary'}
                       </Typography>
                     </TableCell>
 
                     <TableCell
 
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.33%' }}
-                      onClick={() => this.props.history.push(`/customers/${e._id}/edit`)}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '25%' }}
+                      onClick={() => this.props.history.push(`/ customers / ${e._id} /edit`)}
                     >
                       <Typography type="subheading">
                         {e.joinedLifestyle ? e.joinedLifestyle.title : ''}
                       </Typography>
                     </TableCell>
-                    {/* <TableCell
 
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '25%' }}
-                      onClick={() => this.props.history.push(`/customers/${e._id}/edit`)
-                      }
-                    >
-                      <Typography type="body2">
-                        {e.joinedSubscription ? e.joinedSubscription.status.toUpperCase() : e.joinedSubscription === undefined && e.status === 'abandoned' ? 'ABANDONED' : ''}
-                      </Typography>
-                    </TableCell> */}
 
                     <TableCell
 
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.34%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                      onClick={() => this.props.history.push(`/customers/${e._id}/edit`)
+                      }
                     >
-                      {e.secondary === undefined && (
-                        <div>
-                          <Button color="secondary" onClick={this.deleteDialogHandleClickOpen.bind(this, e._id, name)}>Delete</Button>
-                        </div>
-                      )}
+                      <Typography type="body2" className="body2" style={{ textTransform: 'capitalize' }}>
+                        {e.joinedSubscription && (
+                          e.joinedSubscription.paymentMethod
+                        )}
+                      </Typography>
                     </TableCell>
+
+                    <TableCell
+
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                      onClick={() => this.props.history.push(`/customers/${e._id}/edit`)
+                      }
+                    >
+                      <Typography type="body2" className="body2" style={{ textTransform: 'capitalize' }}>
+                        {e.joinedSubscription && (
+                          `$${e.joinedSubscription.amount.toFixed(2)}`
+                        )}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell
+
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                      onClick={() => this.props.history.push(`/customers/${e._id}/edit`)
+                      }
+                    >
+                      <Typography type="body2" className="body2" style={{ textTransform: 'capitalize' }}>
+                        {e.secondary == undefined ? (
+                          <div>
+                            {e.profile.online ? 'Online' : e.profile.lastLogin}
+                          </div>
+                        ) : ''}
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell
+
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                      onClick={() => this.props.history.push(`/customers/${e._id}/edit`)
+                      }
+                    >
+                      <Typography type="body2" className="body2" style={{ textTransform: 'capitalize' }}>
+                        <Chip
+                          style={{ color: '#FFF', textTransform: 'capitalize' }}
+                          label={e.joinedSubscription == undefined ? 'Abandoned' : e.joinedSubscription.status}
+                          className={`${statusClass}`}
+                        />
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}>
+                      {e.secondary == undefined ? (
+                        <div>
+                          <IconButton
+                            onClick={ev => this.handleClick(ev, e._id)}
+                          >
+                            <MoreVert />
+                          </IconButton>
+                        </div>
+                      )
+                        : ''}
+                    </TableCell>
+
+                    <Dialog open={this.state[e._id] == undefined ? false : this.state[e._id]} onClose={ev => this.handleClose(ev, e._id)}>
+                      <DialogTitle id="simple-dialog-title">{`Actions for ${name}`}</DialogTitle>
+                      <div>
+                        <List>
+                          <ListItem button onClick={this.deleteDialogHandleClickOpen.bind(this, e._id, name)}>
+                            <ListItemText primary="Delete" />
+                          </ListItem>
+                        </List>
+                      </div>
+                    </Dialog>
+
                   </TableRow>
+
                 );
               })}
 
-              {this.renderNoResults(this.props.count)}
+              {this.props.results != undefined && (
+                this.renderNoResults(this.props.results.length)
+              )}
             </TableBody>
+
             <TableFooter>
               <TableRow>
                 <TableCell>
@@ -354,27 +440,27 @@ class CustomersTable extends React.Component {
                     type="body2"
                     style={{ color: 'rgba(0, 0, 0, .54)' }}
                   >
-                    {this.props.count} of {this.props.customerCount} customer{this
+                    {this.props.results != undefined && this.props.results.length} of {this.props.customerCount} customer{this
                       .props.customerCount > 1
                       ? 's'
                       : ''}
                   </Typography>
                 </TableCell>
-                <TableCell />
-                {this.props.hasMore ? (
-                  <TableCell
-                    style={{
-                      display: 'flex',
-                      height: '56px',
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                    }}
-                  >
-                    <Button onClick={this.props.loadMore}>Load More</Button>
-                  </TableCell>
-                ) : (
-                    ''
-                  )}
+                <TableCell>
+
+                  {/* <Button>Previous</Button>
+                  <Button>Next</Button> */}
+                  {/* <TablePagination
+                    colSpan={3}
+                    count={this.props.customerCount}
+                    rowsPerPage={50}
+                    page={1}
+                    onChangePage={this.handleChangePage}
+                  /> */}
+
+                </TableCell>
+
+
               </TableRow>
             </TableFooter>
           </Table>
@@ -417,7 +503,7 @@ class CustomersTable extends React.Component {
             </Button>
           </DialogActions>
         </Dialog>
-      </div>
+      </div >
     );
   }
 }

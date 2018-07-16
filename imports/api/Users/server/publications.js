@@ -1,8 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 import { Mongo } from 'meteor/mongo';
-
+import Subscriptions from '../../Subscriptions/Subscriptions';
 import { Match } from 'meteor/check';
 import { check } from 'meteor/check';
+import { JoinServer } from 'meteor-publish-join';
 
 Meteor.publish('users.editProfile', function usersProfile() {
   return Meteor.users.find(this.userId, {
@@ -23,6 +24,66 @@ Meteor.publish('users.customers', (query, selector) => {
   check(selector, Match.Maybe(Object));
 
   return Meteor.users.find({ roles: ['customer'] });
+});
+
+Meteor.publish('users.customers.new', function newMethod(selector, options) {
+  check(selector, Object);
+  check(options, Object);
+  // check(limit, Number);
+  // check(skip, Number);
+
+  JoinServer.publish({
+    context: this,
+    name: 'clientUsers',
+    interval: 1000,
+    doJoin() {
+
+      const usersWithSubs = Meteor.users.aggregate([
+        {
+          $lookup: {
+            from: 'Subscriptions',
+            localField: 'subscriptionId',
+            foreignField: '_id',
+            as: 'joinedSubscription',
+          },
+        },
+        {
+          $lookup: {
+            from: 'Lifestyles',
+            localField: 'lifestyle',
+            foreignField: '_id',
+            as: 'joinedLifestyle',
+          },
+        },
+        {
+          $unwind: {
+            path: '$joinedSubscription',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $unwind: {
+            path: '$joinedLifestyle',
+            preserveNullAndEmptyArrays: true,
+          },
+        },
+        {
+          $addFields: {
+            name: { $concat: ['$profile.name.first', ' ', '$profile.name.last'] },
+          },
+        },
+        {
+          $match: selector,
+        },
+        {
+          $sort: options,
+        },
+      ]);
+
+      return usersWithSubs;
+    },
+  });
+
 });
 
 Meteor.publish('users.customers.primary', (query, selector) => {
@@ -53,3 +114,4 @@ Meteor.publish('customers-all-count', function customersCount() {
     Meteor.users.find({ roles: ['customer'] }),
   );
 });
+
