@@ -44,4 +44,4 @@ force-ssl
 session
 #reywood:publish-composite
 #jcbernack:reactive-aggregate
-ostrio:user-status
+#ostrio:user-status

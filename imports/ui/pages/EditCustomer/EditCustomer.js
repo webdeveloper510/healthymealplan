@@ -5,7 +5,9 @@ import { Meteor } from 'meteor/meteor';
 
 import Grid from 'material-ui/Grid';
 import CurrentCustomerEditor from '../../components/CurrentCustomerEditor/CurrentCustomerEditor';
+import Loading from '../../components/Loading/Loading';
 import NotFound from '../NotFound/NotFound';
+
 import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
 import Restrictions from '../../../api/Restrictions/Restrictions';
@@ -13,7 +15,19 @@ import Ingredients from '../../../api/Ingredients/Ingredients';
 import PostalCodes from '../../../api/PostalCodes/PostalCodes';
 import Discounts from '../../../api/Discounts/Discounts';
 
-const EditCustomer = ({ customer, history, subscription, secondaryAccounts, popTheSnackbar, postalCodes, lifestyles, restrictions, potentialSubIngredients, loading, discounts, }) => (customer ? (
+const EditCustomer = ({ 
+  customer, 
+  history, 
+  subscription,
+  secondaryAccounts,
+  popTheSnackbar,
+  postalCodes,
+  lifestyles, 
+  restrictions,
+  potentialSubIngredients,
+  loading,
+  discounts 
+}) => (loading ? <Loading /> : !loading && lifestyles && customer ? (
   <div className="EditCurrentCustomer">
     <Grid container className="EditCategory SideContent SideContent--spacer-2x--horizontal">
       <CurrentCustomerEditor
@@ -28,7 +42,6 @@ const EditCustomer = ({ customer, history, subscription, secondaryAccounts, popT
         history={history}
         loading={loading}
         discounts={discounts}
-
       />
     </Grid>
   </div>
@@ -40,7 +53,6 @@ EditCustomer.defaultProps = {
 
 EditCustomer.propTypes = {
   customer: PropTypes.object,
-
   subscription: PropTypes.object,
   secondaryAccounts: PropTypes.arrayOf(Object).isRequired,
   history: PropTypes.object.isRequired,

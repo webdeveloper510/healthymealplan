@@ -26,16 +26,16 @@ Meteor.publish('users.customers', (query, selector) => {
   return Meteor.users.find({ roles: ['customer'] });
 });
 
-Meteor.publish('users.customers.new', function newMethod(selector, options) {
+Meteor.publish('users.customers.new', function newMethod(selector, options, skip, limit) {
   check(selector, Object);
   check(options, Object);
-  // check(limit, Number);
-  // check(skip, Number);
+  check(limit, Number);
+  check(skip, Number);
 
   JoinServer.publish({
     context: this,
     name: 'clientUsers',
-    interval: 1000,
+    interval: -500,
     doJoin() {
 
       const usersWithSubs = Meteor.users.aggregate([
@@ -77,6 +77,12 @@ Meteor.publish('users.customers.new', function newMethod(selector, options) {
         },
         {
           $sort: options,
+        },
+        {
+          $skip: skip,
+        },
+        {
+          $limit: limit,
         },
       ]);
 

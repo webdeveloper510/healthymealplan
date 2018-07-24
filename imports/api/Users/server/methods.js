@@ -67,6 +67,56 @@ Meteor.methods({
     return empId;
   },
 
+  getCustomersCount(selector, sort) {
+
+    check(selector, Object);
+    check(sort, Object);
+
+    //change this when you find a good solution to get the count
+    //of the documents through a stage in the pipeline
+    const query = Meteor.users.aggregate([
+      {
+        $lookup: {
+          from: 'Subscriptions',
+          localField: 'subscriptionId',
+          foreignField: '_id',
+          as: 'joinedSubscription',
+        },
+      },
+      {
+        $unwind: {
+          path: '$joinedSubscription',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $match: selector,
+      },
+      {
+        $sort: sort,
+      },
+      {
+        $count: 'totalDocs'
+      }
+    ]);
+
+    // console.log(query)
+
+    let maxPages = 0;
+    const LIMIT = 50;
+    const totalDocs = query.length > 0 ? query[0].totalDocs : 0;
+
+    if (totalDocs < LIMIT) {
+      maxPages = 1;
+    } else {
+      maxPages = Math.ceil(totalDocs / LIMIT)
+    }
+
+    return {
+      recordCount: totalDocs,
+      maxPages,
+    }
+  },
   'customers.delete': function deleteCustomer(id) {
 
     check(id, String);

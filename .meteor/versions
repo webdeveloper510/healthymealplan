@@ -78,7 +78,6 @@ oauth2@1.2.0
 ordered-dict@1.1.0
 ostrio:cookies@2.2.4
 ostrio:files@1.9.6
-ostrio:user-status@1.0.1
 perak:joins@1.1.9
 promise@0.10.1
 raix:eventemitter@0.1.3

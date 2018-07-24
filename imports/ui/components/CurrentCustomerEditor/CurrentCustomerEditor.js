@@ -80,6 +80,7 @@ import Avatar from 'material-ui/Avatar';
 
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
 import Search from 'material-ui-icons/Search';
+import autoBind from 'react-autobind';
 
 import validate from '../../../modules/validate';
 
@@ -151,13 +152,9 @@ class CurrentCustomerEditor extends React.Component {
       deleteDialogOpen: false,
       addRestrictionType: 'Restriction',
 
-      lifestyle: !this.props.loading && this.props.lifestyles && this.props.customer && this.props.customer.lifestyle ?
-        this.props.lifestyles.find(e => e._id === this.props.customer.lifestyle).title : 'Traditional',
+      lifestyle: '',
 
-      isLifestyleCustom: !this.props.loading && this.props.lifestyles && this.props.customer &&
-        this.props.customer.lifestyle &&
-        this.props.lifestyles.find(e => e._id == this.props.customer.lifestyle).custom ?
-        this.props.lifestyles.find(e => e._id == this.props.customer.lifestyle).custom : false,
+      isLifestyleCustom: false,
 
       discountCode: !this.props.loading && this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '', 
       
@@ -293,14 +290,7 @@ class CurrentCustomerEditor extends React.Component {
 
     };
 
-    this.handleTabChange = this.handleTabChange.bind(this);
-    this.saveFirstStep = this.saveFirstStep.bind(this);
-    this.saveSecondStep = this.saveSecondStep.bind(this);
-    this.handleDeliveryNotification = this.handleDeliveryNotification.bind(this);
-
-    this.handleClose = this.handleClose.bind(this);
-
-    this.handleResetPassword = this.handleResetPassword.bind(this);
+    autoBind(this)
   }
 
   handleSelectChange(event) {
@@ -422,6 +412,26 @@ class CurrentCustomerEditor extends React.Component {
         })
       }
     })
+  }
+
+  componentWillReceiveProps(nextProps, prevState){
+    
+    if(!nextProps.loading) {
+      if(nextProps.lifestyles && nextProps.customer && nextProps.customer.lifestyle) {
+        
+        console.log(nextProps)
+        const currentLifestyle = nextProps.lifestyles.find(e => e._id === nextProps.customer.lifestyle);
+        const isLifestyleCustom = currentLifestyle != undefined && currentLifestyle.custom ? currentLifestyle.custom : false;
+
+        if(currentLifestyle != undefined){
+          this.setState({
+            lifestyle: currentLifestyle.title,
+            lifestyleCustom: isLifestyleCustom,
+          })
+        }
+      }
+    }
+    
   }
   
   componentWillUpdate(nextProps, nextState) {
@@ -6456,7 +6466,10 @@ class CurrentCustomerEditor extends React.Component {
     const mealSteps = this.getMealSteps();
     const steps = this.getSteps();
 
-    if (!loading) {
+    if(loading){
+      return <Loading />
+    }
+   
       return (
         <div style={{ width: '100%' }}>
           <Grid container justify="center">
@@ -8682,14 +8695,8 @@ class CurrentCustomerEditor extends React.Component {
 
           </Grid>
         </div>
-      )
-    } else {
-      return (
-        <div>
-          <Loading />
-        </div>
       );
-    }
+
   }
 }
 

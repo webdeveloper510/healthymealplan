@@ -9,8 +9,8 @@ import Table, {
   TableFooter,
   TableHead,
   TableRow,
+  TablePagination,
 } from 'material-ui/Table';
-
 import Dialog, {
   DialogTitle,
   DialogActions,
@@ -18,15 +18,16 @@ import Dialog, {
   DialogContentText,
 } from 'material-ui/Dialog';
 import List, { ListItem, ListItemText } from 'material-ui/List';
-// import ListItem from 'material-ui/List';
-// import ListItemText from 'material-ui/List';
 import Chip from 'material-ui/Chip';
-
-// import { Menu, MenuItem } from 'material-ui/Menu';
 import Menu from 'material-ui/Menu';
 import MenuItem from 'material-ui/Menu';
+
 import IconButton from 'material-ui/IconButton';
 import MoreVert from 'material-ui-icons/MoreVert';
+import FirstPage from 'material-ui-icons/FirstPage';
+import KeyboardArrowLeft from 'material-ui-icons/KeyboardArrowLeft';
+import KeyboardArrowRight from 'material-ui-icons/KeyboardArrowRight';
+import LastPage from 'material-ui-icons/LastPage';
 
 import $ from 'jquery';
 import Paper from 'material-ui/Paper';
@@ -36,6 +37,8 @@ import Button from 'material-ui/Button';
 import Loading from '../../components/Loading/Loading';
 import './CustomerTable.scss';
 import moment from 'moment';
+import cloneDeep from 'lodash/cloneDeep';
+
 
 class CustomersTable extends React.Component {
   constructor(props) {
@@ -227,7 +230,20 @@ class CustomersTable extends React.Component {
     });
   }
 
+  handleChangePage(event, page) {
+    const config = this.props.tableConfig.get();
+    const configCopy = cloneDeep(config);
+
+    configCopy.pageProperties.currentPage = page + 1;
+
+    this.props.tableConfig.set(configCopy)
+
+  }
+
   render() {
+    if (this.props.results == undefined) {
+      return <Loading />;
+    }
     return (
       <div>
         <Paper elevation={2} className="table-container">
@@ -245,7 +261,7 @@ class CustomersTable extends React.Component {
                 </TableCell>
 
                 <TableCell
-                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '25%' }}
+                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '21%' }}
                   onClick={() => this.props.sortByOptions('joinedLifestyle.title')}
                 >
                   <Typography className="body2" type="body2">
@@ -262,21 +278,21 @@ class CustomersTable extends React.Component {
                 </TableCell>
 
                 <TableCell
-                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '19.5%' }}
                   onClick={() => this.props.sortByOptions('joinedSubscription.amount')}
 
                 >
                   <Typography className="body2" type="body2">
-                    Amount
+                    Last order
                   </Typography>
                 </TableCell>
-                <TableCell
+                {/* <TableCell
                   style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
                 >
                   <Typography className="body2" type="body2">
                     Activity
                   </Typography>
-                </TableCell>
+                </TableCell> */}
                 <TableCell
                   style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
                   onClick={() => this.props.sortByOptions('joinedSubscription.status')}
@@ -312,7 +328,7 @@ class CustomersTable extends React.Component {
 
                     <TableCell
 
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.33%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '38.88%' }}
                       onClick={() => this.props.history.push(`/customers/${e._id}/edit`)}
                     >
                       <Typography type="subheading">
@@ -332,7 +348,7 @@ class CustomersTable extends React.Component {
 
                     <TableCell
 
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '25%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '21%' }}
                       onClick={() => this.props.history.push(`/ customers / ${e._id} /edit`)}
                     >
                       <Typography type="subheading">
@@ -356,7 +372,7 @@ class CustomersTable extends React.Component {
 
                     <TableCell
 
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '19.5%' }}
                       onClick={() => this.props.history.push(`/customers/${e._id}/edit`)
                       }
                     >
@@ -367,24 +383,23 @@ class CustomersTable extends React.Component {
                       </Typography>
                     </TableCell>
 
-                    <TableCell
+                    {/* <TableCell
 
                       style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
                       onClick={() => this.props.history.push(`/customers/${e._id}/edit`)
                       }
                     >
                       <Typography type="body2" className="body2" style={{ textTransform: 'capitalize' }}>
-                        {e.secondary == undefined ? (
+                         {e.secondary == undefined ? (
                           <div>
                             {e.profile.online ? 'Online' : e.profile.lastLogin ? moment(e.profile.lastLogin).format('MMMM Mo, YYYY') : ''}
                           </div>
-                        ) : ''}
+                        ) : ''} 
+                    -
                       </Typography>
-                    </TableCell>
+                    </TableCell> */}
 
-                    <TableCell
-
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                    <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
                       onClick={() => this.props.history.push(`/customers/${e._id}/edit`)
                       }
                     >
@@ -431,7 +446,7 @@ class CustomersTable extends React.Component {
               )}
             </TableBody>
 
-            <TableFooter>
+            {/* <TableFooter>
               <TableRow>
                 <TableCell>
                   <Typography
@@ -445,21 +460,34 @@ class CustomersTable extends React.Component {
                       : ''}
                   </Typography>
                 </TableCell>
-                <TableCell>
 
-                  {/* <Button>Previous</Button>
-                  <Button>Next</Button> */}
-                  {/* <TablePagination
-                    colSpan={3}
-                    count={this.props.customerCount}
-                    rowsPerPage={50}
-                    page={1}
-                    onChangePage={this.handleChangePage}
-                  /> */}
+              </TableRow>
+            </TableFooter> */}
 
-                </TableCell>
-
-
+            <TableFooter>
+              <TableRow>
+                <TablePagination
+                  colSpan={5}
+                  count={this.props.tableConfig.get().pageProperties.recordCount}
+                  rowsPerPageOptions={[]}
+                  rowsPerPage={50}
+                  page={this.props.tableConfig.get().pageProperties.currentPage == 1 ? 0
+                    : this.props.tableConfig.get().pageProperties.currentPage - 1
+                  }
+                  backIconButtonProps={{
+                    'aria-label': 'Previous Page',
+                  }}
+                  nextIconButtonProps={{
+                    'aria-label': 'Next Page',
+                  }}
+                  onChangePage={this.handleChangePage}
+                // ActionsComponent={TablePaginationActionsWrapped}
+                />
+                {/* `<TableCell>
+                  <Typography type="body1">
+                    Total {this.props.customerCount}
+                  </Typography>
+                </TableCell>` */}
               </TableRow>
             </TableFooter>
           </Table>

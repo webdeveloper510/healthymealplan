@@ -18,6 +18,7 @@ import Tabs, { Tab } from 'material-ui/Tabs';
 
 import LifestylesColl from '../../../api/Lifestyles/Lifestyles';
 
+import { CircularProgress } from 'material-ui/Progress';
 import Loading from '../../components/Loading/Loading';
 import CustomersTable from './CustomersTable';
 
@@ -25,16 +26,16 @@ import { JoinClient } from 'meteor-publish-join';
 import { Tracker } from 'meteor/tracker';
 import _ from 'lodash';
 
+import autoBind from 'react-autobind';
+
 const tableConfig = new ReactiveVar({
   pageProperties: {
     currentPage: 1,
-    pageSize: 10,
+    pageSize: 50,
     recordCount: 0,
+    maxPages: 1,
   },
-  skip: 0,
-  limit: 20,
   selector: {
-
     roles: ['customer'],
   },
   sort: {
@@ -50,30 +51,61 @@ class Customers extends React.Component {
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      options: { sort: { name: 1 } },
+      options: { sort: {} },
       searchSelector: '',
+      searchTextLoading: false,
       currentTabValue: 'all',
     };
+
+    autoBind(this);
+  }
+
+  componentWillMount() {
+    this.timer = null;
   }
 
   searchByName() {
     const config = tableConfig.get();
     const configCopy = _.cloneDeep(config);
 
-    const searchValue = $('#search-users-text').val().trim();
-    if (searchValue != '') {
-      configCopy.selector.name = { $regex: new RegExp(searchValue), $options: 'i' };
+    const name = $('#search-users-text').val().trim();
+
+    if (name.length != "") {
+      configCopy.selector.name = { $regex: new RegExp(`${name}`), $options: 'gi' };
+      // configCopy.selector.name = { $regex: new RegExp(`(^${searchValue}|${searchValue}$)`), $options: 'i' };
     } else {
       delete configCopy.selector.name;
     }
 
-    console.log(configCopy);
+    // console.log(configCopy);
 
     tableConfig.set(configCopy);
 
     this.setState({
-      searchSelector: searchValue,
+      searchSelector: name,
+      searchTextLoading: false,
     });
+
+
+  }
+
+  handleChange(event) {
+    clearTimeout(this.timer);
+
+    this.setState({
+      searchTextLoading: true,
+    }, () => {
+      this.timer = setTimeout(this.searchByName, 800);
+    })
+
+  }
+
+  searchByNameKeyDown(event) {
+    //enter key
+    if (event.keyCode === 13 || event.keyCode == 8) {
+      this.searchByName();
+    }
+
   }
 
   clearSearchBox() {
@@ -82,7 +114,7 @@ class Customers extends React.Component {
     const config = tableConfig.get();
     const configCopy = _.cloneDeep(config);
 
-    delete configCopy.selector.$or;
+    delete configCopy.selector.name;
 
     tableConfig.set(configCopy);
 
@@ -140,7 +172,7 @@ class Customers extends React.Component {
       configCopy.selector['joinedSubscription.status'] = value;
     }
 
-    console.log(configCopy);
+    // console.log(configCopy);
 
     tableConfig.set(configCopy);
 
@@ -156,8 +188,6 @@ class Customers extends React.Component {
         pageSize: 10,
         recordCount: 0,
       },
-      skip: 0,
-      limit: 20,
       selector: {
         roles: ['customer'],
       },
@@ -208,7 +238,7 @@ class Customers extends React.Component {
               <Tabs
                 indicatorColor="#000"
                 value={this.state.currentTabValue}
-                onChange={this.handleTabChange.bind(this)}
+                onChange={this.handleTabChange}
               >
                 <Tab label="All" value={'all'} />
                 <Tab label="Active" value={'active'} />
@@ -232,31 +262,37 @@ class Customers extends React.Component {
               position: 'relative',
             }}
           >
-            <SearchIcon
-              className="autoinput-icon autoinput-icon--search"
-              style={{
-                display:
-                  this.state.searchSelector.length > 0 ? 'none' : 'block',
-                top: '33%',
-                right: '1.8em !important',
-              }}
-            />
+            {!this.state.searchTextLoading && (
+              <SearchIcon
+                className="autoinput-icon autoinput-icon--search"
+                style={{
+                  display:
+                    this.state.searchSelector.length > 0 ? 'none' : 'block',
+                  top: '33%',
+                  right: '1.8em !important',
+                }}
+              />
+            )}
 
-            <ClearIcon
-              className="autoinput-icon--clear"
-              onClick={this.clearSearchBox.bind(this)}
-              style={{
-                cursor: 'pointer',
-                display: this.state.searchSelector.length > 0 ? 'block' : 'none',
-              }}
-            />
+            {this.state.searchTextLoading ? (
+              <CircularProgress size={27} className="autoinput-icon--clear" />
+            ) :
+              (<ClearIcon
+                className="autoinput-icon--clear"
+                onClick={this.clearSearchBox}
+                style={{
+                  cursor: 'pointer',
+                  display: this.state.searchSelector.length > 0 ? 'block' : 'none',
+                }}
+              />)
+            }
 
             <Input
               className="input-box"
               style={{ width: '100%', position: 'relative' }}
               placeholder="Search customers"
-              // onKeyDown={this.searchByName.bind(this)}
-              onKeyUp={this.searchByName.bind(this)}
+              onChange={this.handleChange}
+              onKeyDown={this.searchByNameKeyDown}
               inputProps={{
                 id: 'search-users-text',
                 'aria-label': 'Description',
@@ -271,7 +307,8 @@ class Customers extends React.Component {
             searchTerm={this.state.searchSelector}
             rowsLimit={this.state.rowsVisible}
             history={this.props.history}
-            sortByOptions={this.sortByOption.bind(this)}
+            sortByOptions={this.sortByOption}
+            tableConfig={tableConfig}
           />
         </Grid>
       </div>
@@ -288,12 +325,32 @@ Customers.propTypes = {
 export default createContainer(() => {
   const config = tableConfig.get();
 
-  const subscription = Meteor.subscribe('users.customers.new', config.selector, config.sort);
-  // // const subscription2 = Meteor.subscribe('subscriptions', {}, {});
-  // Tracker.autorun(() => {
-  //   console.log(JoinClient.has('clientUsers'));
-  //   // console.log(JoinClient.get('clientUsers'));
-  // });
+  const skip = config.pageProperties.currentPage < 0 ? 0 :
+    (config.pageProperties.currentPage - 1) * config.pageProperties.pageSize;
+
+  const limit = config.pageProperties.pageSize;
+
+  const subscription = Meteor.subscribe('users.customers.new',
+    config.selector,
+    config.sort,
+    skip,
+    limit,
+  );
+  // const subscription2 = Meteor.subscribe('subscriptions', {}, {});
+
+  Meteor.call('getCustomersCount', config.selector, config.sort, (error, result) => {
+    if (!error) {
+      const configCopy = _.cloneDeep(config);
+
+      if (configCopy.pageProperties.recordCount != result.recordCount) {
+        // console.log(result);
+        configCopy.pageProperties.recordCount = result.recordCount;
+        configCopy.pageProperties.maxPages = result.maxPages;
+        tableConfig.set(configCopy);
+      }
+
+    }
+  });
 
   const clientusers = JoinClient.get('clientUsers');
   const clientUsersLoaded = !JoinClient.has('clientUsers');
