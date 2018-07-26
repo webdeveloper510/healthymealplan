@@ -266,8 +266,8 @@ class CurrentCustomerEditor extends React.Component {
         
       activeDeliveryScheduleStep: 0,
 
-      completeSchedule: this.props.subscription ? this.props.subscription.completeSchedule : [],
-      deliveryType: this.props.subscription ? this.props.subscription.delivery : [],
+      completeSchedule: !this.props.loading && this.props.subscription ? this.props.subscription.completeSchedule : [],
+      deliveryType: !this.props.loading &&  this.props.subscription ? this.props.subscription.delivery : [],
 
       subscriptionStartDate: moment(this.renderStartDays()[0]).format(
         'dddd MMMM Do YYYY',
@@ -283,7 +283,7 @@ class CurrentCustomerEditor extends React.Component {
 
       secondTime: false, //Step2 modal save
 
-      discountApplied: this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '',
+      discountApplied: !this.props.loading && this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '',
 
       primaryProfileBilling: null,
       secondaryProfilesBilling: null,
@@ -417,7 +417,7 @@ class CurrentCustomerEditor extends React.Component {
   componentWillReceiveProps(nextProps, prevState){
     
     if(!nextProps.loading) {
-      if(nextProps.lifestyles && nextProps.customer && nextProps.customer.lifestyle) {
+      if(nextProps.lifestyles && nextProps.customer && nextProps.customer.lifestyle && nextProps.subscription) {
         
         console.log(nextProps)
         const currentLifestyle = nextProps.lifestyles.find(e => e._id === nextProps.customer.lifestyle);
@@ -427,6 +427,8 @@ class CurrentCustomerEditor extends React.Component {
           this.setState({
             lifestyle: currentLifestyle.title,
             lifestyleCustom: isLifestyleCustom,
+            completeSchedule:  nextProps.subscription.completeSchedule,
+            deliveryType:  nextProps.subscription.delivery,
           })
         }
       }
