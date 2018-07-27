@@ -417,9 +417,31 @@ class CurrentCustomerEditor extends React.Component {
   componentWillReceiveProps(nextProps, prevState){
     
     if(!nextProps.loading) {
-      if(nextProps.lifestyles && nextProps.customer && nextProps.customer.lifestyle && nextProps.subscription) {
+      if(nextProps.lifestyles && nextProps.customer && nextProps.customer.lifestyle && nextProps.subscription && nextProps.secondaryAccounts) {
+
+        const secondaryAccounts = nextProps.secondaryAccounts.map((e) => {
+          return {
+            _id: e._id,
+            first_name: e.profile.name.first,
+            last_name: e.profile.name.last ? e.profile.name.last : '',
+            subIngredients: e.preferences,
+            specificRestrictions: e.specificRestrictions,
+            lifestyle: nextProps.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
+            isLifestyleCustom: nextProps.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom,
+            discount: e.discount,
+            restrictions: e.restrictions, //fix here
+            activeMealScheduleStep: 0,
+            deleteDialogOpen: false,
+            scheduleReal: e.schedule,
+            platingNotes: e.platingNotes ? e.platingNotes : '',
+            adultOrChild: e.adultOrChild,
+          }
+        });
         
-        console.log(nextProps)
+        const discountApplied = nextProps.subscription.hasOwnProperty('discountApplied') ? nextProps.subscription.discountApplied : '';
+
+        
+        // console.log(nextProps)
         const currentLifestyle = nextProps.lifestyles.find(e => e._id === nextProps.customer.lifestyle);
         const isLifestyleCustom = currentLifestyle != undefined && currentLifestyle.custom ? currentLifestyle.custom : false;
 
@@ -429,6 +451,8 @@ class CurrentCustomerEditor extends React.Component {
             lifestyleCustom: isLifestyleCustom,
             completeSchedule:  nextProps.subscription.completeSchedule,
             deliveryType:  nextProps.subscription.delivery,
+            discountApplied: discountApplied,
+            secondaryProfilesData: secondaryAccounts,
           })
         }
       }
