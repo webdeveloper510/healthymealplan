@@ -19,7 +19,7 @@ Meteor.methods({
       mealType: String,
       custom: Match.Optional(Boolean),
       instructionId: Match.Optional(String),
-      ingredients: Array,     
+      ingredients: Array,
       nutritional: Match.Optional(Object),
     });
 
@@ -78,8 +78,8 @@ Meteor.methods({
       plateToInsert.slug = slug.toLowerCase().split(' ').join('-');
     } else {
       const slug = `${plate.title}`;
-      plateToInsert.slug = slug.toLowerCase().split(' ').join('-');   
-   }
+      plateToInsert.slug = slug.toLowerCase().split(' ').join('-');
+    }
 
     console.log(plate);
 
@@ -149,8 +149,8 @@ Meteor.methods({
       plate.slug = slug.toLowerCase().split(' ').join('-');
     } else {
       const slug = `${plate.title}`;
-      plate.slug = slug.toLowerCase().split(' ').join('-');   
-   }
+      plate.slug = slug.toLowerCase().split(' ').join('-');
+    }
 
 
     try {
@@ -182,13 +182,9 @@ Meteor.methods({
       const toSet = {};
 
       if (plate.large) {
-        toSet = {
-          largeImageUrl: plate.imageUrl,
-        };
+        toSet.largeImageUrl = plate.imageUrl;
       } else {
-        toSet = {
-          imageUrl: plate.imageUrl,
-        };
+        toSet.imageUrl = plate.imageUrl;
       }
 
       Plates.update(plateId, {
@@ -197,30 +193,30 @@ Meteor.methods({
 
       return plateId; // Return _id so we can redirect to document after update.
     } catch (exception) {
-      throw new Meteor.Error('500', exception);
-    }
+  throw new Meteor.Error('500', exception);
+}
   },
 
-  'plates.remove': function platesRemove(plateId) {
-    check(plateId, String);
+'plates.remove': function platesRemove(plateId) {
+  check(plateId, String);
 
-    try {
-      return Plates.remove(plateId);
-    } catch (exception) {
-      throw new Meteor.Error('500', exception);
-    }
-  },
+  try {
+    return Plates.remove(plateId);
+  } catch (exception) {
+    throw new Meteor.Error('500', exception);
+  }
+},
 
-  'plates.batchRemove': function platesBatchRemove(plateIds) {
-    check(plateIds, Array);
-    console.log('Server: plates.batchRemove');
+'plates.batchRemove': function platesBatchRemove(plateIds) {
+  check(plateIds, Array);
+  console.log('Server: plates.batchRemove');
 
-    try {
-      return Plates.remove({ _id: { $in: plateIds } });
-    } catch (exception) {
-      throw new Meteor.Error('500', exception);
-    }
-  },
+  try {
+    return Plates.remove({ _id: { $in: plateIds } });
+  } catch (exception) {
+    throw new Meteor.Error('500', exception);
+  }
+},
 });
 
 rateLimit({
