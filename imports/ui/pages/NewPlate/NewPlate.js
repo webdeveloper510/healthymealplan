@@ -8,15 +8,18 @@ import Grid from "material-ui/Grid";
 
 import Ingredients from "../../../api/Ingredients/Ingredients";
 import Instructions from "../../../api/Instructions/Instructions";
+import Plates from "../../../api/Plates/Plates";
 
 import PlateEditor from "../../components/PlateEditor/PlateEditor";
 
 const NewPlate = ({
   history,
-  potentialSubIngredients,
   newPlate,
+  potentialSubIngredients,
+  potentialPlates,
   popTheSnackbar,
-  instructions
+  instructions,
+  loading,
 }) => (
   <div>
     <Grid
@@ -26,9 +29,11 @@ const NewPlate = ({
       <PlateEditor
         history={history}
         potentialSubIngredients={potentialSubIngredients}
+        potentialPlates={potentialPlates}
         popTheSnackbar={popTheSnackbar}
         newPlate={newPlate}
         instructions={instructions}
+        loading={loading}
       />
     </Grid>
   </div>
@@ -45,13 +50,14 @@ export default createContainer(() => {
   const subscription = Meteor.subscribe("ingredients");
   const subscription2 = Meteor.subscribe("ingredientTypes");
   const subscription3 = Meteor.subscribe("instructions");
+  const subscription4 = Meteor.subscribe("plates", {}, {});
 
   return {
     newPlate: true,
     loading:
-      !subscription.ready() && !subscription2.ready() && !subscription3.ready(),
+      !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() ,
     potentialSubIngredients: Ingredients.find().fetch(),
-    instructions: Instructions.find().fetch()
-    // ingredientTypes: IngredientTypes.find().fetch(),
+    potentialPlates: Plates.find().fetch(),
+    instructions: Instructions.find().fetch(),
   };
 }, NewPlate);

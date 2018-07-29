@@ -7,15 +7,20 @@ import rateLimit from '../../modules/rate-limit';
 import { getNextSequence } from '../../modules/server/get-next-sequence';
 
 Meteor.methods({
-  'plates.insert': function platesInsert(plate) {
+  platesInsert(plate) {
     check(plate, {
       title: String,
-      subtitle: String,
+      subtitle: Match.Optional(String),
+      description: Match.Optional(String),
+      madeBy: String,
+      mealCategory: String,
+      substitutePlate: Match.Optional(Object),
+      allergens: Match.Optional(Array),
       mealType: String,
-      custom: Match.Maybe(Boolean),
-      instructionId: Match.Maybe(String),
-      ingredients: Array,
-      nutritional: Object,
+      custom: Match.Optional(Boolean),
+      instructionId: Match.Optional(String),
+      ingredients: Array,     
+      nutritional: Match.Optional(Object),
     });
 
     check(plate.nutritional, {
@@ -45,10 +50,6 @@ Meteor.methods({
       fat: String,
     });
 
-    console.log(plate);
-
-    // console.log("Reaching here");
-
     const existingPlate = Plates.findOne({ title: plate.title });
 
     if (existingPlate) {
@@ -59,19 +60,28 @@ Meteor.methods({
     nextSeqItem = nextSeqItem.toString();
 
     const plateToInsert = {
+      ...plate,
       SKU: nextSeqItem,
-      title: plate.title,
-      subtitle: plate.subtitle,
-      ingredients: plate.ingredients,
-      mealType: plate.mealType,
-      custom: plate.custom,
       createdBy: this.userId,
-      nutritional: plate.nutritional,
     };
 
-    if (plate.instructionId) {
+    if (plate.hasOwnProperty('instructionId')) {
       plateToInsert.instructionId = plate.instructionId;
     }
+
+    if (!plate.hasOwnProperty('substitutePlate')) {
+      plateToInsert.substitutePlate = plate.substitutePlate;
+    }
+
+    if (plateToInsert.subtitle.length > 0) {
+      const slug = `${plate.title} ${plate.subtitle}`;
+      plateToInsert.slug = slug.toLowerCase().split(' ').join('-');
+    } else {
+      const slug = `${plate.title}`;
+      plateToInsert.slug = slug.toLowerCase().split(' ').join('-');   
+   }
+
+    console.log(plate);
 
     try {
       return Plates.insert(plateToInsert);
@@ -79,16 +89,22 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
-  'plates.update': function platesUpdate(plate) {
+
+  platesUpdate(plate) {
     check(plate, {
       _id: String,
       title: String,
-      subtitle: String,
-      instructionId: Match.Maybe(String),
+      subtitle: Match.Optional(String),
+      description: Match.Optional(String),
+      madeBy: String,
+      mealCategory: String,
+      allergens: Match.Optional(Array),
+      substitutePlate: Match.Optional(Object),
+      instructionId: Match.Optional(String),
       mealType: String,
-      custom: Match.Maybe(Boolean),
+      custom: Match.Optional(Boolean),
       ingredients: Array,
-      nutritional: Object,
+      nutritional: Match.Optional(Object),
     });
 
     check(plate.nutritional, {
@@ -120,11 +136,22 @@ Meteor.methods({
 
     const keysToUnset = {};
 
-    if (!plate.instructionId) {
+    if (!plate.hasOwnProperty('instructionId')) {
       keysToUnset.instructionId = '';
     }
 
-    console.log(plate);
+    if (!plate.hasOwnProperty('substitutePlate')) {
+      keysToUnset.substitutePlate = '';
+    }
+
+    if (plate.subtitle.length > 0) {
+      const slug = `${plate.title} ${plate.subtitle}`;
+      plate.slug = slug.toLowerCase().split(' ').join('-');
+    } else {
+      const slug = `${plate.title}`;
+      plate.slug = slug.toLowerCase().split(' ').join('-');   
+   }
+
 
     try {
       const plateId = plate._id;
@@ -142,40 +169,30 @@ Meteor.methods({
     }
   },
 
-  'plates.updateImageId': function platesUpdate(plate) {
-    check(plate, {
-      _id: String,
-      imageId: String,
-    });
-
-    try {
-      const plateId = plate._id;
-
-      Plates.update(plateId, {
-        $set: {
-          imageId: plate.imageId,
-        },
-      });
-
-      return plateId; // Return _id so we can redirect to document after update.
-    } catch (exception) {
-      throw new Meteor.Error('500', exception);
-    }
-  },
-
-  'plates.updateImageUrl': function platesUpdate(plate) {
+  'plates.updateImageUrl': function platesUpdateImageUrl(plate) {
     check(plate, {
       _id: String,
       imageUrl: String,
+      large: Boolean,
     });
 
     try {
       const plateId = plate._id;
 
-      Plates.update(plateId, {
-        $set: {
+      const toSet = {};
+
+      if (plate.large) {
+        toSet = {
+          largeImageUrl: plate.imageUrl,
+        };
+      } else {
+        toSet = {
           imageUrl: plate.imageUrl,
-        },
+        };
+      }
+
+      Plates.update(plateId, {
+        $set: toSet,
       });
 
       return plateId; // Return _id so we can redirect to document after update.
@@ -208,11 +225,11 @@ Meteor.methods({
 
 rateLimit({
   methods: [
-    'plates.insert',
-    'plates.update',
+    'platesInsert',
+    'platespdate',
     'plates.remove',
     'plates.batchRemove',
-    'plates.updateImageId',
+    'plates.updateImageUrl',
   ],
   limit: 5,
   timeRange: 1000,

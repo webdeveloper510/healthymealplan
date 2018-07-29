@@ -20,6 +20,7 @@ import TextField from 'material-ui/TextField';
 
 import Checkbox from 'material-ui/Checkbox';
 import FormControlLabel from 'material-ui/Form/FormControlLabel';
+import Radio, { RadioGroup } from 'material-ui/Radio';
 
 import Table, {
   TableBody,
@@ -51,15 +52,14 @@ import $ from 'jquery';
 
 import { red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
+import autoBind from 'react-autobind';
 
 import Search from 'material-ui-icons/Search';
 import Loading from '../Loading/Loading';
 
 import validate from '../../../modules/validate';
-import PlateImages from '../../../api/PlateImages/PlateImages';
 
 const danger = red[700];
-
 
 const styles = theme => ({
   root: {
@@ -104,14 +104,23 @@ class PlateEditor extends React.Component {
           this.props.document.imageUrl
           ? this.props.document.imageUrl
           : '',
+      plateImageLargeSrc:
+        this.props.newPlate == false &&
+          this.props.document &&
+          this.props.document.largeImageUrl
+          ? this.props.document.largeImageUrl
+          : '',
       value: '', // Autosuggest
+      valuePlate: '', // Autosuggest
       valueMealType: this.props.plate ? this.props.plate.mealType : 'Breakfast',
       valueInstructionActual: 'None',
       suggestions: [],
+      suggestionsPlate: [],
       subIngredients:
         this.props.plate && this.props.plate.ingredients
           ? _.sortBy(this.props.plate.ingredients, 'title')
           : [],
+      substitutePlate: this.props.plate && this.props.plate.substitutePlate ? this.props.plate.substitutePlate : '',
       instructions: this.props.instructions || [],
       custom:
         this.props.plate && !this.props.newPlate
@@ -121,12 +130,16 @@ class PlateEditor extends React.Component {
       deleteDialogOpen: false,
       hasFormChanged: false,
       imageFieldChanged: false,
+      largeImageFieldChanged: false,
+      madeBy: this.props.plate && this.props.plate.madeBy ? this.props.plate.madeBy : '',
+      mealCategory: this.props.plate && this.props.plate.mealCategory ? this.props.plate.mealCategory : '',
+      allergens: this.props.plate && this.props.plate.allergens && this.props.plate.allergens.length > 0 ? this.props.plate.allergens : [],
 
       submitLoading: false,
       submitSuccess: false,
     };
 
-    this.renderImageUrl = this.renderImageUrl.bind(this);
+    autoBind(this);
   }
 
   componentDidMount() {
@@ -143,23 +156,16 @@ class PlateEditor extends React.Component {
       rules: {
         title: {
           required: true,
-        },
+        },  
 
-        subtitle: {
+        madeBy: {
           required: true,
         },
 
-        // plateImage: {
-        //   required: true,
-        // },
-
-        type: {
+        mealCategory: {
           required: true,
         },
 
-        instructionId: {
-          required: true,
-        },
       },
       messages: {
         title: {
@@ -181,6 +187,32 @@ class PlateEditor extends React.Component {
     this.setState({ deleteDialogOpen: false });
   }
 
+  handleChange(event) {
+    console.log(event.target.name);
+    console.log(event.target.value);
+    this.setState({
+      hasFormChanged: true,
+      [event.target.name]: event.target.value,
+    });
+  }
+
+
+  handleChangeAllergens(event) {
+    console.log(event.target.value);
+    const allergensCopy = this.state.allergens.slice();
+    const ifPresentIndex = allergensCopy.indexOf(event.target.value);
+
+    if (ifPresentIndex >= 0) {
+      allergensCopy.splice(ifPresentIndex, 1);
+    } else {
+      allergensCopy.push(event.target.value);
+    }
+
+    this.setState({
+      allergens: allergensCopy,
+    });
+  }
+
   // Use your imagination to render suggestions.
   onChange(event, { newValue }) {
     this.setState({
@@ -188,20 +220,34 @@ class PlateEditor extends React.Component {
     });
   }
 
+  onChangeSubstitute(event, { newValue }) {
+    this.setState({
+      valuePlate: newValue,
+    });
+  }
+
   onFileLoad(e) {
-    // console.log(e.target.files[0]);
+    console.log(e.currentTarget.id);
 
-
+    const imageType = e.currentTarget.id;
     const reader = new FileReader();
     const file = e.target.files[0];
 
     reader.addEventListener('load', () => {
-      this.setState({
-        plateImageSrc: reader.result,
-        imageFieldChanged: true,
-        hasFormChanged: true,
-      });
-    })
+      if (imageType == 'plateImage') {
+        this.setState({
+          plateImageSrc: reader.result,
+          imageFieldChanged: true,
+          hasFormChanged: true,
+        });
+      } else {
+        this.setState({
+          plateImageLargeSrc: reader.result,
+          largeImageFieldChanged: true,
+          hasFormChanged: true,
+        });
+      }
+    });
 
     if (file) {
       reader.readAsDataURL(file);
@@ -236,6 +282,19 @@ class PlateEditor extends React.Component {
     });
   }
 
+  onSuggestionSelectedPlate(
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
+  ) {
+    console.log(suggestion);
+
+    this.setState({
+      substitutePlate: { _id: suggestion._id, title: suggestion.title },
+      hasFormChanged: true,
+      valuePlate: '',
+    });
+  }
+
   // Autosuggest will call this function every time you need to update suggestions.
   // You already implemented this logic above, so just use it.
   onSuggestionsFetchRequested({ value }) {
@@ -244,6 +303,11 @@ class PlateEditor extends React.Component {
     });
   }
 
+  onSuggestionsFetchRequestedPlate({ value }) {
+    this.setState({
+      suggestionsPlate: this.getSuggestionsPlate(value),
+    });
+  }
   // Autosuggest will call this function every time you need to clear suggestions.
   onSuggestionsClearRequested() {
     this.setState({
@@ -251,6 +315,11 @@ class PlateEditor extends React.Component {
     });
   }
 
+  onSuggestionsClearRequestedPlate() {
+    this.setState({
+      suggestionsPlate: [],
+    });
+  }
   // Teach Autosuggest how to calculate suggestions for any given input value.
   getSuggestions(value) {
     const inputValue = value.trim().toLowerCase();
@@ -263,6 +332,20 @@ class PlateEditor extends React.Component {
           ingredient.title.toLowerCase().slice(0, inputLength) === inputValue,
       );
   }
+
+  getSuggestionsPlate(value) {
+    console.log(this.props.potentialPlates);
+    const inputValue = value.trim().toLowerCase();
+    const inputLength = inputValue.length;
+
+    return inputLength === 0
+      ? []
+      : this.props.potentialPlates.filter(
+        ingredient =>
+          ingredient.title.toLowerCase().slice(0, inputLength) === inputValue,
+      );
+  }
+
 
   // When suggestion is clicked, Autosuggest needs to populate the input
   // based on the clicked suggestion. Teach Autosuggest how to calculate the
@@ -317,13 +400,17 @@ class PlateEditor extends React.Component {
 
     const { history, popTheSnackbar } = this.props;
     const existingPlate = this.props.plate && this.props.plate._id;
-    const methodToCall = existingPlate ? 'plates.update' : 'plates.insert';
+    const methodToCall = existingPlate ? 'platesUpdate' : 'platesInsert';
 
     const plate = {
       title: document.querySelector('#title').value.trim(),
       subtitle: document.querySelector('#subtitle').value.trim(),
+      description: document.querySelector('#description').value.trim(),
+      madeBy: this.state.madeBy,
+      mealCategory: this.state.mealCategory,
+      allergens: this.state.allergens,
       mealType: this.state.valueMealType.trim(),
-      ingredients: this.state.subIngredients || [],
+      ingredients: this.state.subIngredients.length > 0 ? this.state.subIngredients : [],
       custom: this.state.custom,
       nutritional: {
         regular: {
@@ -347,23 +434,28 @@ class PlateEditor extends React.Component {
       },
     };
 
-    if (this.state.valueInstructionActual !== 'None') {
-      const selectedInstruction = this.props.instructions.filter((e, i) => {
-        if (this.state.valueInstructionActual === e.title) {
-          return e._id;
-        }
-      });
 
-      plate.instructionId = selectedInstruction[0]._id;
+    if(typeof this.state.substitutePlate == "object"){
+      plate.substitutePlate = this.state.substitutePlate;
     }
 
-    if (existingPlate) plate._id = existingPlate;
+    if (this.state.valueInstructionActual) {
+      const selectedInstruction = this.props.instructions.filter(e => this.state.valueInstructionActual == e.title);
 
+      if(selectedInstruction.length > 0){
+        plate.instructionId = selectedInstruction[0]._id; 
+      }  
+    }
+
+
+
+
+    if (existingPlate) plate._id = existingPlate;
+    console.log('PLATE IS');
     console.log(plate);
 
     Meteor.call(methodToCall, plate, (error, plateId) => {
       if (error) {
-
         this.setState({
           submitSuccess: false,
           submitLoading: false,
@@ -382,65 +474,108 @@ class PlateEditor extends React.Component {
           ? `${localStorage.getItem('plateForSnackbar')} main course updated.`
           : `${localStorage.getItem('plateForSnackbar')} main course added.`;
 
-        if (this.state.imageFieldChanged) {
-          S3.upload({
-            file: document.getElementById('plateImage').files[0],
-            path: 'images',
-          }, (err, res) => {
-            console.log('Err');
-            console.log(err);
-            console.log('Res');
-            console.log(res);
+        if (this.state.imageFieldChanged || this.state.largeImageFieldChanged) {
+          if (this.state.imageFieldChanged) {
+            S3.upload({
+              file: document.getElementById('plateImage').files[0],
+              path: 'images',
+            }, (err, res) => {
+              console.log('Err');
+              console.log(err);
+              console.log('Res');
+              console.log(res);
 
-            if (err) {
-              this.props.popTheSnackbar({
-                message: 'There was a problem uploading the image.',
-              });
+              if (err) {
+                this.props.popTheSnackbar({
+                  message: 'There was a problem uploading the image.',
+                });
 
-              this.setState({
-                submitSuccess: false,
-                submitLoading: false,
-              });
-            } else {
+                this.setState({
+                  submitSuccess: false,
+                  submitLoading: false,
+                });
+              } else {
+                Meteor.call(
+                  'plates.updateImageUrl',
+                  {
+                    _id: plateId,
+                    imageUrl: res.relative_url,
+                    large: false,
+                  },
+                  (err, plateId) => {
+                    if (err) {
+                      this.props.popTheSnackbar({
+                        message: 'There was a problem updating the image.',
+                      });
 
-              Meteor.call(
-                'plates.updateImageUrl',
-                {
-                  _id: plateId,
-                  imageUrl: res.relative_url,
-                },
-                (err, plateId) => {
-                  if (err) {
-                    this.props.popTheSnackbar({
-                      message: 'There was a problem updating the image ID.',
-                    });
+                      this.setState({
+                        submitSuccess: false,
+                        submitLoading: false,
+                      });
+                    }
+                  },
+                );
+              }
+            });
+          }
 
-                    this.setState({
-                      submitSuccess: false,
-                      submitLoading: false,
-                    });
-                  } else {
+          if (this.state.largeImageFieldChanged) {
+            S3.upload({
+              file: document.getElementById('plateImageLarge').files[0],
+              path: 'images',
+            }, (err, res) => {
+              console.log('Err');
+              console.log(err);
+              console.log('Res');
+              console.log(res);
 
-                    this.setState({
-                      submitSuccess: true,
-                      submitLoading: false,
-                    });
+              if (err) {
+                this.props.popTheSnackbar({
+                  message: 'There was a problem uploading the large image.',
+                });
 
-                    this.props.popTheSnackbar({
-                      message: confirmation,
-                      buttonText: 'View',
-                      buttonLink: `/plates/${plateId}/edit`,
-                    });
+                this.setState({
+                  submitSuccess: false,
+                  submitLoading: false,
+                });
+              } else {
+                Meteor.call(
+                  'plates.updateImageUrl',
+                  {
+                    _id: plateId,
+                    imageUrl: res.relative_url,
+                    large: true,
+                  },
+                  (err, plateId) => {
+                    if (err) {
+                      this.props.popTheSnackbar({
+                        message: 'There was a problem updating the large image.',
+                      });
 
-                    this.props.history.push('/plates');
-                  }
-                },
-              );
-            }
+                      this.setState({
+                        submitSuccess: false,
+                        submitLoading: false,
+                      });
+                    }
+                  },
+                );
+              }
+            });
+          }
+
+          this.setState({
+            submitSuccess: true,
+            submitLoading: false,
           });
 
-        } else {
+          this.props.popTheSnackbar({
+            message: confirmation,
+            buttonText: 'View',
+            buttonLink: `/plates/${plateId}/edit`,
+          });
 
+          this.props.history.push('/plates');
+        } else {
           this.setState({
             submitSuccess: true,
             submitLoading: false,
@@ -550,6 +685,15 @@ class PlateEditor extends React.Component {
     });
   }
 
+  handleSubstitutePlateDelete(plate) {
+    console.log(plate);
+
+    this.setState({
+      substitutePlate: '',
+      hasFormChanged: true,
+    });
+  }
+
   getSubIngredientTitle(subIngredient) {
     // console.log(subIngredient);
 
@@ -561,6 +705,7 @@ class PlateEditor extends React.Component {
       return this.props.allIngredients.find(el => el._id === subIngredient);
     }
   }
+
 
   getSubIngredientAvatar(subIngredient) {
     if (subIngredient.title) {
@@ -576,12 +721,8 @@ class PlateEditor extends React.Component {
   }
 
   titleFieldChanged(e) {
-    // console.log(e.currentTarget.value.length);
-
-    const hasFormChanged = e.currentTarget.value.length > 0;
-
     this.setState({
-      hasFormChanged,
+      hasFormChanged: true,
     });
   }
 
@@ -606,10 +747,20 @@ class PlateEditor extends React.Component {
   }
 
   renderImageUrl() {
-    if (this.props.newPlate || this.state.imageFieldChanged) {
+    if (this.props.newPlate || this.state.largeImageFieldChanged) {
       return this.state.plateImageSrc;
     } else if (this.props.document && this.props.document.imageUrl) {
       return `${Meteor.settings.public.S3BucketDomain}${this.state.plateImageSrc}`;
+    }
+
+    return '';
+  }
+
+  renderLargeImageUrl() {
+    if (this.props.newPlate || this.state.largeImageFieldChanged) {
+      return this.state.plateImageLargeSrc;
+    } else if (this.props.document && this.props.document.largeImageUrl) {
+      return `${Meteor.settings.public.S3BucketDomain}${this.state.plateImageLargeSrc}`;
     }
 
     return '';
@@ -624,9 +775,9 @@ class PlateEditor extends React.Component {
 
     return !loading ? (
       <form
+        ref={form => (this.form = form)}
         id="plate-editor"
         style={{ width: '100%' }}
-        ref={form => (this.form = form)}
         onSubmit={event => event.preventDefault()}
       >
         <Grid container justify="center">
@@ -727,7 +878,6 @@ class PlateEditor extends React.Component {
                     margin="normal"
                     fullWidth
                     defaultValue={plate && plate.title}
-                    ref={title => (this.title = title)}
                     inputProps={{}}
                     onChange={this.titleFieldChanged.bind(this)}
                   />
@@ -739,10 +889,178 @@ class PlateEditor extends React.Component {
                     name="subtitle"
                     fullWidth
                     defaultValue={plate && plate.subtitle}
-                    ref={title => (this.title = title)}
-                    inputProps={{}}
                     onChange={this.titleFieldChanged.bind(this)}
                   />
+
+                  <TextField
+                    margin="normal"
+                    id="description"
+                    label="Description"
+                    name="description"
+                    fullWidth
+                    defaultValue={plate && plate.description}
+                    multiline
+                    onChange={this.titleFieldChanged.bind(this)}
+                  />
+
+                  <Grid container style={{ marginTop: '25px' }}>
+                    <Grid item xs={12}>
+                      <Typography>Chef</Typography>
+                    </Grid>
+
+                  </Grid>
+
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <RadioGroup
+                        name="madeBy"
+                        value={this.state.madeBy}
+                        onChange={this.handleChange.bind(this)}
+                        style={{ flexDirection: 'row' }}
+                      >
+                        <FormControlLabel value="mazen" control={<Radio color="primary" checked={this.state.madeBy == 'mazen'} />} label="Mazen Issa" />
+
+                        <FormControlLabel value="jansan" control={<Radio color="primary" checked={this.state.madeBy == 'jansan'} />} label="Jansan McCorkle" />
+                      </RadioGroup>
+                    </Grid>
+
+                  </Grid>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Allergens
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <RadioGroup
+                        name="allergens"
+                        style={{ flexDirection: 'column' }}
+                      >
+                        <Grid container>
+                          <Grid xs={12} md={6} sm={6} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <FormControlLabel
+                              value="dairyFree"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('dairyFree') >= 0}
+                              />}
+                              label="Dairy Free"
+                            />
+
+                            <FormControlLabel
+                              value="glutenFree"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('glutenFree') >= 0}
+                              />}
+                              label="Gluten Free"
+                            />
+
+                            <FormControlLabel
+                              value="halal"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('halal') >= 0}
+                              />}
+                              label="Halal"
+                            />
+
+                            <FormControlLabel
+                              value="noEgg"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('noEgg') >= 0}
+                              />}
+                              label="No egg"
+                            />
+
+                            <FormControlLabel
+                              value="noMeat"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('noMeat') >= 0}
+                              />}
+                              label="No meat"
+                            />
+
+                          </Grid>
+
+                          <Grid xs={12} md={6} sm={6} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <FormControlLabel
+                              value="noShellfish"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('noShellfish') >= 0}
+                              />}
+                              label="No shellfish"
+                            />
+
+                            <FormControlLabel
+                              value="noNut"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('noNut') >= 0}
+                              />}
+                              label="No nut"
+                            />
+
+                            <FormControlLabel
+                              value="soyFree"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('soyFree') >= 0}
+                              />}
+                              label="Soy free"
+                            />
+
+                            <FormControlLabel
+                              value="vegan"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('vegan') >= 0}
+                              />}
+                              label="Vegan"
+                            />
+
+                            <FormControlLabel
+                              value="vegetarian"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('vegetarian') >= 0}
+                              />}
+                              label="Vegetarian"
+                            />
+
+                          </Grid>
+                        </Grid>
+                      </RadioGroup>
+                    </Grid>
+
+                  </Grid>
                 </Paper>
               </Grid>
             </Grid>
@@ -801,6 +1119,34 @@ class PlateEditor extends React.Component {
                     }
                     label="Custom"
                   />
+
+                  <Grid container style={{ marginTop: '25px' }}>
+                    <Grid item xs={12}>
+                      <Typography>Category</Typography>
+                    </Grid>
+
+                  </Grid>
+
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <RadioGroup
+                        name="mealCategory"
+                        value={this.state.mealCategory}
+                        onChange={this.handleChange}
+                        style={{ flexDirection: 'row' }}
+                      >
+                        <FormControlLabel value="omnivore" control={<Radio color="primary" checked={this.state.mealCategory == 'omnivore'} />} label="Omnivore" />
+
+                        <FormControlLabel value="vegetarian" control={<Radio color="primary" checked={this.state.mealCategory == 'vegetarian'} />} label="Vegetarian" />
+
+                        <FormControlLabel value="pescatarian" control={<Radio color="primary" checked={this.state.mealCategory == 'pescatarian'} />} label="Pescatarian" />
+
+                        <FormControlLabel value="vegan" control={<Radio color="primary" checked={this.state.mealCategory == 'vegan'} />} label="Vegan" />
+                      </RadioGroup>
+                    </Grid>
+
+                  </Grid>
+
                 </Paper>
               </Grid>
             </Grid>
@@ -824,7 +1170,7 @@ class PlateEditor extends React.Component {
                     type="file"
                     id="plateImage"
                     name="plateImage"
-                    onChange={this.onFileLoad.bind(this)}
+                    onChange={this.onFileLoad}
                   />
                   <img
                     style={{ marginTop: '50px', display: 'block' }}
@@ -836,6 +1182,37 @@ class PlateEditor extends React.Component {
             </Grid>
           </Grid>
         </Grid>
+
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Large image
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <input
+                    type="file"
+                    id="plateImageLarge"
+                    name="plateImageLarge"
+                    onChange={this.onFileLoad.bind(this)}
+                  />
+                  <img
+                    style={{ marginTop: '50px', display: 'block' }}
+                    src={this.renderLargeImageUrl()}
+                    style={{ maxWidth: '100%' }}
+                  />
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
         <Divider light className="divider--space-x" />
 
         <Grid container justify="center" style={{ marginBottom: '75px' }}>
@@ -924,6 +1301,100 @@ class PlateEditor extends React.Component {
                       ))
                     ) : (
                         <Chip className="chip--bordered" label="Sub-ingredient" />
+                      )}
+                  </div>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Divider light className="divider--space-x" />
+
+        <Grid container justify="center" style={{ marginBottom: '75px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Substitute plate
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Search className="autoinput-icon" />
+                  <Autosuggest
+                    id="3"
+                    className="autosuggest"
+                    theme={{
+                      container: {
+                        flexGrow: 1,
+                        position: 'relative',
+                        marginBottom: '2em',
+                      },
+                      suggestionsContainerOpen: {
+                        position: 'absolute',
+                        left: 0,
+                        right: 0,
+                      },
+                      suggestion: {
+                        display: 'block',
+                      },
+                      suggestionsList: {
+                        margin: 0,
+                        padding: 0,
+                        listStyleType: 'none',
+                      },
+                    }}
+                    renderInputComponent={this.renderInput.bind(this)}
+                    suggestions={this.state.suggestionsPlate}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedPlate.bind(
+                      this,
+                    )}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedPlate.bind(
+                      this,
+                    )}
+                    onSuggestionSelected={this.onSuggestionSelectedPlate.bind(this)}
+                    getSuggestionValue={this.getSuggestionValue.bind(this)}
+                    renderSuggestion={this.renderSuggestion.bind(this)}
+                    renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                      this,
+                    )}
+                    focusInputOnSuggestionClick={false}
+                    inputProps={{
+                      placeholder: 'Search',
+                      value: this.state.valuePlate,
+                      onChange: this.onChangeSubstitute.bind(this),
+                      className: 'autoinput',
+                    }}
+                  />
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                    }}
+                  >
+                    {this.state.substitutePlate ? (
+                      <Chip
+                        avatar={
+                          <Avatar>
+                            {' '}
+                            {this.getSubIngredientAvatar(this.state.substitutePlate)}{' '}
+                          </Avatar>
+                        }
+                        style={{ marginRight: '8px', marginBottom: '8px' }}
+                        label={this.getSubIngredientTitle(this.state.substitutePlate)}
+                        onDelete={this.handleSubstitutePlateDelete.bind(
+                          this,
+                          this.state.substitutePlate,
+                        )}
+                      />
+
+                    ) : (
+                        <Chip className="chip--bordered" label="Dish" />
                       )}
                   </div>
                 </Paper>

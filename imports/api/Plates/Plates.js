@@ -31,24 +31,22 @@ Plates.schema = new SimpleSchema({
   subtitle: {
     type: String,
     label: 'Subtitle of the plate.',
-  },
-
-  imageId: {
-    type: String,
-    label: '_id of the plate image.',
     optional: true,
   },
 
-  imageUrl: {
+  slug: {
     type: String,
-    label: 'URL of the plate image.',
-    optional: true,
+    label: 'URL slug',
   },
 
-  instructionId: {
+  mealCategory: {
     type: String,
-    label: '_id of the instructions.',
-    optional: true,
+    label: 'Plate category',
+  },
+
+  madeBy: {
+    type: String,
+    label: 'Dish made by',
   },
 
   mealType: {
@@ -59,6 +57,50 @@ Plates.schema = new SimpleSchema({
   custom: {
     type: Boolean,
     label: 'If the plate is custom',
+    optional: true,
+  },
+
+  description: {
+    type: String,
+    label: 'This is a long description for blog',
+    optional: true,
+  },
+
+  allergens: {
+    type: Array,
+    label: 'These are allergens on the dish',
+    optional: true,
+  },
+
+  'allergens.$': {
+    type: String,
+    label: 'These are allergen items on the dish',
+    optional: true,
+  },
+
+  imageUrl: {
+    type: String,
+    label: 'URL of the plate image.',
+    optional: true,
+  },
+
+  largeImageUrl: {
+    type: String,
+    label: 'URL of the large plate image.',
+    optional: true,
+  },
+
+  instructionId: {
+    type: String,
+    label: '_id of the instructions.',
+    optional: true,
+  },
+
+
+  substitutePlate: {
+    type: Object,
+    label: 'Alternate plate for veggies',
+    blackbox: true,
     optional: true,
   },
 

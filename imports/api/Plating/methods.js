@@ -2,7 +2,7 @@ import { Meteor } from 'meteor/meteor';
 import { Match } from 'meteor/check';
 import { check } from 'meteor/check';
 import rateLimit from '../../modules/rate-limit';
-import aggregate from 'meteor/meteorhacks:aggregate';
+import aggregate from 'meteor/sakulstra:aggregate';
 
 import Subscriptions from '../Subscriptions/Subscriptions';
 import Lifestyles from '../Lifestyles/Lifestyles';

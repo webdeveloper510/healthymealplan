@@ -6,10 +6,11 @@
     "prod": "meteor run --settings settings-production.json",
     "test": "jest",
     "start3000": "meteor run --settings .\\settings-development.json --port 3000",
-    "start4000": "meteor run --settings settings-development.json --port 4000"
+    "start4000": "meteor run --settings settings-development.json --port 4000",
+    "debug": "meteor run --inspect"
   },
   "dependencies": {
-    "@babel/runtime": "^7.0.0-beta.39",
+    "@babel/runtime": "^7.0.0-beta.54",
     "@cleverbeagle/dates": "^0.5.1",
     "@cleverbeagle/seeder": "^1.2.0",
     "authorizenet": "^1.0.4",
