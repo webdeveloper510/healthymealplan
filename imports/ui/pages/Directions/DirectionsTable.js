@@ -376,10 +376,10 @@ class DirectionsTable extends React.Component {
             const totalBags = Math.ceil(mealTotal / perBag);
 
             for (let index = 1; index <= totalBags; index++) {
-              renderDeliveryLabelData(doc, e, formalType, multiple = true, index, totalBags);
+              renderDeliveryLabelData(doc, e, formalType, true, index, totalBags);
             }
           } else {
-            renderDeliveryLabelData(doc, e, formalType, multiple = false);
+            renderDeliveryLabelData(doc, e, formalType);
           }
         });
       }

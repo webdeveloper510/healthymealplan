@@ -397,7 +397,7 @@ class Step2Plan extends React.Component {
 
     allDates.push(new Date(immediateMonday));
 
-    for (i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 4; i++) {
       const nextMonday = immediateMonday.setDate(immediateMonday.getDate() + 7);
       allDates.push(new Date(nextMonday));
     }

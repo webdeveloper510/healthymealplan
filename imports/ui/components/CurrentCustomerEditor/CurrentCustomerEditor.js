@@ -440,7 +440,7 @@ class CurrentCustomerEditor extends React.Component {
         
         const discountApplied = nextProps.subscription.hasOwnProperty('discountApplied') ? nextProps.subscription.discountApplied : '';
 
-        
+
         // console.log(nextProps)
         const currentLifestyle = nextProps.lifestyles.find(e => e._id === nextProps.customer.lifestyle);
         const isLifestyleCustom = currentLifestyle != undefined && currentLifestyle.custom ? currentLifestyle.custom : false;
@@ -841,7 +841,7 @@ class CurrentCustomerEditor extends React.Component {
 
     allDates.push(new Date(immediateMonday));
 
-    for (i = 1; i <= 4; i++) {
+    for (let i = 1; i <= 4; i++) {
       const nextMonday = immediateMonday.setDate(immediateMonday.getDate() + 7);
       allDates.push(new Date(nextMonday));
     }

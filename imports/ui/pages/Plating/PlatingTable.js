@@ -49,6 +49,7 @@ import cakeImage from '../../../modules/cakebase64';
 import groupBy from 'lodash/groupBy';
 import orderBy from 'lodash/orderBy';
 import concat from 'lodash/concat';
+import autoBind from 'react-autobind';
 
 import './PlatingTable.scss';
 
@@ -71,8 +72,8 @@ function Transition(props) {
 }
 
 function sortByLastName(a, b) {
-  const splitA = a.name.split(" ");
-  const splitB = b.name.split(" ");
+  const splitA = a.name.split(' ');
+  const splitB = b.name.split(' ');
 
   const lastA = splitA[splitA.length - 1];
   const lastB = splitB[splitB.length - 1];
@@ -84,7 +85,6 @@ function sortByLastName(a, b) {
 }
 
 function renderBirthdayCake(birthday, returnBool) {
-
   if (returnBool == false && birthday == null) {
     return '';
   } else if (returnBool == true && birthday == null) {
@@ -97,9 +97,8 @@ function renderBirthdayCake(birthday, returnBool) {
   if (day == parseInt(birthday.day, 10) && month == parseInt(birthday.month, 10)) {
     if (returnBool == false) {
       return <CakeIcon />;
-    } else {
-      return true;
     }
+    return true;
   }
 }
 
@@ -109,14 +108,9 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
   // VITTLE LOGO
   doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
 
-  console.log(renderBirthdayCake(userData.birthday, true));
-
   if (renderBirthdayCake(userData.birthday, true)) {
     doc.addImage(cakeImage, 'PNG', 0.48, 0.18, 0.2, 0.2);
   }
-
-  // HMP LOGO
-  // doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
 
   // plating day + 1
   doc.setFontStyle('normal');
@@ -253,10 +247,7 @@ function renderSummary(doc, currentPlate, dataCurrentLifestyle, lifestyleTitle, 
   doc.addPage();
 
   // VITTLE LOGO
-  // doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
-
-  // HMP LOGO
-  doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
+  doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
 
   // plating day + 1
   doc.setFontStyle('normal');
@@ -345,19 +336,7 @@ class PlatingTable extends React.Component {
     };
 
 
-    this.getCurrentSelectionPlate = this.getCurrentSelectionPlate.bind(this);
-
-
-    this.openAssignDialog = this.openAssignDialog.bind(this);
-    this.closeAssignDialog = this.closeAssignDialog.bind(this);
-
-    // this.printSummary = this.printSummary.bind(this);
-
-    this.printPopupSummary = this.printPopupSummary.bind(this);
-    this.printLabels = this.printLabels.bind(this);
-    // this.renderBirthdayCake = this.renderBirthdayCake.bind(this);
-
-    this.usersWithoutRestrictions = this.usersWithoutRestrictions.bind(this);
+    autoBind(this);
   }
 
   componentDidMount() {
@@ -472,10 +451,6 @@ class PlatingTable extends React.Component {
 
     const orderedUserData = concat([bodybuilder], [athletic], [regular]);
 
-    console.log(orderedUserData);
-
-    // return;
-
     const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
     const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
 
@@ -496,18 +471,10 @@ class PlatingTable extends React.Component {
       format: [4, 3],
     });
 
-    // const aggregatedUsers = this.state.aggregateData.userData;
-    // this.state.aggregateData.userData.filter(user => user.lifestyleId == this.state.lifestyleSelected &&
-    //   user[this.state.mealTitle.toLowerCase()] > 0 ||
-    //   user[`athletic${this.state.mealTitle}`] > 0 ||
-    //   user[`bodybuilder${this.state.mealTitle}`] > 0)
-    //userdataNew
-
     orderedUserData.forEach((e, upperIndex) => {
       console.log(e);
       e.forEach((userData, index) => {
         if (this.state.mealTitle === 'Breakfast') {
-
           if (userData.bodybuilderBreakfast > 0 && upperIndex == 0) {
             for (let i = 1; i <= userData.bodybuilderBreakfast; i++) {
               renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
@@ -525,12 +492,9 @@ class PlatingTable extends React.Component {
               renderUserDetailsOnPage(doc, userData, currentPlate, 'Breakfast', 'regular', this.props.currentSelectorDate);
             }
           }
-
-
         }// Breakfast
 
         if (this.state.mealTitle === 'Dinner') {
-
           if (userData.bodybuilderDinner > 0 && upperIndex == 0) {
             for (let i = 1; i <= userData.bodybuilderDinner; i++) {
               renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
@@ -548,11 +512,9 @@ class PlatingTable extends React.Component {
               renderUserDetailsOnPage(doc, userData, currentPlate, 'Dinner', 'regular', this.props.currentSelectorDate);
             }
           }
-
         } // Dinner
 
         if (this.state.mealTitle === 'Lunch') {
-
           if (userData.bodybuilderLunch > 0 && upperIndex == 0) {
             for (let i = 1; i <= userData.bodybuilderLunch; i++) {
               renderUserDetailsOnPage(doc, userData, currentPlate, 'Lunch (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
@@ -572,8 +534,7 @@ class PlatingTable extends React.Component {
           }
         } // Lunch
       }); // map
-
-    })
+    });
 
     renderSummary(doc, currentPlate, dataCurrentLifestyle, this.state.lifestyleTitle, this.state.mealTitle, this.props.currentSelectorDate, this.usersWithoutRestrictions());
 
@@ -753,15 +714,14 @@ class PlatingTable extends React.Component {
       },
       headerStyles: {
         fillColor: [0, 0, 0],
-        fontSize: 8,
-        // fontSize: 15
+        fontSize: 10,
       },
       afterPageContent: (data) => {
         let footerStr = `Page ${doc.internal.getNumberOfPages()}`;
         if (typeof doc.putTotalPages === 'function') {
           footerStr = `${footerStr} of ${totalPagesExp}`;
         }
-        doc.setFontSize(10);
+        doc.setFontSize(8);
         doc.text(footerStr, data.settings.margin.right, doc.internal.pageSize.height - 10);
       },
     });
@@ -774,20 +734,6 @@ class PlatingTable extends React.Component {
     doc.save(`Plating_summary_${this.state.lifestyleTitle}_${this.state.mealTitle}_${moment(this.state.currentSelectorDate).format('dddd, MMMM D')}.pdf`);
   }
 
-  // renderBirthdayCake(birthday) {
-
-  //   if (birthday == null) {
-  //     return '';
-  //   }
-
-  //   const day = parseInt(moment().format('D'), 10);
-  //   const month = parseInt(moment().format('M'), 10);
-
-  //   if (day == parseInt(birthday.day, 10) && month == parseInt(birthday.month, 10)) {
-  //     return <CakeIcon />;
-  //   }
-  // }
-
   render() {
     return (
       <div>
@@ -796,7 +742,6 @@ class PlatingTable extends React.Component {
         <Paper elevation={2} className="table-container">
           <div style={{ padding: '20px 20px 1em', borderBottom: '1px solid rgba(235, 235, 235, 1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography type="headline" gutterBottom style={{ fontWeight: 500 }}>Plating for {moment(this.props.currentSelectorDate).format('dddd, MMMM D')}</Typography>
-            {/* <Button style={{ float: 'right' }} onClick={this.printSummary}>Print plating summary</Button> */}
           </div>
           <Table className="table-container plating-table" style={{ tableLayout: 'fixed' }}>
             <TableHead>
