@@ -4,6 +4,9 @@ import { check } from 'meteor/check';
 import Plates from './Plates';
 import rateLimit from '../../modules/rate-limit';
 
+import slugify from 'slugify';
+
+
 import { getNextSequence } from '../../modules/server/get-next-sequence';
 
 Meteor.methods({
@@ -75,10 +78,10 @@ Meteor.methods({
 
     if (plateToInsert.subtitle.length > 0) {
       const slug = `${plate.title} ${plate.subtitle}`;
-      plateToInsert.slug = slug.toLowerCase().split(' ').join('-');
+      plateToInsert.slug = slugify(slug, { lower: true });
     } else {
       const slug = `${plate.title}`;
-      plateToInsert.slug = slug.toLowerCase().split(' ').join('-');
+      plateToInsert.slug = slugify(slug, { lower: true });
     }
 
     console.log(plate);
@@ -146,10 +149,10 @@ Meteor.methods({
 
     if (plate.subtitle.length > 0) {
       const slug = `${plate.title} ${plate.subtitle}`;
-      plate.slug = slug.toLowerCase().split(' ').join('-');
+      plate.slug = slugify(slug, { lower: true });
     } else {
       const slug = `${plate.title}`;
-      plate.slug = slug.toLowerCase().split(' ').join('-');
+      plate.slug = slugify(slug, { lower: true });
     }
 
 
@@ -193,30 +196,30 @@ Meteor.methods({
 
       return plateId; // Return _id so we can redirect to document after update.
     } catch (exception) {
-  throw new Meteor.Error('500', exception);
-}
+      throw new Meteor.Error('500', exception);
+    }
   },
 
-'plates.remove': function platesRemove(plateId) {
-  check(plateId, String);
+  'plates.remove': function platesRemove(plateId) {
+    check(plateId, String);
 
-  try {
-    return Plates.remove(plateId);
-  } catch (exception) {
-    throw new Meteor.Error('500', exception);
-  }
-},
+    try {
+      return Plates.remove(plateId);
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
 
-'plates.batchRemove': function platesBatchRemove(plateIds) {
-  check(plateIds, Array);
-  console.log('Server: plates.batchRemove');
+  'plates.batchRemove': function platesBatchRemove(plateIds) {
+    check(plateIds, Array);
+    console.log('Server: plates.batchRemove');
 
-  try {
-    return Plates.remove({ _id: { $in: plateIds } });
-  } catch (exception) {
-    throw new Meteor.Error('500', exception);
-  }
-},
+    try {
+      return Plates.remove({ _id: { $in: plateIds } });
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
 });
 
 rateLimit({

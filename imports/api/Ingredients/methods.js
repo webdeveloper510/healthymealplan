@@ -11,6 +11,7 @@ Meteor.methods({
     check(ingredient, {
       title: String,
       subIngredients: Array,
+      tags: Match.Optional(Array),
       typeId: String,
       discount: Match.Maybe(Number),
       extra: Match.Maybe(Number),
@@ -34,14 +35,16 @@ Meteor.methods({
       createdBy: this.userId
     };
 
-    console.log(ingredientToInsert);
-
     if (ingredient.discount) {
       ingredientToInsert.discount = ingredient.discount;
       ingredientToInsert.discountOrExtraType = ingredient.discountOrExtraType;
     } else if (ingredient.extra) {
       ingredientToInsert.extra = ingredient.extra;
       ingredientToInsert.discountOrExtraType = ingredient.discountOrExtraType;
+    }
+
+    if (ingredient.hasOwnProperty('tags')) {
+      ingredientToInsert.tags = ingredient.tags
     }
 
     try {
@@ -54,6 +57,7 @@ Meteor.methods({
     check(ingredient, {
       _id: String,
       title: String,
+      tags: Match.Optional(Array),
       subIngredients: Array,
       typeId: String,
       discount: Match.Maybe(Number),
@@ -83,6 +87,12 @@ Meteor.methods({
       keysToUnset.extra = "";
       keysToUnset.discount = "";
       keysToUnset.discountOrExtraType = "";
+    }
+
+    if (!ingredient.hasOwnProperty('tags')) {
+      keysToUnset.tags = "";
+    } else {
+      ingredientToUpdate.tags = ingredient.tags;
     }
 
     try {

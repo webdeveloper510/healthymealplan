@@ -13,6 +13,7 @@ import Autosuggest from 'react-autosuggest';
 import _ from 'lodash';
 
 import { Meteor } from 'meteor/meteor';
+import Select from 'material-ui/Select';
 
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
@@ -114,6 +115,7 @@ class PlateEditor extends React.Component {
       valuePlate: '', // Autosuggest
       valueMealType: this.props.plate ? this.props.plate.mealType : 'Breakfast',
       valueInstructionActual: 'None',
+      valueInstructionSelect: this.props.plate && this.props.plate.hasOwnProperty('instructionId') ? this.props.plate.instructionId : 'None',
       suggestions: [],
       suggestionsPlate: [],
       subIngredients:
@@ -156,7 +158,7 @@ class PlateEditor extends React.Component {
       rules: {
         title: {
           required: true,
-        },  
+        },
 
         madeBy: {
           required: true,
@@ -209,6 +211,7 @@ class PlateEditor extends React.Component {
     }
 
     this.setState({
+      hasFormChanged: true,
       allergens: allergensCopy,
     });
   }
@@ -435,16 +438,16 @@ class PlateEditor extends React.Component {
     };
 
 
-    if(typeof this.state.substitutePlate == "object"){
+    if (typeof this.state.substitutePlate == "object") {
       plate.substitutePlate = this.state.substitutePlate;
     }
 
-    if (this.state.valueInstructionActual) {
-      const selectedInstruction = this.props.instructions.filter(e => this.state.valueInstructionActual == e.title);
+    if (this.state.valueInstructionSelect) {
+      const selectedInstruction = this.props.instructions.filter(e => this.state.valueInstructionSelect == e._id);
 
-      if(selectedInstruction.length > 0){
-        plate.instructionId = selectedInstruction[0]._id; 
-      }  
+      if (selectedInstruction.length > 0) {
+        plate.instructionId = selectedInstruction[0]._id;
+      }
     }
 
 
@@ -739,9 +742,9 @@ class PlateEditor extends React.Component {
     });
   }
 
-  handleInstructionChange(event, value) {
+  handleInstructionSelect(event, value) {
     this.setState({
-      valueInstructionActual: event.target.value,
+      valueInstructionSelect: event.target.value,
       hasFormChanged: true,
     });
   }
@@ -764,6 +767,13 @@ class PlateEditor extends React.Component {
     }
 
     return '';
+  }
+
+  generateTags(){
+
+    console.log("yes");
+
+    console.log(this.state.subIngredients);
   }
 
   render() {
@@ -992,16 +1002,6 @@ class PlateEditor extends React.Component {
                               label="No egg"
                             />
 
-                            <FormControlLabel
-                              value="noMeat"
-                              control={<Checkbox
-                                color="primary"
-                                onChange={this.handleChangeAllergens}
-                                checked={this.state.allergens.indexOf('noMeat') >= 0}
-                              />}
-                              label="No meat"
-                            />
-
                           </Grid>
 
                           <Grid xs={12} md={6} sm={6} style={{ display: 'flex', flexDirection: 'column' }}>
@@ -1080,6 +1080,7 @@ class PlateEditor extends React.Component {
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
+
                   <TextField
                     fullWidth
                     id="select-meal-type"
@@ -1319,6 +1320,33 @@ class PlateEditor extends React.Component {
                   type="subheading"
                   className="subheading font-medium"
                 >
+                  Tags
+                </Typography>
+                <Typography style={{ paddingRight: '80px' }}>
+                  Please make sure you have at least one or two ingredients inserted on
+                  the plate. This will not work if there are no ingredients. This should always
+                  be done when all the ingredients are added onto the plate. 
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                      <Button color="primary" onClick={this.generateTags}>Generate</Button>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Divider light className="divider--space-x" />
+
+        <Grid container justify="center" style={{ marginBottom: '75px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
                   Substitute plate
                 </Typography>
               </Grid>
@@ -1418,7 +1446,18 @@ class PlateEditor extends React.Component {
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
-                  <TextField
+                  <Select fullWidth onChange={this.handleInstructionSelect} value={this.state.valueInstructionSelect}>
+                      <MenuItem key={2134} value={`None`}>
+                        None
+                      </MenuItem>
+                    {this.props.instructions.map((e, i) => (
+                      <MenuItem key={i} value={e._id}>
+                        {e.title}
+                      </MenuItem>
+                    ))}
+
+                  </Select>
+                  {/* <TextField
                     fullWidth
                     id="select-instruction"
                     select
@@ -1449,7 +1488,7 @@ class PlateEditor extends React.Component {
                         {e.title}
                       </option>
                     ))}
-                  </TextField>
+                  </TextField> */}
                 </Paper>
               </Grid>
             </Grid>

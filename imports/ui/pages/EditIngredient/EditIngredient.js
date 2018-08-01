@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
 
 import Grid from 'material-ui/Grid';
@@ -13,7 +13,7 @@ import IngredientEditor from '../../components/IngredientEditor/IngredientEditor
 
 import NotFound from '../NotFound/NotFound';
 
-const EditIngredient = ({ ingredient, history, potentialSubIngredients, newIngredient, ingredientTypes, popTheSnackbar }) => (ingredient ? (
+const EditIngredient = ({ ingredient, history, potentialSubIngredients, newIngredient, ingredientTypes, popTheSnackbar, loading }) => (ingredient ? (
   <div>
     <Grid container className="EditIngredient SideContent SideContent--spacer-2x--horizontal">
       <IngredientEditor
@@ -23,6 +23,7 @@ const EditIngredient = ({ ingredient, history, potentialSubIngredients, newIngre
         ingredientTypes={ingredientTypes}
         history={history}
         newIngredient={newIngredient}
+        loading={loading}
       />
     </Grid>
   </div>
@@ -40,17 +41,17 @@ EditIngredient.propTypes = {
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
-export default createContainer(({ match }) => {
+export default withTracker(({ match }) => {
   const ingredientId = match.params._id;
   const subscription = Meteor.subscribe('ingredients');
   const subscription2 = Meteor.subscribe('ingredientTypes');
 
   return {
     newIngredient: false,
-    loading: !subscription.ready() || !subscription2.ready(),
+    loading: !subscription.ready() && !subscription2.ready(),
     ingredient: Ingredients.findOne(ingredientId),
     allIngredients: Ingredients.find().fetch(),
     potentialSubIngredients: Ingredients.find().fetch(),
     ingredientTypes: IngredientTypes.find().fetch(),
   };
-}, EditIngredient);
+})(EditIngredient);

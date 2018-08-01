@@ -23,6 +23,19 @@ Ingredients.schema = new SimpleSchema({
     label: "SKU of the item"
   },
 
+  tags: {
+    type: Array,
+    optional: true,
+    label: 'Ingredient tags',
+    blackbox: true,
+  },
+
+  'tags.$': {
+    type: String,
+    label: 'Tag',
+    optional: true,
+  },
+
   title: {
     type: String,
     label: "The title of the ingredient."
