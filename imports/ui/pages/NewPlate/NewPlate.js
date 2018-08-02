@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-import { createContainer } from "meteor/react-meteor-data";
+import { withTracker } from "meteor/react-meteor-data";
 import { Meteor } from "meteor/meteor";
 
 import Grid from "material-ui/Grid";
@@ -46,18 +46,18 @@ NewPlate.propTypes = {
   popTheSnackbar: PropTypes.func.isRequired
 };
 
-export default createContainer(() => {
-  const subscription = Meteor.subscribe("ingredients");
-  const subscription2 = Meteor.subscribe("ingredientTypes");
+export default withTracker(() => {
+  const subscription = Meteor.subscribe("ingredientsWithoutTypeJoin", {}, {});
+  // const subscription2 = Meteor.subscribe("ingredientTypes");
   const subscription3 = Meteor.subscribe("instructions");
   const subscription4 = Meteor.subscribe("plates", {}, {});
 
   return {
     newPlate: true,
     loading:
-      !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() ,
+      !subscription.ready() && !subscription3.ready() && !subscription4.ready(),
     potentialSubIngredients: Ingredients.find().fetch(),
     potentialPlates: Plates.find().fetch(),
     instructions: Instructions.find().fetch(),
   };
-}, NewPlate);
+})(NewPlate);

@@ -74,7 +74,7 @@ EditPlate.propTypes = {
 
 export default withTracker(({ match }) => {
   const plateId = match.params._id;
-  const subscription = Meteor.subscribe("ingredients");
+  const subscription = Meteor.subscribe("ingredientsWithoutTypeJoin", {}, {});
   const subscription2 = Meteor.subscribe("plates.view", plateId);
   const subscription3 = Meteor.subscribe("plates", {}, {});
   const subscription4 = Meteor.subscribe("instructions");

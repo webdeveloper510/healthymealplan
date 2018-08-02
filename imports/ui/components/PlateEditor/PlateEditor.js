@@ -779,7 +779,7 @@ class PlateEditor extends React.Component {
     e.preventDefault();
 
     if (this.state.subIngredients.length == 0) {
-      this.props.popTheSnackBar({
+      this.props.popTheSnackbar({
         message: 'Please add at least one ingredient to generate tags.',
       });
       return;
@@ -788,7 +788,13 @@ class PlateEditor extends React.Component {
     const generatedTags = [];
     let MAX_TAG_LIMIT = 5;
 
-    const ingredientItemTags = this.props.potentialSubIngredients.filter((e) => this.state.subIngredients.find(el => el._id == e._id) != undefined).map(e => e.tags);
+    const ingredientItemTags = this.props.potentialSubIngredients
+                                .filter((e) => this.state.subIngredients
+                                .find(el => el._id == e._id) != undefined)
+                                .map(e => e.tags)
+                                .filter(e => e !== undefined);
+    
+    console.log(ingredientItemTags);
 
     if(ingredientItemTags.length <= 5){
       MAX_TAG_LIMIT = ingredientItemTags.length;
@@ -796,7 +802,7 @@ class PlateEditor extends React.Component {
 
     if (ingredientItemTags.length == 0) {
       
-      this.props.popTheSnackBar({
+      this.props.popTheSnackbar({
         message: 'Selected ingredients do not have tags. Please verify.',
       });
 

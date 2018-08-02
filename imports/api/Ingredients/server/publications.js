@@ -17,6 +17,16 @@ Meteor.publish("ingredients", function ingredients(selector, options) {
   return Ingredients.publishJoinedCursors(cursor);
 });
 
+
+Meteor.publish("ingredientsWithoutTypeJoin", function ingredientsWithoutTypeJoin(selector, options) {
+  check(selector, Match.Any);
+  check(options, Match.Any);
+
+  return Ingredients.find(selector, options);
+});
+
+
+
 Meteor.publish("ingredients-all-count", function() {
   Counts.publish(this, "ingredients", Ingredients.find());
 });
