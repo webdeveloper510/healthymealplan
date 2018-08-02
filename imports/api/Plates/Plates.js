@@ -124,6 +124,16 @@ Plates.schema = new SimpleSchema({
     optional: true,
   },
 
+  generatedTags: {
+    type: Array,
+    optional: true,
+  },
+
+  'generatedTags.$': {
+    type: String,
+    optional: true,
+  },
+
   nutritional: {
     type: Object,
     optional: true,

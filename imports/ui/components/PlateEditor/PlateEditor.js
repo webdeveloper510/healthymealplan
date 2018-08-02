@@ -137,6 +137,8 @@ class PlateEditor extends React.Component {
       mealCategory: this.props.plate && this.props.plate.mealCategory ? this.props.plate.mealCategory : '',
       allergens: this.props.plate && this.props.plate.allergens && this.props.plate.allergens.length > 0 ? this.props.plate.allergens : [],
 
+      generatedTags: this.props.plate && this.props.plate.hasOwnProperty('generatedTags') ? this.props.plate.generatedTags : [],
+
       submitLoading: false,
       submitSuccess: false,
     };
@@ -438,8 +440,13 @@ class PlateEditor extends React.Component {
     };
 
 
-    if (typeof this.state.substitutePlate == "object") {
+    if (typeof this.state.substitutePlate === 'object') {
       plate.substitutePlate = this.state.substitutePlate;
+    }
+
+
+    if (this.state.generatedTags.length > 0) {
+      plate.generatedTags = this.state.generatedTags;
     }
 
     if (this.state.valueInstructionSelect) {
@@ -449,8 +456,6 @@ class PlateEditor extends React.Component {
         plate.instructionId = selectedInstruction[0]._id;
       }
     }
-
-
 
 
     if (existingPlate) plate._id = existingPlate;
@@ -769,11 +774,63 @@ class PlateEditor extends React.Component {
     return '';
   }
 
-  generateTags(){
+  generateTags(e) {
 
-    console.log("yes");
+    e.preventDefault();
 
-    console.log(this.state.subIngredients);
+    if (this.state.subIngredients.length == 0) {
+      this.props.popTheSnackBar({
+        message: 'Please add at least one ingredient to generate tags.',
+      });
+      return;
+    }
+
+    const generatedTags = [];
+    let MAX_TAG_LIMIT = 5;
+
+    const ingredientItemTags = this.props.potentialSubIngredients.filter((e) => this.state.subIngredients.find(el => el._id == e._id) != undefined).map(e => e.tags);
+
+    if(ingredientItemTags.length <= 5){
+      MAX_TAG_LIMIT = ingredientItemTags.length;
+    }
+
+    if (ingredientItemTags.length == 0) {
+      
+      this.props.popTheSnackBar({
+        message: 'Selected ingredients do not have tags. Please verify.',
+      });
+
+      return;
+    }
+
+    while (generatedTags.length <= MAX_TAG_LIMIT) {
+
+      const randomIngredientIndex = Math.floor(Math.random() * (ingredientItemTags.length - 0)) + 0;
+      const randomIngredientTagIndex = Math.floor(Math.random() * (ingredientItemTags[randomIngredientIndex].length - 0)) + 0;
+
+      const itemToPush = ingredientItemTags[randomIngredientIndex][randomIngredientTagIndex];
+
+      if(generatedTags.includes(itemToPush)){
+        continue;
+      }else{
+        generatedTags.push(itemToPush);
+      }
+    }
+    // ingredientItemTags.forEach((itemTags, itemIndex) => {
+
+    //     const randomIndex = Math.floor(Math.random() * (+itemTags.length - 0)) + 0;
+
+    //   if (generatedTags.length <= MAX_TAG_LIMIT) {
+    //     generatedTags.push(itemTags[randomIndex]);
+    //   }
+    // });
+
+    console.log(generatedTags);
+
+    this.setState({
+      generatedTags: generatedTags,
+      hasFormChanged: true,
+    });
   }
 
   render() {
@@ -1325,12 +1382,20 @@ class PlateEditor extends React.Component {
                 <Typography style={{ paddingRight: '80px' }}>
                   Please make sure you have at least one or two ingredients inserted on
                   the plate. This will not work if there are no ingredients. This should always
-                  be done when all the ingredients are added onto the plate. 
+                  be done when all the ingredients are added onto the plate.
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
-                      <Button color="primary" onClick={this.generateTags}>Generate</Button>
+                  <Button color="secondary" type="secondary" onClick={this.generateTags}>Generate</Button>
+
+                  {this.state.generatedTags.map(e => (
+
+                    <Typography style={{marginTop: '1.5em'}} type="body2">
+                      {e}
+                    </Typography>
+                  ))}
+
                 </Paper>
               </Grid>
             </Grid>
@@ -1447,9 +1512,9 @@ class PlateEditor extends React.Component {
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
                   <Select fullWidth onChange={this.handleInstructionSelect} value={this.state.valueInstructionSelect}>
-                      <MenuItem key={2134} value={`None`}>
-                        None
-                      </MenuItem>
+                    <MenuItem key={2134} value={'None'}>
+                      None
+                    </MenuItem>
                     {this.props.instructions.map((e, i) => (
                       <MenuItem key={i} value={e._id}>
                         {e.title}
@@ -1882,7 +1947,7 @@ class PlateEditor extends React.Component {
                       }
                     >
                       Delete
-                  </Button>
+                    </Button>
                   )}
               </Grid>
 
@@ -1909,7 +1974,7 @@ class PlateEditor extends React.Component {
                     onClick={() => this.handleSubmitNew()}
                   >
                     Save
-
+  
                     {this.state.submitLoading && (
                       <CircularProgress
                         size={24}

@@ -270,7 +270,7 @@ class IngredientsTable extends React.Component {
                   </TableCell>
                   <TableCell
                     padding="none"
-                    style={{ width: '22%' }}
+                    style={{ width: '29%' }}
                     onClick={() => this.props.sortByOptions('title')}
                   >
                     <Typography className="body2" type="body2">
@@ -278,7 +278,7 @@ class IngredientsTable extends React.Component {
                     </Typography>
                   </TableCell>
                   <TableCell
-                    style={{ width: '22%' }}
+                    style={{ width: '15%' }}
                     onClick={() => this.props.sortByOptions('type')}
                   >
                     <Typography className="body2" type="body2">
@@ -286,9 +286,16 @@ class IngredientsTable extends React.Component {
                     </Typography>
                   </TableCell>
 
-                  <TableCell style={{ width: '22%' }}>
+                  <TableCell style={{ width: '14%' }}>
                     <Typography className="body2" type="body2">
                       Value
+                    </Typography>
+                  </TableCell>
+
+                  
+                  <TableCell style={{ width: '8%' }}>
+                    <Typography className="body2" type="body2">
+                      Tags
                     </Typography>
                   </TableCell>
                 </TableRow>
@@ -334,7 +341,7 @@ class IngredientsTable extends React.Component {
                       style={{
                         paddingTop: '10px',
                         paddingBottom: '10px',
-                        width: '22%',
+                        width: '29%',
                       }}
                       padding="none"
                       onClick={() =>
@@ -357,7 +364,7 @@ class IngredientsTable extends React.Component {
                       </Typography>
                     </TableCell>
                     <TableCell
-                      style={{ width: '22%' }}
+                      style={{ width: '15%' }}
                       onClick={() =>
                         this.props.history.push(`ingredients/${e._id}/edit`)
                       }
@@ -377,12 +384,21 @@ class IngredientsTable extends React.Component {
                     </TableCell>
 
                     <TableCell
-                      style={{ width: '22%' }}
+                      style={{ width: '14%' }}
                       onClick={() =>
                         this.props.history.push(`ingredients/${e._id}/edit`)
                       }
                     >
                       {this.renderDiscountOrExtra(e)}
+                    </TableCell>
+
+                    <TableCell
+                      style={{ width: '8%' }}
+                      onClick={() =>
+                        this.props.history.push(`ingredients/${e._id}/edit`)
+                      }
+                    >
+                      {e.hasOwnProperty('tags') ? e.tags.length : '-'}
                     </TableCell>
                   </TableRow>
                 );

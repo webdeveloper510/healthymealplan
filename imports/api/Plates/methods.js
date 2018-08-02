@@ -22,6 +22,7 @@ Meteor.methods({
       mealType: String,
       custom: Match.Optional(Boolean),
       instructionId: Match.Optional(String),
+      generatedTags: Match.Optional(Array),
       ingredients: Array,
       nutritional: Match.Optional(Object),
     });
@@ -72,9 +73,14 @@ Meteor.methods({
       plateToInsert.instructionId = plate.instructionId;
     }
 
-    if (!plate.hasOwnProperty('substitutePlate')) {
+    if (plate.hasOwnProperty('substitutePlate')) {
       plateToInsert.substitutePlate = plate.substitutePlate;
     }
+
+    if (plate.hasOwnProperty('generatedTags')) {
+      plateToInsert.generatedTags = plate.generatedTags;
+    }
+
 
     if (plateToInsert.subtitle.length > 0) {
       const slug = `${plate.title} ${plate.subtitle}`;
@@ -84,7 +90,7 @@ Meteor.methods({
       plateToInsert.slug = slugify(slug, { lower: true });
     }
 
-    console.log(plate);
+    // console.log(plate);
 
     try {
       return Plates.insert(plateToInsert);
@@ -103,6 +109,7 @@ Meteor.methods({
       mealCategory: String,
       allergens: Match.Optional(Array),
       substitutePlate: Match.Optional(Object),
+      generatedTags: Match.Optional(Array),
       instructionId: Match.Optional(String),
       mealType: String,
       custom: Match.Optional(Boolean),
@@ -153,6 +160,10 @@ Meteor.methods({
     } else {
       const slug = `${plate.title}`;
       plate.slug = slugify(slug, { lower: true });
+    }
+
+    if (!plate.hasOwnProperty('generatedTags')) {
+      keysToUnset.generatedTags = '';
     }
 
 
