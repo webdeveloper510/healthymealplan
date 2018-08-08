@@ -1125,13 +1125,13 @@ class SideEditor extends React.Component {
                     SelectProps={{ native: false }}
                     name="type"
                   >
-                    <MenuItem key={2} value="Desserts">
+                    <MenuItem key={2} value="desserts">
                       Desserts
                     </MenuItem>
-                    <MenuItem key={3} value="Snacks">
+                    <MenuItem key={3} value="snacks">
                       Snacks
                     </MenuItem>
-                    <MenuItem key={4} value="Juices">
+                    <MenuItem key={4} value="juices">
                       Juices
                     </MenuItem>
                   </TextField>
