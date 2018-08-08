@@ -19,6 +19,8 @@ import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
 import Checkbox from 'material-ui/Checkbox';
 import FormControlLabel from 'material-ui/Form/FormControlLabel';
+import Select from 'material-ui/Select';
+import Radio, { RadioGroup } from 'material-ui/Radio';
 
 import Dialog, {
   DialogActions,
@@ -50,12 +52,12 @@ import $ from 'jquery';
 
 import { red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
+import autoBind from 'react-autobind';
 
 import Search from 'material-ui-icons/Search';
 import Loading from '../Loading/Loading';
 
 import validate from '../../../modules/validate';
-import SideImages from '../../../api/SideImages/SideImages';
 
 const danger = red[700];
 
@@ -97,22 +99,24 @@ class SideEditor extends React.Component {
     super(props);
 
     this.state = {
-      // plateImageSrc:
-      //   this.props.newPlate == false &&
-      //     this.props.document &&
-      //     this.props.document.image
-      //     ? this.props.document.image.link()
-      //     : "",
+
       plateImageSrc:
         this.props.newPlate == false &&
           this.props.document &&
           this.props.document.imageUrl
           ? this.props.document.imageUrl
           : '',
-
+      plateImageLargeSrc:
+        this.props.newPlate == false &&
+          this.props.document &&
+          this.props.document.largeImageUrl
+          ? this.props.document.largeImageUrl
+          : '',
       value: '', // Autosuggest
+      valuePlate: '', // Autosuggest
       valueMealType: this.props.plate ? this.props.plate.mealType : 'Desserts',
       valueInstructionActual: 'None',
+      valueInstructionSelect: this.props.plate && this.props.plate.hasOwnProperty('instructionId') ? this.props.plate.instructionId : 'None',
       custom: this.props.plate && !this.props.newPlate
         ? this.props.plate.custom
         : false,
@@ -121,15 +125,26 @@ class SideEditor extends React.Component {
         this.props.plate && this.props.plate.ingredients
           ? _.sortBy(this.props.plate.ingredients, 'title')
           : [],
+
       deleteDialogOpen: false,
+
       hasFormChanged: false,
       imageFieldChanged: false,
+      largeImageFieldChanged: false,
+
+      instructions: this.props.instructions || [],
+
+      // madeBy: this.props.plate && this.props.plate.madeBy ? this.props.plate.madeBy : '',
+      // mealCategory: this.props.plate && this.props.plate.mealCategory ? this.props.plate.mealCategory : '',
+      allergens: this.props.plate && this.props.plate.allergens && this.props.plate.allergens.length > 0 ? this.props.plate.allergens : [],
+      generatedTags: this.props.plate && this.props.plate.hasOwnProperty('generatedTags') ? this.props.plate.generatedTags : [],
 
       submitLoading: false,
       submitSuccess: false,
     };
 
-    this.renderImageUrl = this.renderImageUrl.bind(this);
+    autoBind(this);
+
   }
 
   componentDidMount() {
@@ -180,6 +195,35 @@ class SideEditor extends React.Component {
     this.setState({ deleteDialogOpen: false });
   }
 
+
+  handleChange(event) {
+    console.log(event.target.name);
+    console.log(event.target.value);
+    this.setState({
+      hasFormChanged: true,
+      [event.target.name]: event.target.value,
+    });
+  }
+
+
+  handleChangeAllergens(event) {
+    console.log(event.target.value);
+    const allergensCopy = this.state.allergens.slice();
+    const ifPresentIndex = allergensCopy.indexOf(event.target.value);
+
+    if (ifPresentIndex >= 0) {
+      allergensCopy.splice(ifPresentIndex, 1);
+    } else {
+      allergensCopy.push(event.target.value);
+    }
+
+    this.setState({
+      hasFormChanged: true,
+      allergens: allergensCopy,
+    });
+  }
+
+
   // Use your imagination to render suggestions.
   onChange(event, { newValue }) {
     this.setState({
@@ -188,16 +232,26 @@ class SideEditor extends React.Component {
   }
 
   onFileLoad(e) {
-    // console.log(e.target.files[0]);
+    console.log(e.currentTarget.id);
+
+    const imageType = e.currentTarget.id;
     const reader = new FileReader();
     const file = e.target.files[0];
 
     reader.addEventListener('load', () => {
-      this.setState({
-        plateImageSrc: reader.result,
-        imageFieldChanged: true,
-        hasFormChanged: true,
-      });
+      if (imageType == 'plateImage') {
+        this.setState({
+          plateImageSrc: reader.result,
+          imageFieldChanged: true,
+          hasFormChanged: true,
+        });
+      } else {
+        this.setState({
+          plateImageLargeSrc: reader.result,
+          largeImageFieldChanged: true,
+          hasFormChanged: true,
+        });
+      }
     });
 
     if (file) {
@@ -319,9 +373,13 @@ class SideEditor extends React.Component {
     const plate = {
       title: document.querySelector('#title').value.trim(),
       subtitle: document.querySelector('#subtitle').value.trim(),
-      mealType: this.state.valueMealType.trim(),
+      description: document.querySelector('#description').value.trim(),
+      // madeBy: this.state.madeBy,
+      // mealCategory: this.state.mealCategory,
+      allergens: this.state.allergens,
+      mealType: this.state.valueMealType.trim().toLowerCase(),
       custom: this.state.custom,
-      ingredients: this.state.subIngredients,
+      ingredients: this.state.subIngredients.length > 0 ? this.state.subIngredients : [],
       nutritional: {
         regular: {
           fat: $("[name='regular_fat']").val(),
@@ -344,15 +402,20 @@ class SideEditor extends React.Component {
       },
     };
 
-    if (this.state.valueInstructionActual !== 'None') {
-      const selectedInstruction = this.props.instructions.filter((e, i) => {
-        if (this.state.valueInstructionActual === e.title) {
-          return e._id;
-        }
-      });
 
-      plate.instructionId = selectedInstruction[0]._id;
+    if (this.state.generatedTags.length > 0) {
+      plate.generatedTags = this.state.generatedTags;
     }
+
+
+    if (this.state.valueInstructionSelect) {
+      const selectedInstruction = this.props.instructions.filter(e => this.state.valueInstructionSelect == e._id);
+
+      if (selectedInstruction.length > 0) {
+        plate.instructionId = selectedInstruction[0]._id;
+      }
+    }
+
 
     if (existingPlate) plate._id = existingPlate;
 
@@ -382,64 +445,108 @@ class SideEditor extends React.Component {
           ? `${localStorage.getItem('plateForSnackbar')} side updated.`
           : `${localStorage.getItem('plateForSnackbar')} side added.`;
 
-        if (this.state.imageFieldChanged) {
-          S3.upload({
-            file: document.getElementById('plateImage').files[0],
-            path: 'images',
-          }, (e, res) => {
-            // console.log(res);
+        if (this.state.imageFieldChanged || this.state.largeImageFieldChanged) {
+          if (this.state.imageFieldChanged) {
+            S3.upload({
+              file: document.getElementById('plateImage').files[0],
+              path: 'images',
+            }, (err, res) => {
+              console.log('Err');
+              console.log(err);
+              console.log('Res');
+              console.log(res);
 
-            if (e) {
-              this.props.popTheSnackbar({
-                message: 'There was a problem uploading the image.',
-              });
+              if (err) {
+                this.props.popTheSnackbar({
+                  message: 'There was a problem uploading the image.',
+                });
 
-              this.setState({
-                submitSuccess: false,
-                submitLoading: false,
-              });
-            } else {
+                this.setState({
+                  submitSuccess: false,
+                  submitLoading: false,
+                });
+              } else {
+                Meteor.call(
+                  'sides.updateImageUrl',
+                  {
+                    _id: plateId,
+                    imageUrl: res.relative_url,
+                    large: false,
+                  },
+                  (err, plateId) => {
+                    if (err) {
+                      this.props.popTheSnackbar({
+                        message: 'There was a problem updating the image.',
+                      });
 
-              Meteor.call(
-                'sides.updateImageUrl',
-                {
-                  _id: plateId,
-                  imageUrl: res.relative_url,
-                },
-                (err, plateId) => {
-                  if (err) {
+                      this.setState({
+                        submitSuccess: false,
+                        submitLoading: false,
+                      });
+                    }
+                  },
+                );
+              }
+            });
+          }
 
-                    this.props.popTheSnackbar({
-                      message: 'There was a problem updating the image ID.',
-                    });
+          if (this.state.largeImageFieldChanged) {
+            S3.upload({
+              file: document.getElementById('plateImageLarge').files[0],
+              path: 'images',
+            }, (err, res) => {
+              console.log('Err');
+              console.log(err);
+              console.log('Res');
+              console.log(res);
 
-                    this.setState({
-                      submitSuccess: false,
-                      submitLoading: false,
-                    });
+              if (err) {
+                this.props.popTheSnackbar({
+                  message: 'There was a problem uploading the large image.',
+                });
 
-                  } else {
-                    this.setState({
-                      submitSuccess: true,
-                      submitLoading: false,
-                    });
+                this.setState({
+                  submitSuccess: false,
+                  submitLoading: false,
+                });
+              } else {
+                Meteor.call(
+                  'sides.updateImageUrl',
+                  {
+                    _id: plateId,
+                    imageUrl: res.relative_url,
+                    large: true,
+                  },
+                  (err, plateId) => {
+                    if (err) {
+                      this.props.popTheSnackbar({
+                        message: 'There was a problem updating the large image.',
+                      });
 
-                    this.props.popTheSnackbar({
-                      message: confirmation,
-                      buttonText: 'View',
-                      buttonLink: `/sides/${plateId}/edit`,
-                    });
+                      this.setState({
+                        submitSuccess: false,
+                        submitLoading: false,
+                      });
+                    }
+                  },
+                );
+              }
+            });
+          }
 
-                    this.props.history.push('/sides');
-                  }
-                },
-              );
-            }
+          this.setState({
+            submitSuccess: true,
+            submitLoading: false,
           });
 
+          this.props.popTheSnackbar({
+            message: confirmation,
+            buttonText: 'View',
+            buttonLink: `/sides/${plateId}/edit`,
+          });
 
+          this.props.history.push('/sides');
         } else {
-
           this.setState({
             submitSuccess: true,
             submitLoading: false,
@@ -597,6 +704,13 @@ class SideEditor extends React.Component {
     });
   }
 
+  handleInstructionSelect(event, value) {
+    this.setState({
+      valueInstructionSelect: event.target.value,
+      hasFormChanged: true,
+    });
+  }
+
   handleInstructionChange(event, value) {
     this.setState({
       valueInstructionActual: event.target.value,
@@ -614,6 +728,81 @@ class SideEditor extends React.Component {
     return '';
   }
 
+
+  renderLargeImageUrl() {
+    if (this.props.newPlate || this.state.largeImageFieldChanged) {
+      return this.state.plateImageLargeSrc;
+    } else if (this.props.document && this.props.document.largeImageUrl) {
+      return `${Meteor.settings.public.S3BucketDomain}${this.state.plateImageLargeSrc}`;
+    }
+
+    return '';
+  }
+
+  generateTags(e) {
+
+    e.preventDefault();
+
+    if (this.state.subIngredients.length == 0) {
+      this.props.popTheSnackbar({
+        message: 'Please add at least one ingredient to generate tags.',
+      });
+      return;
+    }
+
+    const generatedTags = [];
+    let MAX_TAG_LIMIT = 5;
+
+    const ingredientItemTags = this.props.potentialSubIngredients
+      .filter((e) => this.state.subIngredients
+        .find(el => el._id == e._id) != undefined)
+      .map(e => e.tags)
+      .filter(e => e !== undefined);
+
+    console.log(ingredientItemTags);
+
+    if (ingredientItemTags.length <= 5) {
+      MAX_TAG_LIMIT = ingredientItemTags.length;
+    }
+
+    if (ingredientItemTags.length == 0) {
+
+      this.props.popTheSnackbar({
+        message: 'Selected ingredients do not have tags. Please verify.',
+      });
+
+      return;
+    }
+
+    while (generatedTags.length <= MAX_TAG_LIMIT) {
+
+      const randomIngredientIndex = Math.floor(Math.random() * (ingredientItemTags.length - 0)) + 0;
+      const randomIngredientTagIndex = Math.floor(Math.random() * (ingredientItemTags[randomIngredientIndex].length - 0)) + 0;
+
+      const itemToPush = ingredientItemTags[randomIngredientIndex][randomIngredientTagIndex];
+
+      if (generatedTags.includes(itemToPush)) {
+        continue;
+      } else {
+        generatedTags.push(itemToPush);
+      }
+    }
+    // ingredientItemTags.forEach((itemTags, itemIndex) => {
+
+    //     const randomIndex = Math.floor(Math.random() * (+itemTags.length - 0)) + 0;
+
+    //   if (generatedTags.length <= MAX_TAG_LIMIT) {
+    //     generatedTags.push(itemTags[randomIndex]);
+    //   }
+    // });
+
+    console.log(generatedTags);
+
+    this.setState({
+      generatedTags: generatedTags,
+      hasFormChanged: true,
+    });
+  }
 
   render() {
     const { plate, history, loading } = this.props;
@@ -744,6 +933,167 @@ class SideEditor extends React.Component {
                     inputProps={{}}
                     onChange={this.titleFieldChanged.bind(this)}
                   />
+
+                  <TextField
+                    margin="normal"
+                    id="description"
+                    label="Description"
+                    name="description"
+                    fullWidth
+                    defaultValue={plate && plate.description}
+                    multiline
+                    onChange={this.titleFieldChanged.bind(this)}
+                  />
+
+                  {/* <Grid container style={{ marginTop: '25px' }}>
+                    <Grid item xs={12}>
+                      <Typography>Chef</Typography>
+                    </Grid>
+
+                  </Grid>
+
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <RadioGroup
+                        name="madeBy"
+                        value={this.state.madeBy}
+                        onChange={this.handleChange.bind(this)}
+                        style={{ flexDirection: 'row' }}
+                      >
+                        <FormControlLabel value="mazen" control={<Radio color="primary" checked={this.state.madeBy == 'mazen'} />} label="Mazen Issa" />
+
+                        <FormControlLabel value="jansan" control={<Radio color="primary" checked={this.state.madeBy == 'jansan'} />} label="Jansan McCorkle" />
+                      </RadioGroup>
+                    </Grid>
+
+                  </Grid> */}
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Allergens
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <RadioGroup
+                        name="allergens"
+                        style={{ flexDirection: 'column' }}
+                      >
+                        <Grid container>
+                          <Grid xs={12} md={6} sm={6} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <FormControlLabel
+                              value="dairyFree"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('dairyFree') >= 0}
+                              />}
+                              label="Dairy Free"
+                            />
+
+                            <FormControlLabel
+                              value="glutenFree"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('glutenFree') >= 0}
+                              />}
+                              label="Gluten Free"
+                            />
+
+                            <FormControlLabel
+                              value="halal"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('halal') >= 0}
+                              />}
+                              label="Halal"
+                            />
+
+                            <FormControlLabel
+                              value="noEgg"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('noEgg') >= 0}
+                              />}
+                              label="No egg"
+                            />
+
+                          </Grid>
+
+                          <Grid xs={12} md={6} sm={6} style={{ display: 'flex', flexDirection: 'column' }}>
+                            <FormControlLabel
+                              value="noShellfish"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('noShellfish') >= 0}
+                              />}
+                              label="No shellfish"
+                            />
+
+                            <FormControlLabel
+                              value="noNut"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('noNut') >= 0}
+                              />}
+                              label="No nut"
+                            />
+
+                            <FormControlLabel
+                              value="soyFree"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('soyFree') >= 0}
+                              />}
+                              label="Soy free"
+                            />
+
+                            <FormControlLabel
+                              value="vegan"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('vegan') >= 0}
+                              />}
+                              label="Vegan"
+                            />
+
+                            <FormControlLabel
+                              value="vegetarian"
+                              control={<Checkbox
+                                color="primary"
+                                onChange={this.handleChangeAllergens}
+                                checked={this.state.allergens.indexOf('vegetarian') >= 0}
+                              />}
+                              label="Vegetarian"
+                            />
+
+                          </Grid>
+                        </Grid>
+                      </RadioGroup>
+                    </Grid>
+
+                  </Grid>
                 </Paper>
               </Grid>
             </Grid>
@@ -837,6 +1187,37 @@ class SideEditor extends React.Component {
             </Grid>
           </Grid>
         </Grid>
+
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Large image
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <input
+                    type="file"
+                    id="plateImageLarge"
+                    name="plateImageLarge"
+                    onChange={this.onFileLoad.bind(this)}
+                  />
+                  <img
+                    style={{ marginTop: '50px', display: 'block' }}
+                    src={this.renderLargeImageUrl()}
+                    style={{ maxWidth: '100%' }}
+                  />
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
         <Divider light className="divider--space-x" />
 
         <Grid container justify="center" style={{ marginBottom: '75px' }}>
@@ -935,6 +1316,41 @@ class SideEditor extends React.Component {
 
         <Divider light className="divider--space-x" />
 
+        <Grid container justify="center" style={{ marginBottom: '75px' }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Tags
+                </Typography>
+                <Typography style={{ paddingRight: '80px' }}>
+                  Please make sure you have at least one or two ingredients inserted on
+                  the plate. This will not work if there are no ingredients. This should always
+                  be done when all the ingredients are added onto the plate.
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Button color="secondary" type="secondary" onClick={this.generateTags}>Generate</Button>
+
+                  {this.state.generatedTags.map(e => (
+
+                    <Typography style={{ marginTop: '1.5em' }} type="body2">
+                      {e}
+                    </Typography>
+                  ))}
+
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+
+        <Divider light className="divider--space-x" />
+
         <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <Grid container>
@@ -948,38 +1364,17 @@ class SideEditor extends React.Component {
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
-                  <TextField
-                    fullWidth
-                    id="select-instruction"
-                    select
-                    onChange={this.handleInstructionChange.bind(this)}
-                    SelectProps={{ native: true }}
-                    name="instruction"
-                  >
-                    <option
-                      selected={
-                        !!(
-                          !this.props.newPlate &&
-                          !this.props.plate.instructionId
-                        )
-                      }
-                    >
+                  <Select fullWidth onChange={this.handleInstructionSelect} value={this.state.valueInstructionSelect}>
+                    <MenuItem key={2134} value={'None'}>
                       None
-                    </option>
+                    </MenuItem>
                     {this.props.instructions.map((e, i) => (
-                      <option
-                        selected={
-                          !this.props.newPlate
-                            ? e._id === this.props.plate.instructionId
-                            : ''
-                        }
-                        key={i + 2}
-                        value={e.title}
-                      >
+                      <MenuItem key={i} value={e._id}>
                         {e.title}
-                      </option>
+                      </MenuItem>
                     ))}
-                  </TextField>
+
+                  </Select>
                 </Paper>
               </Grid>
             </Grid>

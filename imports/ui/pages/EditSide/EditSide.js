@@ -58,8 +58,8 @@ const EditSide = ({
       </Grid>
     </div>
   ) : (
-      <NotFound />
-    ));
+    <NotFound />
+  ));
 
 EditSide.defaultProps = {
   plate: null,
@@ -74,7 +74,7 @@ EditSide.propTypes = {
 
 export default createContainer(({ match }) => {
   const sideId = match.params._id;
-  const subscription = Meteor.subscribe('ingredients');
+  const subscription = Meteor.subscribe('ingredientsWithoutTypeJoin', {}, {});
   const subscription2 = Meteor.subscribe('sides.view', sideId);
   const subscription4 = Meteor.subscribe('instructions');
 

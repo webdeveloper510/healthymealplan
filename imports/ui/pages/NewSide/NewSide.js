@@ -1,22 +1,22 @@
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import { createContainer } from "meteor/react-meteor-data";
-import { Meteor } from "meteor/meteor";
+import { createContainer } from 'meteor/react-meteor-data';
+import { Meteor } from 'meteor/meteor';
 
-import Grid from "material-ui/Grid";
+import Grid from 'material-ui/Grid';
 
-import Ingredients from "../../../api/Ingredients/Ingredients";
-import Instructions from "../../../api/Instructions/Instructions";
+import Ingredients from '../../../api/Ingredients/Ingredients';
+import Instructions from '../../../api/Instructions/Instructions';
 
-import SideEditor from "../../components/SideEditor/SideEditor";
+import SideEditor from '../../components/SideEditor/SideEditor';
 
 const NewSide = ({
   history,
   potentialSubIngredients,
   newPlate,
   popTheSnackbar,
-  instructions
+  instructions,
 }) => (
   <div>
     <Grid
@@ -38,19 +38,18 @@ NewSide.propTypes = {
   history: PropTypes.object.isRequired,
   potentialSubIngredients: PropTypes.array.isRequired,
   // ingredientTypes: PropTypes.array.isRequired,
-  popTheSnackbar: PropTypes.func.isRequired
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 export default createContainer(() => {
-  const subscription = Meteor.subscribe("ingredients");
-  const subscription2 = Meteor.subscribe("ingredientTypes");
-  const subscription3 = Meteor.subscribe("instructions");
+  const subscription = Meteor.subscribe('ingredientsWithoutTypeJoin', {}, {});
+  const subscription3 = Meteor.subscribe('instructions');
 
   return {
     newPlate: true,
     loading:
-      !subscription.ready() && !subscription2.ready() && !subscription3.ready(),
+      !subscription.ready() && !subscription3.ready(),
     potentialSubIngredients: Ingredients.find().fetch(),
-    instructions: Instructions.find().fetch()
+    instructions: Instructions.find().fetch(),
   };
 }, NewSide);

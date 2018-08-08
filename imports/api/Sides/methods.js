@@ -5,6 +5,8 @@ import { Match } from 'meteor/check';
 import Sides from './Sides';
 import rateLimit from '../../modules/rate-limit';
 
+import slugify from 'slugify';
+
 import { getNextSequence } from '../../modules/server/get-next-sequence';
 
 Meteor.methods({
@@ -13,8 +15,11 @@ Meteor.methods({
       title: String,
       subtitle: String,
       mealType: String,
-      custom: Match.Maybe(Boolean),
-      instructionId: Match.Maybe(String),
+      description: Match.Optional(String),
+      allergens: Match.Optional(Array),
+      generatedTags: Match.Optional(Array),
+      custom: Match.Optional(Boolean),
+      instructionId: Match.Optional(String),
       ingredients: Array,
       nutritional: Object,
     });
@@ -46,12 +51,12 @@ Meteor.methods({
       fat: String,
     });
 
-    console.log(side);
+    // console.log(side);
 
-    console.log('Reaching here');
+    // console.log('Reaching here');
 
     const existingSide = Sides.findOne({ title: side.title });
-    console.log(existingSide);
+    // console.log(existingSide);
 
     if (existingSide) {
       throw new Meteor.Error('500', `${side.title} is already present`);
@@ -61,18 +66,25 @@ Meteor.methods({
     nextSeqItem = nextSeqItem.toString();
 
     const plateToInsert = {
+      ...side,
       SKU: nextSeqItem,
-      title: side.title,
-      subtitle: side.subtitle,
-      ingredients: side.ingredients,
-      mealType: side.mealType,
-      custom: side.custom,
-      nutritional: side.nutritional,
       createdBy: this.userId,
     };
 
-    if (side.instructionId) {
+    if (side.hasOwnProperty('instructionId')) {
       plateToInsert.instructionId = side.instructionId;
+    }
+
+    if (side.hasOwnProperty('generatedTags')) {
+      plateToInsert.generatedTags = side.generatedTags;
+    }
+
+    if (plateToInsert.subtitle.length > 0) {
+      const slug = `${side.title} ${side.subtitle}`;
+      plateToInsert.slug = slugify(slug, { lower: true });
+    } else {
+      const slug = `${side.title}`;
+      plateToInsert.slug = slugify(slug, { lower: true });
     }
 
     try {
@@ -87,8 +99,11 @@ Meteor.methods({
       title: String,
       subtitle: String,
       mealType: String,
-      custom: Match.Maybe(Boolean),
-      instructionId: Match.Maybe(String),
+      description: Match.Optional(String),
+      allergens: Match.Optional(Array),
+      generatedTags: Match.Optional(Array),
+      custom: Match.Optional(Boolean),
+      instructionId: Match.Optional(String),
       ingredients: Array,
       nutritional: Object,
     });
@@ -122,8 +137,21 @@ Meteor.methods({
 
     const keysToUnset = {};
 
-    if (!side.instructionId) {
+
+    if (!side.hasOwnProperty('instructionId')) {
       keysToUnset.instructionId = '';
+    }
+
+    if (side.subtitle.length > 0) {
+      const slug = `${side.title} ${side.subtitle}`;
+      side.slug = slugify(slug, { lower: true });
+    } else {
+      const slug = `${side.title}`;
+      side.slug = slugify(slug, { lower: true });
+    }
+
+    if (!side.hasOwnProperty('generatedTags')) {
+      keysToUnset.generatedTags = '';
     }
 
     try {
@@ -146,15 +174,22 @@ Meteor.methods({
     check(side, {
       _id: String,
       imageUrl: String,
+      large: Boolean,
     });
 
     try {
       const sideId = side._id;
 
+      const toSet = {};
+
+      if (side.large) {
+        toSet.largeImageUrl = side.imageUrl;
+      } else {
+        toSet.imageUrl = side.imageUrl;
+      }
+
       Sides.update(sideId, {
-        $set: {
-          imageUrl: side.imageUrl,
-        },
+        $set: toSet,
       });
 
       return sideId; // Return _id so we can redirect to document after update.

@@ -34,9 +34,41 @@ Sides.schema = new SimpleSchema({
     optional: true,
   },
 
-  imageId: {
+  slug: {
     type: String,
-    label: '_id of the plate image.',
+    label: 'URL slug',
+  },
+
+  // mealCategory: {
+  //   type: String,
+  //   label: 'Plate category',
+  // },
+
+  // madeBy: {
+  //   type: String,
+  //   label: 'Dish made by',
+  // },
+
+  mealType: {
+    type: String,
+    label: 'Meal type of the plate.',
+  },
+
+  description: {
+    type: String,
+    label: 'This is a long description for blog',
+    optional: true,
+  },
+
+  allergens: {
+    type: Array,
+    label: 'These are allergens on the dish',
+    optional: true,
+  },
+
+  'allergens.$': {
+    type: String,
+    label: 'These are allergen items on the dish',
     optional: true,
   },
 
@@ -46,6 +78,11 @@ Sides.schema = new SimpleSchema({
     optional: true,
   },
 
+  largeImageUrl: {
+    type: String,
+    label: 'URL of the large plate image.',
+    optional: true,
+  },
 
   instructionId: {
     type: String,
@@ -53,14 +90,19 @@ Sides.schema = new SimpleSchema({
     optional: true,
   },
 
-  mealType: {
-    type: String,
-    label: 'Meal type of the side.',
-  },
-
   custom: {
     type: Boolean,
     label: 'If the side is custom',
+    optional: true,
+  },
+
+  generatedTags: {
+    type: Array,
+    optional: true,
+  },
+
+  'generatedTags.$': {
+    type: String,
     optional: true,
   },
 

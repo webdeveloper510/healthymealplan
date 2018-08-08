@@ -1528,38 +1528,7 @@ class PlateEditor extends React.Component {
                     ))}
 
                   </Select>
-                  {/* <TextField
-                    fullWidth
-                    id="select-instruction"
-                    select
-                    onChange={this.handleInstructionChange.bind(this)}
-                    SelectProps={{ native: true }}
-                    name="instruction"
-                  >
-                    <option
-                      selected={
-                        !!(
-                          !this.props.newPlate &&
-                          !this.props.plate.instructionId
-                        )
-                      }
-                    >
-                      None
-                    </option>
-                    {this.props.instructions.map((e, i) => (
-                      <option
-                        selected={
-                          !this.props.newPlate
-                            ? e._id === this.props.plate.instructionId
-                            : ''
-                        }
-                        key={i + 2}
-                        value={e.title}
-                      >
-                        {e.title}
-                      </option>
-                    ))}
-                  </TextField> */}
+      
                 </Paper>
               </Grid>
             </Grid>
