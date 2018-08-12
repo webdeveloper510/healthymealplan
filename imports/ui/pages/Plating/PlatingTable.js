@@ -784,8 +784,16 @@ class PlatingTable extends React.Component {
                 this.props.lifestyles && !this.state.aggregateDataLoading && this.props.lifestyles.map((lifestyle) => {
                   const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === lifestyle._id);
 
+                  const mealTypeOrder = ['Breakfast', 'Lunch', 'Dinner'];
+                  const mapBy = [];
+
+                  mealTypeOrder.forEach(e => {
+                    mapBy.push(this.props.meals.find(el => el.title == e));
+                  });
+
                   return (
-                    this.props.meals && this.props.meals.filter(el => el.type === 'Main' || el.type === 'Main Course').map(meal => (
+
+                    this.props.meals && mapBy.map(meal => (
 
                       <TableRow hover key={`${lifestyle._id} ${meal._id} `}>
 
@@ -794,35 +802,6 @@ class PlatingTable extends React.Component {
 
                         </TableCell>
 
-                        {/* <TableCell padding="none" style={{ width: '14.28%' }}>
-                          <Typography className="subheading" type="subheading">{!this.state.aggregateDataLoading &&
-                            this.state.aggregateData.userData.reduce((accumulator, user) => {
-
-                              if (user.specificRestrictions) {
-                                if (user.specificRestrictions.length > 0) {
-                                  return 0;
-                                }
-                              }
-
-                              if (user.restrictions) {
-                                if (user.restrictions.length > 0) {
-                                  return 0;
-                                }
-                              }
-
-                              if (user.preferences) {
-                                if (user.preferences.length > 0) {
-                                  return 0;
-                                }
-                              }
-
-                              return accumulator + user[meal.title.toLowerCase()].regular + user[meal.title.toLowerCase()].athletic + user[meal.title.toLowerCase()].bodybuilder;
-
-                            }, 0)
-
-                          }</Typography>
-
-                        </TableCell> */}
                         <TableCell
                           style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
                           padding="none"
