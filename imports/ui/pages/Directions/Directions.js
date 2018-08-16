@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
+import { ReactiveVar } from 'meteor/reactive-var';
 
 import $ from 'jquery';
 
@@ -34,6 +35,9 @@ import Containers from 'meteor/utilities:react-list-container';
 
 const ListContainer = Containers.ListContainer;
 
+const deliveriesData = new ReactiveVar({
+  onDate: moment().format('YYYY-MM-DD')
+});
 
 class Directions extends React.Component {
   constructor(props) {
@@ -52,7 +56,7 @@ class Directions extends React.Component {
       searchSelector: '',
       currentTabValue: /./,
       selectedRoute: '',
-      currentSelectorDate: moment(new Date()).format('YYYY-MM-DD'),
+      currentSelectorDate: moment().format('YYYY-MM-DD'),
     };
   }
 
@@ -103,13 +107,17 @@ class Directions extends React.Component {
 
   changeDate(operation) {
     if (operation === 'add') {
+      const formattedDate = moment(this.state.currentSelectorDate).add(1, 'd').format('YYYY-MM-DD');
       this.setState({
-        currentSelectorDate: moment(this.state.currentSelectorDate).add(1, 'd').format('YYYY-MM-DD'),
+        currentSelectorDate: formattedDate,
       });
+      deliveriesData.set({ onDate: formattedDate })
     } else {
+      const formattedDate = moment(this.state.currentSelectorDate).subtract(1, 'd').format('YYYY-MM-DD');
       this.setState({
-        currentSelectorDate: moment(this.state.currentSelectorDate).subtract(1, 'd').format('YYYY-MM-DD'),
+        currentSelectorDate: formattedDate,
       });
+      deliveriesData.set({ onDate: formattedDate })
     }
   }
 
@@ -251,12 +259,15 @@ Directions.propTypes = {
   history: PropTypes.object.isRequired,
 };
 
-export default createContainer(() => {
-  const subscription = Meteor.subscribe('directions');
+export default withTracker(() => {
+
+  const deliveriesDataVar = deliveriesData.get();
+
+  const subscription = Meteor.subscribe('deliveries.onDate', deliveriesDataVar.onDate);
   const subscription2 = Meteor.subscribe('postalcodes');
   const subscription3 = Meteor.subscribe('routes');
   const subscription4 = Meteor.subscribe('subscriptions');
-  const subscription5 = Meteor.subscribe('users.customers');
+  const subscription5 = Meteor.subscribe('users.customers', {}, {});
 
 
   return {
@@ -265,4 +276,4 @@ export default createContainer(() => {
     routes: Routes.find().fetch(),
     postalCodes: PostalCodes.find().fetch(),
   };
-}, Directions);
+})(Directions);

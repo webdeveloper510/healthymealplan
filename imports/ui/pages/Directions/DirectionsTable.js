@@ -34,6 +34,7 @@ import moment from 'moment';
 import sumBy from 'lodash/sumBy';
 import groupBy from 'lodash/groupBy';
 import jsPDF from 'jspdf';
+import autoBind from 'react-autobind';
 
 import vittlebase64 from '../../../modules/vittlelogobase64';
 import hmpbase64 from '../../../modules/hmplogobase64';
@@ -115,15 +116,7 @@ class DirectionsTable extends React.Component {
       searchBy: '',
     };
 
-    this.handleStatusChange = this.handleStatusChange.bind(this);
-    this.checkInDeliveries = this.checkInDeliveries.bind(this);
-
-    this.handleAddressDialogOpen = this.handleAddressDialogOpen.bind(this);
-    this.handleAddressDialogClose = this.handleAddressDialogClose.bind(this);
-
-
-    this.handleNoteDialogOpen = this.handleNoteDialogOpen.bind(this);
-    this.handleNoteDialogClose = this.handleNoteDialogClose.bind(this);
+    autoBind(this);
   }
 
   componentDidMount() {
@@ -576,21 +569,21 @@ class DirectionsTable extends React.Component {
               {!this.state.aggregateDataLoading && this.state.aggregateData.deliveries.filter((el) => {
                 if (this.state.currentTabValue != 'all' && el.routeId != this.state.currentTabValue) {
                   return false;
-                } 
-                  return true;
-                
+                }
+                return true;
+
               }).filter((el) => {
                 const fullName = `${el.customer.profile.name.first} ${el.customer.profile.name.last}`;
 
                 const like = new RegExp(this.state.searchBy, 'gi');
 
-                console.log(like);
+                // console.log(like);
 
                 if (this.state.searchBy != '' && !like.test(fullName)) {
                   return false;
-                } 
-                  return true;
-                
+                }
+                return true;
+
               }).map((e, i) => {
                 const inDeliveries = this.checkInDeliveries(e);
                 const rowId = inDeliveries != undefined ? inDeliveries._id : e._id;

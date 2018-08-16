@@ -10,6 +10,16 @@ Meteor.publish('deliveries', (selector, options) => {
   return Deliveries.find();
 });
 
+Meteor.publish('deliveries.onDate', (date) => {
+  // check(selector, Match.Any);
+  // check(options, Match.Any);
+  
+  check(date, String);
+  
+
+  return Deliveries.find({ onDate: date });
+});
+
 // Note: IngredientTypes.view is also used when editing an existing document.
 Meteor.publish('deliveries.view', (categoryId) => {
   check(categoryId, String);
