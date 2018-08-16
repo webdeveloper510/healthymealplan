@@ -455,11 +455,11 @@ class MealPlannerTable extends React.Component {
                     return dish != null && this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ?
                       (
                         <Grid item xs={12} sm={6} md={4} lg={4} key={assignedPlannerId}>
-                          <Card style={{ width: '100%', height: '100%' }}>
+                          <Card style={{ width: '100%' }}>
                             {(lifestyle.title == "Traditional" || lifestyle.title == "No meat" || lifestyle.title == "Flex") && (
                               <CardMedia
                                 style={{ height: '400px' }}
-                                image={dish.imageUrl ? dish.imageUrl : 'https://via.placeholder.com/460x540?text=+'}
+                                image={dish.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${dish.imageUrl}` : 'https://via.placeholder.com/460x540?text=+'}
                               />
                             )}
                             <CardContent>
