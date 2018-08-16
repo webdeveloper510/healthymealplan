@@ -571,7 +571,9 @@ class OrderSummary extends React.Component {
                 <Grid container>
                   <Grid item xs={12} sm={6}>
                     <Typography type="body2">
-                      {this.props.discounts.find(e => this.props.discountSelected == e.title || this.props.discountSelected == e._id).title}
+                      {this.props.discountSelected 
+                      && this.props.discounts 
+                      && this.props.discounts.find(e => this.props.discountSelected == e.title || this.props.discountSelected == e._id).title}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
