@@ -15,6 +15,7 @@ import Dialog, {
   DialogContentText,
 } from 'material-ui/Dialog';
 
+import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';
 
 import $ from 'jquery';
 import Paper from 'material-ui/Paper';
@@ -23,14 +24,21 @@ import TextField from 'material-ui/TextField';
 import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
+import IconButton from 'material-ui/IconButton';
 import Input from 'material-ui/Input';
+import Menu from 'material-ui/Menu';
 import { MenuItem } from 'material-ui/Menu';
+import Grid from 'material-ui/Grid';
+import { Divider } from 'material-ui';
 
 import moment from 'moment';
+import autoBind from 'react-autobind';
 
 import sumBy from 'lodash/sumBy';
 import Autosuggest from 'react-autosuggest';
 import CloseIcon from 'material-ui-icons/Close';
+import LaunchIcon from 'material-ui-icons/Launch';
+import EditIcon from 'material-ui-icons/Edit';
 
 import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
@@ -65,17 +73,7 @@ class MealPlannerTable extends React.Component {
       reassignPlannerId: '',
     };
 
-    this.openAssignDialog = this.openAssignDialog.bind(this);
-    this.closeAssignDialog = this.closeAssignDialog.bind(this);
-
-    this.openReassignDialog = this.openReassignDialog.bind(this);
-    this.closeReassignDialog = this.closeReassignDialog.bind(this);
-
-    this.handleMealAssignment = this.handleMealAssignment.bind(this);
-    this.handleMealReassignment = this.handleMealReassignment.bind(this);
-
-    this.renderPresentPlate = this.renderPresentPlate.bind(this);
-    this.getPlannerId = this.getPlannerId.bind(this);
+    autoBind(this);
   }
 
   openAssignDialog(lifestyleId, mealId) {
@@ -270,10 +268,16 @@ class MealPlannerTable extends React.Component {
     return (<Typography type="subheading">{plateToReturn.plate.title}</Typography>);
   }
 
-  getAssignedPlateId(results, lifestyleId, mealId, date) {
+  getAssignedPlannerId(results, lifestyleId, mealId, date) {
     const plateToReturn = results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === date);
     return plateToReturn._id;
   }
+
+  getAssignedPlateId(results, lifestyleId, mealId, date) {
+    const plateToReturn = results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === date);
+    return plateToReturn.plateId;
+  }
+
 
   renderInput(inputProps) {
     const { value, ...other } = inputProps;
@@ -310,7 +314,7 @@ class MealPlannerTable extends React.Component {
       : this.props.plates.filter(
         plate =>
           plate.title.toLowerCase().slice(0, inputLength) === inputValue,
-      )
+      );
   }
 
   getSuggestionValue(suggestion) {
@@ -364,94 +368,178 @@ class MealPlannerTable extends React.Component {
     });
   }
 
+  renderFormattedAllergy(allergy) {
+    switch (allergy) {
+      case 'vegetarian':
+        return 'Vegetarian';
+        break;
+
+      case 'vegan':
+        return 'Vegan';
+        break;
+
+      case 'halal':
+        return 'Halal';
+        break;
+
+      case 'glutenFree':
+        return 'Gluten-free';
+        break;
+
+      case 'noEgg':
+        return 'No egg';
+        break;
+
+      case 'noNut':
+        return 'Nut-free';
+        break;
+
+      case 'dairyFree':
+        return 'Dairy-free';
+        break;
+
+      case 'soyFree':
+        return 'Soy-free';
+        break;
+
+      case 'noShellfish':
+        return 'No shellfish';
+        break;
+
+      default:
+        return '';
+        break;
+    }
+  }
+
   render() {
+    if (this.props.loading) {
+      return <Loading />;
+    }
+
     return (
-      <div>
-        <Paper elevation={2} className="table-container">
+      <div style={{ width: '100%' }}>
 
-          <Table className="table-container meal-planner-table" style={{ tableLayout: 'fixed' }}>
-            <TableHead>
-              <TableRow>
+        {this.props.lifestyles && this.props.lifestyles.map((lifestyle) => {
+          const mealTypeOrder = ['Breakfast', 'Lunch', 'Dinner'];
+          const mapBy = [];
 
-                <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                  <Typography className="body2" type="body2">Plan</Typography>
-                </TableCell>
+          mealTypeOrder.forEach((e) => {
+            mapBy.push(this.props.meals.find(el => el.title == e));
+          });
 
-                <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('title')}>
-                  <Typography className="body2" type="body2">Meal type</Typography>
-                </TableCell>
+          return (
+            <div style={{ width: '100%', marginBottom: '50px', marginTop: '25px' }} key={lifestyle._id}>
+              <Grid container>
+                <Grid item xs={12} lg={12}>
+                  <Typography type="headline" style={{ marginBottom: '25px' }}>{`${lifestyle.title} for ${moment(this.props.currentSelectorDate).format('dddd, MMMM D')}`}</Typography>
+                </Grid>
+              </Grid>
+              <Grid container>
+                {
+                  mapBy.map((meal, index) => {
+                    const presentDish = this.props.results.find(e => e.onDate == this.props.currentSelectorDate && e.lifestyleId == lifestyle._id && e.mealId == meal._id);
+                    // console.log(presentDish);
+                    // console.log(presentDish);
+                    let dish = null;
+                    let assignedPlateId = null;
+                    let assignedPlannerId = null;
+                    if (presentDish) {
+                      dish = this.props.plates.find(e => presentDish.plateId == e._id);
+                      assignedPlateId = this.getAssignedPlateId(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate);
+                      assignedPlannerId = this.getAssignedPlannerId(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate);
+                    }
 
-                <TableCell padding="none" style={{ width: '33.33%' }} onClick={() => this.props.sortByOptions('title')}>
-                  <Typography className="body2" type="body2">Main</Typography>
-                </TableCell>
+                    // console.log(dish);
 
-              </TableRow>
-            </TableHead>
-            <TableBody>
+                    return dish != null && this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ?
+                      (
+                        <Grid item xs={12} sm={6} md={4} lg={4} key={assignedPlannerId}>
+                          <Card style={{ width: '100%', height: '100%' }}>
+                            {(lifestyle.title == "Traditional" || lifestyle.title == "No meat" || lifestyle.title == "Flex") && (
+                              <CardMedia
+                                style={{ height: '400px' }}
+                                image={dish.imageUrl ? dish.imageUrl : 'https://via.placeholder.com/460x540?text=+'}
+                              />
+                            )}
+                            <CardContent>
+                              <Typography style={{ marginBottom: '16px', fontSize: '14px', color: 'rgba(0, 0, 0, .54)' }}>
+                                {meal.title}
+                              </Typography>
 
-              {this.props.lifestyles && this.props.lifestyles.map(lifestyle => (
+                              <Typography type="headline" component="h2">
+                                {dish.title}
+                              </Typography>
+                              <Typography type="body1" style={{ marginBottom: '12px', color: 'rgba(0, 0, 0, .54)' }}>
+                                {dish.subtitle != undefined && dish.subtitle}
+                              </Typography>
 
-                this.props.meals && this.props.meals.filter(el => el.type === 'Main' || el.type === 'Main Course').map(meal => (
+                              {/* {dish.allergens && dish.allergens.length > 0 && (
+                                <div style={{ marginBottom: '10px' }}>
+                                  {dish.allergens.map(e => (
+                                    <Typography type="body2" style={{ display: 'inline-block', marginRight: '6px', textTransform: 'uppercase', color: 'rgba(0, 0, 0, .54)' }}>
+                                      {this.renderFormattedAllergy(e)}
+                                    </Typography>
+                                  ))}
+                                </div>
+                              )} */}
 
-                  <TableRow hover key={`${lifestyle._id}${meal._id}`} className={`${this.isPlateAssignedClass(this.props.results, lifestyle._id, meal._id)}`}>
+                              {/* {dish.madeBy && (
+                                <Typography type="body2" style={{ marginBottom: '8px', color: 'rgba(0, 0, 0, .54)' }}>
+                                  Chef {dish.madeBy == 'mazen' ? 'Mazen Issa' : dish.madeBy == 'jansan' ? 'Jansan McCorkle' : ''}
+                                </Typography>
+                              )} */}
 
-                    <TableCell padding="none" style={{ width: '33.33%' }}>
-                      <Typography className="subheading" type="subheading">{lifestyle.title}</Typography>
+                            </CardContent>
+                            <Divider />
+                            <CardActions style={{ justifyContent: 'flex-end' }}>
 
-                    </TableCell>
+                              {dish.mealCategory && dish.slug && (
+                                <Button
+                                  size="small"
+                                  dense
+                                  color="primary"
+                                  onClick={() => window.open(`https://www.vittle.ca/on-the-menu/${dish.mealCategory}/${dish.slug}`, '_blank')}
+                                >
+                                  View
+                                </Button>
+                              )}
 
-                    <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.33%' }}
-                      padding="none"
-                    >
-
-                      <Typography className="subheading" type="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }} >
-                        {meal.title}
-                      </Typography>
-
-
-                    </TableCell>
-
-                    <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '33.34%' }}
-                      padding="none"
-                    >
-                      {this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ? (
-                        <div>
-                          <div>{this.renderPresentPlate(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate)}</div>
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <Button onClick={() => this.openReassignDialog(lifestyle._id, meal._id,
-                              this.getPlannerId(this.props.results, lifestyle._id, meal._id))}
-                            >
-                              Reassign
-                            </Button>
-
-                            <CloseIcon onClick={() => this.removeMealPlanner(this.getAssignedPlateId(this.props.results, lifestyle._id, meal._id, this.props.currentSelectorDate))} />
-                          </div>
-                        </div>
+                              <Button
+                                dense
+                                size="small"
+                                color="primary"
+                                onClick={e => this.setState({ [`menu${assignedPlateId}`]: e.currentTarget })}
+                              >
+                                Edit
+                              </Button>
+                            </CardActions>
+                          </Card>
+                          <Menu
+                            id={`menu${assignedPlateId}`}
+                            anchorEl={this.state[`menu${assignedPlateId}`]}
+                            open={Boolean(this.state[`menu${assignedPlateId}`])}
+                            onClose={e => this.setState({ [`menu${assignedPlateId}`]: null })}
+                          >
+                            <MenuItem onClick={() => this.removeMealPlanner(assignedPlannerId)}>Remove</MenuItem>
+                            <MenuItem onClick={() => this.openReassignDialog(lifestyle._id, meal._id, assignedPlannerId)}>Reassign</MenuItem>
+                            <MenuItem onClick={() => this.props.history.push(`/plates/${assignedPlateId}/edit`)}>View</MenuItem>
+                          </Menu>
+                        </Grid>
                       ) : (
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                          <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>Assign</Button>
-                        </Typography>
-                      )
-                      }
+                        <Grid item xs={12} sm={6} md={4} lg={4}>
+                          <div className="card-bordered-emtpy" onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>
+                            <Typography className="card-bordered-empty__para" type="body1" component="p">Assign {meal && meal.title != undefined ? meal.title.toLowerCase() : ''}</Typography>
+                          </div>
+                        </Grid>
+                      );
+                  })// map
+                }
+              </Grid>
+            </div>
+          );
 
-                    </TableCell>
-
-                  </TableRow>
-
-                ))
-
-
-              ))}
-
-
-              {/* {this.renderNoResults(this.props.count)} */}
-
-            </TableBody>
-
-          </Table>
-        </Paper>
+        })}
 
         <Dialog maxWidth="md" fullWidth fullScreen open={this.state.assignDialogOpen} onClose={this.closeAssignDialog}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 import Containers from 'meteor/utilities:react-list-container';
 
 import $ from 'jquery';
@@ -28,7 +28,6 @@ import PlatesCollection from '../../../api/Plates/Plates';
 
 import Loading from '../../components/Loading/Loading';
 import MealPlannerTable from './MealPlannerTable';
-
 
 const ListContainer = Containers.ListContainer;
 
@@ -142,7 +141,7 @@ class MealPlanner extends React.Component {
 
           <Grid container className="clearfix">
             <Grid item xs={12} style={{ alignItems: 'center' }}>
-              <Typography type="headline" gutterBottom style={{ fontWeight: 500 }}>Meal planner for {moment(this.state.currentSelectorDate).format('dddd, MMMM D')}</Typography>
+              <Typography type="headline" gutterBottom style={{ fontWeight: 500 }}>Meal planner</Typography>
             </Grid>
           </Grid>
 
@@ -182,6 +181,8 @@ class MealPlanner extends React.Component {
               lifestyles={this.props.lifestyles}
               meals={this.props.meals}
               plates={this.props.plates}
+              loading={this.props.loading}
+            // forDate={moment(this.state.currentSelectorDate).format('dddd, MMMM D')}
             />
           </ListContainer>
         </Grid>
@@ -199,7 +200,7 @@ MealPlanner.propTypes = {
 
 };
 
-export default createContainer(() => {
+export default withTracker(() => {
   const subscription1 = Meteor.subscribe('lifestyles');
   const subscription2 = Meteor.subscribe('Meals');
   const subscription3 = Meteor.subscribe('mealplanner');
@@ -211,4 +212,4 @@ export default createContainer(() => {
     meals: Meals.find().fetch(),
     plates: PlatesCollection.find().fetch(),
   };
-}, MealPlanner);
+})(MealPlanner);

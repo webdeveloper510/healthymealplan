@@ -14,3 +14,29 @@
 .meal-planner-table tr td {
   padding: 1em;
 }
+
+.card-bordered-emtpy{
+
+  border: 2px dashed rgba(0,0,0,.25);
+  width: 100%;
+  min-height: 540px;
+  height: 100%;
+  transition: all .2s ease;
+  cursor: pointer;
+
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+
+  p{
+    text-align: center; 
+    font-size: 18px;
+  }
+
+  &:hover{
+    border-color: rgba(0,0,0,.45);
+  }
+}
