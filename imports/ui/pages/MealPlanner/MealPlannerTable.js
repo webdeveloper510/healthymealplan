@@ -459,7 +459,7 @@ class MealPlannerTable extends React.Component {
                             {(lifestyle.title == "Traditional" || lifestyle.title == "No meat" || lifestyle.title == "Flex") && (
                               <CardMedia
                                 style={{ height: '400px' }}
-                                image={dish.imageUrl ? dish.imageUrl : 'https://via.placeholder.com/460x540?text=+'}
+                                image={dish.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${dish.imageUrl}` : 'https://via.placeholder.com/460x540?text=+'}
                               />
                             )}
                             <CardContent>
