@@ -35,6 +35,7 @@ import DriversIcon from 'material-ui-icons/DriveEta';
 import CustomersIcon from 'material-ui-icons/Person';
 import SettingsIcon from 'material-ui-icons/Settings';
 import TeamIcon from 'material-ui-icons/SupervisorAccount';
+import EditIcon from 'material-ui-icons/Edit';
 
 import Collapse from 'material-ui/transitions/Collapse';
 
@@ -327,6 +328,15 @@ class AuthenticatedSideNav extends Component {
               </ListItem>
             </NavLink>
           </Collapse>
+
+          <NavLink onClick={this.props.handleDrawerToggle} to="/blog">
+            <ListItem button>
+              <ListItemIcon>
+                <EditIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Blog" />
+            </ListItem>
+          </NavLink>
 
           {/* <ListItem button onClick={this.handleToggleDelivery.bind(this)}>
 

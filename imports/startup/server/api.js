@@ -1,3 +1,6 @@
+import '../../api/Blog/methods';
+import '../../api/Blog/server/publications';
+
 import '../../api/Deliveries/methods';
 import '../../api/Deliveries/server/publications';
 

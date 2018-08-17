@@ -46,7 +46,9 @@ import AuthenticatedNavigation from '../../components/AuthenticatedNavigation/Au
 import Public from '../../components/Public/Public';
 import Index from '../../pages/Index/Index';
 
-// import AddAccount from '../../pages/Accounts/AddAccount';
+import Blog from '../../pages/Blog/Blog';
+import NewBlog from '../../pages/NewBlog/NewBlog';
+import EditBlog from '../../pages/EditBlog/EditBlog';
 
 import Categories from '../../pages/Categories/Categories';
 import NewCategory from '../../pages/NewCategory/NewCategory';
@@ -503,6 +505,32 @@ class App extends React.Component {
               >
                 {!this.props.loading ? (
                   <Switch key={this.props.key} location={this.props.location}>
+
+                    <Authenticated
+                      exact
+                      path="/blog"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={Blog}
+                      {...this.props}
+                    />
+
+
+                    <Authenticated
+                      exact
+                      path="/blog/new"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={NewBlog}
+                      {...this.props}
+                    />
+
+                    <Authenticated
+                      exact
+                      path="/blog/:_id/edit"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={EditBlog}
+                      {...this.props}
+                    />
+
                     <Authenticated
                       exact
                       path="/categories"
