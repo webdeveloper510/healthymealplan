@@ -592,7 +592,7 @@ class DirectionsTable extends React.Component {
                 const statusClass = this.getStatusClass(status);
 
                 return (
-                  <TableRow hover className={`${rowId} ${statusClass} `} key={rowId}>
+                  <TableRow hover className={`${rowId} ${statusClass} delivery-status`} key={rowId}>
                     <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }} padding="checkbox">
                       <Checkbox
                         className="row-checkbox"
