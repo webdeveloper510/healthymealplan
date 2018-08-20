@@ -6,13 +6,14 @@ import templateToText from '../../../modules/server/handlebars-email-to-text';
 
 const name = 'Vittle';
 const email = '<support@mg.vittle.ca>';
-const from = 'support@mg.vittle.ca';
 const emailTemplates = Accounts.emailTemplates;
 
 emailTemplates.siteName = name;
-emailTemplates.from = from;
 
 emailTemplates.verifyEmail = {
+  from(){
+    return 'Vittle <support@vittle.ca>'
+  },
   subject() {
     return `[${name}] Verify Your Email Address`;
   },
@@ -38,6 +39,9 @@ emailTemplates.verifyEmail = {
 };
 
 emailTemplates.resetPassword = {
+  from(){
+    return 'Vittle <support@vittle.ca>'
+  },
   subject() {
     return `[${name}] Reset Your Password`;
   },
