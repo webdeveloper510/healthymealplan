@@ -57,7 +57,6 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
     const route = el.route[0];
     // console.log(primaryCustomerName);
-    // console.log(el.route[0]._id);
 
 
     // console.log(`Customer ${i}`);
@@ -593,28 +592,58 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           }
           // set cooking as sunday
         } else if (e === 'dayOfMonday') {
-          // set delivery for tuesday as monday day
-          if (this.deliveryDay == 1) {
-            delivery.title = 'dayOf';
-            delivery.onDate = currentDay;
 
-            // summation of tuesday meals
-            delivery.meals.push({
-              name: primaryCustomerName,
-              total: addMealsForTheDay(primarySchedule[index]),
-            });
+          if (nextDay == "dayOfPaired") { // set delivery for tuesday and wednesday as monday day
 
-            if (containsSecondaries) {
-              secondarySchedules.forEach((secondarySchedule, profileIndex) => {
-                delivery.meals.push({
-                  name: secondaryCustomerNames[profileIndex],
-                  total: addMealsForTheDay(secondarySchedule[index]),
-                });
+            if (this.deliveryDay == 1) {
+              
+              daysPaired.push(2);
+
+              delivery.title = 'dayOf';
+              delivery.onDate = currentDay;
+  
+              // summation of tuesday meals
+              delivery.meals.push({
+                name: primaryCustomerName,
+                total: addMealsForTheDay(primarySchedule[index]) + addMealsForTheDay(primarySchedule[index + 1]),
               });
-
-              // console.log(delivery.meals);
+  
+              if (containsSecondaries) {
+                secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+                  delivery.meals.push({
+                    name: secondaryCustomerNames[profileIndex],
+                    total: addMealsForTheDay(secondarySchedule[index]) + addMealsForTheDay(secondarySchedule[index + 1]),
+                  });
+                });
+  
+                // console.log(delivery.meals);
+              }
             }
-          } // set cooking as sunday
+          } else {          // set delivery for tuesday as monday day
+
+            if (this.deliveryDay == 1) {
+              delivery.title = 'dayOf';
+              delivery.onDate = currentDay;
+  
+              // summation of tuesday meals
+              delivery.meals.push({
+                name: primaryCustomerName,
+                total: addMealsForTheDay(primarySchedule[index]),
+              });
+  
+              if (containsSecondaries) {
+                secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+                  delivery.meals.push({
+                    name: secondaryCustomerNames[profileIndex],
+                    total: addMealsForTheDay(secondarySchedule[index]),
+                  });
+                });
+  
+                // console.log(delivery.meals);
+              }
+            }
+          }
+       // set cooking as sunday
         }
       } // tuesday
 

@@ -43,6 +43,10 @@ function setUpLifestyles() {
   return dataByLifestyle;
 }
 
+/**
+ * Loops through all lifestyles and sets up the dishes (mains and sides) for the next day
+ */
+
 function setUpPlates(lifestyles, nextDay) {
   const lifestylePlates = [];
   // console.log('Inside setup PLATEs');
@@ -313,7 +317,6 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // set cooking as sunday
             } else {
               // set delivery for monday as monday day
-
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0]], lifestyleIndex);
                 this.appendDataToCustomers([customerSchedule[0]], customer, delivery);
@@ -396,12 +399,22 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
             }
             // set cooking as sunday
           } else if (e === 'dayOfMonday') {
-            // set delivery for tuesday as monday day
-            if (this.platingDay == 0) {
-              this.appendDataToLifestyle([customerSchedule[1]], lifestyleIndex);
-              this.appendDataToCustomers([customerSchedule[1]], customer, delivery);
-            }
-            // set cooking as sunday
+
+            // set delivery for tuesday and wednesday as monday day
+            if (nextDay == 'dayOfPaired') {
+
+              if (this.platingDay == 0) {
+                this.appendDataToLifestyle([customerSchedule[1], customerSchedule[2]], lifestyleIndex);
+                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2]], customer, delivery);
+              }
+
+            } else {
+              // set delivery for tuesday as monday day
+              if (this.platingDay == 0) {
+                this.appendDataToLifestyle([customerSchedule[1]], lifestyleIndex);
+                this.appendDataToCustomers([customerSchedule[1]], customer, delivery);
+              }
+            }// set cooking as sunday
           }
         } // tuesday
 
