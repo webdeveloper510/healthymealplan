@@ -774,8 +774,50 @@ class PlateEditor extends React.Component {
     return '';
   }
 
-  generateTags(e) {
+  handleDeleteImage(type) {
+    let path = ""
+    if (type == 'small') {
+      path = this.state.plateImageSrc;
+    }
 
+    if (type == 'large') {
+     path = this.state.plateImageLargeSrc;
+    }
+
+    S3.delete(path, (err, res) => {
+      if(err){
+        this.props.popTheSnackbar({
+          message: 'There was a problem deleting the image.'
+        })
+      }else{
+
+        if(type == "large"){
+          this.setState({plateImageLargeSrc: ''})
+        }
+
+        if(type == "small"){
+          this.setState({plateImageSrc: ''})
+        } 
+
+        const toSend = { _id: this.props.plate._id, large: type == 'large' };
+
+        Meteor.call('plates.deleteImageUrl', toSend, (err, res) => {
+          if(err){
+            console.log(err);
+            this.props.popTheSnackbar({
+              message: err.reason || err
+            })
+          }else{
+            this.props.popTheSnackbar({
+              message: 'The image reference been removed from the main.'
+            })
+          }
+        })
+      }
+    })
+  }
+
+  generateTags(e) {
     e.preventDefault();
 
     if (this.state.subIngredients.length == 0) {
@@ -789,19 +831,17 @@ class PlateEditor extends React.Component {
     let MAX_TAG_LIMIT = 5;
 
     const ingredientItemTags = this.props.potentialSubIngredients
-                                .filter((e) => this.state.subIngredients
-                                .find(el => el._id == e._id) != undefined)
-                                .map(e => e.tags)
-                                .filter(e => e !== undefined);
-    
+      .filter(e => this.state.subIngredients.find(el => el._id == e._id) != undefined)
+      .map(e => e.tags)
+      .filter(e => e !== undefined);
+
     console.log(ingredientItemTags);
 
-    if(ingredientItemTags.length <= 5){
+    if (ingredientItemTags.length <= 5) {
       MAX_TAG_LIMIT = ingredientItemTags.length;
     }
 
     if (ingredientItemTags.length == 0) {
-      
       this.props.popTheSnackbar({
         message: 'Selected ingredients do not have tags. Please verify.',
       });
@@ -810,15 +850,14 @@ class PlateEditor extends React.Component {
     }
 
     while (generatedTags.length <= MAX_TAG_LIMIT) {
-
       const randomIngredientIndex = Math.floor(Math.random() * (ingredientItemTags.length - 0)) + 0;
       const randomIngredientTagIndex = Math.floor(Math.random() * (ingredientItemTags[randomIngredientIndex].length - 0)) + 0;
 
       const itemToPush = ingredientItemTags[randomIngredientIndex][randomIngredientTagIndex];
 
-      if(generatedTags.includes(itemToPush)){
+      if (generatedTags.includes(itemToPush)) {
         continue;
-      }else{
+      } else {
         generatedTags.push(itemToPush);
       }
     }
@@ -834,7 +873,7 @@ class PlateEditor extends React.Component {
     console.log(generatedTags);
 
     this.setState({
-      generatedTags: generatedTags,
+      generatedTags,
       hasFormChanged: true,
     });
   }
@@ -894,8 +933,8 @@ class PlateEditor extends React.Component {
                 SKU {plate.SKU ? plate.SKU : ''}{' '}
               </Typography>
             ) : (
-                ''
-              )}
+              ''
+            )}
           </Grid>
           <Grid item xs={8}>
             <div
@@ -978,7 +1017,7 @@ class PlateEditor extends React.Component {
 
                   <Grid container style={{ marginTop: '25px' }}>
                     <Grid item xs={12}>
-                      <Typography>Chef</Typography>
+                      <Typography>Created by Chef</Typography>
                     </Grid>
 
                   </Grid>
@@ -1230,12 +1269,17 @@ class PlateEditor extends React.Component {
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
-                  <input
-                    type="file"
-                    id="plateImage"
-                    name="plateImage"
-                    onChange={this.onFileLoad}
-                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2em' }}>
+                    <input
+                      type="file"
+                      id="plateImage"
+                      name="plateImage"
+                      onChange={this.onFileLoad}
+                    />
+                    {this.state.plateImageSrc && (
+                      <Button size="small" onClick={() => this.handleDeleteImage('small')}>Delete</Button>
+                    )}
+                  </div>
                   <img
                     style={{ marginTop: '50px', display: 'block' }}
                     src={this.renderImageUrl()}
@@ -1260,12 +1304,17 @@ class PlateEditor extends React.Component {
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
-                  <input
-                    type="file"
-                    id="plateImageLarge"
-                    name="plateImageLarge"
-                    onChange={this.onFileLoad.bind(this)}
-                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2em' }}>
+                    <input
+                      type="file"
+                      id="plateImageLarge"
+                      name="plateImageLarge"
+                      onChange={this.onFileLoad.bind(this)}
+                    />
+                    {this.state.plateImageLargeSrc && (
+                      <Button size="small" onClick={() => this.handleDeleteImage('large')}>Delete</Button>
+                    )}
+                  </div>
                   <img
                     style={{ marginTop: '50px', display: 'block' }}
                     src={this.renderLargeImageUrl()}
@@ -1364,8 +1413,8 @@ class PlateEditor extends React.Component {
                         />
                       ))
                     ) : (
-                        <Chip className="chip--bordered" label="Sub-ingredient" />
-                      )}
+                      <Chip className="chip--bordered" label="Sub-ingredient" />
+                    )}
                   </div>
                 </Paper>
               </Grid>
@@ -1397,7 +1446,7 @@ class PlateEditor extends React.Component {
 
                   {this.state.generatedTags.map(e => (
 
-                    <Typography style={{marginTop: '1.5em'}} type="body2">
+                    <Typography style={{ marginTop: '1.5em' }} type="body2">
                       {e}
                     </Typography>
                   ))}
@@ -1493,8 +1542,8 @@ class PlateEditor extends React.Component {
                       />
 
                     ) : (
-                        <Chip className="chip--bordered" label="Dish" />
-                      )}
+                      <Chip className="chip--bordered" label="Dish" />
+                    )}
                   </div>
                 </Paper>
               </Grid>
@@ -1528,7 +1577,7 @@ class PlateEditor extends React.Component {
                     ))}
 
                   </Select>
-      
+
                 </Paper>
               </Grid>
             </Grid>
@@ -1912,18 +1961,18 @@ class PlateEditor extends React.Component {
                 {this.props.newPlate ? (
                   ''
                 ) : (
-                    <Button
-                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
-                      raised
-                      onClick={
-                        plate && plate._id
-                          ? this.handleRemove.bind(this)
-                          : () => this.props.history.push('/plates')
-                      }
-                    >
+                  <Button
+                    style={{ backgroundColor: danger, color: '#FFFFFF' }}
+                    raised
+                    onClick={
+                      plate && plate._id
+                        ? this.handleRemove.bind(this)
+                        : () => this.props.history.push('/plates')
+                    }
+                  >
                       Delete
-                    </Button>
-                  )}
+                  </Button>
+                )}
               </Grid>
 
               <Grid item xs={8}>
@@ -1949,7 +1998,7 @@ class PlateEditor extends React.Component {
                     onClick={() => this.handleSubmitNew()}
                   >
                     Save
-  
+
                     {this.state.submitLoading && (
                       <CircularProgress
                         size={24}
@@ -1966,8 +2015,8 @@ class PlateEditor extends React.Component {
         {this.renderDeleteDialog()}
       </form>
     ) : (
-        <Loading />
-      );
+      <Loading />
+    );
   }
 }
 

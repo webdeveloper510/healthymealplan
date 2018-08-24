@@ -1,8 +1,8 @@
 import './accounts';
 import './api';
 import './email';
-
 import Jobs from '../../api/Jobs/Jobs';
+
 
 import './jobs';
 import './jobs/setSubscriptionActive';
@@ -26,6 +26,6 @@ S3 = {};
 S3.config = {
   key: 'AKIAJAJSCSTOP6PEVJZA',
   secret: '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',
-  bucket: 'vittle-bucket',
-  region: 'ca-central-1',
+  bucket: 'vittle-new',
 };
+

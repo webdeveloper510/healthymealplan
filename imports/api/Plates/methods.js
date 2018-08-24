@@ -3,7 +3,6 @@ import { Match } from 'meteor/check';
 import { check } from 'meteor/check';
 import Plates from './Plates';
 import rateLimit from '../../modules/rate-limit';
-
 import slugify from 'slugify';
 
 
@@ -203,6 +202,33 @@ Meteor.methods({
 
       Plates.update(plateId, {
         $set: toSet,
+      });
+
+      return plateId; // Return _id so we can redirect to document after update.
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
+
+  'plates.deleteImageUrl': function platesDeleteImageUrl(plate) {
+    check(plate, {
+      _id: String,
+      large: Boolean,
+    });
+
+    try {
+      const plateId = plate._id;
+
+      const toUnset = {};
+
+      if (plate.large) {
+        toUnset.largeImageUrl = '';
+      } else {
+        toUnset.imageUrl = '';
+      }
+
+      Plates.update(plateId, {
+        $unset: toUnset,
       });
 
       return plateId; // Return _id so we can redirect to document after update.

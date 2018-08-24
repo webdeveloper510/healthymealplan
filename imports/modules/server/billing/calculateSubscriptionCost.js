@@ -45,6 +45,7 @@ export default function calculateSubscriptionCost(customerInfo) {
 
     discountCodeApplies: false,
     dicsountCodeAmount: 0,
+    discountCodeRemove: customerInfo.discountCodeRemove,
 
     restrictions: customerInfo.restrictions,
     restrictionsActual: [],
@@ -63,25 +64,28 @@ export default function calculateSubscriptionCost(customerInfo) {
 
   let discountCodePresent = false;
   let discountCodeApplied = null;
-
-  if (sub.hasOwnProperty('discountApplied') || customerInfo.hasOwnProperty('discountCode')) {
+  // &&
+  //
+  if ((sub.hasOwnProperty('discountApplied') || customerInfo.hasOwnProperty('discountCode'))
+    && !customerInfo.discountCodeRemove) {
     discountCodePresent = true;
   }
 
-  if (discountCodePresent) {
+  if (discountCodePresent && !customerInfo.discountCodeRemove) {
     if (sub.hasOwnProperty('discountApplied')) {
       discountCodeApplied = Discounts.findOne({ _id: sub.discountApplied });
     }
 
-    if (customerInfo.discountCode != '') {
-      discountCodeApplied = Discounts.findOne({ $or: [{ title: customerInfo.discountCode }, { _id: customerInfo.discountCode }] });
+    if (customerInfo.discountCode) {
+      if (customerInfo.discountCode.length > 0) {
+        discountCodeApplied = Discounts.findOne({ $or: [{ title: customerInfo.discountCode }, { _id: customerInfo.discountCode }] });
+      }
     }
 
     primaryCustomer.discountCodeApplied = discountCodeApplied;
   }
 
-  // console.log('Yes');
-  // console.log(primaryCustomer.discountCodeApplied);
+  console.log(primaryCustomer.discountCodeApplied);
 
   primaryCustomer.lifestyle = Lifestyles.findOne({ _id: customerInfo.lifestyle });
   // calculating basePrices for Breakfast, lunch and dinner
@@ -1154,19 +1158,20 @@ export default function calculateSubscriptionCost(customerInfo) {
   primaryCustomer.groupTotal = parseFloat(primaryCustomer.groupTotal.toFixed(2));
 
 
-  let actualTotal = primaryCustomer.groupTotal;
 
-  if (sub.taxExempt) {
-    actualTotal =
-      primaryCustomer.groupTotal -
-      primaryCustomer.taxes;
+  let taxExempt = false;
+
+  if (sub.hasOwnProperty('taxExempt')) {
+    if (sub.taxExempt) {
+      actualTotal = primaryCustomer.groupTotal - primaryCustomer.taxes;
+      taxExempt = true;
+    }
   }
-
 
   const lineItems = createSubscriptionLineItems(primaryCustomer,
     secondaryCustomers,
     customerInfo.secondaryProfiles.length,
-    sub.taxExempt,
+    taxExempt,
     customerInfo.delivery);
 
   return {
