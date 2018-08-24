@@ -982,6 +982,12 @@ class RestrictionEditor extends React.Component {
                         control={<Radio />}
                         label="Religious"
                       />
+                      <FormControlLabel
+                        className="radiobuttonlabel"
+                        value="preference"
+                        control={<Radio />}
+                        label="Preference"
+                      />
                     </RadioGroup>
                   </FormControl>
                 </Paper>
