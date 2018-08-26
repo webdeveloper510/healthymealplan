@@ -45,7 +45,7 @@ export default function calculateSubscriptionCost(customerInfo) {
 
     discountCodeApplies: false,
     dicsountCodeAmount: 0,
-    discountCodeRemove: customerInfo.discountCodeRemove,
+    discountCodeRemove: customerInfo.discountCodeRemove || false,
 
     restrictions: customerInfo.restrictions,
     restrictionsActual: [],
@@ -85,7 +85,7 @@ export default function calculateSubscriptionCost(customerInfo) {
     primaryCustomer.discountCodeApplied = discountCodeApplied;
   }
 
-  console.log(primaryCustomer.discountCodeApplied);
+  // console.log(primaryCustomer.discountCodeApplied);
 
   primaryCustomer.lifestyle = Lifestyles.findOne({ _id: customerInfo.lifestyle });
   // calculating basePrices for Breakfast, lunch and dinner
@@ -1160,10 +1160,11 @@ export default function calculateSubscriptionCost(customerInfo) {
 
 
   let taxExempt = false;
+  let actualTotal = primaryCustomer.groupTotal;
 
   if (sub.hasOwnProperty('taxExempt')) {
     if (sub.taxExempt) {
-      actualTotal = primaryCustomer.groupTotal - primaryCustomer.taxes;
+      actualTotal -= primaryCustomer.taxes;
       taxExempt = true;
     }
   }
