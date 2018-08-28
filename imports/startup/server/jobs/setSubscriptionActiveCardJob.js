@@ -21,7 +21,7 @@ const worker = Job.processJobs(
         subscription.authorizeCustomerProfileId,
         subscription.authorizePaymentProfileId,
         insertData.subDate,
-        insertData.subscriptionAmount,
+        subscription.amount,
       );
 
       if (syncCreateSubscriptionFromCustomerProfileRes.messages.resultCode == 'Ok') {
@@ -32,7 +32,7 @@ const worker = Job.processJobs(
             $set: {
               status: 'paused',
               authorizeSubscriptionId: newAuthSubId, // when done successfully
-              amount: insertData.subscriptionAmount,
+              amount: subscription.amount,
             },
           });
       } else {

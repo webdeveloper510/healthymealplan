@@ -10,11 +10,13 @@ const worker = Job.processJobs(
     const insertData = job.data;
     // do anything with the job data here.
     // when done, call job.done() or job.fail()
+
+    const subscription = Subscriptions.findOne({ _id: insertData.subscriptionId });
+
     try {
       Subscriptions.update(
         {
           _id: insertData.subscriptionId,
-          amount: insertData.subscriptionAmount,
         },
         {
           $set: {
