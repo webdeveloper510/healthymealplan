@@ -126,7 +126,7 @@ class SideEditor extends React.Component {
           ? _.sortBy(this.props.plate.ingredients, 'title')
           : [],
 
-      deleteDialogOpen: false,
+    deleteDialogOpen: false,
 
       hasFormChanged: false,
       imageFieldChanged: false,
@@ -739,6 +739,49 @@ class SideEditor extends React.Component {
     return '';
   }
 
+  handleDeleteImage(type) {
+    let path = ""
+    if (type == 'small') {
+      path = this.state.plateImageSrc;
+    }
+
+    if (type == 'large') {
+     path = this.state.plateImageLargeSrc;
+    }
+
+    S3.delete(path, (err, res) => {
+      if(err){
+        this.props.popTheSnackbar({
+          message: 'There was a problem deleting the image.'
+        })
+      }else{
+
+        if(type == "large"){
+          this.setState({plateImageLargeSrc: ''})
+        }
+
+        if(type == "small"){
+          this.setState({plateImageSrc: ''})
+        } 
+
+        const toSend = { _id: this.props.plate._id, large: type == 'large' };
+
+        Meteor.call('sides.deleteImageUrl', toSend, (err, res) => {
+          if(err){
+            console.log(err);
+            this.props.popTheSnackbar({
+              message: err.reason || err
+            })
+          }else{
+            this.props.popTheSnackbar({
+              message: 'The image reference been removed from the main.'
+            })
+          }
+        })
+      }
+    })
+  }
+
   generateTags(e) {
 
     e.preventDefault();
@@ -1171,12 +1214,18 @@ class SideEditor extends React.Component {
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
-                  <input
-                    type="file"
-                    id="plateImage"
-                    name="plateImage"
-                    onChange={this.onFileLoad.bind(this)}
-                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2em' }}>
+                    <input
+                      type="file"
+                      id="plateImage"
+                      name="plateImage"
+                      onChange={this.onFileLoad.bind(this)}
+                    />
+                    
+                    {this.state.plateImageSrc && (
+                      <Button size="small" onClick={() => this.handleDeleteImage('small')}>Delete</Button>
+                    )}
+                  </div>
                   <img
                     style={{ marginTop: '50px', display: 'block' }}
                     src={this.renderImageUrl()}
@@ -1201,12 +1250,18 @@ class SideEditor extends React.Component {
               </Grid>
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2em' }}>
+
                   <input
                     type="file"
                     id="plateImageLarge"
                     name="plateImageLarge"
                     onChange={this.onFileLoad.bind(this)}
                   />
+                   {this.state.plateImageLargeSrc && (
+                      <Button size="small" onClick={() => this.handleDeleteImage('large')}>Delete</Button>
+                    )}
+                  </div>
                   <img
                     style={{ marginTop: '50px', display: 'block' }}
                     src={this.renderLargeImageUrl()}

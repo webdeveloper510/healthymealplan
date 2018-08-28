@@ -89,7 +89,16 @@ Meteor.methods({
       plateToInsert.slug = slugify(slug, { lower: true });
     }
 
-    // console.log(plate);
+    plateToInsert.title = plateToInsert.title.toLowerCase();
+    plateToInsert.subtitle = plateToInsert.subtitle.toLowerCase();
+
+    plateToInsert.title = plateToInsert.title.charAt(0).toUpperCase() + plateToInsert.title.slice(1);
+    if (!['with', 'in', 'and'].includes(plateToInsert.subtitle.split(' ')[0])) {
+      plateToInsert.subtitle = plateToInsert.subtitle.charAt(0).toUpperCase() + plateToInsert.subtitle.slice(1);
+    }
+
+    plateToInsert.title = plateToInsert.title.replace(/&/gm, 'and');
+    plateToInsert.subtitle = plateToInsert.subtitle.replace(/&/gm, 'and');
 
     try {
       return Plates.insert(plateToInsert);
@@ -165,6 +174,17 @@ Meteor.methods({
       keysToUnset.generatedTags = '';
     }
 
+    plate.title = plate.title.toLowerCase();
+    plate.subtitle = plate.subtitle.toLowerCase();
+
+    plate.title = plate.title.replace(/&/gm, 'and');
+    plate.subtitle = plate.subtitle.replace(/&/gm, 'and');
+
+    plate.title = plate.title.charAt(0).toUpperCase() + plate.title.slice(1);
+
+    if (!['with', 'in', 'and'].includes(plate.subtitle.split(' ')[0])) {
+      plate.subtitle = plate.subtitle.charAt(0).toUpperCase() + plate.subtitle.slice(1);
+    }
 
     try {
       const plateId = plate._id;

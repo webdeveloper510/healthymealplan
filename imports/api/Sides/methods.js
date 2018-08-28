@@ -87,6 +87,16 @@ Meteor.methods({
       plateToInsert.slug = slugify(slug, { lower: true });
     }
 
+    plateToInsert.title = plateToInsert.title.toLowerCase();
+    plateToInsert.subtitle = plateToInsert.subtitle.toLowerCase();
+
+    plateToInsert.title = plateToInsert.title.charAt(0).toUpperCase() + plateToInsert.title.slice(1);
+    if(!["with", "in", "and"].includes(plateToInsert.subtitle.split(" ")[0])){
+     plateTotInsert.subtitle = plateTotInsert.subtitle.charAt(0).toUpperCase() + plateTotInsert.subtitle.slice(1);
+    }
+    plateToInsert.title = plateToInsert.title.replace(/&/gm, 'and');
+    plateToInsert.subtitle = plateToInsert.subtitle.replace(/&/gm, 'and');
+
     try {
       return Sides.insert(plateToInsert);
     } catch (exception) {
@@ -154,6 +164,17 @@ Meteor.methods({
       keysToUnset.generatedTags = '';
     }
 
+    side.title = side.title.toLowerCase();
+    side.subtitle = side.subtitle.toLowerCase();
+
+    side.title = side.title.replace(/&/gm, 'and');
+    side.subtitle = side.subtitle.replace(/&/gm, 'and');
+
+    side.title = side.title.charAt(0).toUpperCase() + side.title.slice(1);
+    if (!['with', 'in', 'and'].includes(side.subtitle.split(' ')[0])) {
+      side.subtitle = side.subtitle.charAt(0).toUpperCase() + side.subtitle.slice(1);
+    }
+
     try {
       const sideId = side._id;
 
@@ -198,22 +219,28 @@ Meteor.methods({
     }
   },
 
-  'sides.updateImageId': function sidesUpdate(side) {
+  'sides.deleteImageUrl': function sidesDeleteImageUrl(side) {
     check(side, {
       _id: String,
-      imageId: String,
+      large: Boolean,
     });
 
     try {
       const sideId = side._id;
 
+      const toUnset = {};
+
+      if (side.large) {
+        toUnset.largeImageUrl = '';
+      } else {
+        toUnset.imageUrl = '';
+      }
+
       Sides.update(sideId, {
-        $set: {
-          imageId: side.imageId,
-        },
+        $unset: toUnset,
       });
 
-      return sideId; // Return _id so we can redirect to document after update.
+      return plateId; // Return _id so we can redirect to document after update.
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
