@@ -81,22 +81,22 @@ Meteor.methods({
 
     if (plateToInsert.subtitle.length > 0) {
       const slug = `${side.title} ${side.subtitle}`;
-      plateToInsert.slug = slugify(slug, { lower: true });
+      plateToInsert.slug = slugify(slug, { remove: /[*+~.,()'"!:@]/g, lower: true });
     } else {
       const slug = `${side.title}`;
-      plateToInsert.slug = slugify(slug, { lower: true });
+      plateToInsert.slug = slugify(slug, { remove: /[*+~.,()'"!:@]/g, lower: true });
     }
 
     plateToInsert.title = plateToInsert.title.toLowerCase();
     plateToInsert.subtitle = plateToInsert.subtitle.toLowerCase();
 
-    plateToInsert.title = plateToInsert.title.charAt(0).toUpperCase() + plateToInsert.title.slice(1);
-    if(!["with", "in", "and"].includes(plateToInsert.subtitle.split(" ")[0])){
-     plateTotInsert.subtitle = plateTotInsert.subtitle.charAt(0).toUpperCase() + plateTotInsert.subtitle.slice(1);
-    }
     plateToInsert.title = plateToInsert.title.replace(/&/gm, 'and');
     plateToInsert.subtitle = plateToInsert.subtitle.replace(/&/gm, 'and');
 
+    plateToInsert.title = plateToInsert.title.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+    plateToInsert.subtitle = plateToInsert.subtitle.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+
+    
     try {
       return Sides.insert(plateToInsert);
     } catch (exception) {
@@ -154,10 +154,10 @@ Meteor.methods({
 
     if (side.subtitle.length > 0) {
       const slug = `${side.title} ${side.subtitle}`;
-      side.slug = slugify(slug, { lower: true });
+      side.slug = slugify(slug, { remove: /[*+~.,()'"!:@]/g, lower: true });
     } else {
       const slug = `${side.title}`;
-      side.slug = slugify(slug, { lower: true });
+      side.slug = slugify(slug, { remove: /[*+~.,()'"!:@]/g, lower: true });
     }
 
     if (!side.hasOwnProperty('generatedTags')) {
@@ -170,10 +170,9 @@ Meteor.methods({
     side.title = side.title.replace(/&/gm, 'and');
     side.subtitle = side.subtitle.replace(/&/gm, 'and');
 
-    side.title = side.title.charAt(0).toUpperCase() + side.title.slice(1);
-    if (!['with', 'in', 'and'].includes(side.subtitle.split(' ')[0])) {
-      side.subtitle = side.subtitle.charAt(0).toUpperCase() + side.subtitle.slice(1);
-    }
+    side.title = side.title.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+    side.subtitle = side.subtitle.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+
 
     try {
       const sideId = side._id;
