@@ -102,8 +102,6 @@ class Step1Eligibility extends React.Component {
         },
 
         postal_code: {
-          minlength: 6,
-          maxlength: 6,
           cdnPostal: true,
           required: true,
         },

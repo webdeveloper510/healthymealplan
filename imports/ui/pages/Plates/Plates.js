@@ -6,8 +6,6 @@ import { teal, red } from 'material-ui/colors';
 import Containers from 'meteor/utilities:react-list-container';
 import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';
 
-const ListContainer = Containers.ListContainer;
-
 
 import Button from 'material-ui/Button';
 import Grid from 'material-ui/Grid';
@@ -30,11 +28,11 @@ import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 
 import PlatesCollection from '../../../api/Plates/Plates';
-import PlateImagesCollection from '../../../api/PlateImages/PlateImages';
-
 import PlatesGrid from './PlatesGrid.js';
 
 import Loading from '../../components/Loading/Loading';
+
+const ListContainer = Containers.ListContainer;
 
 
 const primary = teal[500];
@@ -62,7 +60,7 @@ class Plates extends React.Component {
       checkboxesSelected: false,
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      options: { sort: { title: 1 } },
+      options: { sort: { createdAt: 1 } },
       searchSelector: '',
       currentTabValue: 0,
     };
@@ -179,14 +177,16 @@ class Plates extends React.Component {
               </AppBar>
             </div>
 
-            <div style={{ width: '100%',
+            <div style={{
+              width: '100%',
               background: '#FFF',
               borderTopRightRadius: '2px',
               borderTopLeftRadius: '2px',
               marginTop: '3em',
               padding: '16px 25px 1em',
               boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
-              position: 'relative' }}
+              position: 'relative',
+            }}
             >
 
               <SearchIcon
@@ -197,8 +197,10 @@ class Plates extends React.Component {
               <ClearIcon
                 className="autoinput-icon--clear"
                 onClick={this.clearSearchBox.bind(this)}
-                style={{ cursor: 'pointer',
-                  display: (this.state.searchSelector.length > 0) ? 'block' : 'none' }}
+                style={{
+                  cursor: 'pointer',
+                  display: (this.state.searchSelector.length > 0) ? 'block' : 'none',
+                }}
               />
 
               <Input
@@ -215,18 +217,12 @@ class Plates extends React.Component {
             <ListContainer
               limit={20}
               collection={PlatesCollection}
-              joins={[{
-                localProperty: 'imageId',
-                collection: PlateImagesCollection,
-                joinAs: 'image',
-              }]}
-
               options={this.state.options}
-              selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-                { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
-
+              selector={{
+                $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
+                  { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }],
+              }}
             >
-
               <PlatesGrid
                 popTheSnackbar={this.props.popTheSnackbar}
                 searchTerm={this.state.searchSelector}
@@ -241,11 +237,6 @@ class Plates extends React.Component {
               selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
                 { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
 
-                 joins={[{
-                localProperty: 'imageId',
-                collection: PlateImages,
-                joinAs: 'image',
-              }]}
 
                 joins={[{
                     localProperty: "typeId",
@@ -368,10 +359,8 @@ Plates.propTypes = {
 
 export default createContainer(() => {
   const subscription = Meteor.subscribe('plates', {}, {});
-  const subscription2 = Meteor.subscribe('plateImages.all', {}, {});
-
   return {
-    loading: !subscription.ready() && !subscription2.ready(),
+    loading: !subscription.ready(),
     // plates: PlatesCollection.find().fetch(),
   };
 }, Plates);

@@ -75,8 +75,6 @@ npm-mongo@3.0.11
 oauth@1.2.3
 oauth2@1.2.0
 ordered-dict@1.1.0
-ostrio:cookies@2.3.0
-ostrio:files@1.10.1
 perak:joins@1.2.0
 promise@0.11.1
 raix:eventemitter@0.1.3

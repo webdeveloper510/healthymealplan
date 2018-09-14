@@ -38,7 +38,6 @@ import '../../api/OAuth/server/methods';
 
 import '../../api/Plates/methods';
 import '../../api/Plates/server/publications';
-import '../../api/PlateImages/server/publications';
 
 import '../../api/Plating/methods';
 
@@ -53,7 +52,6 @@ import '../../api/Routes/server/publications';
 
 import '../../api/Sides/methods';
 import '../../api/Sides/server/publications';
-import '../../api/SideImages/server/publications';
 
 import '../../api/Subscriptions/methods';
 import '../../api/Subscriptions/server/publications';

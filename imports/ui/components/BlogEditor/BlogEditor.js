@@ -28,7 +28,6 @@ import FormControlLabel from 'material-ui/Form/FormControlLabel';
 import Radio, { RadioGroup } from 'material-ui/Radio';
 import Switch from 'material-ui/Switch';
 
-
 import slugify from 'slugify';
 
 import Table, {
@@ -547,7 +546,7 @@ class BlogEditor extends React.Component {
   }
 
   editorOnChange(editorState) {
-    this.setState({ editorState, hasFormChanged: true, });
+    this.setState({ editorState, hasFormChanged: true });
   }
 
   handlePostStatus(event) {
@@ -729,6 +728,18 @@ class BlogEditor extends React.Component {
                       description: 'Heading 3',
                     },
                     {
+                      label: 'H4',
+                      style: 'header-four',
+                      icon: 'header',
+                      description: 'Heading 4',
+                    },
+                    {
+                      label: 'OL',
+                      style: 'ordered-list-item',
+                      icon: 'list-ol',
+                      description: 'Ordered List',
+                    },
+                    {
                       label: 'UL',
                       style: 'unordered-list-item',
                       icon: 'list-ul',
@@ -799,7 +810,7 @@ class BlogEditor extends React.Component {
                       }
                     >
                       Delete
-                  </Button>
+                    </Button>
                   )}
               </Grid>
 
@@ -840,7 +851,7 @@ class BlogEditor extends React.Component {
           </Grid>
         </Grid>
 
-             {this.renderDeleteDialog()}
+        {this.renderDeleteDialog()}
       </form>
     ) : (
         <Loading />

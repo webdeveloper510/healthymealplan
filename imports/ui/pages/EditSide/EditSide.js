@@ -10,7 +10,6 @@ import Grid from 'material-ui/Grid';
 import InstructionsColl from '../../../api/Instructions/Instructions';
 import Ingredients from '../../../api/Ingredients/Ingredients';
 import Sides from '../../../api/Sides/Sides';
-import SideImages from '../../../api/SideImages/SideImages';
 
 import SideEditor from '../../components/SideEditor/SideEditor';
 

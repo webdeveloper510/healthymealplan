@@ -34,7 +34,6 @@ perak:joins
 utilities:react-list-container
 tmeasday:publish-counts
 fongandrew:find-and-modify
-ostrio:files
 jquery@1.11.10
 vsivsi:job-collection
 meteorhacks:picker

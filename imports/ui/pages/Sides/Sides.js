@@ -29,8 +29,6 @@ import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
 
 import SidesCollection from '../../../api/Sides/Sides';
-import SideImagesCollection from '../../../api/SideImages/SideImages';
-
 import SidesGrid from './SidesGrid.js';
 
 import Loading from '../../components/Loading/Loading';
@@ -195,12 +193,6 @@ class Sides extends React.Component {
             <ListContainer
               limit={20}
               collection={SidesCollection}
-              joins={[{
-                localProperty: 'imageId',
-                collection: SideImagesCollection,
-                joinAs: 'image',
-              }]}
-
               options={this.state.options}
               selector={{
                 $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
@@ -259,10 +251,9 @@ Sides.propTypes = {
 
 export default createContainer(() => {
   const subscription = Meteor.subscribe('sides', {}, {});
-  const subscription2 = Meteor.subscribe('sideImages.all', {}, {});
 
   return {
-    loading: !subscription.ready() && !subscription2.ready(),
+    loading: !subscription.ready(),
     // plates: SidesCollection.find().fetch(),
   };
 }, Sides);
