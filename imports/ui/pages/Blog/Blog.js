@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
 import { withTracker } from 'meteor/react-meteor-data';
 import { teal, red } from 'material-ui/colors';
-import Containers from 'meteor/utilities:react-list-container';
+import Containers from 'meteor/jivanysh:react-list-container';
 import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';
 
 const ListContainer = Containers.ListContainer;

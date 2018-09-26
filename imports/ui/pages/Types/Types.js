@@ -23,7 +23,7 @@ import CategoriesCollection from "../../../api/Categories/Categories";
 import AuthenticatedSideNav from "../../components/AuthenticatedSideNav/AuthenticatedSideNav";
 import Loading from "../../components/Loading/Loading";
 
-import Containers from "meteor/utilities:react-list-container";
+import Containers from "meteor/jivanysh:react-list-container";
 
 const ListContainer = Containers.ListContainer;
 

@@ -20,7 +20,7 @@ import IngredientTypesCollection from '../../../api/IngredientTypes/IngredientTy
 import Loading from '../../components/Loading/Loading';
 import CategoriesTable from './CategoriesTable';
 
-import Containers from 'meteor/utilities:react-list-container';
+import Containers from 'meteor/jivanysh:react-list-container';
 
 const ListContainer = Containers.ListContainer;
 

@@ -15,7 +15,7 @@ import SearchIcon from 'material-ui-icons/Search';
 import ClearIcon from 'material-ui-icons/Clear';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
-import Containers from 'meteor/utilities:react-list-container';
+import Containers from 'meteor/jivanysh:react-list-container';
 
 import MealsCollection from '../../../api/Meals/Meals';
 import MealsTableNew from './MealsTable';

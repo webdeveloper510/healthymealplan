@@ -39,9 +39,20 @@ Blog.schema = new SimpleSchema({
     type: String,
     label: 'The category of the article',
   },
-  content: {
-    type: String,
-    label: 'Blog content',
+  // content: {
+  //   type: String,
+  //   label: 'Blog content',
+  // },
+  blocks: {
+    type: Array,
+    label: 'Content blocks',
+    blackbox: true,
+  },
+
+  'blocks.$': {
+    type: Object,
+    label: 'Content blocks',
+    blackbox: true,
   },
   imageUrl: {
     type: String,

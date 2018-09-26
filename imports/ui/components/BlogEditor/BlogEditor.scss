@@ -1,7 +1,24 @@
 .editor-container {
   font-family: "Roboto", Helvetica, Arial, sans-serif;
+  background: #fff;
+ 
+  button { 
+    margin-left: 1em;
+    margin-bottom: 1em;
+  }
 }
 
 .md-RichEditor-root{
   padding: 0;
+}
+
+.md-RichEditor-editor .public-DraftEditor-content, 
+.md-RichEditor-editor .public-DraftEditorPlaceholder-root {
+  // padding: 20px;
+  padding: 15px 10px;
+  margin: 0 !important;
+}
+
+.md-side-toolbar {
+  left: -46px;
 }

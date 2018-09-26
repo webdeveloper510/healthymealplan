@@ -13,7 +13,7 @@ import SearchIcon from "material-ui-icons/Search";
 import ClearIcon from "material-ui-icons/Clear";
 import AppBar from "material-ui/AppBar";
 import Tabs, { Tab } from "material-ui/Tabs";
-import Containers from "meteor/utilities:react-list-container";
+import Containers from "meteor/jivanysh:react-list-container";
 
 import InvoicesCollection from "../../../api/Invoices/Invoices";
 import Subscriptions from "../../../api/Subscriptions/Subscriptions";

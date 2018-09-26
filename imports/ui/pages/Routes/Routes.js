@@ -22,7 +22,7 @@ import RoutesCollection from '../../../api/Routes/Routes';
 import Loading from '../../components/Loading/Loading';
 import RoutesTable from './RoutesTable';
 
-import Containers from 'meteor/utilities:react-list-container';
+import Containers from 'meteor/jivanysh:react-list-container';
 
 const ListContainer = Containers.ListContainer;
 

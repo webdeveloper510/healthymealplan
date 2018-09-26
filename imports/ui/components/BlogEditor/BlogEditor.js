@@ -10,7 +10,7 @@ import PropTypes from 'prop-types';
 
 import Autosuggest from 'react-autosuggest';
 
-import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import { Meteor } from 'meteor/meteor';
 import Select from 'material-ui/Select';
@@ -20,6 +20,7 @@ import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
 
+import AddIcon from 'material-ui-icons/Add';
 import AddAPhotoIcon from 'material-ui-icons/AddAPhoto';
 import CloseIcon from 'material-ui-icons/Close';
 
@@ -63,9 +64,9 @@ import ChevronLeft from 'material-ui-icons/ChevronLeft';
 import autoBind from 'react-autobind';
 
 import Search from 'material-ui-icons/Search';
+import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
+
 import Loading from '../Loading/Loading';
-
-
 import validate from '../../../modules/validate';
 
 import {
@@ -191,7 +192,7 @@ class BlogEditor extends React.Component {
     super(props);
 
     this.state = {
-      editorState: this.props.blog && !this.props.loading ? createEditorState(convertToRaw(mediumDraftImporter(this.props.blog.content))) : createEditorState(),
+      // editorState: this.props.blog && !this.props.loading ? createEditorState(convertToRaw(mediumDraftImporter(this.props.blog.content))) : createEditorState(),
       title: !this.props.loading && this.props.blog ? this.props.blog.title : '',
 
       blogImageLargeSrc: !this.props.loading && this.props.blog && this.props.blog.largeImageUrl != undefined ? this.props.blog.largeImageUrl : '',
@@ -206,9 +207,63 @@ class BlogEditor extends React.Component {
 
       status: !this.props.loading && this.props.blog ? this.props.blog.status : 'draft',
 
+      blocks: this.props.blog && !this.props.loading && this.props.blog.blocks ? this.props.blog.blocks.map(e => {
+
+        if (e.type == "editor") {
+          e.editorState = createEditorState(convertToRaw(mediumDraftImporter(e.editorState)))
+        }
+
+        return e;
+
+      }) : [
+          {
+            type: 'editor',
+            editorState: createEditorState(),
+          },
+        ],
+
     };
 
     autoBind(this);
+
+    this.blockButtons = [
+      {
+        label: 'H1',
+        style: 'header-one',
+        icon: 'header',
+        description: 'Heading 1',
+      },
+      {
+        label: 'H2',
+        style: 'header-two',
+        icon: 'header',
+        description: 'Heading 2',
+      },
+      {
+        label: 'H3',
+        style: 'header-three',
+        icon: 'header',
+        description: 'Heading 3',
+      },
+      {
+        label: 'H4',
+        style: 'header-four',
+        icon: 'header',
+        description: 'Heading 4',
+      },
+      {
+        label: 'OL',
+        style: 'ordered-list-item',
+        icon: 'list-ol',
+        description: 'Ordered List',
+      },
+      {
+        label: 'UL',
+        style: 'unordered-list-item',
+        icon: 'list-ul',
+        description: 'Unordered List',
+      },
+    ];
   }
 
   componentDidMount() {
@@ -274,6 +329,62 @@ class BlogEditor extends React.Component {
     });
   }
 
+  onFileLoadBlock(e, index, secondary = '') {
+    const file = e.target.files[0];
+    const reader = new FileReader();
+
+    S3.upload({
+      file,
+      path: 'images',
+    }, (err, res) => {
+      if (err) {
+        console.log(err);
+        this.props.popTheSnackBar({
+          message: 'There was an error uploading the file',
+        });
+      } else {
+        const blocks = this.state.blocks;
+
+        if (secondary == 'one') {
+          blocks[index].imageOneSrc = Meteor.settings.public.S3BucketDomain + res.relative_url;
+        } else if (secondary == 'two') {
+          blocks[index].imageTwoSrc = Meteor.settings.public.S3BucketDomain + res.relative_url;
+        } else if (secondary == 'avatar') {
+          blocks[index].avatar = Meteor.settings.public.S3BucketDomain + res.relative_url;
+        } else {
+          blocks[index].src = Meteor.settings.public.S3BucketDomain + res.relative_url;
+        }
+
+        this.setState({
+          blocks,
+          hasFormChanged: true,
+        });
+      }
+    });
+
+    reader.addEventListener('load', () => {
+      const blocks = this.state.blocks;
+
+      if (secondary == 'one') {
+        blocks[index].imageOneSrc = reader.result;
+      } else if (secondary == 'two') {
+        blocks[index].imageTwoSrc = reader.result;
+      } else if (secondary == 'avatar') {
+        blocks[index].avatar = reader.result;
+      } else {
+        blocks[index].src = reader.result;
+      }
+
+      this.setState({
+        blocks,
+      });
+    });
+
+    if (file) {
+      reader.readAsDataURL(file);
+    }
+  }
+
 
   onFileLoad(e) {
     const imageType = e.currentTarget.id;
@@ -309,7 +420,7 @@ class BlogEditor extends React.Component {
     localStorage.setItem('blogDeleted', blog.title);
     const blogDeletedMessage = `${localStorage.getItem(
       'blogDeleted',
-    )} deleted from main courses.`;
+    )} deleted from articles.`;
 
     this.deleteDialogHandleRequestClose();
 
@@ -349,6 +460,7 @@ class BlogEditor extends React.Component {
     const { history, popTheSnackbar } = this.props;
     const existingBlog = this.props.blog && this.props.blog._id;
     const methodToCall = existingBlog ? 'blog.update' : 'blog.insert';
+    const blocksCopy = cloneDeep(this.state.blocks);
 
     const blog = {
       title: this.state.title,
@@ -356,8 +468,15 @@ class BlogEditor extends React.Component {
       slug: this.state.slug,
       status: this.state.status,
       category: this.state.category,
-      content: mediumDraftExporter(this.state.editorState.getCurrentContent()),
     };
+
+    blog.blocks = blocksCopy.map(e => {
+      if (e.type == 'editor') {
+        e.editorState = mediumDraftExporter(e.editorState.getCurrentContent());
+      }
+
+      return e;
+    })
 
     console.log(blog);
 
@@ -380,8 +499,8 @@ class BlogEditor extends React.Component {
         );
 
         const confirmation = existingBlog
-          ? `${localStorage.getItem('blogForSnackbar')} main course updated.`
-          : `${localStorage.getItem('blogForSnackbar')} main course added.`;
+          ? `${localStorage.getItem('blogForSnackbar')} article updated.`
+          : `${localStorage.getItem('blogForSnackbar')} article added.`;
 
         if (this.state.blogImageSrc || this.state.blogImageLargeSrc) {
           if (this.state.blogImageSrc) {
@@ -545,8 +664,14 @@ class BlogEditor extends React.Component {
     );
   }
 
-  editorOnChange(editorState) {
-    this.setState({ editorState, hasFormChanged: true });
+  editorOnChange(index, editorState) {
+    const blocksCopy = this.state.blocks;
+    blocksCopy[index].editorState = editorState;
+
+    this.setState({
+      blocks: blocksCopy,
+      hasFormChanged: true,
+    });
   }
 
   handlePostStatus(event) {
@@ -554,6 +679,30 @@ class BlogEditor extends React.Component {
       hasFormChanged: true,
       status: event.target.checked ? 'published' : 'draft',
     });
+  }
+
+  renderImageUrlBlock(index, secondary = '') {
+    // if (this.props.newBlog) {
+    if (secondary == 'one') {
+      return this.state.blocks[index].imageOneSrc;
+    } else if (secondary == 'two') {
+      return this.state.blocks[index].imageTwoSrc;
+    } else if (secondary == 'avatar') {
+      return this.state.blocks[index].avatar;
+    }
+
+    return this.state.blocks[index].src;
+    // }
+
+    // if (secondary == 'one') {
+    //   return `${Meteor.settings.public.S3BucketDomain}${this.state.blocks[index].imageOneSrc}`;
+    // } else if (secondary == 'two') {
+    //   return Meteor.settings.public.S3BucketDomain + this.state.blocks[index].imageTwoSrc;
+    // } else if (secondary == 'avatar') {
+    //   return Meteor.settings.public.S3BucketDomain + this.state.blocks[index].avatar;
+    // }
+
+    // return Meteor.settings.public.S3BucketDomain + this.state.blocks[index].src;
   }
 
   renderImageUrl() {
@@ -576,6 +725,290 @@ class BlogEditor extends React.Component {
     return '';
   }
 
+  onChangeBlockField(e, type, index, field) {
+    const blocksCopy = this.state.blocks;
+
+    if (type == 'call-out') {
+      blocksCopy[index][field] = e.target.value;
+
+      this.setState({
+        blocks: blocksCopy,
+        hasFormChanged: true,
+      });
+    }
+
+    if (type == 'cta') {
+      blocksCopy[index][field] = e.target.value;
+      this.setState({
+        blocks: blocksCopy,
+        hasFormChanged: true,
+      });
+    }
+
+    if (type == 'related-reading') {
+      blocksCopy[index][field] = e.target.value;
+      this.setState({
+        blocks: blocksCopy,
+        hasFormChanged: true,
+      });
+    }
+
+    if (type == 'quote') {
+      blocksCopy[index][field] = e.target.value;
+      this.setState({
+        blocks: blocksCopy,
+        hasFormChanged: true,
+      });
+    }
+
+    if (type == 'image') {
+      blocksCopy[index][field] = e.target.value;
+      this.setState({
+        blocks: blocksCopy,
+        hasFormChanged: true,
+      });
+    }
+  }
+
+  renderRemoveBlockButton(index, isImageBlock = false) {
+    return (
+      <Button style={{ marginTop: '1em' }} onClick={e => this.removeBlockFromArticle(index, isImageBlock)} color="danger" size="small">
+        Remove
+      </Button>
+    );
+  }
+
+  removeBlockFromArticle(index, isImageBlock) {
+    const blocks = this.state.blocks;
+
+    if (isImageBlock) {
+      const blockBeingRemoved = blocks[index];
+
+      if (blockBeingRemoved.type == 'image') {
+
+        console.log(blockBeingRemoved.src.split(Meteor.settings.public.S3BucketDomain)[1]);
+
+        S3.delete(blockBeingRemoved.src.split(Meteor.settings.public.S3BucketDomain)[1], (err, res) => {
+          if (err) {
+            console.log(err);
+            this.props.popTheSnackBar({
+              message: err.reason || err,
+            });
+          } else {
+            console.log(res);
+            blocks.splice(index, 1);
+
+            this.setState({
+              blocks,
+              hasFormChanged: true,
+            });
+          }
+        });
+      } else if (blockBeingRemoved.type == 'quote') {
+
+        console.log(blockBeingRemoved.avatar.split(Meteor.settings.public.S3BucketDomain)[1]);
+
+        S3.delete(blockBeingRemoved.avatar.split(Meteor.settings.public.S3BucketDomain)[1], (err, res) => {
+          if (err) {
+            console.log(err);
+            this.props.popTheSnackBar({
+              message: err.reason || err,
+            });
+          } else {
+            console.log(res);
+            blocks.splice(index, 1);
+
+            this.setState({
+              blocks,
+              hasFormChanged: true,
+            });
+          }
+        });
+      } else if (blockBeingRemoved.type == 'two-images') {
+        S3.delete(blockBeingRemoved.imageOneSrc.split(Meteor.settings.public.S3BucketDomain)[1], (err, res) => {
+          if (err) {
+            console.log(err);
+            this.props.popTheSnackBar({
+              message: err.reason || err,
+            });
+          }
+        });
+
+        S3.delete(blockBeingRemoved.imageTwoSrc.split(Meteor.settings.public.S3BucketDomain)[1], (err, res) => {
+          if (err) {
+            console.log(err);
+            this.props.popTheSnackBar({
+              message: err.reason || err,
+            });
+          } else {
+            blocks.splice(index, 1);
+            this.setState({
+              blocks,
+              hasFormChanged: true,
+            });
+          }
+        });
+      }
+    } else {
+      blocks.splice(index, 1);
+    }
+
+    this.setState({
+      blocks,
+      hasFormChanged: true,
+    });
+  }
+
+  addBlockToArticle(e, type) {
+    e.preventDefault();
+
+    if (type == 'body') {
+      const blocksCopy = this.state.blocks;
+
+      blocksCopy.push({
+        type: 'editor',
+        editorState: createEditorState(),
+      });
+
+      this.setState({
+        blocks: blocksCopy,
+      });
+    }
+
+
+    if (type == 'cta') {
+      const blocksCopy = this.state.blocks;
+
+      blocksCopy.push({
+        type: 'cta',
+        color: 'teal',
+        paragraph: '',
+      });
+
+      this.setState({
+        blocks: blocksCopy,
+      });
+    }
+
+    if (type == 'image') {
+      const blocksCopy = this.state.blocks;
+
+      blocksCopy.push({
+        type: 'image',
+        src: '',
+        caption: '',
+      });
+
+      this.setState({
+        blocks: blocksCopy,
+      });
+    }
+
+    if (type == 'call-out') {
+      const blocksCopy = this.state.blocks;
+
+      blocksCopy.push({
+        type: 'call-out',
+        title: '',
+        paragraph: '',
+      });
+
+      this.setState({
+        blocks: blocksCopy,
+      });
+    }
+
+    if (type == 'two-images') {
+      const blocksCopy = this.state.blocks;
+
+      blocksCopy.push({
+        type: 'two-images',
+        imageOneSrc: '',
+        imageTwoSrc: '',
+      });
+
+      this.setState({
+        blocks: blocksCopy,
+      });
+    }
+
+    if (type == 'related-reading') {
+      const blocksCopy = this.state.blocks;
+
+      blocksCopy.push({
+        type: 'related-reading',
+        heading: 'Related reading',
+        linkText: '',
+        link: '',
+      });
+
+      this.setState({
+        blocks: blocksCopy,
+      });
+    }
+
+
+    if (type == 'quote') {
+      const blocksCopy = this.state.blocks;
+
+      blocksCopy.push({
+        type: 'quote',
+        quote: '',
+        name: '',
+        title: '',
+        avatar: '',
+      });
+
+      this.setState({
+        blocks: blocksCopy,
+      });
+    }
+  }
+
+  reorder(list, startIndex, endIndex) {
+    const result = Array.from(list);
+    const [removed] = result.splice(startIndex, 1);
+    result.splice(endIndex, 0, removed);
+
+    return result;
+  }
+
+  onDragEnd(result) {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const blocks = this.reorder(
+      this.state.blocks,
+      result.source.index,
+      result.destination.index,
+    );
+
+    this.setState({
+      blocks,
+    });
+  }
+
+  getListStyle(isDraggingOver) {
+    return {
+      background: isDraggingOver ? 'lightblue' : '',
+      padding: 0,
+      width: '100%',
+    };
+  }
+
+  getItemStyle(isDragging, draggableStyle) {
+    return ({
+      userSelect: 'none',
+      padding: 8,
+      margin: '0 0 8px 0',
+
+      background: isDragging ? 'lightgreen' : 'lightgrey',
+
+      ...draggableStyle,
+    });
+  }
 
   render() {
     const { blog, history, loading } = this.props;
@@ -704,54 +1137,268 @@ class BlogEditor extends React.Component {
                 <TextField multiline fullWidth name="excerpt" label="Excerpt" value={this.state.excerpt} onChange={this.handleChange} />
               </div>
 
-              <div className="editor-container">
-                <Editor
-                  onChange={this.editorOnChange}
-                  editorState={this.state.editorState}
-                  blockButtons={[
-                    {
-                      label: 'H1',
-                      style: 'header-one',
-                      icon: 'header',
-                      description: 'Heading 1',
-                    },
-                    {
-                      label: 'H2',
-                      style: 'header-two',
-                      icon: 'header',
-                      description: 'Heading 2',
-                    },
-                    {
-                      label: 'H3',
-                      style: 'header-three',
-                      icon: 'header',
-                      description: 'Heading 3',
-                    },
-                    {
-                      label: 'H4',
-                      style: 'header-four',
-                      icon: 'header',
-                      description: 'Heading 4',
-                    },
-                    {
-                      label: 'OL',
-                      style: 'ordered-list-item',
-                      icon: 'list-ol',
-                      description: 'Ordered List',
-                    },
-                    {
-                      label: 'UL',
-                      style: 'unordered-list-item',
-                      icon: 'list-ul',
-                      description: 'Unordered List',
-                    },
-                  ]}
-                  sideButtons={[{
-                    title: 'Image',
-                    component: CustomImageSideButton,
-                  }]}
-                />
-              </div>
+              <DragDropContext onDragEnd={this.onDragEnd}>
+                <Droppable droppableId="droppable">
+                  {
+                    (provided, snapshot) => (
+
+                      <div
+                        ref={provided.innerRef}
+                        style={this.getListStyle(snapshot.isDraggingOver)}
+                      >
+                        {
+                          this.state.blocks.map((block, index) => (
+                            <Draggable key={index} draggableId={index} index={index}>
+                              {(provided, snapshot) => (
+                                <div
+                                  ref={provided.innerRef}
+                                  {...provided.draggableProps}
+                                  {...provided.dragHandleProps}
+                                  style={this.getItemStyle(
+                                    snapshot.isDragging,
+                                    provided.draggableProps.style,
+                                  )}
+                                >
+
+                                  {block.type == 'editor' && (
+
+                                    <div className="editor-container">
+                                      <Editor
+                                        placeholder="Body"
+                                        onChange={editorState => this.editorOnChange(index, editorState)}
+                                        editorState={this.state.blocks[index].editorState}
+                                        blockButtons={this.blockButtons}
+                                        sideButtons={[{
+                                          title: 'Image',
+                                          component: CustomImageSideButton,
+                                        }]}
+                                      />
+
+                                      {this.renderRemoveBlockButton(index)}
+
+                                    </div>
+                                  )}
+
+                                  {block.type == 'call-out' && (
+                                    <div style={{ background: '#fff', padding: '15px' }}>
+                                      <Typography type="body2">Call out</Typography>
+
+                                      <TextField
+                                        label="Title"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].title}
+                                        onChange={e => this.onChangeBlockField(e, 'call-out', index, 'title')}
+                                      />
+
+                                      <TextField
+                                        label="Paragraph"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].paragraph}
+                                        onChange={e => this.onChangeBlockField(e, 'call-out', index, 'paragraph')}
+                                      />
+
+                                      {this.renderRemoveBlockButton(index)}
+
+                                    </div>
+                                  )}
+
+                                  {block.type == 'image' && (
+                                    <div style={{ background: '#fff', padding: '15px' }}>
+                                      <Typography type="body2">Image</Typography>
+                                      <input
+                                        type="file"
+                                        name="blogImage"
+                                        onChange={e => this.onFileLoadBlock(e, index)}
+                                        style={{ marginBottom: '25px' }}
+                                      />
+
+                                      <TextField
+                                        label="Caption"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].caption}
+                                        onChange={e => this.onChangeBlockField(e, 'image', index, 'caption')}
+                                      />
+
+                                      <img
+                                        style={{ marginTop: '50px', display: 'block' }}
+                                        src={this.renderImageUrlBlock(index)}
+                                        style={{ maxWidth: '100%' }}
+                                      />
+
+                                      {this.renderRemoveBlockButton(index, true)}
+                                    </div>
+                                  )}
+
+                                  {block.type == 'two-images' && (
+                                    <div style={{ background: '#fff', padding: '15px' }}>
+                                      <Typography type="body2">Two Images</Typography>
+                                      <input
+                                        type="file"
+                                        name="blogImage"
+                                        onChange={e => this.onFileLoadBlock(e, index, 'one')}
+                                        style={{ marginBottom: '25px' }}
+                                      />
+
+                                      <img
+                                        style={{ marginTop: '50px', display: 'block' }}
+                                        src={this.renderImageUrlBlock(index, 'one')}
+                                        style={{ maxWidth: '100%' }}
+                                      />
+
+                                      <input
+                                        type="file"
+                                        name="blogImage"
+                                        onChange={e => this.onFileLoadBlock(e, index, 'two')}
+                                        style={{ marginBottom: '25px' }}
+                                      />
+
+
+                                      <img
+                                        style={{ marginTop: '50px', display: 'block' }}
+                                        src={this.renderImageUrlBlock(index, 'two')}
+                                        style={{ maxWidth: '100%' }}
+                                      />
+                                      <p />
+                                      {this.renderRemoveBlockButton(index, true)}
+                                    </div>
+                                  )}
+
+                                  {block.type == 'cta' && (
+                                    <div style={{ background: '#fff', padding: '15px' }}>
+                                      <Typography type="body2">CTA</Typography>
+                                      <RadioGroup
+                                        name="madeBy"
+                                        value={this.state.blocks[index].color}
+                                        onChange={e => this.onChangeBlockField(e, 'cta', index, 'color')}
+                                        style={{ flexDirection: 'row' }}
+                                      >
+                                        <FormControlLabel value="teal" control={<Radio color="primary" checked={this.state.blocks[index].color == 'teal'} />} label="Teal" />
+
+                                        <FormControlLabel value="white" control={<Radio color="primary" checked={this.state.blocks[index].color == 'white'} />} label="White" />
+                                      </RadioGroup>
+
+                                      <TextField
+                                        label="Paragraph"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].paragraph}
+                                        onChange={e => this.onChangeBlockField(e, 'cta', index, 'paragraph')}
+                                      />
+                                      {this.renderRemoveBlockButton(index)}
+                                    </div>
+                                  )}
+
+                                  {block.type == 'related-reading' && (
+                                    <div style={{ background: '#fff', padding: '15px' }}>
+                                      <Typography type="body2">Related Reading</Typography>
+
+                                      <TextField
+                                        label="Heading"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].heading}
+                                        onChange={e =>
+                                          this.onChangeBlockField(e, 'related-reading', index, 'heading')}
+                                      />
+
+                                      <TextField
+                                        label="Link text"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].linkText}
+                                        onChange={e =>
+                                          this.onChangeBlockField(e, 'related-reading', index, 'linkText')}
+                                      />
+
+
+                                      <TextField
+                                        label="Link"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].link}
+                                        onChange={e =>
+                                          this.onChangeBlockField(e, 'related-reading', index, 'link')}
+                                      />
+
+
+                                      {this.renderRemoveBlockButton(index)}
+                                    </div>
+                                  )}
+
+                                  {block.type == 'quote' && (
+                                    <div style={{ background: '#fff', padding: '15px' }}>
+                                      <Typography type="body2">Quote</Typography>
+
+                                      <TextField
+                                        label="Quote"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].quote}
+                                        onChange={e =>
+                                          this.onChangeBlockField(e, 'quote', index, 'quote')}
+                                      />
+
+                                      <TextField
+                                        label="Name"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].name}
+                                        onChange={e =>
+                                          this.onChangeBlockField(e, 'quote', index, 'name')}
+                                      />
+
+
+                                      <TextField
+                                        label="Title"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].title}
+                                        onChange={e =>
+                                          this.onChangeBlockField(e, 'quote', index, 'title')}
+                                      />
+
+                                      <input
+                                        type="file"
+                                        name="quoteAvatar"
+                                        onChange={e => this.onFileLoadBlock(e, index, 'avatar')}
+                                        style={{ marginBottom: '25px' }}
+                                      />
+
+
+                                      <img
+                                        style={{ marginTop: '50px', display: 'block' }}
+                                        src={this.renderImageUrlBlock(index, 'avatar')}
+                                        style={{ maxWidth: '100%' }}
+                                      />
+
+
+                                      {this.renderRemoveBlockButton(index, true)}
+                                    </div>
+                                  )}
+
+                                </div>
+                              )}
+                            </Draggable>
+                          ))
+                        }
+
+                        {provided.placeholder}
+                      </div>
+                    )
+                  }
+                </Droppable>
+              </DragDropContext>
+
+              <Button type="small" onClick={e => this.addBlockToArticle(e, 'body')}><AddIcon /> Body</Button>
+              <Button type="small" onClick={e => this.addBlockToArticle(e, 'call-out')}>Call out</Button>
+              <Button type="small" onClick={e => this.addBlockToArticle(e, 'image')}>Image</Button>
+              <Button type="small" onClick={e => this.addBlockToArticle(e, 'two-images')}> Two images</Button>
+              <Button type="small" onClick={e => this.addBlockToArticle(e, 'cta')}> CTA</Button>
+              <Button type="small" onClick={e => this.addBlockToArticle(e, 'related-reading')}> Related reading</Button>
+              <Button type="small" onClick={e => this.addBlockToArticle(e, 'quote')}> Quote</Button>
             </Paper>
 
           </Grid>
@@ -810,7 +1457,7 @@ class BlogEditor extends React.Component {
                       }
                     >
                       Delete
-                    </Button>
+                  </Button>
                   )}
               </Grid>
 
@@ -862,7 +1509,6 @@ class BlogEditor extends React.Component {
 BlogEditor.propTypes = {
   blog: PropTypes.object.isRequired,
   instructions: PropTypes.array.isRequired,
-  potentialSubIngredients: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
   document: PropTypes.object.isRequired,

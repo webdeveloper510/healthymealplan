@@ -12,7 +12,7 @@ Meteor.methods({
       slug: String,
       status: String,
       category: String,
-      content: String,
+      blocks: Array,
     });
 
     const existsCategory = Blog.findOne({ title: blog.title });
@@ -21,10 +21,10 @@ Meteor.methods({
       throw new Meteor.Error('500', `${blog.title} is already present`);
     }
 
+    console.log(blog);
+
     try {
-      return Blog.insert({
-        ...blog
-      });
+      return Blog.insert(blog);
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
@@ -38,7 +38,7 @@ Meteor.methods({
       slug: String,
       status: String,
       category: String,
-      content: String,
+      blocks: Array,
     });
 
     try {

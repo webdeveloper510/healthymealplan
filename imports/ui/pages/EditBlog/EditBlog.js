@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 
 import { withTracker } from "meteor/react-meteor-data";
 import { Meteor } from "meteor/meteor";
-import Containers from "meteor/utilities:react-list-container";
+import Containers from "meteor/jivanysh:react-list-container";
 
 import Grid from "material-ui/Grid";
 

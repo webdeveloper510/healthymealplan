@@ -22,7 +22,7 @@ import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 import Loading from '../../components/Loading/Loading';
 import DiscountsTable from './DiscountsTable';
 
-import Containers from 'meteor/utilities:react-list-container';
+import Containers from 'meteor/jivanysh:react-list-container';
 
 const ListContainer = Containers.ListContainer;
 

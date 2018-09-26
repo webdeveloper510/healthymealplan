@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { Meteor } from 'meteor/meteor';
 import { createContainer } from 'meteor/react-meteor-data';
 import { teal, red } from 'material-ui/colors';
-import Containers from 'meteor/utilities:react-list-container';
+import Containers from 'meteor/jivanysh:react-list-container';
 
 const ListContainer = Containers.ListContainer;
 
