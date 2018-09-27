@@ -83,7 +83,7 @@ class BlogsGrid extends React.Component {
                   <Card style={{ width: '100%' }}>
                     <CardMedia
                       style={styles.media}
-                      image={e.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${e.imageUrl}` : e.image ? e.image : 'https://via.placeholder.com/600x600?text=+'}
+                      image={e.largeImageUrl ? `${Meteor.settings.public.S3BucketDomain}${e.largeImageUrl}` : e.image ? e.image : 'https://via.placeholder.com/600x600?text=+'}
                     />
                     <CardContent>
                       <Typography type="body1" className="font-uppercase font-medium" style={{ marginBottom: '16px', fontSize: '14px', color: 'rgba(0, 0, 0, .54)' }}>

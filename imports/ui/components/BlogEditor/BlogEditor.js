@@ -207,20 +207,18 @@ class BlogEditor extends React.Component {
 
       status: !this.props.loading && this.props.blog ? this.props.blog.status : 'draft',
 
-      blocks: this.props.blog && !this.props.loading && this.props.blog.blocks ? this.props.blog.blocks.map(e => {
-
-        if (e.type == "editor") {
-          e.editorState = createEditorState(convertToRaw(mediumDraftImporter(e.editorState)))
+      blocks: this.props.blog && !this.props.loading && this.props.blog.blocks ? this.props.blog.blocks.map((e) => {
+        if (e.type == 'editor') {
+          e.editorState = createEditorState(convertToRaw(mediumDraftImporter(e.editorState)));
         }
 
         return e;
-
       }) : [
-          {
-            type: 'editor',
-            editorState: createEditorState(),
-          },
-        ],
+        {
+          type: 'editor',
+          editorState: createEditorState(),
+        },
+      ],
 
     };
 
@@ -470,13 +468,13 @@ class BlogEditor extends React.Component {
       category: this.state.category,
     };
 
-    blog.blocks = blocksCopy.map(e => {
+    blog.blocks = blocksCopy.map((e) => {
       if (e.type == 'editor') {
         e.editorState = mediumDraftExporter(e.editorState.getCurrentContent());
       }
 
       return e;
-    })
+    });
 
     console.log(blog);
 
@@ -502,95 +500,49 @@ class BlogEditor extends React.Component {
           ? `${localStorage.getItem('blogForSnackbar')} article updated.`
           : `${localStorage.getItem('blogForSnackbar')} article added.`;
 
-        if (this.state.blogImageSrc || this.state.blogImageLargeSrc) {
-          if (this.state.blogImageSrc) {
-            S3.upload({
-              file: document.getElementById('blogImage').files[0],
-              path: 'images',
-            }, (err, res) => {
-              console.log('Err');
-              console.log(err);
-              console.log('Res');
-              console.log(res);
+        if (this.state.blogImageLargeSrc) {
+          S3.upload({
+            file: document.getElementById('blogImageLarge').files[0],
+            path: 'images',
+          }, (err, res) => {
+            console.log('Err');
+            console.log(err);
+            console.log('Res');
+            console.log(res);
 
-              if (err) {
-                this.props.popTheSnackbar({
-                  message: 'There was a problem uploading the image.',
-                });
+            if (err) {
+              this.props.popTheSnackbar({
+                message: 'There was a problem uploading the large image.',
+              });
 
-                this.setState({
-                  submitSuccess: false,
-                  submitLoading: false,
-                });
-              } else {
-                Meteor.call(
-                  'blog.updateImageUrl',
-                  {
-                    _id: blogId,
-                    imageUrl: res.relative_url,
-                    large: false,
-                  },
-                  (err, blogId) => {
-                    if (err) {
-                      this.props.popTheSnackbar({
-                        message: 'There was a problem updating the image.',
-                      });
+              this.setState({
+                submitSuccess: false,
+                submitLoading: false,
+              });
+            } else {
+              Meteor.call(
+                'blog.updateImageUrl',
+                {
+                  _id: blogId,
+                  imageUrl: res.relative_url,
+                  large: true,
+                },
+                (err, blogId) => {
+                  if (err) {
+                    this.props.popTheSnackbar({
+                      message: 'There was a problem updating the large image.',
+                    });
 
-                      this.setState({
-                        submitSuccess: false,
-                        submitLoading: false,
-                      });
-                    }
-                  },
-                );
-              }
-            });
-          }
-
-          if (this.state.blogImageLargeSrc) {
-            S3.upload({
-              file: document.getElementById('blogImageLarge').files[0],
-              path: 'images',
-            }, (err, res) => {
-              console.log('Err');
-              console.log(err);
-              console.log('Res');
-              console.log(res);
-
-              if (err) {
-                this.props.popTheSnackbar({
-                  message: 'There was a problem uploading the large image.',
-                });
-
-                this.setState({
-                  submitSuccess: false,
-                  submitLoading: false,
-                });
-              } else {
-                Meteor.call(
-                  'blog.updateImageUrl',
-                  {
-                    _id: blogId,
-                    imageUrl: res.relative_url,
-                    large: true,
-                  },
-                  (err, blogId) => {
-                    if (err) {
-                      this.props.popTheSnackbar({
-                        message: 'There was a problem updating the large image.',
-                      });
-
-                      this.setState({
-                        submitSuccess: false,
-                        submitLoading: false,
-                      });
-                    }
-                  },
-                );
-              }
-            });
-          }
-
+                    this.setState({
+                      submitSuccess: false,
+                      submitLoading: false,
+                    });
+                  }
+                },
+              );
+            }
+          });
+          
           this.setState({
             submitSuccess: true,
             submitLoading: false,
@@ -692,27 +644,6 @@ class BlogEditor extends React.Component {
     }
 
     return this.state.blocks[index].src;
-    // }
-
-    // if (secondary == 'one') {
-    //   return `${Meteor.settings.public.S3BucketDomain}${this.state.blocks[index].imageOneSrc}`;
-    // } else if (secondary == 'two') {
-    //   return Meteor.settings.public.S3BucketDomain + this.state.blocks[index].imageTwoSrc;
-    // } else if (secondary == 'avatar') {
-    //   return Meteor.settings.public.S3BucketDomain + this.state.blocks[index].avatar;
-    // }
-
-    // return Meteor.settings.public.S3BucketDomain + this.state.blocks[index].src;
-  }
-
-  renderImageUrl() {
-    if (this.props.newBlog || this.state.imageFieldChanged) {
-      return this.state.blogImageSrc;
-    } else if (this.props.document && this.props.document.imageUrl) {
-      return `${Meteor.settings.public.S3BucketDomain}${this.state.blogImageSrc}`;
-    }
-
-    return '';
   }
 
   renderLargeImageUrl() {
@@ -785,7 +716,6 @@ class BlogEditor extends React.Component {
       const blockBeingRemoved = blocks[index];
 
       if (blockBeingRemoved.type == 'image') {
-
         console.log(blockBeingRemoved.src.split(Meteor.settings.public.S3BucketDomain)[1]);
 
         S3.delete(blockBeingRemoved.src.split(Meteor.settings.public.S3BucketDomain)[1], (err, res) => {
@@ -805,7 +735,6 @@ class BlogEditor extends React.Component {
           }
         });
       } else if (blockBeingRemoved.type == 'quote') {
-
         console.log(blockBeingRemoved.avatar.split(Meteor.settings.public.S3BucketDomain)[1]);
 
         S3.delete(blockBeingRemoved.avatar.split(Meteor.settings.public.S3BucketDomain)[1], (err, res) => {
@@ -883,6 +812,8 @@ class BlogEditor extends React.Component {
         type: 'cta',
         color: 'teal',
         paragraph: '',
+        buttonText: '',
+        buttonLink: '',
       });
 
       this.setState({
@@ -1102,22 +1033,6 @@ class BlogEditor extends React.Component {
               </div>
 
               <div style={{ marginBottom: '1em' }}>
-                <Typography type="body2">Thumbnail</Typography>
-                <input
-                  type="file"
-                  id="blogImage"
-                  name="blogImage"
-                  onChange={this.onFileLoad}
-                  style={{ marginBottom: '25px' }}
-                />
-                <img
-                  style={{ marginTop: '50px', display: 'block' }}
-                  src={this.renderImageUrl()}
-                  style={{ maxWidth: '100%' }}
-                />
-              </div>
-
-              <div style={{ marginBottom: '1em' }}>
                 <Typography type="body2">Featured image</Typography>
                 <input
                   type="file"
@@ -1287,6 +1202,24 @@ class BlogEditor extends React.Component {
                                         value={this.state.blocks[index].paragraph}
                                         onChange={e => this.onChangeBlockField(e, 'cta', index, 'paragraph')}
                                       />
+
+
+                                      <TextField
+                                        label="Button text"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].buttonText}
+                                        onChange={e => this.onChangeBlockField(e, 'cta', index, 'buttonText')}
+                                      />
+
+                                      <TextField
+                                        label="Button link"
+                                        fullWidth
+                                        margin
+                                        value={this.state.blocks[index].buttonLink}
+                                        onChange={e => this.onChangeBlockField(e, 'cta', index, 'buttonLink')}
+                                      />
+
                                       {this.renderRemoveBlockButton(index)}
                                     </div>
                                   )}
@@ -1447,18 +1380,18 @@ class BlogEditor extends React.Component {
                 {this.props.newBlog ? (
                   ''
                 ) : (
-                    <Button
-                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
-                      raised
-                      onClick={
-                        blog && blog._id
-                          ? this.handleRemove
-                          : () => this.props.history.push('/blog')
-                      }
-                    >
+                  <Button
+                    style={{ backgroundColor: danger, color: '#FFFFFF' }}
+                    raised
+                    onClick={
+                      blog && blog._id
+                        ? this.handleRemove
+                        : () => this.props.history.push('/blog')
+                    }
+                  >
                       Delete
-                  </Button>
-                  )}
+                    </Button>
+                )}
               </Grid>
 
               <Grid item xs={8}>
@@ -1501,8 +1434,8 @@ class BlogEditor extends React.Component {
         {this.renderDeleteDialog()}
       </form>
     ) : (
-        <Loading />
-      );
+      <Loading />
+    );
   }
 }
 
