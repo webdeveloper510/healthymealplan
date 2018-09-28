@@ -156,7 +156,7 @@ class IngredientEditor extends React.Component {
             : this.props.ingredient.extra
           : '',
 
-      tags: !this.props.loading && this.props.ingredient && this.props.ingredient.hasOwnProperty('tags') ? this.props.ingredient.tags : [''],
+      tags: !this.props.newIngredient && this.props.ingredient.hasOwnProperty('tags') ? this.props.ingredient.tags.map(e => e) : [''],
     };
 
     autoBind(this);
@@ -440,16 +440,13 @@ class IngredientEditor extends React.Component {
     ingredient.typeId = typeActual._id;
 
 
-    if(this.state.tags.length > 0){
-
-      if(this.state.tags.length == 1 && this.state.tags[0] != ""){
+    if (this.state.tags.length > 0) {
+      if (this.state.tags.length == 1 && this.state.tags[0] != '') {
         ingredient.tags = this.state.tags;
-      }else if(this.state.tags.length > 1){
+      } else if (this.state.tags.length > 1) {
+        const indexBlank = this.state.tags.findIndex(e => e == '');
 
-        const indexBlank = this.state.tags.findIndex(e => e == "");
-
-        if(indexBlank >= 0){
-          
+        if (indexBlank >= 0) {
           popTheSnackbar({
             message: 'Failed. Please remove all empty tags.',
           });
@@ -457,15 +454,13 @@ class IngredientEditor extends React.Component {
           this.setState({
             submitSuccess: false,
             submitLoading: false,
-          })
+          });
 
           return;
         }
-        
-        ingredient.tags = this.state.tags;
-      
-      }
 
+        ingredient.tags = this.state.tags;
+      }
     }
 
     console.log(ingredient);
@@ -798,8 +793,8 @@ class IngredientEditor extends React.Component {
                 SKU {ingredient.SKU ? ingredient.SKU : ''}{' '}
               </Typography>
             ) : (
-              ''
-            )}
+                ''
+              )}
           </Grid>
           <Grid item xs={8}>
             <div
@@ -881,23 +876,22 @@ class IngredientEditor extends React.Component {
               <Grid item xs={12} sm={8}>
                 <Paper elevation={2} className="paper-for-fields">
 
-
                   {this.state.tags.map((e, i) => (
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                        <TextField
-                          name={`tag${i}`}
-                          fullWidth
-                          placeholder="Tag"
-                          multiline
-                          onChange={(e) => this.onChangeTag(e, i)}
-                          style={{ marginBottom: '1.5em', paddingRight: '10px' }}
-                          value={this.state.tags[i]}
-                        />
-                        {i >= 1 ? (
-                          <CloseIcon style={{ cusrsor: 'pointer', width: '20px', marginBottom: '10px' }} onClick={() => this.onRemoveTag(i)} />
-                        ) : ''}
-                      </div>
-                    ))}
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} key={i}>
+                      <TextField
+                        name={`tag${i}`}
+                        fullWidth
+                        placeholder="Tag"
+                        multiline
+                        onChange={e => this.onChangeTag(e, i)}
+                        style={{ marginBottom: '1.5em', paddingRight: '10px' }}
+                        value={e}
+                      />
+                      {i >= 1 ? (
+                        <CloseIcon style={{ cusrsor: 'pointer', width: '20px', marginBottom: '10px' }} onClick={() => this.onRemoveTag(i)} />
+                      ) : ''}
+                    </div>
+                  ))}
 
                   <Button type="secondary" onClick={this.addTagField}>Add tag</Button>
                 </Paper>
@@ -1178,8 +1172,8 @@ class IngredientEditor extends React.Component {
                         />
                       ))
                     ) : (
-                      <Chip className="chip--bordered" label="Sub-ingredient" />
-                    )}
+                        <Chip className="chip--bordered" label="Sub-ingredient" />
+                      )}
                   </div>
                 </Paper>
               </Grid>
@@ -1194,18 +1188,18 @@ class IngredientEditor extends React.Component {
                 {this.props.newIngredient ? (
                   ''
                 ) : (
-                  <Button
-                    style={{ backgroundColor: danger, color: '#FFFFFF' }}
-                    raised
-                    onClick={
-                      ingredient && ingredient._id
-                        ? this.handleRemove.bind(this)
-                        : () => this.props.history.push('/ingredients')
-                    }
-                  >
+                    <Button
+                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
+                      raised
+                      onClick={
+                        ingredient && ingredient._id
+                          ? this.handleRemove.bind(this)
+                          : () => this.props.history.push('/ingredients')
+                      }
+                    >
                       Delete
                     </Button>
-                )}
+                  )}
               </Grid>
 
               <Grid item xs={8}>
