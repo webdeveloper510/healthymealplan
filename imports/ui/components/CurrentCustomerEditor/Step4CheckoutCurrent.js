@@ -652,18 +652,15 @@ class Step4CheckoutCurrent extends React.Component {
               message: 'Discount addition scheduled for friday night',
             });
           } else {
-
             this.props.popTheSnackbar({
               message: 'Discount added successfully.',
             });
-
-
-            this.setState({
-              orderSummaryDialogOpen: false,
-            });
-
           }
-
+          
+          this.setState({
+            orderSummaryDialogOpen: false,
+          });
+        
         });
       }
     });
@@ -1853,7 +1850,7 @@ class Step4CheckoutCurrent extends React.Component {
                         <Grid container>
                           <Grid item xs={12} sm={6}>
                             <Typography type="body2">
-                              {this.props.discounts.find(e => this.props.subscription.discountApplied == e._id).title}
+                              {this.props.discounts && this.state.discountApplied && this.props.discounts.find(e => this.props.subscription.discountApplied == e._id).title}
                             </Typography>
                           </Grid>
                           <Grid item xs={12} sm={6}>
