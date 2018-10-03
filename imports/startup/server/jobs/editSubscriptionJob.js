@@ -5,6 +5,7 @@ import { Random } from 'meteor/random';
 
 import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
+import Discounts from '../../../api/Discounts/Discounts';
 
 import calculateSubscriptionCost from '../../../modules/server/billing/calculateSubscriptionCost';
 import updateSubscription from '../../../modules/server/authorize/updateSubscription';
@@ -19,13 +20,11 @@ const worker = Job.processJobs(
 
     console.log('Inside editSubscriptionJob');
 
-
     const billing = calculateSubscriptionCost(data);
 
     const sub = Subscriptions.findOne({ customerId: data.id });
 
     const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
-
     const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
 
     if (updateSubscriptionRes.messages.resultCode != 'Ok') {
@@ -33,7 +32,6 @@ const worker = Job.processJobs(
     }
 
     console.log('Inside editSubscriptionJob: Updated subscription on authorize end');
-
 
     if (data.secondaryProfiles && data.secondaryProfiles.length > 0) {
       data.secondaryProfiles.forEach((e) => {
@@ -136,16 +134,39 @@ const worker = Job.processJobs(
       return e;
     });
 
+
+    // console.log(data.discountCode);
+    // console.log(data);
+
+    let keysToUnset = {};
+    let keysToSet = {
+      completeSchedule: data.completeSchedule,
+      delivery: newDeliveryType,
+      amount: billing.actualTotal,
+      subscriptionItems: billing.lineItems,
+    };
+
+    if (data.hasOwnProperty('discountCodeRemove')) {
+      if (data.discountCodeRemove) {
+        console.log("Going in discountCodeRemove inner if statement");
+        keysToUnset.discountApplied = 1;
+      }
+    }
+
+    if (data.hasOwnProperty('discountCode') && !keysToUnset.hasOwnProperty('discountApplied')) {
+      console.log("Going in discountCode inner KEY SET statement");
+
+      keysToSet.discountApplied = Discounts.findOne({ $or: [{ title: data.discountCode }, { _id: data.discountCode }] })._id;
+    }
+
+    // console.log(keysToSet);
+
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-      $set: {
-        completeSchedule: data.completeSchedule,
-        delivery: newDeliveryType,
-        amount: billing.actualTotal,
-        subscriptionItems: billing.lineItems,
-      },
-    });
+        $set: keysToSet,
+        $unset: keysToUnset,
+      });
 
     console.log('Inside editSubscriptionJob: Updated subscription on Vittle');
 

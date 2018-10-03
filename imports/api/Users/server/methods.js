@@ -72,8 +72,8 @@ Meteor.methods({
     check(selector, Object);
     check(sort, Object);
 
-    //change this when you find a good solution to get the count
-    //of the documents through a stage in the pipeline
+    // change this when you find a good solution to get the count
+    // of the documents through a stage in the pipeline
     const query = Meteor.users.aggregate([
       {
         $lookup: {
@@ -96,8 +96,8 @@ Meteor.methods({
         $sort: sort,
       },
       {
-        $count: 'totalDocs'
-      }
+        $count: 'totalDocs',
+      },
     ]);
 
     // console.log(query)
@@ -109,14 +109,15 @@ Meteor.methods({
     if (totalDocs < LIMIT) {
       maxPages = 1;
     } else {
-      maxPages = Math.ceil(totalDocs / LIMIT)
+      maxPages = Math.ceil(totalDocs / LIMIT);
     }
 
     return {
       recordCount: totalDocs,
       maxPages,
-    }
+    };
   },
+
   'customers.delete': function deleteCustomer(id) {
 
     check(id, String);
@@ -195,8 +196,8 @@ Meteor.methods({
     Meteor.users.update({
       _id: data.id,
     }, {
-      $set: toUpdate,
-    });
+        $set: toUpdate,
+      });
 
     // console.log(data);
   },
@@ -238,30 +239,39 @@ Meteor.methods({
 
   },
 
-  'customer.getBillingData': function (customerId, discountCode) {
-    check(customerId, String);
-    check(discountCode, Match.Optional(String));
+  'customer.getBillingData': function (data) {
+    check(data, {
+      customerId: String,
+      discountCode: Match.Optional(String),
+      removeDiscount: Match.Optional(Boolean),
+    });
 
-    const primaryUser = Meteor.users.findOne({ _id: customerId });
-    const sub = Subscriptions.findOne({ customerId });
+    const primaryUser = Meteor.users.findOne({ _id: data.customerId });
+    const sub = Subscriptions.findOne({ customerId: data.customerId });
     let discountCodeToSend = '';
+    let discountCodeRemove = false;
 
     if (sub.hasOwnProperty('discountApplied')) {
       discountCodeToSend = sub.discountApplied;
     }
 
-    if (discountCode) {
-      discountCodeToSend = discountCode;
+    if (data.hasOwnProperty('discountCode')) {
+      discountCodeToSend = data.discountCode;
     }
 
-    console.log(discountCodeToSend);
+    if(data.hasOwnProperty('removeDiscount')){
+      if(data.removeDiscount){
+        discountCodeRemove = true;
+      }
+    }
 
-    const data = {
+    const dataToSend = {
       id: primaryUser._id,
       address: primaryUser.address,
       lifestyle: primaryUser.lifestyle,
       discount: primaryUser.discount,
       discountCode: discountCodeToSend,
+      discountCodeRemove: discountCodeRemove,
       restrictions: primaryUser.restrictions,
       specificRestrictions: primaryUser.specificRestrictions,
       subIngredients: primaryUser.preferences,
@@ -278,11 +288,11 @@ Meteor.methods({
     };
 
     if (primaryUser.associatedProfiles > 0) {
-      data.secondary = true;
-      const secondaries = Meteor.users.find({ primaryAccount: customerId }).fetch();
+      dataToSend.secondary = true;
+      const secondaries = Meteor.users.find({ primaryAccount: data.customerId }).fetch();
 
       secondaries.forEach((e, i) => {
-        data.secondaryProfiles.push({
+        dataToSend.secondaryProfiles.push({
           lifestyle: e.lifestyle,
           scheduleReal: e.schedule,
           subIngredients: e.preferences,
@@ -293,7 +303,8 @@ Meteor.methods({
       });
     }
 
-    const billing = calculateSubscriptionCost(data);
+    // console.log(data);
+    const billing = calculateSubscriptionCost(dataToSend);
 
     return billing;
   },
@@ -321,9 +332,17 @@ Meteor.methods({
       secondaryProfilesRemoved: Array,
     });
 
+    const sub = Subscriptions.findOne({ customerId: data.id });
+
+    if (sub.hasOwnProperty('discountApplied')) {
+      if (sub.discountApplied.length > 0) {
+        data.discountCode = sub.discountApplied
+      }
+    }
+
     const billing = calculateSubscriptionCost(data);
 
-    // console.log(data);
+    // console.log("IN BILLING");
     // console.log(billing);
 
     let friday = '';
@@ -331,21 +350,19 @@ Meteor.methods({
     // if we haven't yet passed the day of the week that I need:
     if (moment().isoWeekday() <= 5) {
       // then just give me this week's instance of that day
-      friday = moment().isoWeekday(5).hour(23).minute(30)
+      friday = moment().isoWeekday(5).hour(7).minute(30)
         .toDate();
     } else {
       // otherwise, give me next week's instance of that day
-      friday = moment().add(1, 'weeks').isoWeekday(5).hour(23)
+      friday = moment().add(1, 'weeks').isoWeekday(5).hour(7)
         .minute(30)
         .toDate();
     }
 
-    const sub = Subscriptions.findOne({ customerId: data.id });
 
     if (sub.paymentMethod == 'card') {
 
-      console.log('Payment method is card and the subscription is paused');
-
+      console.log('Inside card');
 
       const syncGetSubscription = Meteor.wrapAsync(getSubscription);
 
@@ -359,12 +376,14 @@ Meteor.methods({
 
       const subscriptionStartDate = getSubscriptionRes.subscription.paymentSchedule.startDate;
       const subscriptionTotalOccurrences = getSubscriptionRes.subscription.paymentSchedule.totalOccurrences;
-
+      console.log('Total: ' + '');
+      console.log(subscriptionTotalOccurrences);
       console.log(moment(subscriptionStartDate).hour(23).minute(30));
       console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
 
       // this changes subscription amount immediately if first charge hasn't happened
       if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))) {
+        console.log('Inside card if');
 
         console.log("Subscription hasn't been charged");
 
@@ -377,11 +396,12 @@ Meteor.methods({
         }
 
       } else {
+        console.log('Inside card else');
 
         const jobExists = Jobs.findOne({ type: 'editSubscriptionJob', 'data.id': data.id, status: 'waiting' });
 
         if (jobExists) {
-          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for updation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for update on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
         }
 
         const job = new Job(
@@ -401,6 +421,8 @@ Meteor.methods({
       }
 
     }
+
+    console.log('Inside card after return');
 
     if (data.secondaryProfiles && data.secondaryProfiles.length > 0) {
 
@@ -515,21 +537,22 @@ Meteor.methods({
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-      $set: {
-        completeSchedule: data.completeSchedule,
-        delivery: newDeliveryType,
-        amount: billing.actualTotal,
-        subscriptionItems: billing.lineItems,
-      },
-    });
+        $set: {
+          completeSchedule: data.completeSchedule,
+          delivery: newDeliveryType,
+          amount: billing.actualTotal,
+          subscriptionItems: billing.lineItems,
+        },
+      });
 
   },
 
-  'edit.customer.step4': function editStep2(data) {
+  'edit.customer.step4': function editStep4(data) {
 
     check(data, {
       id: String,
       discountCode: String,
+      removeDiscount: Match.Optional(Boolean),
     });
 
     const primaryUser = Meteor.users.findOne({ _id: data.id });
@@ -537,6 +560,7 @@ Meteor.methods({
 
     const discountCodeActual = Discounts.findOne({ title: data.discountCode });
     let discountCodeToSend = '';
+    let discountCodeRemove = false;
 
     if (sub.hasOwnProperty('discountApplied')) {
       discountCodeToSend = sub.discountApplied;
@@ -546,12 +570,19 @@ Meteor.methods({
       discountCodeToSend = data.discountCode;
     }
 
+    if (data.hasOwnProperty('removeDiscount')) {
+      if (data.removeDiscount) {
+        discountCodeRemove = true;
+      }
+    }
+
     const billingData = {
       id: primaryUser._id,
       address: primaryUser.address,
       lifestyle: primaryUser.lifestyle,
       discount: primaryUser.discount,
       discountCode: discountCodeToSend,
+      discountCodeRemove: discountCodeRemove,
       restrictions: primaryUser.restrictions,
       specificRestrictions: primaryUser.specificRestrictions,
       subIngredients: primaryUser.preferences,
@@ -624,7 +655,8 @@ Meteor.methods({
       console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
 
       // this changes subscription amount immediately if first charge hasn't happened
-      if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))) {
+      if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute')) 
+      && sub.status == "paused") {
 
         console.log("Subscription hasn't been charged");
 
@@ -638,20 +670,21 @@ Meteor.methods({
 
       } else {
 
-        const jobExists = Jobs.findOne({ type: 'editSubscriptionJobStep4', 'data.id': data.id, status: 'waiting' });
+        const jobExists = Jobs.findOne({ type: 'editSubscriptionJob', 'data.id': data.id, status: 'waiting' });
 
         if (jobExists) {
-          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for updation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+          // throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for update on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+          
+          console.log('Going in job exists');
+  
+          Jobs.update({ _id: jobExists._id }, { $set: { 'data.discountCodeRemove': discountCodeRemove, 'data.discountCode': discountCodeToSend } })
+          
+          return {
+            subUpdateScheduled: true,
+          };
         }
 
-        const job = new Job(
-          Jobs,
-          'editSubscriptionJobStep4', // type of job
-          {
-            ...data,
-          },
-        );
-
+        const job = new Job(Jobs,'editSubscriptionJob', billingData);
         job.priority('normal').after(friday).save(); // Commit it to the server
 
         return {
@@ -660,15 +693,24 @@ Meteor.methods({
       }
     }
 
+    const keysToUnset = {};
+    const keysToSet = {
+      amount: billing.actualTotal,
+      subscriptionItems: billing.lineItems,
+    };
+
+    if (data.hasOwnProperty('removeDiscount')) {
+      keysToUnset.discountApplied = 1;
+    } else {
+      keysToSet.discountApplied = discountCodeActual._id;
+    }
+
     Subscriptions.update({
       customerId: data.id,
     }, {
-      $set: {
-        amount: billing.actualTotal,
-        subscriptionItems: billing.lineItems,
-        discountApplied: discountCodeActual._id,
-      },
-    });
+        $set: keysToSet,
+        $unset: keysToUnset,
+      });
 
   },
 
@@ -1105,7 +1147,7 @@ Meteor.methods({
     const subscriptionIdToSave = Random.id();
 
 
-    console.log(customerInfo);
+    // console.log(customerInfo);
 
 
     const syncCreateCustomerProfile = Meteor.wrapAsync(createCustomerProfile);
@@ -1771,9 +1813,7 @@ Meteor.methods({
     });
 
     check(subscriptionAmount, Number);
-
     check(billingInfo, Object);
-
     check(userId, String);
 
     const userChange = Meteor.users.findOne({ _id: userId });
@@ -1830,10 +1870,6 @@ Meteor.methods({
       );
     }
 
-    console.log(userChange._id);
-
-    console.log(Subscriptions.findOne({ customerId: userChange._id }));
-
     Subscriptions.update({ customerId: userChange._id },
       {
         $set: {
@@ -1886,10 +1922,10 @@ Meteor.methods({
         Subscriptions.update({
           _id: subscription._id,
         }, {
-          $set: {
-            paymentMethod: type,
-          },
-        });
+            $set: {
+              paymentMethod: type,
+            },
+          });
       } catch (error) {
         console.log(error);
         throw new Meteor.Error(500, error);

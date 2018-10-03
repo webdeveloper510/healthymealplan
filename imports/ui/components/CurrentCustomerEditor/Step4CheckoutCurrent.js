@@ -114,13 +114,16 @@ class Step4CheckoutCurrent extends React.Component {
       submitSuccess: false,
 
       summaryLoaded: false,
+      summaryLoading: false,
 
       paymentMethod: this.props.customer && this.props.subscription ? this.props.subscription.paymentMethod : '',
       taxExempt: this.props.customer && this.props.subscription ? this.props.subscription.taxExempt : '',
 
-
       paymentProfileDetails: null,
+      paymentProfileLoading: false,
+
       subscriptionDetails: null,
+      getSubscriptionDetailsLoading: false,
 
       dialogCancelSubscription: false,
       dialogEditPaymentMethod: false,
@@ -134,7 +137,7 @@ class Step4CheckoutCurrent extends React.Component {
       discountSelected: '',
       discountApplied: this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '',
       secondTime: '',
-      removeDiscount: false,
+      discountBeingRemoved: false,
 
       discountDeleteDialog: false,
       orderSummaryDialogOpen: false,
@@ -165,8 +168,6 @@ class Step4CheckoutCurrent extends React.Component {
         },
 
         postal_code: {
-          minlength: 6,
-          maxlength: 6,
           cdnPostal: true,
           required: true,
         },
@@ -187,14 +188,26 @@ class Step4CheckoutCurrent extends React.Component {
 
     if (paymentMethod === 'card') {
 
+      this.setState({
+        getSubscriptionDetailsLoading: true,
+        paymentProfileLoading: true,
+
+      })
+
       Meteor.call('getSubscriptionDetails', this.props.subscription.authorizeSubscriptionId, (err, res) => {
         if (err) {
           console.log(err);
+
+          this.setState({
+            getSubscriptionDetailsLoading: false,
+          });
+
         } else {
           console.log(res);
 
           this.setState({
             subscriptionDetails: res.subscription,
+            getSubscriptionDetailsLoading: false,
           });
         }
       });
@@ -206,22 +219,34 @@ class Step4CheckoutCurrent extends React.Component {
           console.log(res);
 
           this.setState({
+            paymentProfileLoading: false,
             paymentProfileDetails: res.paymentProfile,
           });
         }
       });
     }
 
-    Meteor.call('customer.getBillingData', this.props.customer._id, (err, res) => {
+    this.setState({
+      summaryLoading: true,
+    })
+
+    Meteor.call('customer.getBillingData', { customerId: this.props.customer._id }, (err, res) => {
       if (err) {
         console.log(err);
         this.props.popTheSnackbar({
           message: 'There was a problem fetching billing line items',
         });
+        this.setState({
+          summaryLoaded: true,
+          summaryLoading: false,
+        });
+
       } else {
         console.log(res);
         this.setState({
           summaryLoaded: true,
+          summaryLoading: false,
+
           primaryProfileBilling: res.primaryProfileBilling,
           secondaryProfilesBilling: res.secondaryProfilesBilling,
         });
@@ -530,32 +555,37 @@ class Step4CheckoutCurrent extends React.Component {
 
   openOrderSummaryDialog() {
 
-    Meteor.call('customer.getBillingData', this.props.customer._id, this.state.discountSelected, (err, res) => {
+    Meteor.call('customer.getBillingData',
+      {
+        customerId: this.props.customer._id,
+        discountCode: this.state.discountSelected,
+        removeDiscount: this.state.discountBeingRemoved,
+      }, (err, res) => {
 
-      if (err) {
-        this.setState({
-          submitSuccess: false,
-          submitLoading: false,
-        }, () => {
-          this.props.popTheSnackbar({
-            message: err.reason,
-          });
-        });
-      } else {
-        console.log(res);
-        this.setState({
-          submitSuccess: true,
-          submitLoading: false,
-          primaryProfileBillingNew: res.primaryProfileBilling,
-          secondaryProfilesBillingNew: res.secondaryProfilesBilling,
-        }, () => {
+        if (err) {
           this.setState({
-            orderSummaryDialogOpen: true,
-            secondTime: true,
+            submitSuccess: false,
+            submitLoading: false,
+          }, () => {
+            this.props.popTheSnackbar({
+              message: err.reason,
+            });
           });
-        });
-      }
-    });
+        } else {
+          console.log(res);
+          this.setState({
+            submitSuccess: true,
+            submitLoading: false,
+            primaryProfileBillingNew: res.primaryProfileBilling,
+            secondaryProfilesBillingNew: res.secondaryProfilesBilling,
+          }, () => {
+            this.setState({
+              orderSummaryDialogOpen: true,
+              secondTime: true,
+            });
+          });
+        }
+      });
   }
 
 
@@ -619,9 +649,10 @@ class Step4CheckoutCurrent extends React.Component {
 
           if (typeof res === 'object' && res.hasOwnProperty('subUpdateScheduled')) {
             this.props.popTheSnackbar({
-              message: 'Customer details update scheduled for friday night.',
+              message: 'Discount addition scheduled for friday night',
             });
           } else {
+
             this.props.popTheSnackbar({
               message: 'Discount added successfully.',
             });
@@ -667,39 +698,37 @@ class Step4CheckoutCurrent extends React.Component {
 
           if (typeof res === 'object' && res.hasOwnProperty('subUpdateScheduled')) {
             this.props.popTheSnackbar({
-              message: 'Customer details update scheduled for friday night.',
+              message: 'Discount removal scheduled for friday night.',
             });
           } else {
             this.props.popTheSnackbar({
-              message: 'Discount added successfully.',
+              message: 'Discount removed successfully.',
             });
-
-
-            this.setState({
-              orderSummaryDialogOpen: false,
-            });
-
           }
 
+          this.setState({
+            orderSummaryDialogOpen: false,
+            discountBeingRemoved: false,
+          });
         });
       }
     });
   }
 
-  handleRestrictionChipDelete(type) {
+  openDiscountDeleteConfirmDialog(type) {
 
     this.openDiscountDeleteDialog();
   }
 
-  handleRestrictionChipDeleteActual() {
+  handleRemoveDiscountConfirmed() {
     this.setState({
       discountApplied: '',
       hasFormChanged: true,
-      removeDiscount: true,
+      discountBeingRemoved: true,
+    }, () => {
+      this.closeDiscountDeleteDialog();
+      this.openOrderSummaryDialog();
     });
-
-    this.closeDiscountDeleteDialog();
-    this.openOrderSummaryDialog();
   }
 
   getTypeAvatar(discount) {
@@ -882,30 +911,34 @@ class Step4CheckoutCurrent extends React.Component {
                 </Grid>
 
                 <Grid item xs={12}>
-                  {this.state.paymentMethod === 'card' && this.state.paymentProfileDetails != null ? (
-                    <div>
-                      <div style={{ display: 'flex', alignItems: 'center' }}>
+                  {this.state.paymentProfileLoading ? (
+                    <CircularProgress size={30} />
+                  ) : (
+                      this.state.paymentMethod === 'card' && this.state.paymentProfileDetails != null && (
                         <div>
-                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Visa' && (<img width="80" src="/visa.svg" />)}
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <div>
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Visa' && (<img width="80" src="/visa.svg" />)}
 
-                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Mastercard' && (<img width="80" src="/mastercard.svg" />)}
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Mastercard' && (<img width="80" src="/mastercard.svg" />)}
 
-                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'AmericanExpress' && (<img width="80" src="/amex.svg" />)}
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'AmericanExpress' && (<img width="80" src="/amex.svg" />)}
 
-                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Discover' && (<img width="80" src="/discover.svg" />)}
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Discover' && (<img width="80" src="/discover.svg" />)}
 
-                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'JCB' && (<img width="80" src="/jcb.svg" />)}
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'JCB' && (<img width="80" src="/jcb.svg" />)}
 
-                          {this.state.paymentProfileDetails.payment.creditCard.cardType == 'DinersClub' && (<img width="80" src="/diners.svg" />)}
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'DinersClub' && (<img width="80" src="/diners.svg" />)}
+                            </div>
+                            <div style={{ marginLeft: '10px' }}>
+                              <Typography type="body2">Card {this.state.paymentProfileDetails.payment.creditCard.cardNumber}</Typography>
+                              <Typography type="body2">Expiry {this.state.paymentProfileDetails.payment.creditCard.expirationDate}</Typography>
+                            </div>
+                            <Button onClick={this.openEditPaymentMethodDialog} style={{ marginLeft: '1em' }}>Edit</Button>
+                          </div>
                         </div>
-                        <div style={{ marginLeft: '10px' }}>
-                          <Typography type="body2">Card {this.state.paymentProfileDetails.payment.creditCard.cardNumber}</Typography>
-                          <Typography type="body2">Expiry {this.state.paymentProfileDetails.payment.creditCard.expirationDate}</Typography>
-                        </div>
-                        <Button onClick={this.openEditPaymentMethodDialog} style={{ marginLeft: '1em' }}>Edit</Button>
-                      </div>
-                    </div>
-                  ) : ''}
+                      )
+                    )}
 
                   {this.state.paymentMethod === 'cash' ? (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -1052,7 +1085,7 @@ class Step4CheckoutCurrent extends React.Component {
                           style={{ marginRight: '8px', marginBottom: '8px' }}
                           label={`${e.title}`}
                           key={i}
-                          onDelete={this.handleRestrictionChipDelete.bind(
+                          onDelete={this.openDiscountDeleteConfirmDialog.bind(
                             this,
                             e,
                           )}
@@ -1099,8 +1132,8 @@ class Step4CheckoutCurrent extends React.Component {
                     </DialogContentText>
                   </DialogContent>
                   <DialogActions>
-                    <Button onClick={this.handleDiscountApply} color="primary">No</Button>
-                    <Button onClick={this.handleRestrictionChipDeleteActual} color="primary" autoFocus>Yes</Button>
+                    <Button onClick={this.closeDiscountDeleteDialog} color="primary">No</Button>
+                    <Button onClick={this.handleRemoveDiscountConfirmed} color="primary" autoFocus>Yes</Button>
 
                   </DialogActions>
                 </Dialog>
@@ -1264,6 +1297,9 @@ class Step4CheckoutCurrent extends React.Component {
           </Grid>
           <Grid item xs={12} sm={5}>
             <Paper elevation={2} className="paper-for-fields">
+
+              {this.state.summaryLoading && ( <CircularProgress size={30} /> )}
+
               {this.state.summaryLoaded && (
                 <Grid container>
                   <Grid item xs={12} sm={12}>
@@ -1806,7 +1842,8 @@ class Step4CheckoutCurrent extends React.Component {
                           </Grid>
                         </Grid>
                       )}
-                    {this.state.primaryProfileBilling.discountTotal > 0 && (
+                    {this.state.primaryProfileBilling.discountTotal > 0 && !this.state.discountBeingRemoved
+                    && this.props.subscription.hasOwnProperty('discountApplied') ? (
                       <div style={{ marginTop: '25px' }}>
                         <Grid container>
                           <Grid item xs={12}>
@@ -1831,7 +1868,7 @@ class Step4CheckoutCurrent extends React.Component {
                           </Grid>
                         </Grid>
                       </div>
-                    )}
+                    ) : ''}
 
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.coolerBag > 0 && (
@@ -1923,7 +1960,9 @@ class Step4CheckoutCurrent extends React.Component {
                       <Typography type="title" color="inherit" className={this.props.classes.flex}>
                         Subscription update
                       </Typography>
-                      <Button color="inherit" onClick={() => this.handleSaveDiscount()}>Save</Button>
+                      <Button color="inherit"
+                        onClick={this.state.discountBeingRemoved ? this.handleRemoveDiscount : this.handleSaveDiscount}>
+                        Save</Button>
                     </Toolbar>
                   </AppBar>
                   <OrderSummary
@@ -1934,6 +1973,7 @@ class Step4CheckoutCurrent extends React.Component {
                     discounts={this.props.discounts}
                     subscription={this.props.subscription}
                     discountSelected={this.state.discountSelected}
+                    discountBeingRemoved={this.state.discountBeingRemoved}
                   />
                 </Dialog>
               )}

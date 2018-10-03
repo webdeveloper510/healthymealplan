@@ -84,7 +84,12 @@ Meteor.publish('users.customers.new', function newMethod(selector, options, skip
         {
           $limit: limit,
         },
-      ]);
+      ], {
+        collation: {
+          locale: 'en_US',
+          strength: 1,
+        },
+      });
 
       return usersWithSubs;
     },

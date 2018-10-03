@@ -127,7 +127,7 @@ class OrderSummary extends React.Component {
                 0 ||
                 this.state.primaryProfileBilling
                   .totalBodybuilderSurcharge > 0) ? (
-                    <Grid item xs={12}>
+                <Grid item xs={12}>
                   <Typography
                     type="body2"
                     className="font-medium font-uppercase"
@@ -178,7 +178,7 @@ class OrderSummary extends React.Component {
             {this.state.primaryProfileBilling &&
               this.state.primaryProfileBilling
                 .totalBodybuilderSurcharge > 0 ? (
-                  <Grid container>
+                <Grid container>
                   <Grid item xs={12} sm={6}>
                     <Typography type="subheading">
                       Bodybuilder
@@ -403,8 +403,8 @@ class OrderSummary extends React.Component {
                       </Grid>
                     </Grid>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {e.totalBodybuilderSurcharge > 0 ? (
                     <Grid container>
@@ -434,8 +434,8 @@ class OrderSummary extends React.Component {
                       </Grid>
                     </Grid>
                   ) : (
-                    ''
-                  )}
+                      ''
+                    )}
 
                   {e.restrictionsActual.length > 0 && (
                     <Typography
@@ -518,7 +518,7 @@ class OrderSummary extends React.Component {
                   {this.state.primaryProfileBilling &&
                     this.state.primaryProfileBilling.deliveryCost > 0
                     ? `$${
-                      this.state.primaryProfileBilling.deliveryCost
+                    this.state.primaryProfileBilling.deliveryCost
                     }`
                     : 'Free'}
                 </Typography>
@@ -552,8 +552,8 @@ class OrderSummary extends React.Component {
                         this.state.primaryProfileBilling
                           .deliverySurcharges > 0
                         ? `$${
-                          this.state.primaryProfileBilling
-                            .deliverySurcharges
+                        this.state.primaryProfileBilling
+                          .deliverySurcharges
                         }`
                         : ''}
                     </Typography>
@@ -561,7 +561,7 @@ class OrderSummary extends React.Component {
                 </Grid>
               )}
 
-            {this.state.primaryProfileBilling.discountTotal > 0 && (
+            {this.state.primaryProfileBilling.discountTotal > 0 && !this.props.discountBeingRemoved ? (
               <div style={{ marginTop: '25px' }}>
                 <Grid container>
                   <Grid item xs={12}>
@@ -586,7 +586,7 @@ class OrderSummary extends React.Component {
                   </Grid>
                 </Grid>
               </div>
-            )}
+            ) : ''}
 
             {this.state.primaryProfileBilling &&
               this.state.primaryProfileBilling.coolerBag > 0 && (
@@ -632,8 +632,8 @@ class OrderSummary extends React.Component {
                 </Grid>
               </Grid>
             ) : (
-              ''
-            )}
+                ''
+              )}
             <Grid container>
               <Grid item xs={12} sm={6}>
                 <Typography type="title">Total</Typography>
@@ -653,7 +653,7 @@ class OrderSummary extends React.Component {
                     this.state.primaryProfileBilling.taxes}/week`
                     : this.state.primaryProfileBilling &&
                     `$${
-                      this.state.primaryProfileBilling.groupTotal
+                    this.state.primaryProfileBilling.groupTotal
                     }/week`}
                 </Typography>
               </Grid>

@@ -3,7 +3,7 @@ export default function createSubscriptionLineItems(
   primaryProfileBilling,
   secondaryProfilesBilling,
   secondaryProfileCount,
-  taxExempt, deliveryType) {
+  taxExempt) {
   const subscriptionItemsReal = [];
 
   const primaryProfileLineItems = {
@@ -196,8 +196,6 @@ export default function createSubscriptionLineItems(
       subscriptionItemsReal.push(currentProfileLineItems);
     });
   }
-  // console.log(subscriptionItemsReal);
-
-
+  
   return subscriptionItemsReal;
 }

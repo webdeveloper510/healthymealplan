@@ -6556,7 +6556,8 @@ class CurrentCustomerEditor extends React.Component {
                 {(this.props.customer && this.props.customer.secondary == undefined) ? (
                   <Tabs indicatorColor="#000" value={this.state.currentTab} onChange={this.handleTabChange}>
                     <Tab label="Basic" />
-                    (<Tab label="Plan" />
+                    <Tab label="Plan" />
+                    <Tab label="Activity" />
                     <Tab label="Subscription" />
                   </Tabs>
                 ) : (
@@ -8671,7 +8672,13 @@ class CurrentCustomerEditor extends React.Component {
               </div>
             )}
 
-            {(this.state.currentTab === 2 && this.props.customer && this.props.subscription != undefined && this.props.customer.secondary == undefined) ? (
+            {this.state.currentTab == 2 && (
+              <div>
+                <Typography type="headline" >Activity</Typography>
+              </div>
+            )}
+
+            {(this.state.currentTab === 3 && this.props.customer && this.props.subscription != undefined && this.props.customer.secondary == undefined) ? (
               <Step4CheckoutCurrent
                 secondaryAccounts={this.props.secondaryAccounts}
                 activeStep={this.state.currentTab}
@@ -8711,7 +8718,7 @@ class CurrentCustomerEditor extends React.Component {
                 // }}
 
               />
-            ) : this.state.currentTab === 2 ? (
+            ) : this.state.currentTab === 3 ? (
               <Typography type="subheading">
                 This account doesn't have a subscription yet.
             </Typography>

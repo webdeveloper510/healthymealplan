@@ -716,7 +716,7 @@ export default function calculateSubscriptionCost(customerInfo) {
             Restrictions.findOne({ _id: e }),
           );
         });
-
+        console.log('Before calculating retrictions actual');
         currentCustomer.restrictionsActual.forEach((e, i) => {
           if (e.hasOwnProperty('extra')) {
             let totalRestrictionsSurcharge = 0;
@@ -995,6 +995,7 @@ export default function calculateSubscriptionCost(customerInfo) {
   const selectedPostalCode = PostalCodes.findOne({ title: customerInfo.address.postalCode.substring(0, 3).toUpperCase() });
 
   // console.log(selectedPostalCode);
+  console.log('Before calculating extra surcharge postal code');
 
   if (selectedPostalCode.hasOwnProperty('extraSurcharge')) {
     surchargePerDelivery = selectedPostalCode.extraSurcharge;
@@ -1161,6 +1162,7 @@ export default function calculateSubscriptionCost(customerInfo) {
 
   let taxExempt = false;
   let actualTotal = primaryCustomer.groupTotal;
+  console.log('Before calculating taxexempt');
 
   if (sub.hasOwnProperty('taxExempt')) {
     if (sub.taxExempt) {
@@ -1169,11 +1171,15 @@ export default function calculateSubscriptionCost(customerInfo) {
     }
   }
 
+  console.log('after calculating taxexempt');
+
   const lineItems = createSubscriptionLineItems(primaryCustomer,
-    secondaryCustomers,
-    customerInfo.secondaryProfiles.length,
-    taxExempt,
-    customerInfo.delivery);
+  secondaryCustomers,
+  customerInfo.secondaryProfiles.length,
+  taxExempt,
+  customerInfo.delivery);
+
+  console.log(lineItems);
 
   return {
     primaryProfileBilling: primaryCustomer,

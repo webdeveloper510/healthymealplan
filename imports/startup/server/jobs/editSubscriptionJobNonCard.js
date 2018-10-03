@@ -124,18 +124,48 @@ const worker = Job.processJobs(
       return e;
     });
 
+    // Subscriptions.update({
+    //   _id: data.subscriptionId,
+    // }, {
+    //   $set: {
+    //     completeSchedule: data.completeSchedule,
+    //     delivery: newDeliveryType,
+    //     amount: billing.actualTotal,
+    //     subscriptionItems: billing.lineItems,
+    //   },
+    // });
+
+    // console.log('Inside editSubscriptionJob: Updated subscription on Vittle');
+
+    const keysToUnset = {};
+    const keysToSet = {
+      completeSchedule: data.completeSchedule,
+      delivery: newDeliveryType,
+      amount: billing.actualTotal,
+      subscriptionItems: billing.lineItems,
+    };
+
+    if (data.hasOwnProperty('discountCodeRemove')) {
+      if (data.discountCodeRemove) {
+        console.log("Going in discountCodeRemove inner if statement");
+        keysToUnset.discountApplied = 1;
+      }
+    }
+
+    if (data.hasOwnProperty('discountCode') && !keysToUnset.hasOwnProperty('discountApplied')) {
+      console.log("Going in discountCode inner KEY SET statement");
+
+      keysToSet.discountApplied = Discounts.findOne({ $or: [{ title: data.discountCode }, { _id: data.discountCode }] })._id;
+    }
+
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-      $set: {
-        completeSchedule: data.completeSchedule,
-        delivery: newDeliveryType,
-        amount: billing.actualTotal,
-        subscriptionItems: billing.lineItems,
-      },
-    });
+        $set: keysToSet,
+        $unset: keysToUnset,
+      });
 
-    console.log('Inside editSubscriptionJob: Updated subscription on Vittle');
+    console.log('Inside editSubscriptionJobNonCard: Updated subscription on Vittle');
 
 
     job.done(); // when done successfully
