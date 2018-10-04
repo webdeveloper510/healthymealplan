@@ -1,0 +1,11 @@
+Hi {{firstName}},
+
+I saw that you were about to order a meal plan with Vittle and that you didn’t get a chance to finish your order. 
+I just wanted to see if there were any problems, or anything at all I could help with. If so, please let me know by responding to this email.
+
+Thanks again for visiting Vittle.
+
+Bon appétit!
+
+Omar
+Founder, Vittle

@@ -1260,21 +1260,35 @@ class DiscountEditor extends React.Component {
                               onChange={this.handleChange.bind(this, 'checkbox/value', 'usageLimitType')}
                               label="Limit number of times this discount can be used in total"
                             />
+
                             <FormControlLabel
                               className="radiobuttonlabel"
                               value="oneUsePerCustomer"
-                              disabled
+                              onChange={this.handleChange.bind(this, 'checkbox/value', 'usageLimitType')}
                               control={
                                 <Checkbox
-                                  disabled
                                   checked={
-                                    this.state.usageLimitType ===
-                                    'oneUsePerCustomer'
+                                    this.state.usageLimitType === 'oneUsePerCustomer'
                                   }
                                 />
                               }
                               label="Limit to one use per customer"
                             />
+
+                            <FormControlLabel
+                              className="radiobuttonlabel"
+                              value="firstOrderOnly"
+                              onChange={this.handleChange.bind(this, 'checkbox/value', 'usageLimitType')}
+                              control={
+                                <Checkbox
+                                  checked={
+                                    this.state.usageLimitType === 'firstOrderOnly'
+                                  }
+                                />
+                              }
+                              label="Limit to first order only"
+                            />
+
                           </FormControl>
                         </Grid>
 

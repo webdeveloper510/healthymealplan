@@ -19,6 +19,8 @@ import './jobs/editSubscriptionJobNonCard';
 import './jobs/enableDiscountJob';
 import './jobs/disableDiscountJob';
 
+import './jobs/sendFirstRecoveryEmailJob';
+
 import '../../modules/server/authorize/webhooks/';
 
 S3 = {};
