@@ -64,6 +64,10 @@ import Discounts from '../../pages/Discounts/Discounts';
 import NewDiscount from '../../pages/NewDiscount/NewDiscount';
 import EditDiscount from '../../pages/EditDiscount/EditDiscount';
 
+import GiftCards from '../../pages/GiftCards/GiftCards';
+import NewGiftCard from '../../pages/NewGiftCard/NewGiftCard';
+import EditGiftCard from '../../pages/EditGiftCard/EditGiftCard';
+
 import Restrictions from '../../pages/Restrictions/Restrictions';
 import NewRestriction from '../../pages/NewRestriction/NewRestriction';
 import EditRestriction from '../../pages/EditRestriction/EditRestriction';
@@ -619,6 +623,30 @@ class App extends React.Component {
                       {...this.props}
                     />
 
+                    <Authenticated
+                      exact
+                      path="/gift-cards"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={GiftCards}
+                      {...this.props}
+                    />
+
+
+                    <Authenticated
+                      exact
+                      path="/gift-cards/new"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={NewGiftCard}
+                      {...this.props}
+                    />
+
+                    <Authenticated
+                      exact
+                      path="/gift-cards/:_id/edit"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={EditGiftCard}
+                      {...this.props}
+                    />
 
                     <Authenticated
                       exact

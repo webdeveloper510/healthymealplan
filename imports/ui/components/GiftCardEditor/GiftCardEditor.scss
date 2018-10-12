@@ -1,0 +1,38 @@
+.table-lifestyles{
+  table-layout: fixed !important;
+
+  tr td,
+  tr th{
+    border: 0 !important;
+    padding: 0 5px !important
+  }
+
+  tbody tr td:first-child{
+    text-transform: uppercase;
+
+    h3{
+      font-weight: bold;      
+      color: rgba(0,0,0,0.54) !important;
+    }
+  }
+}
+
+
+/* 
+
+  prices: {
+    
+    breakfast: [0,1,2,3,4,5,6,7],
+    lunch: [0,1,2,3,4,5,6,7],
+    dinner: [0,1,2,3,4,5,6,7]
+
+  }
+
+
+  prices: {
+    
+  }
+
+
+
+*/

@@ -10,6 +10,9 @@ import '../../api/Documents/server/publications';
 import '../../api/Discounts/methods';
 import '../../api/Discounts/server/publications';
 
+import '../../api/GiftCards/methods';
+import '../../api/GiftCards/server/publications';
+
 import '../../api/Ingredients/methods';
 import '../../api/Ingredients/server/publications';
 

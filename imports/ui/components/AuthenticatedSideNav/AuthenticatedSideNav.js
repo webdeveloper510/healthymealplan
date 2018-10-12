@@ -21,6 +21,7 @@ import LifestylesIcon from 'material-ui-icons/FitnessCenter';
 import PlatingIcon from 'material-ui-icons/RoomService';
 import SubscriptionsIcon from 'material-ui-icons/CreditCard';
 import DiscountsIcon from 'material-ui-icons/LocalOffer';
+import GiftCardIcon from 'material-ui-icons/CardGiftCard';
 
 import RestrictionsIcon from 'material-ui-icons/DoNotDisturbAlt';
 import PlatesIcon from 'material-ui-icons/LocalPizza';
@@ -182,6 +183,16 @@ class AuthenticatedSideNav extends Component {
                 <ListItemText className="subheading" primary="Discounts" />
               </ListItem>
             </NavLink>
+
+            <NavLink onClick={this.props.handleDrawerToggle} to="/gift-cards">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <GiftCardIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Gift Cards" />
+              </ListItem>
+            </NavLink>
+
           </Collapse>
 
           <NavLink onClick={this.props.handleDrawerToggle} to="/customers">
