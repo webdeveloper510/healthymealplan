@@ -30,7 +30,7 @@ import autoBind from 'react-autobind';
 const tableConfig = new ReactiveVar({
   pageProperties: {
     currentPage: 1,
-    pageSize: 30,
+    pageSize: 50,
     recordCount: 0,
     maxPages: 1,
   },

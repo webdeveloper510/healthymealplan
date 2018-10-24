@@ -12,77 +12,53 @@ import rateLimit from '../../modules/rate-limit';
 import moment from 'moment';
 
 Meteor.methods({
-  'giftcards.insert': function giftCardsInsert(discount) {
-    check(discount, {
-      title: String,
-      discountType: String,
-      discountValue: Number,
+  'giftcards.insert': function giftCardsInsert(giftCard) {
+    // onst giftCard = {
+    //   code: this.state.code.trim(),
+    //   codeType: this.state.codeType,
+    //   initialAmountPreset: this.state.initialAmountPreset,
 
-      appliesToType: String,
-      appliesToValue: String,
-      appliesToRestrictionsAndExtras: Boolean,
+    //   customerType: this.state.customerType,
+    //   customer: this.state.customerType == 'specific' ? customerClone.map((e) => {
+    //     const foundCustomer = this.props.customers.find(el => el._id === e);
+    //     return foundCustomer._id;
+    //   }) : this.state.customer,
 
-      appliesToExistingDiscounts: Boolean,
+    //   status: 'active',
+    check(giftCard, {
+      code: String,
+      codeType: String,
+      initialAmountPreset: Match.OneOf(String, Number),
+      initialAmount: Match.OneOf(String, Number),
 
-      usageLimitType: Match.Maybe(String),
-      usageLimitValue: Match.Maybe(Number),
-
-      minimumRequirementType: String,
-      minimumRequirementValue: Match.OneOf(String, Number),
-
-      customerEligibilityType: String,
-      customerEligibilityValue: Match.OneOf(String, Array),
+      customerType: String,
+      customer: String,
 
       status: String,
-
-      startDate: Date,
-      endDate: Match.Maybe(Date),
+      note: Match.Optional(String),
     });
 
-    console.log(discount);
+    console.log(giftCard);
 
-    const existsCategory = GiftCards.findOne({ title: discount.title });
+    const existsCategory = GiftCards.findOne({ code: giftCard.code });
 
     if (existsCategory) {
-      throw new Meteor.Error('500', `${discount.title} is already present`);
+      throw new Meteor.Error('500', `${giftCard.code} is already present`);
     }
 
-    const insertedId = Random.id();
+    const currentBalance = parseFloat(giftCard.initialAmount);
 
-    const discountToInsert = {
+    const toInsert = {
+      ...giftCard,
+      balance: currentBalance,
+      isDepleted: false,
+      purchased: false,
     };
 
-    if (discount.endDate) {
-      discountToInsert.endDate = discount.endDate;
-    }
-
     try {
-      const inserted = GiftCards.insert({ ...discountToInsert });
+      const inserted = GiftCards.insert(toInsert);
 
-      if (moment(discount.startDate).isAfter(moment(), 'day')) {
-        const job = new Job(
-          Jobs, 'enableDiscountJob', // type of job
-          { _id: insertedId },
-        );
-
-        job.priority('normal').after(moment(discount.startDate).set({ hours: 0, minutes: 0, seconds: 0, milliseconds: 0 }).toDate()).save(); // Commit it to the server
-      }
-
-
-      if (discount.endDate && moment(discount.endDate).isSameOrAfter(moment(), 'day')) {
-        const job = new Job(
-          Jobs,
-          'disableDiscountJob', // type of job
-          {
-            _id: insertedId,
-          },
-        );
-
-        job.priority('normal').after(moment(discount.endDate).set({ hours: 0, minutes: 0, seconds: 0, milliseconds: 0 }).toDate()).save(); // Commit it to the server
-      }
-
-
-      return insertedId;
+      return inserted;
     } catch (exception) {
       console.log(exception);
       throw new Meteor.Error('500', exception);
@@ -212,11 +188,7 @@ Meteor.methods({
   'giftcards.enable': function giftCardsEnable(giftCardId) {
     check(giftCardId, String);
 
-    const discount = GiftCards.findOne({ _id: giftCardId });
-
-    const updated = GiftCards.update({ _id: giftCardId }, { $set: { status: 'active' }, $unset: { endDate: '' } });
-
-    console.log(updated);
+    const updated = GiftCards.update({ _id: giftCardId }, { $set: { status: 'active' } });
 
     return updated;
   },

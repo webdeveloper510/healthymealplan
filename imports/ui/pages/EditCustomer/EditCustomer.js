@@ -15,19 +15,19 @@ import Ingredients from '../../../api/Ingredients/Ingredients';
 import PostalCodes from '../../../api/PostalCodes/PostalCodes';
 import Discounts from '../../../api/Discounts/Discounts';
 
-const EditCustomer = ({ 
-  customer, 
-  history, 
+const EditCustomer = ({
+  customer,
+  history,
   subscription,
   secondaryAccounts,
   popTheSnackbar,
   postalCodes,
-  lifestyles, 
+  lifestyles,
   restrictions,
   potentialSubIngredients,
   loading,
-  discounts 
-}) => (loading ? <Loading /> : !loading && lifestyles && customer ? (
+  discounts
+}) => (loading ? <Loading /> : customer ? (
   <div className="EditCurrentCustomer">
     <Grid container className="EditCategory SideContent SideContent--spacer-2x--horizontal">
       <CurrentCustomerEditor
