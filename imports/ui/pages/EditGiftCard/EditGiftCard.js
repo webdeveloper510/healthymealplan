@@ -9,10 +9,11 @@ import Grid from 'material-ui/Grid';
 import GiftCards from '../../../api/GiftCards/GiftCards';
 
 import GiftCardEditor from '../../components/GiftCardEditor/GiftCardEditor';
+import Loading from '../../components/Loading/Loading';
 
 import NotFound from '../NotFound/NotFound';
 
-const EditGiftCard = ({ discount, history, popTheSnackbar, newGiftCard, customers, loading }) => (giftCard ? (
+const EditGiftCard = ({ history, popTheSnackbar, customers, loading, giftCard }) => (loading ? <Loading /> : giftCard ? (
   <div>
     <Grid container className="EditGiftCard SideContent SideContent--spacer-2x--horizontal">
       <GiftCardEditor
@@ -20,23 +21,18 @@ const EditGiftCard = ({ discount, history, popTheSnackbar, newGiftCard, customer
         popTheSnackbar={popTheSnackbar}
         customers={customers}
         history={history}
-        newGiftCard={newGiftCard}
+        newGiftCard={false}
         loading={loading}
       />
     </Grid>
   </div>
 ) : <NotFound />);
 
-EditGiftCard.defaultProps = {
-  giftCard: null,
-  newGiftCard: false,
-};
-
 EditGiftCard.propTypes = {
   giftCard: PropTypes.object,
   history: PropTypes.object.isRequired,
-  newGiftCard: PropTypes.bool.isRequired,
   customers: PropTypes.array.isRequried,
+  loading: PropTypes.bool.isRequired,
 };
 
 export default withTracker(({ match }) => {
@@ -45,7 +41,6 @@ export default withTracker(({ match }) => {
   const subscription1 = Meteor.subscribe('users.customers.primary');
 
   return {
-    newGiftCard: false,
     loading: !subscription.ready() && !subscription1.ready(),
     giftCard: GiftCards.findOne(giftCardId),
     customers: Meteor.users.find({ roles: ['customer'] }).fetch(),

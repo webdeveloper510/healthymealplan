@@ -118,34 +118,34 @@ class DiscountEditor extends React.Component {
       suggestionsTypes: [],
 
 
-      discountCode: !this.props.newDiscount && !this.props.loading ? this.props.discount.title : '',
+      discountCode: !this.props.loading && this.props.discount ? this.props.discount.title : '',
 
-      discountType: !this.props.newDiscount && !this.props.loading ? this.props.discount.discountType : 'Percentage',
-      discountValue: !this.props.newDiscount && !this.props.loading ? this.props.discount.discountValue : '',
+      discountType: !this.props.loading && this.props.discount ? this.props.discount.discountType : 'Percentage',
+      discountValue: !this.props.loading && this.props.discount ? this.props.discount.discountValue : '',
 
 
-      appliesToType: !this.props.newDiscount && !this.props.loading ? this.props.discount.appliesToType : 'whole',
-      appliesToValue: !this.props.newDiscount && !this.props.loading ? this.props.discount.appliesToValue : 'whole',
+      appliesToType: !this.props.loading && this.props.discount ? this.props.discount.appliesToType : 'whole',
+      appliesToValue: !this.props.loading && this.props.discount ? this.props.discount.appliesToValue : 'whole',
 
-      appliesToRestrictionsAndExtras: !this.props.newDiscount && !this.props.loading ? this.props.discount.appliesToRestrictionsAndExtras : false,
-      appliesToExistingDiscounts: !this.props.newDiscount && !this.props.loading ? this.props.discount.appliesToExistingDiscounts : false,
+      appliesToRestrictionsAndExtras: !this.props.loading && this.props.discount ? this.props.discount.appliesToRestrictionsAndExtras : false,
+      appliesToExistingDiscounts: !this.props.loading && this.props.discount ? this.props.discount.appliesToExistingDiscounts : false,
 
-      minimumRequirementType: !this.props.newDiscount && !this.props.loading ? this.props.discount.minimumRequirementType : 'none',
-      minimumRequirementValue: !this.props.newDiscount && !this.props.loading ? this.props.discount.minimumRequirementValue : '',
+      minimumRequirementType: !this.props.loading && this.props.discount ? this.props.discount.minimumRequirementType : 'none',
+      minimumRequirementValue: !this.props.loading && this.props.discount ? this.props.discount.minimumRequirementValue : '',
 
-      customerEligibilityType: !this.props.newDiscount && !this.props.loading ? this.props.discount.customerEligibilityType : 'everyone',
-      customerEligibilityValue: !this.props.newDiscount && !this.props.loading ? this.props.discount.customerEligibilityValue : '',
+      customerEligibilityType: !this.props.loading && this.props.discount ? this.props.discount.customerEligibilityType : 'everyone',
+      customerEligibilityValue: !this.props.loading && this.props.discount ? this.props.discount.customerEligibilityValue : '',
 
-      usageLimitType: !this.props.newDiscount && !this.props.loading ? this.props.discount.usageLimitType : '',
-      usageLimitValue: !this.props.newDiscount && !this.props.loading ? this.props.discount.usageLimitValue : '',
+      usageLimitType: !this.props.loading && this.props.discount ? this.props.discount.usageLimitType : '',
+      usageLimitValue: !this.props.loading && this.props.discount ? this.props.discount.usageLimitValue : '',
 
-      startDateValue: !this.props.newDiscount && !this.props.loading ? moment(this.props.discount.startDate).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
-      endDate: !this.props.newDiscount && !this.props.loading ? this.props.discount.hasOwnProperty('endDate') : false,
-      endDateValue: !this.props.newDiscount && !this.props.loading ? moment(this.props.discount.endDate).format('YYYY-MM-DD') : '',
+      startDateValue: !this.props.loading && this.props.discount ? moment(this.props.discount.startDate).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
+      endDate: !this.props.loading && this.props.discount ? this.props.discount.hasOwnProperty('endDate') : false,
+      endDateValue: !this.props.loading && this.props.discount ? moment(this.props.discount.endDate).format('YYYY-MM-DD') : '',
 
-      status: !this.props.newDiscount && !this.props.loading ? this.props.discount.status : '',
+      status: !this.props.loading && this.props.discount ? this.props.discount.status : '',
 
-      currentCustomers: this.props.customers && !this.props.newDiscount && !this.props.loading && this.props.discount.customerEligibilityType == 'specific' ?
+      currentCustomers: this.props.customers && !this.props.loading && this.props.discount && this.props.discount.customerEligibilityType == 'specific' ?
         _.filter(this.props.customers, (u) => this.props.discount.customerEligibilityValue.find(e => e == u._id) != undefined) : [],
 
       deleteDialogOpen: false,
@@ -393,6 +393,8 @@ class DiscountEditor extends React.Component {
     if (this.state.usageLimitType == 'numberOfTimes') {
       discount.usageLimitType = this.state.usageLimitType;
       discount.usageLimitValue = parseInt(this.state.usageLimitValue, 10);
+    } else if (this.state.usageLimitType){
+      discount.usageLimitType = this.state.usageLimitType;
     }
 
     if (!this.state.endDate) {
@@ -1455,12 +1457,7 @@ class DiscountEditor extends React.Component {
   }
 }
 
-DiscountEditor.defaultProps = {
-  category: { title: '' },
-};
-
 DiscountEditor.propTypes = {
-  category: PropTypes.object,
   customers: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,

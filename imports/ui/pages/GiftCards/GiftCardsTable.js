@@ -172,8 +172,12 @@ class GiftCardsTable extends React.Component {
                   <TableCell padding="checkbox" style={{ width: '7%' }}>
                     <Checkbox onChange={this.selectAllRows.bind(this)} />
                   </TableCell>
-                  <TableCell padding="none" style={{ width: '42%' }} onClick={() => this.props.sortByOptions('title')}>
+                  <TableCell padding="none" style={{ width: '30%' }} onClick={() => this.props.sortByOptions('title')}>
                     <Typography className="body2" type="body2">Code</Typography>
+                  </TableCell>
+
+                  <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Type</Typography>
                   </TableCell>
 
                   <TableCell padding="none" style={{ width: '17%' }}>
@@ -181,12 +185,12 @@ class GiftCardsTable extends React.Component {
                   </TableCell>
 
                   <TableCell padding="none" style={{ width: '17%' }}>
-                    <Typography className="body2" type="body2">Start</Typography>
+                    <Typography className="body2" type="body2">Initial amount</Typography>
                   </TableCell>
 
 
                   <TableCell padding="none" style={{ width: '17%' }}>
-                    <Typography className="body2" type="body2">End</Typography>
+                    <Typography className="body2" type="body2">Balance</Typography>
                   </TableCell>
 
                 </TableRow>
@@ -210,28 +214,27 @@ class GiftCardsTable extends React.Component {
                     </TableCell>
 
                     <TableCell
-                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '42%' }}
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '30%' }}
+                      padding="none"
+                      onClick={() => this.props.history.push(`/gift-cards/${e._id}/edit`)}
+                    >
+
+                      <Typography type="subheading" className="subheading">
+                        {e.code}
+                      </Typography>
+
+                    </TableCell>
+
+                    <TableCell
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }}
                       padding="none"
                       onClick={() => this.props.history.push(`/gift-cards/${e._id}/edit`)}
                     >
 
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                        {e.title}
-                      </Typography>
-                      <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                        {this.renderDiscountValue(e)} off {e.appliesToType == 'whole' ? 'whole order' : e.appliesToType == 'lifestyle' && e.appliesToValue == 'All' ? `${e.appliesToValue} lifestyles` : e.appliesToType == 'lifestyle' ? e.appliesToValue : ''}
+                        {e.codeType}
                       </Typography>
 
-                      {e.appliesToRestrictionsAndExtras ? (
-                        <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          Applies to restrictions and extras
-                        </Typography>) : ''}
-
-
-                      {e.minimumRequirementType != 'none' ? (
-                        <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          Minimum {e.minimumRequirementType == 'purchaseAmount' ? `amount of $${e.minimumRequirementValue}` : e.minimumRequirementType == 'minQuantity' ? `quantity of ${e.minimumRequirementValue}` : ''}
-                        </Typography>) : ''}
                     </TableCell>
 
 
@@ -241,9 +244,12 @@ class GiftCardsTable extends React.Component {
                       onClick={() => this.props.history.push(`/gift-cards/${e._id}/edit`)}
                     >
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                        <Chip label={e.status} className={e.status == 'active' ? 'status status--delivered' :
-                          e.status == 'scheduled' ? 'status status--in-transit' :
-                            e.status == "expired" ? 'status status--not-delivered' : ''} />
+                        <Chip
+                          label={e.status}
+                          className={e.status == 'active' ? 'status status--delivered' :
+                            e.status == 'scheduled' ? 'status status--in-transit' :
+                              e.status == 'depleted' ? 'status status--not-delivered' : ''}
+                        />
                       </Typography>
                     </TableCell>
 
@@ -254,7 +260,7 @@ class GiftCardsTable extends React.Component {
                       onClick={() => this.props.history.push(`/gift-cards/${e._id}/edit`)}
                     >
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                        {moment(e.startDate).format('YYYY-MM-DD')}
+                        ${e.initialAmount}
                       </Typography>
                     </TableCell>
 
@@ -264,7 +270,7 @@ class GiftCardsTable extends React.Component {
                       onClick={() => this.props.history.push(`/gift-cards/${e._id}/edit`)}
                     >
                       <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                        {e.endDate ? moment(e.endDate).format('YYYY-MM-DD') : '-'}
+                        ${e.balance}
                       </Typography>
                     </TableCell>
 

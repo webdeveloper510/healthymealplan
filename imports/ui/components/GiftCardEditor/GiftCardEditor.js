@@ -66,10 +66,10 @@ import validate from '../../../modules/validate';
 
 import moment from 'moment';
 
+import './GiftCardEditor.scss';
+
 // const primary = teal[500];
 const danger = red[700];
-
-import './GiftCardEditor.scss';
 
 
 const styles = theme => ({
@@ -117,30 +117,21 @@ class GiftCardEditor extends React.Component {
       valueTypes: '',
       suggestionsTypes: [],
 
+      code: !this.props.newGiftCard && !this.props.loading && this.props.giftCard ? this.props.giftCard.code : '',
+      codeType: !this.props.newGiftCard && !this.props.loading && this.props.giftCard ? this.props.giftCard.codeType : 'digital',
 
-      discountCode: !this.props.newGiftCard && !this.props.loading && this.props.discount ? this.props.giftCard.title : '',
+      initialAmountPreset: !this.props.newGiftCard && !this.props.loading && this.props.giftCard ? this.props.giftCard.initialAmountPreset : '20',
+      initialAmount: !this.props.newGiftCard && !this.props.loading && this.props.giftCard ? this.props.giftCard.initialAmount : '',
 
-      discountType: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.discountType : 'Percentage',
-      discountValue: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.discountValue : '',
+      note: !this.props.newGiftCard && !this.props.loading && this.props.giftCard.hasOwnProperty('note') ? this.props.giftCard.note : '',
 
+      customerType: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.customerType : 'email',
+      customer: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.customer : '',
 
-      appliesToType: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.appliesToType : 'whole',
-      appliesToValue: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.appliesToValue : 'whole',
+      status: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.status : 'active',
 
-      customerEligibilityType: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.customerEligibilityType : 'everyone',
-      customerEligibilityValue: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.customerEligibilityValue : '',
-
-      // usageLimitType: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.usageLimitType : '',
-      // usageLimitValue: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.usageLimitValue : '',
-
-      // startDateValue: !this.props.newGiftCard && !this.props.loading ? moment(this.props.giftCard.startDate).format('YYYY-MM-DD') : moment().format('YYYY-MM-DD'),
-      // endDate: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.hasOwnProperty('endDate') : false,
-      // endDateValue: !this.props.newGiftCard && !this.props.loading ? moment(this.props.giftCard.endDate).format('YYYY-MM-DD') : '',
-
-      status: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.status : '',
-
-      currentCustomers: this.props.customers && !this.props.newGiftCard && !this.props.loading && this.props.giftCard.customerEligibilityType == 'specific' ?
-        _.filter(this.props.customers, (u) => this.props.giftCard.customerEligibilityValue.find(e => e == u._id) != undefined) : [],
+      currentCustomers: this.props.customers && !this.props.newGiftCard && !this.props.loading && this.props.giftCard.customerType == 'specific' ?
+        _.filter(this.props.customers, u => this.props.giftCard.customer.find(e => e == u._id) != undefined) : [],
 
       deleteDialogOpen: false,
       hasFormChanged: false,
@@ -168,7 +159,7 @@ class GiftCardEditor extends React.Component {
         },
         purchaseAmount: {
           required: true,
-        }
+        },
       },
       messages: {
         title: {
@@ -200,8 +191,8 @@ class GiftCardEditor extends React.Component {
     event,
     { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
-    const clonedRestrictions = this.state.customerEligibilityValue
-      ? this.state.customerEligibilityValue.slice()
+    const clonedRestrictions = this.state.customer
+      ? this.state.customer.slice()
       : [];
 
     let isThere = false;
@@ -220,7 +211,7 @@ class GiftCardEditor extends React.Component {
 
     this.setState({
       hasFormChanged: true,
-      customerEligibilityValue: clonedRestrictions,
+      customer: clonedRestrictions,
     });
   }
 
@@ -258,18 +249,18 @@ class GiftCardEditor extends React.Component {
     return suggestion.profile.name.first;
   }
 
-  handleRemoveActual() {
-    const { popTheSnackbar, history, discount } = this.props;
+  handleDisable() {
+    const { popTheSnackbar, history, giftCard } = this.props;
 
-    const existingLifestyle = discount && discount._id;
-    localStorage.setItem('discountDeleted', discount.title);
-    const discountDeletedMessage = `${localStorage.getItem(
-      'discountDeleted',
-    )} deleted from discounts.`;
+    const existingGiftCard = giftCard && giftCard._id;
+    localStorage.setItem('discountDeleted', giftCard.code);
+    const giftCardDeletedMessage = `${localStorage.getItem(
+      'giftCardDeleted',
+    )} deleted from gift cards.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('discounts.remove', existingLifestyle, (error) => {
+    Meteor.call('giftcards.disable', existingGiftCard, (error) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
@@ -336,78 +327,38 @@ class GiftCardEditor extends React.Component {
 
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
-    const existingDiscount = this.props.discount && this.props.giftCard._id;
-    const methodToCall = existingDiscount
-      ? 'discounts.update'
-      : 'discounts.insert';
+    const existingGiftCard = this.props.giftCard && this.props.giftCard._id;
+    const methodToCall = existingGiftCard
+      ? 'giftcards.update'
+      : 'giftcards.insert';
 
+    const giftCard = {
+      code: this.state.code.trim(),
+      codeType: this.state.codeType,
+      initialAmountPreset: this.state.initialAmountPreset,
 
+      customerType: this.state.customerType,
+      customer: this.state.customerType == 'specific' ? this.state.customer[0] : this.state.customer,
 
-    const customerEligibilityValueClone = this.state.customerEligibilityValue.slice();
-
-    if (this.state.customerEligibilityType == "specific") {
-      const everyonePresent = customerEligibilityValueClone.findIndex(el => el == "everyone");
-
-      if (everyonePresent != -1) {
-        customerEligibilityValueClone.splice(everyonePresent, 1);
-      }
-    }
-
-    const discount = {
-      title: this.state.discountCode.trim(),
-
-      discountType: this.state.discountType,
-      discountValue: parseFloat(this.state.discountValue),
-
-      appliesToType: this.state.appliesToType,
-      appliesToValue: this.state.appliesToType == 'whole' ? 'whole' : this.state.appliesToValue,
-
-      customerEligibilityType: this.state.customerEligibilityType,
-      customerEligibilityValue: this.state.customerEligibilityType == 'specific' ? customerEligibilityValueClone.map((e) => {
-        const foundCustomer = this.props.customers.find(el => el._id == e);
-
-        return foundCustomer._id;
-
-      }) : 'everyone',
-
-      status: moment(this.state.startDateValue).isSameOrBefore(moment(), 'day') ? 'active' :
-        moment(this.state.startDateValue).isAfter(moment(), 'day') ? 'scheduled' :
-          this.props.giftCard.status,
-
-      startDate: moment(this.state.startDateValue).toDate(),
-      endDate: this.state.endDate ? moment(this.state.endDateValue).toDate() : '',
+      note: this.state.note,
+      status: 'active',
     };
 
-    if (this.state.usageLimitType == 'numberOfTimes') {
-      discount.usageLimitType = this.state.usageLimitType;
-      discount.usageLimitValue = parseInt(this.state.usageLimitValue, 10);
+    if (this.state.initialAmountPreset == 'custom') {
+      giftCard.initialAmount = parseFloat(this.state.initialAmount);
+    } else {
+      console.log(this.state.initialAmountPreset);
+      // console.log(this.state.initialAmountPreset.toFixed(2))
+      giftCard.initialAmount = parseFloat(this.state.initialAmountPreset);
     }
 
-    if (!this.state.endDate) {
-      delete discount.endDate;
-    }
-
-    if (existingDiscount) {
-      discount._id = existingDiscount;
-
-
-      if (this.state.usageLimitType == '') {
-        delete discount.usageLimitType;
-        delete discount.usageLimitValue;
-      }
-
-      // delete properties here
-    }
-
-    console.log(discount);
-
-    // return;
+    console.log(giftCard);
 
     this.setState({
       submitLoading: true,
     });
 
-    Meteor.call(methodToCall, discount, (error, discountId) => {
+    Meteor.call(methodToCall, giftCard, (error, giftCardId) => {
       console.log('Inside Method');
 
       if (error) {
@@ -424,19 +375,20 @@ class GiftCardEditor extends React.Component {
           submitSuccess: true,
           submitLoading: false,
         });
+
         localStorage.setItem(
-          'discountForSnackbar',
-          discount.title || $('[name="title"]').val(),
+          'giftCardInserted',
+          giftCard.code || $('[name="code"]').val(),
         );
 
-        const confirmation = existingDiscount
-          ? `${localStorage.getItem('discountForSnackbar')} discount updated.`
-          : `${localStorage.getItem('discountForSnackbar')} discount added.`;
+        const confirmation = existingGiftCard
+          ? `${localStorage.getItem('giftCardInserted')} discount updated.`
+          : `${localStorage.getItem('giftCardInserted')} discount added.`;
 
         popTheSnackbar({
           message: confirmation,
           buttonText: 'View',
-          buttonLink: `/gift-cards/${discountId}/edit`,
+          buttonLink: `/gift-cards/${giftCardId}/edit`,
         });
 
         history.push('/gift-cards');
@@ -460,14 +412,12 @@ class GiftCardEditor extends React.Component {
           type="title"
         >
           Delete{' '}
-          {this.props.discount ? this.props.giftCard.title.toLowerCase() : ''}?
+          {this.props.giftCard ? this.props.giftCard.code : ''}?
         </Typography>
         <DialogContent>
           <DialogContentText className="subheading">
-            Are you sure you want to delete{' '}
-            {this.props.discount
-              ? this.props.giftCard.title.toLowerCase()
-              : ''}?
+            Are you sure you want to disable{' '}
+            {this.props.giftCard ? this.props.giftCard.code : ''}?
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -480,10 +430,10 @@ class GiftCardEditor extends React.Component {
           <Button
             stroked
             className="button--bordered button--bordered--accent"
-            onClick={this.handleRemoveActual.bind(this)}
+            onClick={this.handleDisable.bind(this)}
             color="accent"
           >
-            Delete
+            Disable
           </Button>
         </DialogActions>
       </Dialog>
@@ -527,7 +477,7 @@ class GiftCardEditor extends React.Component {
   }
 
   handleRestrictionChipDelete(type) {
-    console.log(type)
+    console.log(type);
     const stateCopy = this.state.customerEligibilityValue.slice();
 
     stateCopy.splice(stateCopy.indexOf(type._id), 1);
@@ -544,9 +494,9 @@ class GiftCardEditor extends React.Component {
     return customer.profile.name.first.charAt(0);
   }
 
-  generateDiscountCode() {
+  generateGiftCode() {
     this.setState({
-      discountCode: Random.id().toUpperCase().substring(0, 9),
+      code: Random.id(16).toLowerCase(),
       hasFormChanged: true,
     });
   }
@@ -558,163 +508,318 @@ class GiftCardEditor extends React.Component {
   }
 
   enableDiscount() {
-    console.log(this.props.giftCard._id);
-
     Meteor.call('discounts.enable', this.props.giftCard._id);
   }
 
   disableDiscount() {
-    console.log(this.props.giftCard._id);
-
     Meteor.call('discounts.disable', this.props.giftCard._id);
   }
 
   render() {
     // console.log(this.props);
-    const { lifestyle, history } = this.props;
+    const { giftCard, history } = this.props;
 
     const buttonClassname = classNames({
       [this.props.classes.buttonSuccess]: this.state.submitSuccess,
     });
 
-    // if (this.props.loading == false) {
-    //   console.log(this.props.giftCard.customerEligibilityValue)
-    // }
+    return (
+      <form
+        style={{ width: '100%' }}
+        ref={form => (this.form = form)}
+        onSubmit={event => event.preventDefault()}
+      >
 
-
-    if (!this.props.loading) {
-      // console.log(this.props.customers.filter(e => this.props.giftCard.customerEligibilityValue.indexOf(e._id) != -1));
-
-      return (
-        <form
-          style={{ width: '100%' }}
-          ref={form => (this.form = form)}
-          onSubmit={event => event.preventDefault()}
-        >
-
-          <div style={{ maxWidth: '900px', margin: '0 auto' }}>
-            <Grid container justify="center">
-              <Grid item xs={12}>
-                <Button
-                  onClick={() => this.props.history.push('/gift-cards')}
-                  className="button button-secondary button-secondary--top"
-                >
-                  <Typography
-                    type="subheading"
-                    className="subheading font-medium"
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexDirection: 'row',
-                    }}
-                  >
-                    <ChevronLeft style={{ marginRight: '4px' }} /> Gift cards
-                  </Typography>
-                </Button>
-              </Grid>
-            </Grid>
-            <Grid container style={{ marginBottom: '50px' }}>
-              <Grid item xs={4}>
+        <div style={{ maxWidth: '900px', margin: '0 auto' }}>
+          <Grid container justify="center">
+            <Grid item xs={12}>
+              <Button
+                onClick={() => this.props.history.push('/gift-cards')}
+                className="button button-secondary button-secondary--top"
+              >
                 <Typography
-                  type="headline"
-                  className="headline"
-                  style={{ fontWeight: 500 }}
-                >
-                  {this.props.discount && this.props.giftCard._id
-                    ? `${this.props.giftCard.title}`
-                    : 'Create gift card'}
-                </Typography>
-                {this.props.discount && this.props.giftCard._id ? (
-                  <Button size="small" onClick={this.props.giftCard.status == 'expired' ? this.enableDiscount.bind(this) : this.disableDiscount.bind(this)}>{this.props.giftCard.status == 'expired' ? 'Enable' : 'Disable'}</Button>
-                ) : ''}
-
-              </Grid>
-              <Grid item xs={8}>
-                <div
+                  type="subheading"
+                  className="subheading font-medium"
                   style={{
                     display: 'flex',
                     alignItems: 'center',
-                    justifyContent: 'flex-end',
+                    flexDirection: 'row',
                   }}
                 >
-                  <Button
-                    style={{ marginRight: '10px' }}
-                    onClick={() => history.push('/gift-cards')}
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    disabled={!this.state.hasFormChanged || this.state.submitLoading}
-                    className={`btn btn-primary ${buttonClassname}`}
-                    raised
-                    type="submit"
-                    color="contrast"
-                  >
-                    Save
-                    {this.state.submitLoading && (
-                      <CircularProgress
-                        size={24}
-                        className={this.props.classes.buttonProgress}
-                      />
-                    )}
-                  </Button>
-                </div>
-              </Grid>
+                  <ChevronLeft style={{ marginRight: '4px' }} /> Gift cards
+                  </Typography>
+              </Button>
             </Grid>
+          </Grid>
+          <Grid container style={{ marginBottom: '50px' }}>
+            <Grid item xs={4}>
+              <Typography
+                type="headline"
+                className="headline"
+                style={{ fontWeight: 500 }}
+              >
+                {this.props.giftCard && this.props.giftCard._id
+                  ? `${this.props.giftCard.code}`
+                  : 'Create gift card'}
+              </Typography>
+              {this.props.giftCard && this.props.giftCard._id ? (
+                <Button size="small" onClick={this.props.giftCard.status == 'expired' ? this.enableDiscount.bind(this) : this.disableDiscount.bind(this)}>{this.props.giftCard.status == 'expired' ? 'Enable' : 'Disable'}</Button>
+              ) : ''}
 
-            <Grid container justify="center" style={{ marginBottom: '50px' }}>
-              <Grid item xs={12}>
-                <Grid container>
-                  <Grid item xs={12} sm={4}>
-                    <Typography
-                      type="subheading"
-                      className="subheading font-medium"
-                    >
-                      Code
+            </Grid>
+            <Grid item xs={8}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'flex-end',
+                }}
+              >
+                <Button
+                  style={{ marginRight: '10px' }}
+                  onClick={() => history.push('/gift-cards')}
+                >
+                  Cancel
+                  </Button>
+                <Button
+                  disabled={!this.state.hasFormChanged || this.state.submitLoading}
+                  className={`btn btn-primary ${buttonClassname}`}
+                  raised
+                  type="submit"
+                  color="contrast"
+                >
+                  Save
+                    {this.state.submitLoading && (
+                    <CircularProgress
+                      size={24}
+                      className={this.props.classes.buttonProgress}
+                    />
+                  )}
+                </Button>
+              </div>
+            </Grid>
+          </Grid>
+
+          <Grid container justify="center" style={{ marginBottom: '50px' }}>
+            <Grid item xs={12}>
+              <Grid container>
+                <Grid item xs={12} sm={4}>
+                  <Typography
+                    type="subheading"
+                    className="subheading font-medium"
+                  >
+                    Code
                     </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={8}>
-                    <Paper elevation={2} className="paper-for-fields">
-                      <Button size="small" style={{ float: 'right', marginBottom: '20px' }} onClick={this.generateDiscountCode.bind(this)}>Generate code</Button>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Paper elevation={2} className="paper-for-fields">
+                    <Button
+                      size="small"
+                      style={{ float: 'right', marginBottom: '20px' }}
+                      onClick={this.generateGiftCode.bind(this)}
+                    >
+                      Generate code
+                      </Button>
 
-                      <TextField
-                        id="title"
-                        label="Code"
-                        name="title"
-                        fullWidth
-                        value={this.state.discountCode}
-                        onChange={this.handleChange.bind(this, 'text', 'discountCode')}
-                      />
+                    <TextField
+                      id="title"
+                      label="Code"
+                      name="title"
+                      fullWidth
+                      value={this.state.code}
+                      onChange={this.handleChange.bind(this, 'text', 'code')}
+                      required
+                    />
 
-                    </Paper>
-                  </Grid>
+                  </Paper>
                 </Grid>
               </Grid>
             </Grid>
+          </Grid>
 
-            <Divider light className="divider--space-x" />
+          <Divider light className="divider--space-x" />
 
+          <Grid container justify="center" style={{ marginBottom: '50px' }}>
+            <Grid item xs={12}>
+              <Grid container>
+                <Grid item xs={12} sm={4}>
+                  <Typography
+                    type="subheading"
+                    className="subheading font-medium"
+                  >
+                    Type
+                    </Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Paper elevation={2} className="paper-for-fields">
 
-            <Grid container justify="center" style={{ marginBottom: '50px' }}>
-              <Grid item xs={12}>
-                <Grid container>
-                  <Grid item xs={12} sm={4}>
-                    <Typography
-                      type="subheading"
-                      className="subheading font-medium"
-                    >
-                      Intial amount
+                    <FormControl component="fieldset">
+                      <RadioGroup
+                        aria-label="Gift code type"
+                        name="codeType"
+                        value={this.state.codeType}
+                        onChange={this.handleChange.bind(
+                          this,
+                          'radio',
+                          'codeType',
+                        )}
+                        style={{ flexDirection: 'row' }}
+                      >
+                        <FormControlLabel
+                          className="radiobuttonlabel"
+                          value="physical"
+                          control={
+                            <Radio
+                              checked={
+                                this.state.codeType ===
+                                'physical'
+                              }
+                            />
+                          }
+                          label="Physical"
+                        />
+                        <FormControlLabel
+                          className="radiobuttonlabel"
+                          value="digital"
+                          control={
+                            <Radio
+                              checked={
+                                this.state.codeType ===
+                                'digital'
+                              }
+                            />
+                          }
+                          label="Digital"
+                        />
+
+                      </RadioGroup>
+                    </FormControl>
+
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Divider light className="divider--space-x" />
+
+          <Grid container justify="center" style={{ marginBottom: '50px' }}>
+            <Grid item xs={12}>
+              <Grid container>
+                <Grid item xs={12} sm={4}>
+                  <Typography
+                    type="subheading"
+                    className="subheading font-medium"
+                  >
+                    Intial amount
                     </Typography>
 
-                  </Grid>
-                  <Grid item xs={12} sm={8}>
-                    <Paper elevation={2} className="paper-for-fields">
-                      <Grid container>
-                        <Grid item xs={12} sm={12} md={12}>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Paper elevation={2} className="paper-for-fields">
+                    <Grid container>
+                      <Grid item xs={12} sm={12} md={12}>
+                        <FormControl component="fieldset">
+                          <RadioGroup
+                            aria-label="Intial amount preset"
+                            name="initialAmountPreset"
+                            value={this.state.initialAmountPreset}
+                            onChange={this.handleChange.bind(
+                              this,
+                              'radio',
+                              'initialAmountPreset',
+                            )}
+                            style={{ flexDirection: 'row' }}
+                          >
+                            <FormControlLabel
+                              className="radiobuttonlabel"
+                              value="20"
+                              control={
+                                <Radio
+                                  checked={
+                                    this.state.initialAmountPreset ===
+                                    '20'
+                                  }
+                                />
+                              }
+                              label="$20.00"
+                            />
+                            <FormControlLabel
+                              className="radiobuttonlabel"
+                              value="50"
+                              control={
+                                <Radio
+                                  checked={
+                                    this.state.initialAmountPreset ===
+                                    '50'
+                                  }
+                                />
+                              }
+                              label="$50.00"
+                            />
+                            <FormControlLabel
+                              className="radiobuttonlabel"
+                              value="100"
+                              control={
+                                <Radio
+                                  checked={
+                                    this.state.initialAmountPreset ===
+                                    '100'
+                                  }
+                                />
+                              }
+                              label="$100.00"
+                            />
 
-                        </Grid>
+                            <FormControlLabel
+                              className="radiobuttonlabel"
+                              value="200"
+                              control={
+                                <Radio
+                                  checked={
+                                    this.state.initialAmountPreset ===
+                                    '200'
+                                  }
+                                />
+                              }
+                              label="$200.00"
+                            />
 
-                        <Grid item xs={12} sm={12} md={12}>
+                            <FormControlLabel
+                              className="radiobuttonlabel"
+                              value="200"
+                              control={
+                                <Radio
+                                  checked={
+                                    this.state.initialAmountPreset ===
+                                    '300'
+                                  }
+                                />
+                              }
+                              label="$200.00"
+                            />
+
+                            <FormControlLabel
+                              className="radiobuttonlabel"
+                              value="custom"
+                              control={
+                                <Radio
+                                  checked={
+                                    this.state.initialAmountPreset ===
+                                    'custom'
+                                  }
+                                />
+                              }
+                              label="Custom"
+                            />
+
+
+                          </RadioGroup>
+                        </FormControl>
+                      </Grid>
+
+                      <Grid item xs={12} sm={12} md={12}>
+                        {this.state.initialAmountPreset == 'custom' && (
                           <TextField
                             fullWidth
                             value={this.state.initialAmount}
@@ -728,247 +833,280 @@ class GiftCardEditor extends React.Component {
                               startAdornment: <InputAdornment position={'start'}>$</InputAdornment>,
                             }}
                           />
-                        </Grid>
+                        )}
                       </Grid>
+                    </Grid>
 
-                    </Paper>
-                  </Grid>
+                  </Paper>
                 </Grid>
               </Grid>
             </Grid>
+          </Grid>
 
-            <Divider light className="divider--space-x" />
+          <Divider light className="divider--space-x" />
 
-            <Grid container justify="center" style={{ marginBottom: '50px' }}>
-              <Grid item xs={12}>
-                <Grid container>
-                  <Grid item xs={12} sm={4}>
-                    <Typography
-                      type="subheading"
-                      className="subheading font-medium"
-                    >
-                      Customer eligibility
+          <Grid container justify="center" style={{ marginBottom: '50px' }}>
+            <Grid item xs={12}>
+              <Grid container>
+                <Grid item xs={12} sm={4}>
+                  <Typography
+                    type="subheading"
+                    className="subheading font-medium"
+                  >
+                    Customer
                     </Typography>
 
-                  </Grid>
-                  <Grid item xs={12} sm={8}>
-                    <Paper elevation={2} className="paper-for-fields">
-                      <Grid container>
-                        <Grid item xs={12}>
-                          <FormControl component="fieldset">
-                            <RadioGroup
-                              aria-label="email"
-                              name="email"
-                              value={this.state.customerEligibilityType}
-                              onChange={this.handleChange.bind(
-                                this,
-                                'radio',
-                                'customerEligibilityType',
-                              )}
-                              style={{ flexDirection: 'row' }}
-                            >
-                              <FormControlLabel
-                                className="radiobuttonlabel"
-                                value="email"
-                                control={
-                                  <Radio
-                                    checked={
-                                      this.state.customerEligibilityType ===
-                                      'email'
-                                    }
-                                  />
-                                }
-                                label="Email"
-                              />
-                              <FormControlLabel
-                                className="radiobuttonlabel"
-                                value="specific"
-                                control={
-                                  <Radio
-                                    checked={
-                                      this.state.customerEligibilityType ===
-                                      'specific'
-                                    }
-                                  />
-                                }
-                                label="Existing Customer"
-                              />
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Paper elevation={2} className="paper-for-fields">
+                    <Grid container>
+                      <Grid item xs={12}>
+                        <FormControl component="fieldset">
+                          <RadioGroup
+                            aria-label="email"
+                            name="email"
+                            value={this.state.customerType}
+                            onChange={this.handleChange.bind(
+                              this,
+                              'radio',
+                              'customerType',
+                            )}
+                            style={{ flexDirection: 'row' }}
+                          >
+                            <FormControlLabel
+                              className="radiobuttonlabel"
+                              value="email"
+                              control={
+                                <Radio
+                                  checked={
+                                    this.state.customerType ===
+                                    'email'
+                                  }
+                                />
+                              }
+                              label="Email"
+                            />
+                            <FormControlLabel
+                              className="radiobuttonlabel"
+                              value="specific"
+                              control={
+                                <Radio
+                                  checked={
+                                    this.state.customerType ===
+                                    'specific'
+                                  }
+                                />
+                              }
+                              label="Existing Customer"
+                            />
 
 
-                            </RadioGroup>
-                          </FormControl>
-                        </Grid>
-
-                        
-                        {this.state.customerEligibilityType == 'email' && (
-                          <div style={{ width: '100%' }}>
-                            <Grid item xs={12}>
-                              <TextField 
-                                label="Email"
-                                fullWidth
-                                name="email"
-                                id="email"
-                                required
-                                type="email"
-                              />
-                            </Grid>
-                          </div>
-                        )}
-
-                        {this.state.customerEligibilityType == 'specific' && (
-                          <div style={{ width: '100%' }}>
-                            <Grid item xs={12} style={{ position: 'relative' }}>
-                              <Search
-                                className="autoinput-icon"
-                                style={{ right: '0 !important' }}
-                              />
-                              <Autosuggest
-                                id="1"
-                                className="autosuggest"
-                                theme={{
-                                  container: {
-                                    flexGrow: 1,
-                                    position: 'relative',
-                                  },
-                                  suggestionsContainerOpen: {
-                                    position: 'absolute',
-                                    left: 0,
-                                    right: 0,
-                                  },
-                                  suggestion: {
-                                    display: 'block',
-                                  },
-                                  suggestionsList: {
-                                    margin: 0,
-                                    padding: 0,
-                                    listStyleType: 'none',
-                                  },
-                                }}
-                                renderInputComponent={this.renderInputTypes.bind(this)}
-                                suggestions={this.state.suggestionsTypes}
-                                onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(
-                                  this,
-                                )}
-                                onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(
-                                  this,
-                                )}
-                                onSuggestionSelected={this.onSuggestionSelectedTypes.bind(
-                                  this,
-                                )}
-                                getSuggestionValue={this.getSuggestionValueTypes.bind(
-                                  this,
-                                )}
-                                renderSuggestion={this.renderSuggestionTypes.bind(this)}
-                                renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(
-                                  this,
-                                )}
-                                focusInputOnSuggestionClick={false}
-                                inputProps={{
-                                  placeholder: 'Search',
-                                  value: this.state.valueTypes,
-                                  onChange: this.onChangeTypes.bind(this),
-                                  className: 'auto type-autocomplete',
-                                }}
-                              />
-                            </Grid>
-
-                            <div
-                              style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                flexWrap: 'wrap',
-                                marginTop: '25px',
-                              }}
-                            >
-                              {!this.props.loading && this.state.customerEligibilityType == "specific" && this.state.customerEligibilityValue.length > 0 ? (
-                                _.filter(this.props.customers, (u) => this.state.customerEligibilityValue.find(e => e == u._id) != undefined).map((e, i) => (
-                                  <Chip
-                                    avatar={<Avatar> {this.getTypeAvatar(e)} </Avatar>}
-                                    style={{ marginRight: '8px', marginBottom: '8px' }}
-                                    label={`${e.profile.name.first} ${e.profile.name.last}`}
-                                    key={i}
-                                    onDelete={this.handleRestrictionChipDelete.bind(
-                                      this,
-                                      e,
-                                    )}
-                                  />
-                                ))
-                              ) : (
-                                  <Chip className="chip--bordered" label="Customer" />
-                                )}
-                            </div>
-                          </div>
-                        )}
+                          </RadioGroup>
+                        </FormControl>
                       </Grid>
 
-                    </Paper>
-                  </Grid>
+
+                      {this.state.customerType == 'email' && (
+                        <div style={{ width: '100%' }}>
+                          <Grid item xs={12}>
+                            <TextField
+                              label="Email"
+                              fullWidth
+                              name="email"
+                              id="email"
+                              required
+                              type="email"
+                            />
+                          </Grid>
+                        </div>
+                      )}
+
+                      {this.state.customerType == 'specific' && (
+                        <div style={{ width: '100%' }}>
+                          <Grid item xs={12} style={{ position: 'relative' }}>
+                            <Search
+                              className="autoinput-icon"
+                              style={{ right: '0 !important' }}
+                            />
+                            <Autosuggest
+                              id="1"
+                              className="autosuggest"
+                              theme={{
+                                container: {
+                                  flexGrow: 1,
+                                  position: 'relative',
+                                },
+                                suggestionsContainerOpen: {
+                                  position: 'absolute',
+                                  left: 0,
+                                  right: 0,
+                                },
+                                suggestion: {
+                                  display: 'block',
+                                },
+                                suggestionsList: {
+                                  margin: 0,
+                                  padding: 0,
+                                  listStyleType: 'none',
+                                },
+                              }}
+                              renderInputComponent={this.renderInputTypes.bind(this)}
+                              suggestions={this.state.suggestionsTypes}
+                              onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(
+                                this,
+                              )}
+                              onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(
+                                this,
+                              )}
+                              onSuggestionSelected={this.onSuggestionSelectedTypes.bind(
+                                this,
+                              )}
+                              getSuggestionValue={this.getSuggestionValueTypes.bind(
+                                this,
+                              )}
+                              renderSuggestion={this.renderSuggestionTypes.bind(this)}
+                              renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(
+                                this,
+                              )}
+                              focusInputOnSuggestionClick={false}
+                              inputProps={{
+                                placeholder: 'Search',
+                                value: this.state.valueTypes,
+                                onChange: this.onChangeTypes.bind(this),
+                                className: 'auto type-autocomplete',
+                              }}
+                            />
+                          </Grid>
+
+                          <div
+                            style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              marginTop: '25px',
+                            }}
+                          >
+                            {!this.props.loading && this.state.customerType == 'specific' && this.state.customer.length ? (
+                              _.filter(this.props.customers, u => this.state.customer === u._id).map((e, i) => (
+                                <Chip
+                                  avatar={<Avatar> {this.getTypeAvatar(e)} </Avatar>}
+                                  style={{ marginRight: '8px', marginBottom: '8px' }}
+                                  label={`${e.profile.name.first} ${e.profile.name.last}`}
+                                  key={i}
+                                  onDelete={this.handleRestrictionChipDelete.bind(
+                                    this,
+                                    e,
+                                  )}
+                                />
+                              ))
+                            ) : (
+                                <Chip className="chip--bordered" label="Customer" />
+                              )}
+                          </div>
+                        </div>
+                      )}
+                    </Grid>
+
+                  </Paper>
                 </Grid>
               </Grid>
             </Grid>
+          </Grid>
 
-            <Grid container justify="center" style={{ marginBottom: '50px' }}>
-              <Grid item xs={12}>
-                <Grid container>
-                  <Grid item xs={4}>
-                    {
-                      this.props.newGiftCard ? (
-                        ''
-                      ) : (
-                          <Button
-                            raised
-                            onClick={
-                              this.props.discount && this.props.giftCard._id
-                                ? this.handleRemove.bind(this)
-                                : () => this.props.history.push('/gift-cards')
-                            }
-                          >
-                            Delete
-                          </Button>
-                        )}
-                  </Grid>
+          <Divider light className="divider--space-x" />
 
-                  <Grid item xs={8}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'flex-end',
-                      }}
+          <Grid container justify="center" style={{ marginBottom: '50px' }}>
+            <Grid item xs={12}>
+              <Grid container>
+                <Grid item xs={12} sm={4}>
+                  <Typography
+                    type="subheading"
+                    className="subheading font-medium"
+                  >
+                    Note
+                    </Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Paper elevation={2} className="paper-for-fields">
+
+                    <TextField
+                      fullWidth
+                      name="note"
+                      id="note"
+                      multiline
+                      value={this.state.note}
+                      onChange={this.handleChange.bind(this, 'text', 'note')}
+                    />
+
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+
+
+          <Grid container justify="center" style={{ marginBottom: '50px' }}>
+            <Grid item xs={12}>
+              <Grid container>
+                <Grid item xs={4}>
+                  {
+                    this.props.newGiftCard ? (
+                      ''
+                    ) : (
+                        <Button
+                          raised
+                          onClick={
+                            this.props.giftCard && this.props.giftCard._id
+                              ? this.handleRemove.bind(this)
+                              : () => this.props.history.push('/gift-cards')
+                          }
+                        >
+                          Disable
+                        </Button>
+                      )}
+                </Grid>
+
+                <Grid item xs={8}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'flex-end',
+                    }}
+                  >
+                    <Button
+                      style={{ marginRight: '10px' }}
+                      onClick={() => history.push('/gift-cards')}
                     >
-                      <Button
-                        style={{ marginRight: '10px' }}
-                        onClick={() => history.push('/gift-cards')}
-                      >
-                        Cancel
+                      Cancel
                       </Button>
-                      <Button
-                        disabled={!this.state.hasFormChanged || this.state.submitLoading}
-                        type="submit"
-                        className={`btn btn-primary ${buttonClassname}`}
-                        raised
-                        color="contrast"
-                      >
-                        Save
+                    <Button
+                      disabled={!this.state.hasFormChanged || this.state.submitLoading}
+                      type="submit"
+                      className={`btn btn-primary ${buttonClassname}`}
+                      raised
+                      color="contrast"
+                    >
+                      Save
 
                         {this.state.submitLoading && (
-                          <CircularProgress
-                            size={24}
-                            className={this.props.classes.buttonProgress}
-                          />
-                        )}
-                      </Button>
-                    </div>
-                  </Grid>
+                        <CircularProgress
+                          size={24}
+                          className={this.props.classes.buttonProgress}
+                        />
+                      )}
+                    </Button>
+                  </div>
                 </Grid>
               </Grid>
             </Grid>
-          </div>
+          </Grid>
+        </div>
 
-          {this.renderDeleteDialog()}
-        </form>
-      );
-    } return <Loading />;
+        {this.renderDeleteDialog()}
+      </form>
+    );
+
   }
 }
 

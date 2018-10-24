@@ -11,13 +11,13 @@ Meteor.publish('discounts', (selector, options) => {
 });
 
 // Note: IngredientTypes.view is also used when editing an existing document.
-Meteor.publish('discounts.view', (categoryId) => {
-  check(categoryId, String);
+Meteor.publish('discounts.view', (discountId) => {
+  check(discountId, String);
 
-  return Discounts.find({ _id: categoryId });
+  return Discounts.find({ _id: discountId });
 });
 
-Meteor.publish('discounts-all-count', function categoryCount() {
+Meteor.publish('discounts-all-count', function discountsCount() {
   Counts.publish(this, 'discounts-count', Discounts.find());
 });
 

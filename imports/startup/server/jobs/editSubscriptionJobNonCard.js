@@ -4,6 +4,7 @@ import { Meteor } from 'meteor/meteor';
 import { Random } from 'meteor/random';
 
 import Subscriptions from '../../../api/Subscriptions/Subscriptions';
+import Discounts from '../../../api/Discounts/Discounts';
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
 
 import calculateSubscriptionCost from '../../../modules/server/billing/calculateSubscriptionCost';

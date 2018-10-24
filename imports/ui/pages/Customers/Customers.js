@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
-import { Session } from 'meteor/session';
+import { withTracker } from 'meteor/react-meteor-data';
 import { ReactiveVar } from 'meteor/reactive-var';
 
 import $ from 'jquery';
@@ -31,7 +30,7 @@ import autoBind from 'react-autobind';
 const tableConfig = new ReactiveVar({
   pageProperties: {
     currentPage: 1,
-    pageSize: 50,
+    pageSize: 30,
     recordCount: 0,
     maxPages: 1,
   },
@@ -70,7 +69,7 @@ class Customers extends React.Component {
 
     const name = $('#search-users-text').val().trim();
 
-    if (name.length != "") {
+    if (name.length) {
       configCopy.selector.name = { $regex: new RegExp(`${name}`), $options: 'gi' };
       // configCopy.selector.name = { $regex: new RegExp(`(^${searchValue}|${searchValue}$)`), $options: 'i' };
     } else {
@@ -78,6 +77,7 @@ class Customers extends React.Component {
     }
 
     // console.log(configCopy);
+    configCopy.pageProperties.currentPage = 1;
 
     tableConfig.set(configCopy);
 
@@ -85,27 +85,23 @@ class Customers extends React.Component {
       searchSelector: name,
       searchTextLoading: false,
     });
-
-
   }
 
-  handleChange(event) {
+  handleChange() {
     clearTimeout(this.timer);
 
     this.setState({
       searchTextLoading: true,
     }, () => {
       this.timer = setTimeout(this.searchByName, 800);
-    })
-
+    });
   }
 
   searchByNameKeyDown(event) {
-    //enter key
+    // enter key
     if (event.keyCode === 13 || event.keyCode == 8) {
-      this.searchByName();
+      this.handleChange();
     }
-
   }
 
   clearSearchBox() {
@@ -174,6 +170,9 @@ class Customers extends React.Component {
 
     // console.log(configCopy);
 
+    configCopy.pageProperties.currentPage = 1;
+
+
     tableConfig.set(configCopy);
 
     this.setState({
@@ -181,24 +180,8 @@ class Customers extends React.Component {
     });
   }
 
-  componentWillUnmount() {
-    tableConfig.set({
-      pageProperties: {
-        currentPage: 1,
-        pageSize: 10,
-        recordCount: 0,
-      },
-      selector: {
-        roles: ['customer'],
-      },
-      sort: {
-        'profile.name.first': 1,
-      },
-    });
-  }
-
   render() {
-    const { customers, history } = this.props;
+    const { history } = this.props;
 
     return (
       <div>
@@ -322,7 +305,7 @@ Customers.propTypes = {
   history: PropTypes.isRequired,
 };
 
-export default createContainer(() => {
+export default withTracker(() => {
   const config = tableConfig.get();
 
   const skip = config.pageProperties.currentPage < 0 ? 0 :
@@ -348,7 +331,6 @@ export default createContainer(() => {
         configCopy.pageProperties.maxPages = result.maxPages;
         tableConfig.set(configCopy);
       }
-
     }
   });
 
@@ -360,4 +342,4 @@ export default createContainer(() => {
     customers: clientusers,
     lifestyles: LifestylesColl.find().fetch(),
   };
-}, Customers);
+})(Customers);

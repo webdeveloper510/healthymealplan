@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 
 import $ from 'jquery';
 
@@ -217,7 +217,7 @@ Discounts.propTypes = {
   history: PropTypes.isRequired,
 };
 
-export default createContainer(() => {
+export default withTracker(() => {
   const subscription = Meteor.subscribe('lifestyles');
   const subscription2 = Meteor.subscribe('restrictions');
 
@@ -225,4 +225,4 @@ export default createContainer(() => {
     loading: !subscription.ready() && !subscription2.ready(),
     lifestyles: DiscountsCollection.find().fetch(),
   };
-}, Discounts);
+})(Discounts);

@@ -236,8 +236,7 @@ class CustomersTable extends React.Component {
 
     configCopy.pageProperties.currentPage = page + 1;
 
-    this.props.tableConfig.set(configCopy)
-
+    this.props.tableConfig.set(configCopy);
   }
 
   render() {
@@ -394,12 +393,13 @@ class CustomersTable extends React.Component {
                           <div>
                             {e.profile.online ? 'Online' : e.profile.lastLogin ? moment(e.profile.lastLogin).format('MMMM Mo, YYYY') : ''}
                           </div>
-                        ) : ''} 
+                        ) : ''}
                     -
                       </Typography>
                     </TableCell> */}
 
-                    <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                    <TableCell
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
                       onClick={() => this.props.history.push(`/customers/${e._id}/edit`)
                       }
                     >
@@ -446,24 +446,6 @@ class CustomersTable extends React.Component {
               )}
             </TableBody>
 
-            {/* <TableFooter>
-              <TableRow>
-                <TableCell>
-                  <Typography
-                    className="body2 font-medium"
-                    type="body2"
-                    style={{ color: 'rgba(0, 0, 0, .54)' }}
-                  >
-                    {this.props.results != undefined && this.props.results.length} of {this.props.customerCount} customer{this
-                      .props.customerCount > 1
-                      ? 's'
-                      : ''}
-                  </Typography>
-                </TableCell>
-
-              </TableRow>
-            </TableFooter> */}
-
             <TableFooter>
               <TableRow>
                 <TablePagination
@@ -474,20 +456,11 @@ class CustomersTable extends React.Component {
                   page={this.props.tableConfig.get().pageProperties.currentPage == 1 ? 0
                     : this.props.tableConfig.get().pageProperties.currentPage - 1
                   }
-                  backIconButtonProps={{
-                    'aria-label': 'Previous Page',
-                  }}
-                  nextIconButtonProps={{
-                    'aria-label': 'Next Page',
-                  }}
+                  backIconButtonProps={{ 'aria-label': 'Previous Page', }}
+                  nextIconButtonProps={{ 'aria-label': 'Next Page', }}
                   onChangePage={this.handleChangePage}
                 // ActionsComponent={TablePaginationActionsWrapped}
                 />
-                {/* `<TableCell>
-                  <Typography type="body1">
-                    Total {this.props.customerCount}
-                  </Typography>
-                </TableCell>` */}
               </TableRow>
             </TableFooter>
           </Table>
@@ -540,15 +513,8 @@ CustomersTable.propTypes = {
   history: PropTypes.func.isRequired,
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,
-  loadMore: PropTypes.func.isRequired,
   customerCount: PropTypes.number.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
-export default createContainer(() => {
-  const customerCountSub = Meteor.subscribe('customers-all-count');
-
-  return {
-    customerCount: Counts.get('customers-count'),
-  };
-}, CustomersTable);
+export default CustomersTable;

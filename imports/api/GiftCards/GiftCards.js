@@ -44,10 +44,10 @@ GiftCards.schema = new SimpleSchema({
 
   initialAmount: {
     type: Number,
-    label: 'Initial value of the gift card'
+    label: 'Initial value of the gift card',
   },
 
-  currentBalance: {
+  balance: {
     type: Number,
     label: 'The current balance of the gift card',
   },
@@ -63,6 +63,11 @@ GiftCards.schema = new SimpleSchema({
     optional: true,
   },
 
+  purchased: {
+    type: Boolean,
+    label: "If the card was purchased online",
+  },
+  
   activationDate: {
     type: Date,
     label: 'The date when the gift card was activated',

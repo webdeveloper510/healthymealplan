@@ -33,7 +33,7 @@ class GiftCards extends React.Component {
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
-      options: { sort: { SKU: -1 } },
+      options: { sort: { code: -1 } },
       searchByKey: '',
 
       searchSelector: '',
@@ -115,7 +115,7 @@ class GiftCards extends React.Component {
               <Typography type="headline" gutterBottom className="headline pull-left" style={{ fontWeight: 500 }}>Gift cards</Typography>
             </Grid>
             <Grid item xs={6}>
-              <Button className="btn btn-primary" onClick={() => history.push('/gift-cards/new')} raised color="primary" style={{ float: 'right' }}>Add gift card</Button>
+              <Button className="btn btn-primary" onClick={() => history.push('/gift-cards/new')} raised color="primary" style={{ float: 'right' }}>Issue gift card</Button>
             </Grid>
           </Grid>
 
@@ -171,24 +171,11 @@ class GiftCards extends React.Component {
             limit={50}
             collection={GiftCardsCollection}
             publication="giftcards"
-            joins={[
-              {
-                localProperty: 'customerEligibilityValue',
-                collection: Meteor.users,
-                joinAs: 'joinedCustomers',
-              },
-              {
-                foreignProperty: 'discountApplied',
-                collection: Subscriptions,
-                joinAs: 'discountUsed',
-              },
-            ]}
             options={this.state.options}
             selector={typeof (this.state.searchByKey) === 'object' ? this.state.searchByKey : {
               [this.state.searchByKey[0]]: this.state.searchByKey[0],
               $and: [{
-                $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-                { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }],
+                $or: [{ code: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }],
               }],
             }}
           >
@@ -211,17 +198,20 @@ class GiftCards extends React.Component {
 
 GiftCards.propTypes = {
   loading: PropTypes.bool.isRequired,
-  lifestyles: PropTypes.arrayOf(PropTypes.object).isRequired,
+  // lifestyles: PropTypes.arrayOf(PropTypes.object).isRequired,
   match: PropTypes.object.isRequired,
   history: PropTypes.isRequired,
 };
 
-export default withTracker(() => {
-  const subscription = Meteor.subscribe('lifestyles');
-  const subscription2 = Meteor.subscribe('restrictions');
+export default withTracker(() => 
 
-  return {
-    loading: !subscription.ready() && !subscription2.ready(),
-    lifestyles: GiftCardsCollection.find().fetch(),
-  };
-})(GiftCards);
+
+  // return {
+  //   loading: !subscription.ready() && !subscription2.ready(),
+  //   lifestyles: GiftCardsCollection.find().fetch(),
+  // };
+
+   ({
+
+  })
+)(GiftCards);
