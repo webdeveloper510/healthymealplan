@@ -23,7 +23,7 @@ import CustomersTable from './CustomersTable';
 
 import { JoinClient } from 'meteor-publish-join';
 import { Tracker } from 'meteor/tracker';
-import _ from 'lodash';
+import cloneDeep from 'lodash/cloneDeep';
 
 import autoBind from 'react-autobind';
 
@@ -54,6 +54,8 @@ class Customers extends React.Component {
       searchSelector: '',
       searchTextLoading: false,
       currentTabValue: 'all',
+
+      customers: [],
     };
 
     autoBind(this);
@@ -63,52 +65,85 @@ class Customers extends React.Component {
     this.timer = null;
   }
 
-  searchByName() {
-    const config = tableConfig.get();
-    const configCopy = _.cloneDeep(config);
-
-    const name = $('#search-users-text').val().trim();
-
-    if (name.length) {
-      configCopy.selector.name = { $regex: new RegExp(`${name}`), $options: 'gi' };
-      // configCopy.selector.name = { $regex: new RegExp(`(^${searchValue}|${searchValue}$)`), $options: 'i' };
-    } else {
-      delete configCopy.selector.name;
-    }
-
-    // console.log(configCopy);
-    configCopy.pageProperties.currentPage = 1;
-
-    tableConfig.set(configCopy);
-
-    this.setState({
-      searchSelector: name,
-      searchTextLoading: false,
-    });
+  componentDidMount() {
+    this.getCustomers();
   }
 
-  handleChange() {
-    clearTimeout(this.timer);
+  getCustomers() {
+    const config = tableConfig.get();
+
+    const skip = config.pageProperties.currentPage < 0 ? 0 :
+      (config.pageProperties.currentPage - 1) * config.pageProperties.pageSize;
+
+    const limit = config.pageProperties.pageSize;
 
     this.setState({
       searchTextLoading: true,
-    }, () => {
-      this.timer = setTimeout(this.searchByName, 800);
+    })
+
+    Meteor.call('getCustomersTable', config.selector, config.sort, skip, limit, (err, res) => {
+
+      if (!err) {
+        this.setState({
+          searchTextLoading: false,
+          customers: res,
+        })
+      }
+
     });
   }
 
-  searchByNameKeyDown(event) {
-    // enter key
-    if (event.keyCode === 13 || event.keyCode == 8) {
-      this.handleChange();
-    }
+  searchByName() {
+    this.timer = Meteor.setTimeout(() => {
+      const name = $('#search-users-text').val().trim();
+
+      const config = tableConfig.get();
+      const configCopy = cloneDeep(config);
+
+      if (name.length) {
+        configCopy.selector.name = { $regex: new RegExp(`${name}`), $options: 'gi' };
+        // configCopy.selector.name = { $regex: new RegExp(`(^${searchValue}|${searchValue}$)`), $options: 'i' };
+      } else {
+        delete configCopy.selector.name;
+      }
+
+      // console.log(configCopy);
+      configCopy.pageProperties.currentPage = 1;
+
+      tableConfig.set(configCopy);
+
+      this.getCustomers()
+    }, 200)
   }
+
+  handleChange(e) {
+    if(this.timer){
+      Meteor.clearTimeout(this.timer);
+    }
+    this.setState({
+      searchTextLoading: true,
+      searchSelector: e.target.value,
+    });
+
+    // () => {
+    this.searchByName();
+    // });
+  }
+
+  // searchByNameKeyDown(event) {
+  //   // enter key
+  //   // clearTimeout(this.timer);
+
+  //   // if (event.keyCode === 13 || event.keyCode == 8) {
+  //   //   this.handleChange();
+  //   // }
+  // }
 
   clearSearchBox() {
     $('#search-users-text').val('');
 
     const config = tableConfig.get();
-    const configCopy = _.cloneDeep(config);
+    const configCopy = cloneDeep(config);
 
     delete configCopy.selector.name;
 
@@ -151,11 +186,18 @@ class Customers extends React.Component {
     this.setState({
       options: { sort: newOptions },
     });
+
+    this.getCustomers()
   }
 
   handleTabChange(event, value) {
+
+    this.setState({
+      currentTabValue: value,
+    });
+
     const config = tableConfig.get();
-    const configCopy = _.cloneDeep(config);
+    const configCopy = cloneDeep(config);
 
     if (value == 'abandoned') {
       delete configCopy.selector['joinedSubscription.status'];
@@ -168,16 +210,11 @@ class Customers extends React.Component {
       configCopy.selector['joinedSubscription.status'] = value;
     }
 
-    // console.log(configCopy);
-
     configCopy.pageProperties.currentPage = 1;
-
 
     tableConfig.set(configCopy);
 
-    this.setState({
-      currentTabValue: value,
-    });
+    this.getCustomers();
   }
 
   render() {
@@ -274,8 +311,8 @@ class Customers extends React.Component {
               className="input-box"
               style={{ width: '100%', position: 'relative' }}
               placeholder="Search customers"
-              onChange={this.handleChange}
-              onKeyDown={this.searchByNameKeyDown}
+              // onChange={this.handleChange}
+              onKeyUp={this.handleChange}
               inputProps={{
                 id: 'search-users-text',
                 'aria-label': 'Description',
@@ -284,7 +321,8 @@ class Customers extends React.Component {
           </div>
 
           <CustomersTable
-            results={this.props.customers}
+            // results={this.props.customers}
+            results={this.state.customers}
             lifestyles={this.props.lifestyles}
             popTheSnackbar={this.props.popTheSnackbar}
             searchTerm={this.state.searchSelector}
@@ -292,6 +330,7 @@ class Customers extends React.Component {
             history={this.props.history}
             sortByOptions={this.sortByOption}
             tableConfig={tableConfig}
+            getCustomers={this.getCustomers}
           />
         </Grid>
       </div>
@@ -308,22 +347,21 @@ Customers.propTypes = {
 export default withTracker(() => {
   const config = tableConfig.get();
 
-  const skip = config.pageProperties.currentPage < 0 ? 0 :
-    (config.pageProperties.currentPage - 1) * config.pageProperties.pageSize;
+  // const skip = config.pageProperties.currentPage < 0 ? 0 :
+  //   (config.pageProperties.currentPage - 1) * config.pageProperties.pageSize;
 
-  const limit = config.pageProperties.pageSize;
+  // const limit = config.pageProperties.pageSize;
 
-  const subscription = Meteor.subscribe('users.customers.new',
-    config.selector,
-    config.sort,
-    skip,
-    limit,
-  );
-  // const subscription2 = Meteor.subscribe('subscriptions', {}, {});
+  // const subscription = Meteor.subscribe('users.customers.new',
+  //   config.selector,
+  //   config.sort,
+  //   skip,
+  //   limit,
+  // );
 
   Meteor.call('getCustomersCount', config.selector, config.sort, (error, result) => {
     if (!error) {
-      const configCopy = _.cloneDeep(config);
+      const configCopy = cloneDeep(config);
 
       if (configCopy.pageProperties.recordCount != result.recordCount) {
         // console.log(result);
@@ -334,12 +372,12 @@ export default withTracker(() => {
     }
   });
 
-  const clientusers = JoinClient.get('clientUsers');
-  const clientUsersLoaded = !JoinClient.has('clientUsers');
+  // const clientusers = JoinClient.get('clientUsers');
+  // const clientUsersLoaded = !JoinClient.has('clientUsers');
 
   return {
-    loading: clientUsersLoaded,
-    customers: clientusers,
+    // loading: clientUsersLoaded,
+    // customers: clientusers,
     lifestyles: LifestylesColl.find().fetch(),
   };
 })(Customers);

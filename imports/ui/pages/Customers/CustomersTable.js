@@ -237,6 +237,8 @@ class CustomersTable extends React.Component {
     configCopy.pageProperties.currentPage = page + 1;
 
     this.props.tableConfig.set(configCopy);
+
+    this.props.getCustomers()
   }
 
   render() {
@@ -348,7 +350,7 @@ class CustomersTable extends React.Component {
                     <TableCell
 
                       style={{ paddingTop: '10px', paddingBottom: '10px', width: '21%' }}
-                      onClick={() => this.props.history.push(`/ customers / ${e._id} /edit`)}
+                      onClick={() => this.props.history.push(`/customers/${e._id}/edit`)}
                     >
                       <Typography type="subheading">
                         {e.joinedLifestyle ? e.joinedLifestyle.title : ''}
