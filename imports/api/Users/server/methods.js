@@ -67,6 +67,69 @@ Meteor.methods({
     return empId;
   },
 
+  getCustomersTable(selector, options, skip, limit){
+
+    check(selector, Object);
+    check(options, Object);
+    check(limit, Number);
+    check(skip, Number);
+  
+    const data = Meteor.users.aggregate([
+      {
+        $lookup: {
+          from: 'Subscriptions',
+          localField: 'subscriptionId',
+          foreignField: '_id',
+          as: 'joinedSubscription',
+        },
+      },
+      {
+        $lookup: {
+          from: 'Lifestyles',
+          localField: 'lifestyle',
+          foreignField: '_id',
+          as: 'joinedLifestyle',
+        },
+      },
+      {
+        $unwind: {
+          path: '$joinedSubscription',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $unwind: {
+          path: '$joinedLifestyle',
+          preserveNullAndEmptyArrays: true,
+        },
+      },
+      {
+        $addFields: {
+          name: { $concat: ['$profile.name.first', ' ', '$profile.name.last'] },
+        },
+      },
+      {
+        $match: selector,
+      },
+      {
+        $sort: options,
+      },
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit,
+      },
+    ], {
+      collation: {
+        locale: 'en_US',
+        strength: 1,
+      },
+    });
+
+    return data;
+  },
+
   getCustomersCount(selector, sort) {
 
     check(selector, Object);
