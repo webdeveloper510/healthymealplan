@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 import { Meteor } from 'meteor/meteor';
 
 import Grid from 'material-ui/Grid';
@@ -47,10 +47,6 @@ const EditCustomer = ({
   </div>
 ) : <NotFound />);
 
-EditCustomer.defaultProps = {
-  customer: null,
-};
-
 EditCustomer.propTypes = {
   customer: PropTypes.object,
   subscription: PropTypes.object,
@@ -59,7 +55,7 @@ EditCustomer.propTypes = {
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
-export default createContainer(({ match }) => {
+export default withTracker(({ match }) => {
   const customerId = match.params._id;
   const subscription = Meteor.subscribe('user.customer.single', customerId);
   const subscription2 = Meteor.subscribe('subscriptions.single', customerId);
@@ -83,4 +79,4 @@ export default createContainer(({ match }) => {
     postalCodes: PostalCodes.find().fetch(),
     discounts: Discounts.find().fetch(),
   };
-}, EditCustomer);
+})(EditCustomer);
