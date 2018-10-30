@@ -21,10 +21,20 @@ GiftCards.schema = new SimpleSchema({
 
   code: {
     type: String,
-    label: 'The title of the discount.',
+    label: 'The gift code.',
   },
 
-  customerId: {
+  codeType: {
+    type: String,
+    label: 'Type of gift code',
+  },
+
+  customerType: {
+    type: String,
+    label: 'Existing or email customer',
+  },
+
+  customer: {
     type: String,
     label: 'Existing customer who owns this gift card',
     optional: true,
@@ -36,10 +46,9 @@ GiftCards.schema = new SimpleSchema({
     optional: true,
   },
 
-  customerEmail: {
+  initialAmountPreset: {
     type: String,
-    label: 'Email who owns this gift card',
-    optional: true,
+    label: "Preset value identifier",
   },
 
   initialAmount: {
@@ -63,11 +72,11 @@ GiftCards.schema = new SimpleSchema({
     optional: true,
   },
 
-  purchased: {
+  purchasedOnline: {
     type: Boolean,
     label: "If the card was purchased online",
   },
-  
+
   activationDate: {
     type: Date,
     label: 'The date when the gift card was activated',

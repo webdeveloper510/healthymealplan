@@ -10,11 +10,11 @@ import PropTypes from 'prop-types';
 
 import Autosuggest from 'react-autosuggest';
 
-import _ from 'lodash';
-
 import { Meteor } from 'meteor/meteor';
-
 import { Random } from 'meteor/random';
+import filter from 'lodash/filter';
+import autoBind from 'react-autobind';
+
 
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
@@ -122,6 +122,7 @@ class GiftCardEditor extends React.Component {
 
       initialAmountPreset: !this.props.newGiftCard && !this.props.loading && this.props.giftCard ? this.props.giftCard.initialAmountPreset : '20',
       initialAmount: !this.props.newGiftCard && !this.props.loading && this.props.giftCard ? this.props.giftCard.initialAmount : '',
+      balance: !this.props.newGiftCard && !this.props.loading && this.props.giftCard.balance ? this.props.giftCard.balance : '',
 
       note: !this.props.newGiftCard && !this.props.loading && this.props.giftCard.hasOwnProperty('note') ? this.props.giftCard.note : '',
 
@@ -131,7 +132,7 @@ class GiftCardEditor extends React.Component {
       status: !this.props.newGiftCard && !this.props.loading ? this.props.giftCard.status : 'active',
 
       currentCustomers: this.props.customers && !this.props.newGiftCard && !this.props.loading && this.props.giftCard.customerType == 'specific' ?
-        _.filter(this.props.customers, u => this.props.giftCard.customer.find(e => e == u._id) != undefined) : [],
+        filter(this.props.customers, u => this.props.giftCard.customer.find(e => e == u._id) != undefined) : [],
 
       deleteDialogOpen: false,
       hasFormChanged: false,
@@ -139,6 +140,8 @@ class GiftCardEditor extends React.Component {
       submitLoading: false,
       submitSuccess: false,
     };
+
+    autoBind(this);
   }
 
   componentDidMount() {
@@ -191,27 +194,13 @@ class GiftCardEditor extends React.Component {
     event,
     { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
-    const clonedRestrictions = this.state.customer
-      ? this.state.customer.slice()
-      : [];
 
-    let isThere = false;
+    console.log(suggestion);
 
-    if (clonedRestrictions.length > 0) {
-      isThere = clonedRestrictions.filter(
-        present => suggestion._id === present._id,
-      );
-    }
-
-    if (isThere != false) {
-      return;
-    }
-
-    clonedRestrictions.push(suggestion._id);
-
+    
     this.setState({
       hasFormChanged: true,
-      customer: clonedRestrictions,
+      customer: suggestion._id,
     });
   }
 
@@ -253,21 +242,21 @@ class GiftCardEditor extends React.Component {
     const { popTheSnackbar, history, giftCard } = this.props;
 
     const existingGiftCard = giftCard && giftCard._id;
-    localStorage.setItem('discountDeleted', giftCard.code);
+    localStorage.setItem('giftCardDeleted', giftCard.code);
     const giftCardDeletedMessage = `${localStorage.getItem(
       'giftCardDeleted',
     )} deleted from gift cards.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call('giftcards.disable', existingGiftCard, (error) => {
+    Meteor.call('giftcards.remove', existingGiftCard, (error) => {
       if (error) {
         popTheSnackbar({
           message: error.reason,
         });
       } else {
         popTheSnackbar({
-          message: discountDeletedMessage,
+          message: giftCardDeletedMessage,
         });
 
         history.push('/gift-cards');
@@ -280,40 +269,45 @@ class GiftCardEditor extends React.Component {
   // be changed via params
   // refactor v.75
 
-
-  handleChange(type, name, event, value) {
-    // console.log(event);
-    // console.log(type);
-    // console.log(name);
+  handleChange(event, type, name) {
+    console.log(event.nativeEvent.target);
+    console.log(type);
+    console.log(name);
 
     if (type === 'checkbox') {
       this.setState({
-        [name]: event.target.checked,
+        [name]: event.nativeEvent.target.checked,
       });
     }
 
     if (type === 'checkbox/value') {
       this.setState({
-        [name]: event.target.checked ? event.target.value : '',
+        [name]: event.nativeEvent.target.checked ? event.nativeEvent.target.value : '',
       });
     }
 
     if (type === 'text') {
       this.setState({
-        [name]: event.target.value,
+        [name]: event.nativeEvent.target.value,
       });
     }
 
     if (type === 'text/date') {
       this.setState({
-        [name]: moment(event.target.value).format('YYYY-MM-DD'),
+        [name]: moment(event.nativeEvent.target.value).format('YYYY-MM-DD'),
       });
     }
 
     if (type === 'radio') {
       this.setState({
-        [name]: value,
+        [name]: event.nativeEvent.target.value,
       });
+
+      if(name == "customerType"){
+        this.setState({
+          customer: '',
+        })
+      }
     }
 
     this.setState({
@@ -338,11 +332,21 @@ class GiftCardEditor extends React.Component {
       initialAmountPreset: this.state.initialAmountPreset,
 
       customerType: this.state.customerType,
-      customer: this.state.customerType == 'specific' ? this.state.customer[0] : this.state.customer,
+      customer: this.state.customer || '',
 
       note: this.state.note,
       status: 'active',
     };
+
+    if(existingGiftCard){
+      giftCard._id = existingGiftCard._id;
+    }
+
+    // if(giftCard.customer.length == 0) {
+    //   this.props.popTheSnackbar({
+    //     message: 'You need to select at least one customer'
+    //   });
+    // }
 
     if (this.state.initialAmountPreset == 'custom') {
       giftCard.initialAmount = parseFloat(this.state.initialAmount);
@@ -357,6 +361,14 @@ class GiftCardEditor extends React.Component {
     this.setState({
       submitLoading: true,
     });
+
+    if(!this.props.newGiftCard){
+      if(this.props.giftCard.balance < this.props.giftCard.initialAmount){
+        popTheSnackbar({
+          message: "Can modify this card as it seems it's already in use."
+        });
+      }
+    }
 
     Meteor.call(methodToCall, giftCard, (error, giftCardId) => {
       console.log('Inside Method');
@@ -382,8 +394,8 @@ class GiftCardEditor extends React.Component {
         );
 
         const confirmation = existingGiftCard
-          ? `${localStorage.getItem('giftCardInserted')} discount updated.`
-          : `${localStorage.getItem('giftCardInserted')} discount added.`;
+          ? `${localStorage.getItem('giftCardInserted')} gift card updated.`
+          : `${localStorage.getItem('giftCardInserted')} gift card added.`;
 
         popTheSnackbar({
           message: confirmation,
@@ -398,10 +410,7 @@ class GiftCardEditor extends React.Component {
 
   renderDeleteDialog() {
     return (
-      <Dialog
-        open={this.state.deleteDialogOpen}
-        onClose={this.deleteDialogHandleRequestClose.bind(this)}
-      >
+      <Dialog open={this.state.deleteDialogOpen} onClose={this.deleteDialogHandleRequestClose}>
         <Typography
           style={{
             flex: '0 0 auto',
@@ -422,7 +431,7 @@ class GiftCardEditor extends React.Component {
         </DialogContent>
         <DialogActions>
           <Button
-            onClick={this.deleteDialogHandleRequestClose.bind(this)}
+            onClick={this.deleteDialogHandleRequestClose}
             color="default"
           >
             Cancel
@@ -430,10 +439,10 @@ class GiftCardEditor extends React.Component {
           <Button
             stroked
             className="button--bordered button--bordered--accent"
-            onClick={this.handleDisable.bind(this)}
+            onClick={this.handleDisable}
             color="accent"
           >
-            Disable
+            Delete
           </Button>
         </DialogActions>
       </Dialog>
@@ -476,16 +485,10 @@ class GiftCardEditor extends React.Component {
     );
   }
 
-  handleRestrictionChipDelete(type) {
-    console.log(type);
-    const stateCopy = this.state.customerEligibilityValue.slice();
-
-    stateCopy.splice(stateCopy.indexOf(type._id), 1);
-
-    console.log(stateCopy);
+  handleCustomerChipDelete(type) {
 
     this.setState({
-      customerEligibilityValue: stateCopy,
+      customer: '',
       hasFormChanged: true,
     });
   }
@@ -507,12 +510,12 @@ class GiftCardEditor extends React.Component {
     });
   }
 
-  enableDiscount() {
-    Meteor.call('discounts.enable', this.props.giftCard._id);
+  enableGiftCard() {
+    Meteor.call('giftcards.enable', this.props.giftCard._id);
   }
 
-  disableDiscount() {
-    Meteor.call('discounts.disable', this.props.giftCard._id);
+  disableGiftCard() {
+    Meteor.call('giftcards.disable', this.props.giftCard._id);
   }
 
   render() {
@@ -547,7 +550,7 @@ class GiftCardEditor extends React.Component {
                   }}
                 >
                   <ChevronLeft style={{ marginRight: '4px' }} /> Gift cards
-                  </Typography>
+                </Typography>
               </Button>
             </Grid>
           </Grid>
@@ -563,7 +566,7 @@ class GiftCardEditor extends React.Component {
                   : 'Create gift card'}
               </Typography>
               {this.props.giftCard && this.props.giftCard._id ? (
-                <Button size="small" onClick={this.props.giftCard.status == 'expired' ? this.enableDiscount.bind(this) : this.disableDiscount.bind(this)}>{this.props.giftCard.status == 'expired' ? 'Enable' : 'Disable'}</Button>
+                <Button size="small" onClick={this.props.giftCard.status == 'expired' ? this.enableGiftCard : this.disableGiftCard}>{this.props.giftCard.status == 'expired' ? 'Enable' : 'Disable'}</Button>
               ) : ''}
 
             </Grid>
@@ -580,7 +583,7 @@ class GiftCardEditor extends React.Component {
                   onClick={() => history.push('/gift-cards')}
                 >
                   Cancel
-                  </Button>
+                </Button>
                 <Button
                   disabled={!this.state.hasFormChanged || this.state.submitLoading}
                   className={`btn btn-primary ${buttonClassname}`}
@@ -589,7 +592,7 @@ class GiftCardEditor extends React.Component {
                   color="contrast"
                 >
                   Save
-                    {this.state.submitLoading && (
+                  {this.state.submitLoading && (
                     <CircularProgress
                       size={24}
                       className={this.props.classes.buttonProgress}
@@ -609,17 +612,17 @@ class GiftCardEditor extends React.Component {
                     className="subheading font-medium"
                   >
                     Code
-                    </Typography>
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
                   <Paper elevation={2} className="paper-for-fields">
                     <Button
                       size="small"
                       style={{ float: 'right', marginBottom: '20px' }}
-                      onClick={this.generateGiftCode.bind(this)}
+                      onClick={this.generateGiftCode}
                     >
                       Generate code
-                      </Button>
+                    </Button>
 
                     <TextField
                       id="title"
@@ -627,7 +630,7 @@ class GiftCardEditor extends React.Component {
                       name="title"
                       fullWidth
                       value={this.state.code}
-                      onChange={this.handleChange.bind(this, 'text', 'code')}
+                      onChange={(e) => this.handleChange(e, 'text', 'code')}
                       required
                     />
 
@@ -648,7 +651,7 @@ class GiftCardEditor extends React.Component {
                     className="subheading font-medium"
                   >
                     Type
-                    </Typography>
+                  </Typography>
                 </Grid>
                 <Grid item xs={12} sm={8}>
                   <Paper elevation={2} className="paper-for-fields">
@@ -658,11 +661,7 @@ class GiftCardEditor extends React.Component {
                         aria-label="Gift code type"
                         name="codeType"
                         value={this.state.codeType}
-                        onChange={this.handleChange.bind(
-                          this,
-                          'radio',
-                          'codeType',
-                        )}
+                        onChange={(e) => this.handleChange(e, 'radio', 'codeType')}
                         style={{ flexDirection: 'row' }}
                       >
                         <FormControlLabel
@@ -670,10 +669,7 @@ class GiftCardEditor extends React.Component {
                           value="physical"
                           control={
                             <Radio
-                              checked={
-                                this.state.codeType ===
-                                'physical'
-                              }
+                              checked={this.state.codeType === 'physical'}
                             />
                           }
                           label="Physical"
@@ -682,12 +678,7 @@ class GiftCardEditor extends React.Component {
                           className="radiobuttonlabel"
                           value="digital"
                           control={
-                            <Radio
-                              checked={
-                                this.state.codeType ===
-                                'digital'
-                              }
-                            />
+                            <Radio checked={this.state.codeType === 'digital'} />
                           }
                           label="Digital"
                         />
@@ -712,7 +703,7 @@ class GiftCardEditor extends React.Component {
                     className="subheading font-medium"
                   >
                     Intial amount
-                    </Typography>
+                  </Typography>
 
                 </Grid>
                 <Grid item xs={12} sm={8}>
@@ -724,26 +715,24 @@ class GiftCardEditor extends React.Component {
                             aria-label="Intial amount preset"
                             name="initialAmountPreset"
                             value={this.state.initialAmountPreset}
-                            onChange={this.handleChange.bind(
-                              this,
-                              'radio',
-                              'initialAmountPreset',
-                            )}
+                            onChange={(e) => this.handleChange(e, 'radio', 'initialAmountPreset')}
                             style={{ flexDirection: 'row' }}
                           >
+
                             <FormControlLabel
                               className="radiobuttonlabel"
-                              value="20"
+                              value="0"
                               control={
                                 <Radio
                                   checked={
                                     this.state.initialAmountPreset ===
-                                    '20'
+                                    '0'
                                   }
                                 />
                               }
-                              label="$20.00"
+                              label="$0"
                             />
+
                             <FormControlLabel
                               className="radiobuttonlabel"
                               value="50"
@@ -773,6 +762,20 @@ class GiftCardEditor extends React.Component {
 
                             <FormControlLabel
                               className="radiobuttonlabel"
+                              value="150"
+                              control={
+                                <Radio
+                                  checked={
+                                    this.state.initialAmountPreset ===
+                                    '150'
+                                  }
+                                />
+                              }
+                              label="$150.00"
+                            />
+
+                            <FormControlLabel
+                              className="radiobuttonlabel"
                               value="200"
                               control={
                                 <Radio
@@ -787,7 +790,20 @@ class GiftCardEditor extends React.Component {
 
                             <FormControlLabel
                               className="radiobuttonlabel"
-                              value="200"
+                              value="250"
+                              control={
+                                <Radio
+                                  checked={
+                                    this.state.initialAmountPreset ===
+                                    '250'
+                                  }
+                                />
+                              }
+                              label="$250.00"
+                            />
+                            <FormControlLabel
+                              className="radiobuttonlabel"
+                              value="300"
                               control={
                                 <Radio
                                   checked={
@@ -796,9 +812,8 @@ class GiftCardEditor extends React.Component {
                                   }
                                 />
                               }
-                              label="$200.00"
+                              label="$300.00"
                             />
-
                             <FormControlLabel
                               className="radiobuttonlabel"
                               value="custom"
@@ -821,11 +836,12 @@ class GiftCardEditor extends React.Component {
                       <Grid item xs={12} sm={12} md={12}>
                         {this.state.initialAmountPreset == 'custom' && (
                           <TextField
+                            style={{marginBottom: '1em'}}
                             fullWidth
                             value={this.state.initialAmount}
                             id="initialAmount"
                             name="initialAmount"
-                            onChange={this.handleChange.bind(this, 'text', 'initialAmount')}
+                            onChange={(e) => this.handleChange(e, 'text', 'initialAmount')}
                             label="Initial amount"
                             InputProps={{
                               'aria-label': 'Description',
@@ -837,174 +853,23 @@ class GiftCardEditor extends React.Component {
                       </Grid>
                     </Grid>
 
-                  </Paper>
-                </Grid>
-              </Grid>
-            </Grid>
-          </Grid>
 
-          <Divider light className="divider--space-x" />
-
-          <Grid container justify="center" style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Grid container>
-                <Grid item xs={12} sm={4}>
-                  <Typography
-                    type="subheading"
-                    className="subheading font-medium"
-                  >
-                    Customer
-                    </Typography>
-
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                  <Paper elevation={2} className="paper-for-fields">
-                    <Grid container>
-                      <Grid item xs={12}>
-                        <FormControl component="fieldset">
-                          <RadioGroup
-                            aria-label="email"
-                            name="email"
-                            value={this.state.customerType}
-                            onChange={this.handleChange.bind(
-                              this,
-                              'radio',
-                              'customerType',
-                            )}
-                            style={{ flexDirection: 'row' }}
-                          >
-                            <FormControlLabel
-                              className="radiobuttonlabel"
-                              value="email"
-                              control={
-                                <Radio
-                                  checked={
-                                    this.state.customerType ===
-                                    'email'
-                                  }
-                                />
-                              }
-                              label="Email"
-                            />
-                            <FormControlLabel
-                              className="radiobuttonlabel"
-                              value="specific"
-                              control={
-                                <Radio
-                                  checked={
-                                    this.state.customerType ===
-                                    'specific'
-                                  }
-                                />
-                              }
-                              label="Existing Customer"
-                            />
-
-
-                          </RadioGroup>
-                        </FormControl>
-                      </Grid>
-
-
-                      {this.state.customerType == 'email' && (
-                        <div style={{ width: '100%' }}>
-                          <Grid item xs={12}>
-                            <TextField
-                              label="Email"
-                              fullWidth
-                              name="email"
-                              id="email"
-                              required
-                              type="email"
-                            />
-                          </Grid>
-                        </div>
-                      )}
-
-                      {this.state.customerType == 'specific' && (
-                        <div style={{ width: '100%' }}>
-                          <Grid item xs={12} style={{ position: 'relative' }}>
-                            <Search
-                              className="autoinput-icon"
-                              style={{ right: '0 !important' }}
-                            />
-                            <Autosuggest
-                              id="1"
-                              className="autosuggest"
-                              theme={{
-                                container: {
-                                  flexGrow: 1,
-                                  position: 'relative',
-                                },
-                                suggestionsContainerOpen: {
-                                  position: 'absolute',
-                                  left: 0,
-                                  right: 0,
-                                },
-                                suggestion: {
-                                  display: 'block',
-                                },
-                                suggestionsList: {
-                                  margin: 0,
-                                  padding: 0,
-                                  listStyleType: 'none',
-                                },
-                              }}
-                              renderInputComponent={this.renderInputTypes.bind(this)}
-                              suggestions={this.state.suggestionsTypes}
-                              onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(
-                                this,
-                              )}
-                              onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(
-                                this,
-                              )}
-                              onSuggestionSelected={this.onSuggestionSelectedTypes.bind(
-                                this,
-                              )}
-                              getSuggestionValue={this.getSuggestionValueTypes.bind(
-                                this,
-                              )}
-                              renderSuggestion={this.renderSuggestionTypes.bind(this)}
-                              renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(
-                                this,
-                              )}
-                              focusInputOnSuggestionClick={false}
-                              inputProps={{
-                                placeholder: 'Search',
-                                value: this.state.valueTypes,
-                                onChange: this.onChangeTypes.bind(this),
-                                className: 'auto type-autocomplete',
-                              }}
-                            />
-                          </Grid>
-
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              flexWrap: 'wrap',
-                              marginTop: '25px',
-                            }}
-                          >
-                            {!this.props.loading && this.state.customerType == 'specific' && this.state.customer.length ? (
-                              _.filter(this.props.customers, u => this.state.customer === u._id).map((e, i) => (
-                                <Chip
-                                  avatar={<Avatar> {this.getTypeAvatar(e)} </Avatar>}
-                                  style={{ marginRight: '8px', marginBottom: '8px' }}
-                                  label={`${e.profile.name.first} ${e.profile.name.last}`}
-                                  key={i}
-                                  onDelete={this.handleRestrictionChipDelete.bind(
-                                    this,
-                                    e,
-                                  )}
-                                />
-                              ))
-                            ) : (
-                                <Chip className="chip--bordered" label="Customer" />
-                              )}
-                          </div>
-                        </div>
-                      )}
+                    <Grid item xs={12} sm={12} md={12}>
+                      <TextField
+                        disabled={this.props.newGiftCard}
+                        fullWidth
+                        // value={this.props.giftCard.balance < this.props.giftCard.initialAmount ? this.state.balance : this.state.initialAmount}
+                        value={this.state.balance}
+                        id="balance"
+                        name="balance"
+                        onChange={(e) => this.handleChange(e, 'text', 'balance')}
+                        label="Balance"
+                        InputProps={{
+                          'aria-label': 'Description',
+                          type: 'number',
+                          startAdornment: <InputAdornment position={'start'}>$</InputAdornment>,
+                        }}
+                      />
                     </Grid>
 
                   </Paper>
@@ -1013,112 +878,310 @@ class GiftCardEditor extends React.Component {
             </Grid>
           </Grid>
 
+
+
           <Divider light className="divider--space-x" />
 
-          <Grid container justify="center" style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Grid container>
-                <Grid item xs={12} sm={4}>
-                  <Typography
-                    type="subheading"
-                    className="subheading font-medium"
-                  >
-                    Note
-                    </Typography>
+          {!this.props.newGiftCard &&  (
+            <React.Fragment>
+              <Grid container justify="center" style={{ marginBottom: '50px' }}>
+                <Grid item xs={12}>
+                  <Grid container>
+                    <Grid item xs={12} sm={4}>
+                      <Typography
+                        type="subheading"
+                        className="subheading font-medium"
+                      >
+                        Purchase
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={8}>
+                      <Paper elevation={2} className="paper-for-fields">
+
+                          {this.props.giftCard.purchasedOnline ? 'Online' : 'Offline'}
+
+                      </Paper>
+                    </Grid>
+                    </Grid>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12} sm={8}>
-                  <Paper elevation={2} className="paper-for-fields">
 
-                    <TextField
-                      fullWidth
-                      name="note"
-                      id="note"
-                      multiline
-                      value={this.state.note}
-                      onChange={this.handleChange.bind(this, 'text', 'note')}
-                    />
+                <Divider light className="divider--space-x" />
+              </React.Fragment>
+            )}
 
-                  </Paper>
+
+            <Grid container justify="center" style={{ marginBottom: '50px' }}>
+              <Grid item xs={12}>
+                <Grid container>
+                  <Grid item xs={12} sm={4}>
+                    <Typography
+                      type="subheading"
+                      className="subheading font-medium"
+                    >
+                      Customer
+                  </Typography>
+
+                  </Grid>
+                  <Grid item xs={12} sm={8}>
+                    <Paper elevation={2} className="paper-for-fields">
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <FormControl component="fieldset">
+                            <RadioGroup
+                              aria-label="email"
+                              name="email"
+                              value={this.state.customerType}
+                              onChange={(e) => this.handleChange(e, 'radio', 'customerType')}
+                              style={{ flexDirection: 'row' }}
+                            >
+                              <FormControlLabel
+                                className="radiobuttonlabel"
+                                value="email"
+                                control={
+                                  <Radio
+                                    checked={
+                                      this.state.customerType ===
+                                      'email'
+                                    }
+                                  />
+                                }
+                                label="Email"
+                              />
+                              <FormControlLabel
+                                className="radiobuttonlabel"
+                                value="specific"
+                                control={
+                                  <Radio
+                                    checked={
+                                      this.state.customerType ===
+                                      'specific'
+                                    }
+                                  />
+                                }
+                                label="Existing Customer"
+                              />
+
+
+                            </RadioGroup>
+                          </FormControl>
+                        </Grid>
+
+
+                        {this.state.customerType == 'email' && (
+                          <div style={{ width: '100%' }}>
+                            <Grid item xs={12}>
+                              <TextField
+                                label="Email"
+                                fullWidth
+                                name="customer"
+                                id="email"
+                                required
+                                type="email"
+                                onChange={(e) => this.handleChange(e, 'text', 'customer')}
+                                value={this.state.customer}
+                              />
+                            </Grid>
+                          </div>
+                        )}
+
+                        {this.state.customerType == 'specific' && (
+                          <div style={{ width: '100%' }}>
+                            <Grid item xs={12} style={{ position: 'relative' }}>
+                              <Search
+                                className="autoinput-icon"
+                                style={{ right: '0 !important' }}
+                              />
+                              <Autosuggest
+                                id="1"
+                                className="autosuggest"
+                                theme={{
+                                  container: {
+                                    flexGrow: 1,
+                                    position: 'relative',
+                                  },
+                                  suggestionsContainerOpen: {
+                                    position: 'absolute',
+                                    left: 0,
+                                    right: 0,
+                                  },
+                                  suggestion: {
+                                    display: 'block',
+                                  },
+                                  suggestionsList: {
+                                    margin: 0,
+                                    padding: 0,
+                                    listStyleType: 'none',
+                                  },
+                                }}
+                                renderInputComponent={this.renderInputTypes.bind(this)}
+                                suggestions={this.state.suggestionsTypes}
+                                onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(
+                                  this,
+                                )}
+                                onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(
+                                  this,
+                                )}
+                                onSuggestionSelected={this.onSuggestionSelectedTypes.bind(
+                                  this,
+                                )}
+                                getSuggestionValue={this.getSuggestionValueTypes.bind(
+                                  this,
+                                )}
+                                renderSuggestion={this.renderSuggestionTypes.bind(this)}
+                                renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(
+                                  this,
+                                )}
+                                focusInputOnSuggestionClick={false}
+                                inputProps={{
+                                  placeholder: 'Search',
+                                  value: this.state.valueTypes,
+                                  onChange: this.onChangeTypes.bind(this),
+                                  className: 'auto type-autocomplete',
+                                }}
+                              />
+                            </Grid>
+
+                            <div
+                              style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                flexWrap: 'wrap',
+                                marginTop: '25px',
+                              }}
+                            >
+                              {!this.props.loading && this.state.customerType == 'specific' && this.state.customer.length ? (
+                                filter(this.props.customers, u => this.state.customer === u._id).map((e, i) => (
+                                  <Chip
+                                    avatar={<Avatar> {this.getTypeAvatar(e)} </Avatar>}
+                                    style={{ marginRight: '8px', marginBottom: '8px' }}
+                                    label={`${e.profile.name.first} ${e.profile.name.last}`}
+                                    key={i}
+                                    onDelete={this.handleCustomerChipDelete.bind(
+                                      this,
+                                      e,
+                                    )}
+                                  />
+                                ))
+                              ) : (
+                                  <Chip className="chip--bordered" label="Customer" />
+                                )}
+                            </div>
+                          </div>
+                        )}
+                      </Grid>
+
+                    </Paper>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
+
+            <Divider light className="divider--space-x" />
+
+            <Grid container justify="center" style={{ marginBottom: '50px' }}>
+              <Grid item xs={12}>
+                <Grid container>
+                  <Grid item xs={12} sm={4}>
+                    <Typography
+                      type="subheading"
+                      className="subheading font-medium"
+                    >
+                      Note
+                  </Typography>
+                  </Grid>
+                  <Grid item xs={12} sm={8}>
+                    <Paper elevation={2} className="paper-for-fields">
+
+                      <TextField
+                        fullWidth
+                        name="note"
+                        id="note"
+                        multiline
+                        value={this.state.note}
+                        onChange={(e) => this.handleChange(e, 'text', 'note')}
+                      />
+
+                    </Paper>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
 
 
-          <Grid container justify="center" style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <Grid container>
-                <Grid item xs={4}>
-                  {
-                    this.props.newGiftCard ? (
-                      ''
-                    ) : (
-                        <Button
-                          raised
-                          onClick={
-                            this.props.giftCard && this.props.giftCard._id
-                              ? this.handleRemove.bind(this)
-                              : () => this.props.history.push('/gift-cards')
-                          }
-                        >
-                          Disable
+            <Grid container justify="center" style={{ marginBottom: '50px' }}>
+              <Grid item xs={12}>
+                <Grid container>
+                  <Grid item xs={4}>
+                    {
+                      this.props.newGiftCard ? (
+                        ''
+                      ) : (
+                          <Button
+                            raised
+                            onClick={
+                              this.props.giftCard && this.props.giftCard._id
+                                ? this.handleRemove
+                                : () => this.props.history.push('/gift-cards')
+                            }
+                          >
+                            Disable
                         </Button>
-                      )}
-                </Grid>
+                        )}
+                  </Grid>
 
-                <Grid item xs={8}>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'flex-end',
-                    }}
-                  >
-                    <Button
-                      style={{ marginRight: '10px' }}
-                      onClick={() => history.push('/gift-cards')}
+                  <Grid item xs={8}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'flex-end',
+                      }}
                     >
-                      Cancel
-                      </Button>
-                    <Button
-                      disabled={!this.state.hasFormChanged || this.state.submitLoading}
-                      type="submit"
-                      className={`btn btn-primary ${buttonClassname}`}
-                      raised
-                      color="contrast"
-                    >
-                      Save
-
-                        {this.state.submitLoading && (
-                        <CircularProgress
-                          size={24}
-                          className={this.props.classes.buttonProgress}
-                        />
-                      )}
+                      <Button
+                        style={{ marginRight: '10px' }}
+                        onClick={() => history.push('/gift-cards')}
+                      >
+                        Cancel
                     </Button>
-                  </div>
+                      <Button
+                        disabled={!this.state.hasFormChanged || this.state.submitLoading}
+                        type="submit"
+                        className={`btn btn-primary ${buttonClassname}`}
+                        raised
+                        color="contrast"
+                      >
+                        Save
+  
+                      {this.state.submitLoading && (
+                          <CircularProgress
+                            size={24}
+                            className={this.props.classes.buttonProgress}
+                          />
+                        )}
+                      </Button>
+                    </div>
+                  </Grid>
                 </Grid>
               </Grid>
             </Grid>
-          </Grid>
         </div>
 
-        {this.renderDeleteDialog()}
-      </form>
-    );
-
-  }
-}
-
+          {this.renderDeleteDialog()}
+      </form >
+        );
+      }
+    }
+    
 GiftCardEditor.defaultProps = {
-  category: { title: '' },
-};
-
+          category: {title: '' },
+      };
+      
 GiftCardEditor.propTypes = {
-  category: PropTypes.object,
-  customers: PropTypes.array.isRequired,
-  history: PropTypes.object.isRequired,
-  popTheSnackbar: PropTypes.func.isRequired,
-};
-
-export default withStyles(styles)(GiftCardEditor);
+          category: PropTypes.object,
+        customers: PropTypes.array.isRequired,
+        history: PropTypes.object.isRequired,
+        popTheSnackbar: PropTypes.func.isRequired,
+      };
+      
+      export default withStyles(styles)(GiftCardEditor);

@@ -61,8 +61,36 @@ class Customers extends React.Component {
     autoBind(this);
   }
 
+  componentWillUnmount() {
+    this.timer = null;
+
+    tableConfig.set({
+      pageProperties: {
+        currentPage: 1,
+        pageSize: 50,
+        recordCount: 0,
+        maxPages: 1,
+      },
+      selector: {
+        roles: ['customer'],
+      },
+      sort: {
+        'profile.name.first': 1,
+      },
+    });
+
+    this.setState({
+      customers: [],
+    });
+  }
+
+
   componentWillMount() {
     this.timer = null;
+
+    this.setState({
+      customers: [],
+    });
   }
 
   componentDidMount() {
@@ -79,17 +107,15 @@ class Customers extends React.Component {
 
     this.setState({
       searchTextLoading: true,
-    })
+    });
 
     Meteor.call('getCustomersTable', config.selector, config.sort, skip, limit, (err, res) => {
-
       if (!err) {
         this.setState({
           searchTextLoading: false,
           customers: res,
-        })
+        });
       }
-
     });
   }
 
@@ -112,12 +138,12 @@ class Customers extends React.Component {
 
       tableConfig.set(configCopy);
 
-      this.getCustomers()
-    }, 200)
+      this.getCustomers();
+    }, 200);
   }
 
   handleChange(e) {
-    if(this.timer){
+    if (this.timer) {
       Meteor.clearTimeout(this.timer);
     }
     this.setState({
@@ -187,11 +213,10 @@ class Customers extends React.Component {
       options: { sort: newOptions },
     });
 
-    this.getCustomers()
+    this.getCustomers();
   }
 
   handleTabChange(event, value) {
-
     this.setState({
       currentTabValue: value,
     });
