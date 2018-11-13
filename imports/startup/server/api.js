@@ -25,6 +25,9 @@ import '../../api/IngredientTypes/server/publications';
 import '../../api/Invoices/methods';
 import '../../api/Invoices/server/publications';
 
+import '../../api/Jobs/methods';
+import '../../api/Jobs/server/publications';
+
 import '../../api/Categories/methods';
 import '../../api/Categories/server/publications';
 

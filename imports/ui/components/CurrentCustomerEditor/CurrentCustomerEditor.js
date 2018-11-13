@@ -152,12 +152,12 @@ class CurrentCustomerEditor extends React.Component {
       deleteDialogOpen: false,
       addRestrictionType: 'Restriction',
 
-      lifestyle: '',
+      lifestyle: !this.props.loading && this.props.customer && this.props.customer.lifestyle ? this.props.customer.lifestyle : '',
 
       isLifestyleCustom: false,
 
-      discountCode: !this.props.loading && this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '', 
-      
+      discountCode: !this.props.loading && this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '',
+
       discount: !this.props.loading && this.props.customer && this.props.customer.discount
         ? this.props.customer.discount
         : 'none',
@@ -200,18 +200,20 @@ class CurrentCustomerEditor extends React.Component {
           dinner: { active: false, portions: 'regular', quantity: '1' },
         },
       ],
-      platingNotes: this.props.customer.platingNotes ? this.props.customer.platingNotes : '',
+
+      platingNotes: !this.props.loading && this.props.customer.platingNotes ? this.props.customer.platingNotes : '',
 
       secondaryCollapses: [false, false, false, false, false, false],
-      secondaryProfileCount: this.props.customer && this.props.customer.associatedProfiles > 0 ? this.props.customer.associatedProfiles : 0,
-      secondaryProfilesData: this.props.customer && this.props.lifestyles && this.props.secondaryAccounts ? this.props.secondaryAccounts.map((e) => {
+      secondaryProfileCount: !this.props.loading && this.props.customer && this.props.customer.associatedProfiles > 0 ? this.props.customer.associatedProfiles : 0,
+      secondaryProfilesData: !this.props.loading && this.props.customer && this.props.lifestyles && this.props.secondaryAccounts ? this.props.secondaryAccounts.map((e) => {
         return {
           _id: e._id,
           first_name: e.profile.name.first,
           last_name: e.profile.name.last ? e.profile.name.last : '',
           subIngredients: e.preferences,
           specificRestrictions: e.specificRestrictions,
-          lifestyle: this.props.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
+          // lifestyle: this.props.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
+          lifestyle: e.lifestyle,
           isLifestyleCustom: this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom,
           discount: e.discount,
           restrictions: e.restrictions, //fix here
@@ -223,7 +225,7 @@ class CurrentCustomerEditor extends React.Component {
         }
       }) : [],
       secondaryProfilesRemoved: [],
-      
+
       orderSummaryDialogOpen: false,
 
 
@@ -263,11 +265,11 @@ class CurrentCustomerEditor extends React.Component {
           email: false,
           sms: false
         },
-        
+
       activeDeliveryScheduleStep: 0,
 
       completeSchedule: !this.props.loading && this.props.subscription ? this.props.subscription.completeSchedule : [],
-      deliveryType: !this.props.loading &&  this.props.subscription ? this.props.subscription.delivery : [],
+      deliveryType: !this.props.loading && this.props.subscription ? this.props.subscription.delivery : [],
 
       subscriptionStartDate: moment(this.renderStartDays()[0]).format(
         'dddd MMMM Do YYYY',
@@ -299,7 +301,7 @@ class CurrentCustomerEditor extends React.Component {
       hasFormChanged: true,
     });
   }
-  
+
   renderMonths() {
     const options = [];
 
@@ -379,7 +381,7 @@ class CurrentCustomerEditor extends React.Component {
     });
   }
 
-  handleResetPassword(){
+  handleResetPassword() {
 
     this.setState({
       submitLoadingReset: true,
@@ -389,7 +391,7 @@ class CurrentCustomerEditor extends React.Component {
     console.log(this.props.customer._id)
 
     Meteor.call('users.resetPassword', this.props.customer._id, (err, res) => {
-      if(err){
+      if (err) {
         this.setState({
           submitLoadingReset: false,
           submitSuccessReset: false,
@@ -398,13 +400,13 @@ class CurrentCustomerEditor extends React.Component {
         this.props.popTheSnackbar({
           message: 'There was a problem sending the reset password email.'
         })
-    
-      } else{
+
+      } else {
         this.setState({
           submitLoadingReset: false,
           submitSuccessReset: false,
         })
-        
+
         this.props.popTheSnackbar({
           message: 'Successfully sent a reset password email.'
         })
@@ -412,10 +414,10 @@ class CurrentCustomerEditor extends React.Component {
     })
   }
 
-  componentWillReceiveProps(nextProps, prevState){
-    
-    if(!nextProps.loading) {
-      if(nextProps.lifestyles && nextProps.customer && nextProps.customer.lifestyle && nextProps.subscription && nextProps.secondaryAccounts) {
+  componentWillReceiveProps(nextProps, prevState) {
+
+    if (!nextProps.loading) {
+      if (nextProps.lifestyles && nextProps.customer && nextProps.customer.lifestyle && nextProps.subscription && nextProps.secondaryAccounts) {
 
         const secondaryAccounts = nextProps.secondaryAccounts.map((e) => {
           return {
@@ -424,7 +426,8 @@ class CurrentCustomerEditor extends React.Component {
             last_name: e.profile.name.last ? e.profile.name.last : '',
             subIngredients: e.preferences,
             specificRestrictions: e.specificRestrictions,
-            lifestyle: nextProps.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
+            // lifestyle: nextProps.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
+            lifestyle: e.lifestyle,
             isLifestyleCustom: nextProps.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom,
             discount: e.discount,
             restrictions: e.restrictions, //fix here
@@ -435,29 +438,32 @@ class CurrentCustomerEditor extends React.Component {
             adultOrChild: e.adultOrChild,
           }
         });
-        
+
         const discountApplied = nextProps.subscription.hasOwnProperty('discountApplied') ? nextProps.subscription.discountApplied : '';
 
 
         // console.log(nextProps)
         const currentLifestyle = nextProps.lifestyles.find(e => e._id === nextProps.customer.lifestyle);
         const isLifestyleCustom = currentLifestyle != undefined && currentLifestyle.custom ? currentLifestyle.custom : false;
+        const associatedProfiles = nextProps.customer.associatedProfiles > 0 ? this.props.associatedProfiles : 0;
 
-        if(currentLifestyle != undefined){
+        if (currentLifestyle != undefined) {
           this.setState({
-            lifestyle: currentLifestyle.title,
+            // lifestyle: currentLifestyle.title,
+            lifestyle: nextProps.customer.lifestyle,
             lifestyleCustom: isLifestyleCustom,
-            completeSchedule:  nextProps.subscription.completeSchedule,
-            deliveryType:  nextProps.subscription.delivery,
+            completeSchedule: nextProps.subscription.completeSchedule,
+            deliveryType: nextProps.subscription.delivery,
             discountApplied: discountApplied,
+            secondaryProfileCount: associatedProfiles,
             secondaryProfilesData: secondaryAccounts,
           })
         }
       }
     }
-    
+
   }
-  
+
   componentWillUpdate(nextProps, nextState) {
     if (nextState.currentTab == 1) {
       validate(this.secondForm, {
@@ -600,9 +606,7 @@ class CurrentCustomerEditor extends React.Component {
     }
 
     if (
-      this.state.scheduleReal.find(
-        el => el.breakfast.active || el.lunch.active || el.dinner.active,
-      ) === undefined
+      this.state.scheduleReal.find(el => el.breakfast.active || el.lunch.active || el.dinner.active) === undefined
     ) {
       this.props.popTheSnackbar({
         message:
@@ -733,7 +737,8 @@ class CurrentCustomerEditor extends React.Component {
       subscriptionId: this.props.subscription ? this.props.subscription._id : '',
       subIngredients: this.state.subIngredients,
       specificRestrictions: this.state.specificRestrictions,
-      lifestyle: this.props.lifestyles.find(e => e.title === this.state.lifestyle)._id,
+      // lifestyle: this.props.lifestyles.find(e => e.title === this.state.lifestyle)._id,
+      lifestyle: this.state.lifestyle,
       discount: this.state.discount,
       discountCode: this.state.discountCode,
       restrictions: this.state.restrictions,
@@ -856,7 +861,7 @@ class CurrentCustomerEditor extends React.Component {
   // Step 2 Methods
   handleChangeRadioLifestyle(event, value) {
     const getLifestyle = this.props.lifestyles.find(
-      el => el.title === value,
+      el => el._id === value,
     );
 
     const currentRestrictionsIds = [];
@@ -1842,7 +1847,7 @@ class CurrentCustomerEditor extends React.Component {
     this.state.secondaryProfilesData[i].lifestyle = value;
 
     const getLifestyleRestrictions = this.props.lifestyles.find(
-      el => el.title === value,
+      el => el._id === value,
     );
 
     const currentRestrictionsIds = [];
@@ -6485,176 +6490,176 @@ class CurrentCustomerEditor extends React.Component {
       [this.props.classes.buttonSuccess]: this.state.submitSuccess,
     });
 
-    const { customer, history, loading } = this.props;
+    const { jobs, customer, history, loading } = this.props;
     const { activeMealScheduleStep, activeDeliveryScheduleStep } = this.state;
     const mealSteps = this.getMealSteps();
     const steps = this.getSteps();
 
-    if(loading){
+    if (loading) {
       return <Loading />
     }
-   
-      return (
-        <div style={{ width: '100%' }}>
-          <Grid container justify="center">
-            <Grid item xs={12}>
-              <Button
-                onClick={() => this.props.history.push('/customers')}
-                className="button button-secondary button-secondary--top"
-              >
-                <Typography
-                  type="subheading"
-                  className="subheading font-medium"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    flexDirection: 'row',
-                  }}
-                >
-                  <ChevronLeft style={{ marginRight: '4px' }} /> Customers
-              </Typography>
-              </Button>
-            </Grid>
-          </Grid>
 
-          <Grid container style={{ marginBottom: '50px' }}>
-            <Grid item xs={4}>
+    return (
+      <div style={{ width: '100%' }}>
+        <Grid container justify="center">
+          <Grid item xs={12}>
+            <Button
+              onClick={() => this.props.history.push('/customers')}
+              className="button button-secondary button-secondary--top"
+            >
               <Typography
-                type="headline"
-                className="headline"
-                style={{ fontWeight: 500, alignItems: 'center', display: 'flex' }}
-              >
-                {customer.profile ? `${customer.profile.name.first} ${customer.profile.name.last}` : ''}
-                {customer.secondary && <Chip style={{ marginLeft: '20px' }} label="Secondary" />}
-              </Typography>
-
-            </Grid>
-            <Grid item xs={8}>
-              <div
+                type="subheading"
+                className="subheading font-medium"
                 style={{
                   display: 'flex',
                   alignItems: 'center',
-                  justifyContent: 'flex-end',
+                  flexDirection: 'row',
                 }}
               >
-                <Button
-                  style={{ marginRight: '10px' }}
-                  onClick={() => history.push('/customers')}
-                >
-                  Cancel
+                <ChevronLeft style={{ marginRight: '4px' }} /> Customers
+              </Typography>
+            </Button>
+          </Grid>
+        </Grid>
+
+        <Grid container style={{ marginBottom: '50px' }}>
+          <Grid item xs={4}>
+            <Typography
+              type="headline"
+              className="headline"
+              style={{ fontWeight: 500, alignItems: 'center', display: 'flex' }}
+            >
+              {customer.profile ? `${customer.profile.name.first} ${customer.profile.name.last}` : ''}
+              {customer.secondary && <Chip style={{ marginLeft: '20px' }} label="Secondary" />}
+            </Typography>
+
+          </Grid>
+          <Grid item xs={8}>
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
+              }}
+            >
+              <Button
+                style={{ marginRight: '10px' }}
+                onClick={() => history.push('/customers')}
+              >
+                Cancel
               </Button>
 
-              </div>
-            </Grid>
+            </div>
           </Grid>
+        </Grid>
 
-          <Grid container style={{ marginBottom: '50px' }}>
-            <Grid item xs={12}>
-              <AppBar position="static" className="appbar--no-background appbar--no-shadow">
+        <Grid container style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+            <AppBar position="static" className="appbar--no-background appbar--no-shadow">
 
 
-                {(this.props.customer && this.props.customer.secondary == undefined) ? (
+              {(this.props.customer && this.props.customer.secondary == undefined) ? (
+                <Tabs indicatorColor="#000" value={this.state.currentTab} onChange={this.handleTabChange}>
+                  <Tab label="Basic" />
+                  <Tab label="Plan" />
+                  <Tab label="Activity" />
+                  <Tab label="Subscription" />
+                </Tabs>
+              ) : (
                   <Tabs indicatorColor="#000" value={this.state.currentTab} onChange={this.handleTabChange}>
                     <Tab label="Basic" />
-                    <Tab label="Plan" />
-                    <Tab label="Activity" />
-                    <Tab label="Subscription" />
                   </Tabs>
-                ) : (
-                    <Tabs indicatorColor="#000" value={this.state.currentTab} onChange={this.handleTabChange}>
-                      <Tab label="Basic" />
-                    </Tabs>
-                  )}
-              </AppBar>
-            </Grid>
+                )}
+            </AppBar>
+          </Grid>
 
-            {this.state.currentTab === 0 && (
-              <div>
-                <form
-                  id="step1"
-                  ref={form => (this.form = form)}
-                  onSubmit={event => event.preventDefault()}
-                >
-                  <Paper elevation={2} style={{ width: '100%' }} className="paper-for-fields">
-                    <Grid container>
-                      <Grid item xs={12} sm={6}>
-                        <TextField
-                          margin="normal"
-                          id="first_name"
-                          label="First name"
-                          name="first_name"
-                          fullWidth
-                          defaultValue={customer.profile.name.first}
-                          inputProps={{}}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <TextField
-                          margin="normal"
-                          id="last_name"
-                          label="Last name"
-                          name="last_name"
-                          fullWidth
-                          defaultValue={customer.profile.name.last ? customer.profile.name.last : ''}
-                          inputProps={{}}
-                        />
-                      </Grid>
-                    </Grid>
-
-                    {customer.secondary ? (
-
+          {this.state.currentTab === 0 && (
+            <div>
+              <form
+                id="step1"
+                ref={form => (this.form = form)}
+                onSubmit={event => event.preventDefault()}
+              >
+                <Paper elevation={2} style={{ width: '100%' }} className="paper-for-fields">
+                  <Grid container>
+                    <Grid item xs={12} sm={6}>
                       <TextField
                         margin="normal"
-                        id="username"
-                        label="Username"
-                        name="username"
+                        id="first_name"
+                        label="First name"
+                        name="first_name"
                         fullWidth
-                        defaultValue={customer.username}
-                        readOnly
-                        disabled
+                        defaultValue={customer.profile.name.first}
+                        inputProps={{}}
                       />
-
-                    ) : (
-                        <TextField
-                          margin="normal"
-                          id="email"
-                          label="Email"
-                          name="email"
-                          fullWidth
-                          defaultValue={customer.emails[0].address}
-                        />
-                      )}
-                    <Grid container>
-                      <Grid item xs={12} sm={6}>
-                        <TextField
-                          margin="normal"
-                          id="phoneNumber"
-                          label="Phone number"
-                          name="phoneNumber"
-                          fullWidth
-                          defaultValue={customer.phone ? customer.phone : ''}
-                          inputProps={{}}
-                        />
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <TextField
-                          margin="normal"
-                          id="postalCode"
-                          label="Postal code"
-                          name="postal_code"
-                          fullWidth
-                          defaultValue={customer.postalCode}
-                          inputProps={{}}
-                        />
-                      </Grid>
                     </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        id="last_name"
+                        label="Last name"
+                        name="last_name"
+                        fullWidth
+                        defaultValue={customer.profile.name.last ? customer.profile.name.last : ''}
+                        inputProps={{}}
+                      />
+                    </Grid>
+                  </Grid>
 
-                    <Grid container>
-                      <Grid item xs={12}>
-                        <Typography type="body2">Birthday</Typography>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        {/* <Select
+                  {customer.secondary ? (
+
+                    <TextField
+                      margin="normal"
+                      id="username"
+                      label="Username"
+                      name="username"
+                      fullWidth
+                      defaultValue={customer.username}
+                      readOnly
+                      disabled
+                    />
+
+                  ) : (
+                      <TextField
+                        margin="normal"
+                        id="email"
+                        label="Email"
+                        name="email"
+                        fullWidth
+                        defaultValue={customer.emails[0].address}
+                      />
+                    )}
+                  <Grid container>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        id="phoneNumber"
+                        label="Phone number"
+                        name="phoneNumber"
+                        fullWidth
+                        defaultValue={customer.phone ? customer.phone : ''}
+                        inputProps={{}}
+                      />
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        margin="normal"
+                        id="postalCode"
+                        label="Postal code"
+                        name="postal_code"
+                        fullWidth
+                        defaultValue={customer.postalCode}
+                        inputProps={{}}
+                      />
+                    </Grid>
+                  </Grid>
+
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <Typography type="body2">Birthday</Typography>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      {/* <Select
                           id="birthMonth"
                           label="Month"
                           name="birthMonth"
@@ -6667,18 +6672,18 @@ class CurrentCustomerEditor extends React.Component {
                           {this.renderMonths()}
                         </Select> */}
 
-                        <TextField
-                            fullWidth
-                            id="birthMonth"
-                            select
-                            value={this.state.birthMonth}
-                            label="Month"
-                            onChange={this.handleSelectChange.bind(this)}
-                            name="birthMonth"
-                          >
-                            {this.renderMonths()}
-                          </TextField>
-                        {/* <TextField 
+                      <TextField
+                        fullWidth
+                        id="birthMonth"
+                        select
+                        value={this.state.birthMonth}
+                        label="Month"
+                        onChange={this.handleSelectChange.bind(this)}
+                        name="birthMonth"
+                      >
+                        {this.renderMonths()}
+                      </TextField>
+                      {/* <TextField 
                           id="birthMonth"
                           label="Month"
                           name="birthMonth"
@@ -6687,22 +6692,22 @@ class CurrentCustomerEditor extends React.Component {
                           maxlength="2"
                           type="number"
                         /> */}
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            id="birthDay"
-                            select
-                            value={this.state.birthDay}
-                            label="Day"
-                            onChange={this.handleSelectChange.bind(this)}
-                            SelectProps={{ native: false }}
-                            name="birthDay"
-                          >
-                            {this.renderDays()}
-                          </TextField>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <TextField
+                        fullWidth
+                        id="birthDay"
+                        select
+                        value={this.state.birthDay}
+                        label="Day"
+                        onChange={this.handleSelectChange.bind(this)}
+                        SelectProps={{ native: false }}
+                        name="birthDay"
+                      >
+                        {this.renderDays()}
+                      </TextField>
 
-                        {/* <TextField 
+                      {/* <TextField 
                            id="birthDay"
                            label="Day"
                            name="birthDay"
@@ -6711,442 +6716,488 @@ class CurrentCustomerEditor extends React.Component {
                            maxlength="2"
                            type="number"
                         /> */}
-                      </Grid>
                     </Grid>
-                    {!customer.secondary && (
+                  </Grid>
+                  {!customer.secondary && (
                     <Grid container>
-                        <Grid item xs={12}>
-                          <Button
-                            style={{ marginTop: '25px' }}
-                            disabled={this.state.submitLoadingReset}
-                            raised
-                            className={`${buttonClassname}`}
-                            color="primary"
-                            onClick={this.handleResetPassword}
-                          >
-                            Reset password
+                      <Grid item xs={12}>
+                        <Button
+                          style={{ marginTop: '25px' }}
+                          disabled={this.state.submitLoadingReset}
+                          raised
+                          className={`${buttonClassname}`}
+                          color="primary"
+                          onClick={this.handleResetPassword}
+                        >
+                          Reset password
                             {this.state.submitLoadingReset && (
-                              <CircularProgress
-                                size={24}
-                                className={this.props.classes.buttonProgress}
-                              />
-                            )}
-                          </Button>
-                        </Grid>
+                            <CircularProgress
+                              size={24}
+                              className={this.props.classes.buttonProgress}
+                            />
+                          )}
+                        </Button>
                       </Grid>
-                      )}
-                  </Paper>
-
-                  <Button
-                    style={{ marginTop: '25px' }}
-                    disabled={this.state.submitLoading}
-                    raised
-                    className={`${buttonClassname}`}
-                    color="primary"
-                    type="submit"
-                  >
-                    Update
-                  {this.state.submitLoading && (
-                      <CircularProgress
-                        size={24}
-                        className={this.props.classes.buttonProgress}
-                      />
-                    )}
-                  </Button>
-                  {/* <Button onClick={() => this.props.history.push(`/customers/add/type=abandoned&firstName=${customer.profile.name.first}&lastName=${customer.profile.name.last ? customer.profile.name.last : ' '}&email=${customer.emails[0].address}&postalCode=${customer.postalCode}`)} */}
-
-                  {this.props.subscription == undefined && this.props.customer.secondary == undefined && (
-                    <Button onClick={() => this.props.history.push(`/customers/new/${customer._id}`)}
-                      raised color="primary" type="submit" style={{ marginLeft: "25px", marginTop: "25px" }}>
-                      Continue adding
-                    </Button>
+                    </Grid>
                   )}
-                </form>
-              </div>
-            )}
+                </Paper>
 
-            {(this.state.currentTab === 1 && this.props.customer && this.props.subscription != undefined && this.props.customer.secondary == undefined) && (
-              <div>
-                <form id="step2" ref={form => (this.secondForm = form)} onSubmit={event => event.preventDefault()}>
-                  <Paper elevation={2} className="paper-for-fields">
-                    <Typography type="headline" style={{ marginBottom: '25px' }}>
-                      {`${customer.profile.name.first}'s profile`}
-                    </Typography>
+                <Button
+                  style={{ marginTop: '25px' }}
+                  disabled={this.state.submitLoading}
+                  raised
+                  className={`${buttonClassname}`}
+                  color="primary"
+                  type="submit"
+                >
+                  Update
+                  {this.state.submitLoading && (
+                    <CircularProgress
+                      size={24}
+                      className={this.props.classes.buttonProgress}
+                    />
+                  )}
+                </Button>
+                {/* <Button onClick={() => this.props.history.push(`/customers/add/type=abandoned&firstName=${customer.profile.name.first}&lastName=${customer.profile.name.last ? customer.profile.name.last : ' '}&email=${customer.emails[0].address}&postalCode=${customer.postalCode}`)} */}
 
-                    <Grid container>
-                      <Grid item xs={12} sm={6} md={6}>
-                        <FormControl component="fieldset">
-                          <FormLabel component="legend">
-                            <Typography
-                              type="body1"
-                              className="text-uppercase font-medium"
-                            >
-                              Plan
-                          </Typography>
-                          </FormLabel>
-                          <RadioGroup
-                            aria-label="lifestyle"
-                            name="lifestyle"
-                            value={this.state.lifestyle}
-                            onChange={this.handleChangeRadioLifestyle.bind(this)}
-                            style={{ flexDirection: 'row' }}
+                {this.props.subscription == undefined && this.props.customer.secondary == undefined && (
+                  <Button onClick={() => this.props.history.push(`/customers/new/${customer._id}`)}
+                    raised color="primary" type="submit" style={{ marginLeft: "25px", marginTop: "25px" }}>
+                    Continue adding
+                    </Button>
+                )}
+              </form>
+            </div>
+          )}
+
+          {(this.state.currentTab === 1 && this.props.customer && this.props.subscription != undefined && this.props.customer.secondary == undefined) && (
+            <div>
+              <form id="step2" ref={form => (this.secondForm = form)} onSubmit={event => event.preventDefault()}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Typography type="headline" style={{ marginBottom: '25px' }}>
+                    {`${customer.profile.name.first}'s profile`}
+                  </Typography>
+
+                  <Grid container>
+                    <Grid item xs={12} sm={6} md={6}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">
+                          <Typography
+                            type="body1"
+                            className="text-uppercase font-medium"
                           >
-                            {this.props.lifestyles.map((e, i) => (
-                              <FormControlLabel
-                                value={e.title}
-                                control={<Radio />}
-                                label={e.title}
-                                selected
-                                key={i}
-                              />
-                            ))}
-                          </RadioGroup>
-                        </FormControl>
-                      </Grid>
-
-
-                      <Grid item xs={12} sm={6} md={6}>
-                        <FormControl component="fieldset">
-                          <FormLabel component="legend">
-                            <Typography
-                              type="body1"
-                              className="text-uppercase font-medium"
-                            >
-                              Discount
+                            Plan
                           </Typography>
-                          </FormLabel>
-                          <RadioGroup
-                            aria-label="discount"
-                            name="discount"
-                            value={this.state.discount}
-                            onChange={this.handleChangeRadioDiscount.bind(this)}
-                            style={{ flexDirection: 'row' }}
-                          >
+                        </FormLabel>
+                        <RadioGroup
+                          aria-label="lifestyle"
+                          name="lifestyle"
+                          value={this.state.lifestyle}
+                          onChange={this.handleChangeRadioLifestyle.bind(this)}
+                          style={{ flexDirection: 'row' }}
+                        >
+                          {this.props.lifestyles.map((e, i) => (
                             <FormControlLabel
-                              value="none"
+                              value={e._id}
                               control={<Radio />}
-                              label="None"
+                              label={e.title}
                               selected
-                              disabled={
-                                this.state.lifestyle &&
-                                this.props.lifestyles.find(
-                                  element =>
-                                    element.title == this.state.lifestyle &&
-                                    !element.discountStudent &&
-                                    !element.discountSenior,
-                                )
-                              }
+                              key={i}
                             />
-                            <FormControlLabel
-                              value="student"
-                              control={<Radio />}
-                              label={'Student'}
-                              disabled={
-                                this.state.lifestyle &&
-                                this.props.lifestyles.find(
-                                  element =>
-                                    element.title == this.state.lifestyle &&
-                                    !element.discountStudent,
-                                )
-                              }
-                            />
-                            {this.renderDiscountValue.bind(this, 'student')}
-                            <FormControlLabel
-                              value="senior"
-                              control={<Radio />}
-                              label={'Senior'}
-                              disabled={
-                                this.state.lifestyle &&
-                                this.props.lifestyles.find(
-                                  element =>
-                                    element.title == this.state.lifestyle &&
-                                    !element.discountSenior,
-                                )
-                              }
-                            />
-                            {this.renderDiscountValue.bind(this, 'senior')}
-                          </RadioGroup>
-                        </FormControl>
-                      </Grid>
+                          ))}
+                        </RadioGroup>
+                      </FormControl>
                     </Grid>
 
-                    <Stepper
-                      activeStep={activeMealScheduleStep}
-                      style={{
-                        marginTop: '40px',
-                        marginBottom: '20px',
-                        background: 'none !important',
-                      }}
-                    >
-                      {mealSteps.map((label, index) => {
-                        const props = {};
 
-                        const momentDateObj = moment();
-
-                        return (
-                          <Step key={index} {...props}>
-                            <StepLabel>{label}</StepLabel>
-                          </Step>
-                        );
-                      })}
-                    </Stepper>
-                    <div style={{ marginBottom: '30px' }}>
-                      {this.renderMealStepsContent(this.state.activeMealScheduleStep)}
-
-                      {activeMealScheduleStep >= 1 ? (
-                        <Button
-                          onClick={this.handleBackMealSchedule.bind(this)}
-                          style={{ marginTop: '20px' }}
+                    <Grid item xs={12} sm={6} md={6}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">
+                          <Typography
+                            type="body1"
+                            className="text-uppercase font-medium"
+                          >
+                            Discount
+                          </Typography>
+                        </FormLabel>
+                        <RadioGroup
+                          aria-label="discount"
+                          name="discount"
+                          value={this.state.discount}
+                          onChange={this.handleChangeRadioDiscount.bind(this)}
+                          style={{ flexDirection: 'row' }}
                         >
-                          Back
-                      </Button>
-                      ) : (
-                          ''
-                        )}
-
-                      {activeMealScheduleStep < 6 ? (
-                        <Button
-                          onClick={this.handleNextMealSchedule.bind(this)}
-                          style={{ marginTop: '20px' }}
-                        >
-                          Next
-                      </Button>
-                      ) : (
-                          ''
-                        )}
-                    </div>
-                    <Grid container>
-                      <Grid item xs={12} style={{ marginTop: '25px' }}>
-                        <Typography
-                          type="body1"
-                          className="text-uppercase font-medium"
-                        >
-                          Restrictions
-                      </Typography>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <FormControl component="fieldset">
-                          <FormLabel component="legend">Allergies</FormLabel>
-                          <FormGroup>
-                            {this.props.restrictions
-                              .filter(e => e.restrictionType === 'allergy')
-                              .map((e, i) => {
-                                const isSelected = this.state.restrictions.length
-                                  ? this.state.restrictions.indexOf(e._id) != -1
-                                  : false;
-
-                                const isAlreadyChecked = this.state
-                                  .lifestyleRestrictions
-                                  ? this.state.lifestyleRestrictions.indexOf(e._id) !=
-                                  -1
-                                  : false;
-                                return (
-                                  <FormControlLabel
-                                    key={i}
-                                    disabled={isAlreadyChecked}
-                                    control={
-                                      <Checkbox
-                                        checked={isSelected || isAlreadyChecked}
-                                        onChange={this.handleChange.bind(this, e._id)}
-                                        value={e.title.toLowerCase()}
-                                      />
-                                    }
-                                    label={e.title}
-                                  />
-                                );
-                              })}
-                          </FormGroup>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <FormControl component="fieldset">
-                          <FormLabel component="legend">Dietary</FormLabel>
-                          <FormGroup>
-                            {this.props.restrictions
-                              .filter(e => e.restrictionType === 'dietary')
-                              .map((e, i) => {
-                                const isSelected = this.state.restrictions.length
-                                  ? this.state.restrictions.indexOf(e._id) != -1
-                                  : false;
-
-                                const isAlreadyChecked = this.state
-                                  .lifestyleRestrictions
-                                  ? this.state.lifestyleRestrictions.indexOf(e._id) !=
-                                  -1
-                                  : false;
-                                return (
-                                  <FormControlLabel
-                                    key={i}
-                                    disabled={isAlreadyChecked}
-                                    control={
-                                      <Checkbox
-                                        checked={isSelected || isAlreadyChecked}
-                                        onChange={this.handleChange.bind(this, e._id)}
-                                        value={e.title.toLowerCase()}
-                                      />
-                                    }
-                                    label={e.title}
-                                  />
-                                );
-                              })}
-                          </FormGroup>
-                        </FormControl>
-                      </Grid>
-                      <Grid item xs={4}>
-                        <FormControl component="fieldset">
-                          <FormLabel component="legend">Religious</FormLabel>
-                          <FormGroup>
-                            {this.props.restrictions
-                              .filter(e => e.restrictionType === 'religious')
-                              .map((e, i) => {
-                                const isSelected = this.state.restrictions.length
-                                  ? this.state.restrictions.indexOf(e._id) != -1
-                                  : false;
-
-                                const isAlreadyChecked = this.state
-                                  .lifestyleRestrictions
-                                  ? this.state.lifestyleRestrictions.indexOf(e._id) !=
-                                  -1
-                                  : false;
-                                return (
-                                  <FormControlLabel
-                                    key={i}
-                                    disabled={isAlreadyChecked}
-                                    control={
-                                      <Checkbox
-                                        checked={isSelected || isAlreadyChecked}
-                                        onChange={this.handleChange.bind(this, e._id)}
-                                        value={e.title.toLowerCase()}
-                                      />
-                                    }
-                                    label={e.title}
-                                  />
-                                );
-                              })}
-                          </FormGroup>
-                        </FormControl>
-                      </Grid>
+                          <FormControlLabel
+                            value="none"
+                            control={<Radio />}
+                            label="None"
+                            selected
+                            disabled={
+                              this.state.lifestyle &&
+                              this.props.lifestyles.find(
+                                element =>
+                                  element.title == this.state.lifestyle &&
+                                  !element.discountStudent &&
+                                  !element.discountSenior,
+                              )
+                            }
+                          />
+                          <FormControlLabel
+                            value="student"
+                            control={<Radio />}
+                            label={'Student'}
+                            disabled={
+                              this.state.lifestyle &&
+                              this.props.lifestyles.find(
+                                element =>
+                                  element.title == this.state.lifestyle &&
+                                  !element.discountStudent,
+                              )
+                            }
+                          />
+                          {this.renderDiscountValue.bind(this, 'student')}
+                          <FormControlLabel
+                            value="senior"
+                            control={<Radio />}
+                            label={'Senior'}
+                            disabled={
+                              this.state.lifestyle &&
+                              this.props.lifestyles.find(
+                                element =>
+                                  element.title == this.state.lifestyle &&
+                                  !element.discountSenior,
+                              )
+                            }
+                          />
+                          {this.renderDiscountValue.bind(this, 'senior')}
+                        </RadioGroup>
+                      </FormControl>
                     </Grid>
+                  </Grid>
 
-                    <Dialog
-                      maxWidth={false}
-                      open={this.state.deleteDialogOpen}
-                      onClose={this.deleteDialogHandleRequestClose.bind(this)}
-                    >
-                      <Typography
-                        style={{
-                          flex: '0 0 auto',
-                          margin: '0',
-                          padding: '24px 24px 20px 24px',
-                        }}
-                        className="title font-medium"
-                        type="title"
+                  <Stepper
+                    activeStep={activeMealScheduleStep}
+                    style={{
+                      marginTop: '40px',
+                      marginBottom: '20px',
+                      background: 'none !important',
+                    }}
+                  >
+                    {mealSteps.map((label, index) => {
+                      const props = {};
+
+                      const momentDateObj = moment();
+
+                      return (
+                        <Step key={index} {...props}>
+                          <StepLabel>{label}</StepLabel>
+                        </Step>
+                      );
+                    })}
+                  </Stepper>
+                  <div style={{ marginBottom: '30px' }}>
+                    {this.renderMealStepsContent(this.state.activeMealScheduleStep)}
+
+                    {activeMealScheduleStep >= 1 ? (
+                      <Button
+                        onClick={this.handleBackMealSchedule.bind(this)}
+                        style={{ marginTop: '20px' }}
                       >
-                        Add a restriction
+                        Back
+                      </Button>
+                    ) : (
+                        ''
+                      )}
+
+                    {activeMealScheduleStep < 6 ? (
+                      <Button
+                        onClick={this.handleNextMealSchedule.bind(this)}
+                        style={{ marginTop: '20px' }}
+                      >
+                        Next
+                      </Button>
+                    ) : (
+                        ''
+                      )}
+                  </div>
+                  <Grid container>
+                    <Grid item xs={12} style={{ marginTop: '25px' }}>
+                      <Typography
+                        type="body1"
+                        className="text-uppercase font-medium"
+                      >
+                        Restrictions
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">Allergies</FormLabel>
+                        <FormGroup>
+                          {this.props.restrictions
+                            .filter(e => e.restrictionType === 'allergy')
+                            .map((e, i) => {
+                              const isSelected = this.state.restrictions.length
+                                ? this.state.restrictions.indexOf(e._id) != -1
+                                : false;
+
+                              const isAlreadyChecked = this.state
+                                .lifestyleRestrictions
+                                ? this.state.lifestyleRestrictions.indexOf(e._id) !=
+                                -1
+                                : false;
+                              return (
+                                <FormControlLabel
+                                  key={i}
+                                  disabled={isAlreadyChecked}
+                                  control={
+                                    <Checkbox
+                                      checked={isSelected || isAlreadyChecked}
+                                      onChange={this.handleChange.bind(this, e._id)}
+                                      value={e.title.toLowerCase()}
+                                    />
+                                  }
+                                  label={e.title}
+                                />
+                              );
+                            })}
+                        </FormGroup>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">Dietary</FormLabel>
+                        <FormGroup>
+                          {this.props.restrictions
+                            .filter(e => e.restrictionType === 'dietary')
+                            .map((e, i) => {
+                              const isSelected = this.state.restrictions.length
+                                ? this.state.restrictions.indexOf(e._id) != -1
+                                : false;
+
+                              const isAlreadyChecked = this.state
+                                .lifestyleRestrictions
+                                ? this.state.lifestyleRestrictions.indexOf(e._id) !=
+                                -1
+                                : false;
+                              return (
+                                <FormControlLabel
+                                  key={i}
+                                  disabled={isAlreadyChecked}
+                                  control={
+                                    <Checkbox
+                                      checked={isSelected || isAlreadyChecked}
+                                      onChange={this.handleChange.bind(this, e._id)}
+                                      value={e.title.toLowerCase()}
+                                    />
+                                  }
+                                  label={e.title}
+                                />
+                              );
+                            })}
+                        </FormGroup>
+                      </FormControl>
+                    </Grid>
+                    <Grid item xs={4}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">Religious</FormLabel>
+                        <FormGroup>
+                          {this.props.restrictions
+                            .filter(e => e.restrictionType === 'religious')
+                            .map((e, i) => {
+                              const isSelected = this.state.restrictions.length
+                                ? this.state.restrictions.indexOf(e._id) != -1
+                                : false;
+
+                              const isAlreadyChecked = this.state
+                                .lifestyleRestrictions
+                                ? this.state.lifestyleRestrictions.indexOf(e._id) !=
+                                -1
+                                : false;
+                              return (
+                                <FormControlLabel
+                                  key={i}
+                                  disabled={isAlreadyChecked}
+                                  control={
+                                    <Checkbox
+                                      checked={isSelected || isAlreadyChecked}
+                                      onChange={this.handleChange.bind(this, e._id)}
+                                      value={e.title.toLowerCase()}
+                                    />
+                                  }
+                                  label={e.title}
+                                />
+                              );
+                            })}
+                        </FormGroup>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
+
+                  <Dialog
+                    maxWidth={false}
+                    open={this.state.deleteDialogOpen}
+                    onClose={this.deleteDialogHandleRequestClose.bind(this)}
+                  >
+                    <Typography
+                      style={{
+                        flex: '0 0 auto',
+                        margin: '0',
+                        padding: '24px 24px 20px 24px',
+                      }}
+                      className="title font-medium"
+                      type="title"
+                    >
+                      Add a restriction
                     </Typography>
 
-                      <DialogContent>
-                        <DialogContentText>
-                          Select if it's a preference or if it's a restriction
+                    <DialogContent>
+                      <DialogContentText>
+                        Select if it's a preference or if it's a restriction
                       </DialogContentText>
-                        <FormControl component="fieldset">
-                          <RadioGroup
-                            aria-label="restritionOrPref"
-                            name="restritionOrPref"
-                            value={this.state.addRestrictionType}
-                            onChange={this.handleChangeRadioRestriction.bind(this)}
-                            style={{ flexDirection: 'row' }}
-                          >
-                            <FormControlLabel
-                              value="Restriction"
-                              control={<Radio selected />}
-                              label="Restriction"
-                            />
-                            <FormControlLabel
-                              value="Preference"
-                              control={<Radio />}
-                              label="Preference"
-                              selected
-                            />
-                          </RadioGroup>
-                        </FormControl>
-
-                        <Autosuggest
-                          id="2"
-                          className="autosuggest"
-                          theme={{
-                            container: {
-                              flexGrow: 1,
-                              position: 'relative',
-                              marginBottom: '2em',
-                            },
-                            suggestionsContainerOpen: {
-                              position: 'absolute',
-                              left: 0,
-                              right: 0,
-                            },
-                            suggestion: {
-                              display: 'block',
-                            },
-                            suggestionsList: {
-                              margin: 0,
-                              padding: 0,
-                              listStyleType: 'none',
-                            },
-                          }}
-                          renderInputComponent={this.renderInput.bind(this)}
-                          suggestions={this.state.suggestions}
-                          onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                            this,
-                          )}
-                          onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                            this,
-                          )}
-                          onSuggestionSelected={this.onSuggestionSelected.bind(this)}
-                          getSuggestionValue={this.getSuggestionValue.bind(this)}
-                          renderSuggestion={this.renderSuggestion.bind(this)}
-                          renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                            this,
-                          )}
-                          fullWidth
-                          focusInputOnSuggestionClick={false}
-                          inputProps={{
-                            placeholder: 'Search',
-                            value: this.state.value,
-                            onChange: this.onChange.bind(this),
-                            className: 'autoinput',
-                          }}
-                        />
-                      </DialogContent>
-                      <DialogActions>
-                        <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">Close</Button>
-                      </DialogActions>
-                    </Dialog>
-
-                    <Grid container>
-                      <Grid item xs={12} sm={6}>
-                        <Typography
-                          type="subheading"
-                          className="text-uppercase font-medium"
+                      <FormControl component="fieldset">
+                        <RadioGroup
+                          aria-label="restritionOrPref"
+                          name="restritionOrPref"
+                          value={this.state.addRestrictionType}
+                          onChange={this.handleChangeRadioRestriction.bind(this)}
+                          style={{ flexDirection: 'row' }}
                         >
-                          Preferences
+                          <FormControlLabel
+                            value="Restriction"
+                            control={<Radio selected />}
+                            label="Restriction"
+                          />
+                          <FormControlLabel
+                            value="Preference"
+                            control={<Radio />}
+                            label="Preference"
+                            selected
+                          />
+                        </RadioGroup>
+                      </FormControl>
+
+                      <Autosuggest
+                        id="2"
+                        className="autosuggest"
+                        theme={{
+                          container: {
+                            flexGrow: 1,
+                            position: 'relative',
+                            marginBottom: '2em',
+                          },
+                          suggestionsContainerOpen: {
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                          },
+                          suggestion: {
+                            display: 'block',
+                          },
+                          suggestionsList: {
+                            margin: 0,
+                            padding: 0,
+                            listStyleType: 'none',
+                          },
+                        }}
+                        renderInputComponent={this.renderInput.bind(this)}
+                        suggestions={this.state.suggestions}
+                        onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
+                          this,
+                        )}
+                        onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
+                          this,
+                        )}
+                        onSuggestionSelected={this.onSuggestionSelected.bind(this)}
+                        getSuggestionValue={this.getSuggestionValue.bind(this)}
+                        renderSuggestion={this.renderSuggestion.bind(this)}
+                        renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                          this,
+                        )}
+                        fullWidth
+                        focusInputOnSuggestionClick={false}
+                        inputProps={{
+                          placeholder: 'Search',
+                          value: this.state.value,
+                          onChange: this.onChange.bind(this),
+                          className: 'autoinput',
+                        }}
+                      />
+                    </DialogContent>
+                    <DialogActions>
+                      <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">Close</Button>
+                    </DialogActions>
+                  </Dialog>
+
+                  <Grid container>
+                    <Grid item xs={12} sm={6}>
+                      <Typography
+                        type="subheading"
+                        className="text-uppercase font-medium"
+                      >
+                        Preferences
                       </Typography>
 
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            flexWrap: 'wrap',
-                            marginTop: '25px',
-                          }}
-                        >
-                          {this.state.subIngredients.length ? (
-                            this.state.subIngredients.map((subIngredient, i) => (
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          marginTop: '25px',
+                        }}
+                      >
+                        {this.state.subIngredients.length ? (
+                          this.state.subIngredients.map((subIngredient, i) => (
+                            <Chip
+                              avatar={
+                                <Avatar>
+                                  {' '}
+                                  {this.getSubIngredientAvatar(subIngredient)}{' '}
+                                </Avatar>
+                              }
+                              style={{
+                                marginRight: '8px',
+                                marginBottom: '8px',
+                              }}
+                              label={this.getSubIngredientTitle(subIngredient)}
+                              key={i}
+                              onDelete={this.handleSubIngredientChipDelete.bind(
+                                this,
+                                subIngredient,
+                              )}
+                            />
+                          ))
+                        ) : (
+                            <Chip className="chip--bordered" label="Ingredient" />
+                          )}
+                      </div>
+                    </Grid>
+
+                    <Grid item xs={12} sm={6}>
+                      <Typography
+                        type="subheading"
+                        className="text-uppercase font-medium"
+                      >
+                        Restrictions
+                      </Typography>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          alignItems: 'center',
+                          flexWrap: 'wrap',
+                          marginTop: '25px',
+                        }}
+                      >
+                        {this.state.specificRestrictions.length ? (
+                          this.state.specificRestrictions.map(
+                            (subIngredient, i) => (
                               <Chip
                                 avatar={
                                   <Avatar>
                                     {' '}
-                                    {this.getSubIngredientAvatar(subIngredient)}{' '}
+                                    {this.getSubIngredientAvatar(
+                                      subIngredient,
+                                    )}{' '}
                                   </Avatar>
                                 }
                                 style={{
@@ -7155,658 +7206,662 @@ class CurrentCustomerEditor extends React.Component {
                                 }}
                                 label={this.getSubIngredientTitle(subIngredient)}
                                 key={i}
-                                onDelete={this.handleSubIngredientChipDelete.bind(
+                                onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
                                   this,
                                   subIngredient,
                                 )}
                               />
-                            ))
-                          ) : (
-                              <Chip className="chip--bordered" label="Ingredient" />
-                            )}
-                        </div>
-                      </Grid>
-
-                      <Grid item xs={12} sm={6}>
-                        <Typography
-                          type="subheading"
-                          className="text-uppercase font-medium"
-                        >
-                          Restrictions
-                      </Typography>
-
-                        <div
-                          style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            flexWrap: 'wrap',
-                            marginTop: '25px',
-                          }}
-                        >
-                          {this.state.specificRestrictions.length ? (
-                            this.state.specificRestrictions.map(
-                              (subIngredient, i) => (
-                                <Chip
-                                  avatar={
-                                    <Avatar>
-                                      {' '}
-                                      {this.getSubIngredientAvatar(
-                                        subIngredient,
-                                      )}{' '}
-                                    </Avatar>
-                                  }
-                                  style={{
-                                    marginRight: '8px',
-                                    marginBottom: '8px',
-                                  }}
-                                  label={this.getSubIngredientTitle(subIngredient)}
-                                  key={i}
-                                  onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
-                                    this,
-                                    subIngredient,
-                                  )}
-                                />
-                              ),
-                            )
-                          ) : (
-                              <Chip className="chip--bordered" label="Ingredient" />
-                            )}
-                        </div>
-                      </Grid>
-                    </Grid>
-                    <Grid container>
-                      <Grid item xs={12}>
-                        <Button
-                          style={{ marginTop: '25px' }}
-                          color="primary"
-                          onClick={this.deleteDialogHandleOpen.bind(this)}
-                        >
-                          Add a restriction
-                      </Button>
-                      </Grid>
-                    </Grid>
-
-                    <Grid container style={{ marginTop: '25px' }}>
-                      <Grid item xs={12} sm={12}>
-                        <TextField
-                          label="Plating notes"
-                          id="platingNotes"
-                          name="platingNotes"
-                          value={this.state.platingNotes}
-                          fullWidth
-                          multiline
-                          onChange={(event) => { this.setState({ platingNotes: event.target.value }); }}
-                        />
-                      </Grid>
-                    </Grid>
-
-                    {this.props.customer.secondary == undefined ? this.state.secondaryProfilesData.map((e, profileIndex) => (
-                      <div key={profileIndex}>
-                        <ListItem
-                          style={{ marginTop: '15px', marginBottom: '15px' }}
-                          button
-                          onClick={this.handleProfileOpen.bind(
-                            this,
-                            false,
-                            profileIndex,
+                            ),
+                          )
+                        ) : (
+                            <Chip className="chip--bordered" label="Ingredient" />
                           )}
-                        >
-                          <ListItemText
-                            primary={
+                      </div>
+                    </Grid>
+                  </Grid>
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <Button
+                        style={{ marginTop: '25px' }}
+                        color="primary"
+                        onClick={this.deleteDialogHandleOpen.bind(this)}
+                      >
+                        Add a restriction
+                      </Button>
+                    </Grid>
+                  </Grid>
+
+                  <Grid container style={{ marginTop: '25px' }}>
+                    <Grid item xs={12} sm={12}>
+                      <TextField
+                        label="Plating notes"
+                        id="platingNotes"
+                        name="platingNotes"
+                        value={this.state.platingNotes}
+                        fullWidth
+                        multiline
+                        onChange={(event) => { this.setState({ platingNotes: event.target.value }); }}
+                      />
+                    </Grid>
+                  </Grid>
+
+                  {this.props.customer.secondary == undefined ? this.state.secondaryProfilesData.map((e, profileIndex) => (
+                    <div key={profileIndex}>
+                      <ListItem
+                        style={{ marginTop: '15px', marginBottom: '15px' }}
+                        button
+                        onClick={this.handleProfileOpen.bind(
+                          this,
+                          false,
+                          profileIndex,
+                        )}
+                      >
+                        <ListItemText
+                          primary={
+                            this.state.secondaryProfilesData[profileIndex]
+                              .first_name
+                              ? `${
                               this.state.secondaryProfilesData[profileIndex]
                                 .first_name
-                                ? `${
-                                this.state.secondaryProfilesData[profileIndex]
-                                  .first_name
-                                }'s Profile`
-                                : `Profile ${profileIndex + 2}`
-                            }
-                          />
-                          {this.state.secondaryCollapses[profileIndex] ? (
-                            <ExpandLess />
-                          ) : (
-                              <ExpandMore />
-                            )}
-                        </ListItem>
-                        <Collapse
-                          in={this.state.secondaryCollapses[profileIndex]}
-                          transitionDuration="auto"
-                          component="div"
-                        >
-                          <div style={{ paddingLeft: '16px', paddingRight: '16px' }}>
-                            <Grid container>
-                              <Grid item xs={12} sm={6}>
-                                <TextField
-                                  margin="normal"
-                                  id="first_name"
-                                  label="First name"
-                                  name={`first_name${profileIndex + 1}`}
-                                  fullWidth
-                                  value={this.state.secondaryProfilesData[profileIndex].first_name}
-                                  data-rule-required="true"
-                                  inputProps={{}}
-                                  onChange={(event) => {
-                                    this.state.secondaryProfilesData[
-                                      profileIndex
-                                    ].first_name =
-                                      event.target.value;
-                                    this.forceUpdate();
-                                  }}
-                                />
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <TextField
-                                  margin="normal"
-                                  id="last_name"
-                                  label="Last name"
-                                  name={`last_name${profileIndex + 1}`}
-                                  data-rule-required="true"
-                                  value={this.state.secondaryProfilesData[profileIndex].last_name}
-                                  fullWidth
-                                  onChange={(event) => {
-                                    this.state.secondaryProfilesData[
-                                      profileIndex
-                                    ].last_name = event.target.value;
-                                    this.forceUpdate();
-                                  }}
-                                  inputProps={{}}
-                                />
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <FormControl component="fieldset">
-                                  <FormLabel component="legend">
-                                    <Typography
-                                      type="body1"
-                                      className="text-uppercase font-medium"
-                                    >
-                                      Plan
-                                    </Typography>
-                                  </FormLabel>
-                                  <RadioGroup
-                                    aria-label="lifestyle"
-                                    name={`lifestyle${profileIndex + 1}`}
-                                    value={
-                                      this.state.secondaryProfilesData[profileIndex]
-                                        .lifestyle
-                                    }
-                                    onChange={this.handleChangeRadioLifestyleSecondary.bind(
-                                      this,
-                                      profileIndex,
-                                    )}
-                                    style={{ flexDirection: 'row' }}
-                                    data-rule-required="true"
-                                  >
-                                    {this.props.lifestyles.map(e => (
-                                      <FormControlLabel
-                                        value={e.title}
-                                        control={<Radio />}
-                                        label={e.title}
-                                        selected
-                                      />
-                                    ))}
-                                  </RadioGroup>
-                                </FormControl>
-                              </Grid>
-
-                              <Grid item xs={12} sm={6}>
-                                <FormControl component="fieldset">
-                                  <FormLabel component="legend">
-                                    <Typography
-                                      type="body1"
-                                      className="text-uppercase font-medium"
-                                    >
-                                      Discount
-                                    </Typography>
-                                  </FormLabel>
-                                  <RadioGroup
-                                    aria-label="discount"
-                                    name="discount"
-                                    value={
-                                      this.state.secondaryProfilesData[profileIndex]
-                                        .discount
-                                    }
-                                    onChange={this.handleChangeRadioDiscountSecondary.bind(
-                                      this,
-                                      profileIndex,
-                                    )}
-                                    style={{ flexDirection: 'row' }}
-                                  >
-                                    <FormControlLabel
-                                      value="none"
-                                      control={<Radio />}
-                                      label="None"
-                                      selected
-                                      disabled={
-                                        this.state.secondaryProfilesData[profileIndex]
-                                          .lifestyle &&
-                                        this.props.lifestyles.find(
-                                          element =>
-                                            element.title ==
-                                            this.state.secondaryProfilesData[
-                                              profileIndex
-                                            ].lifestyle &&
-                                            !element.discountStudent &&
-                                            !element.discountSenior,
-                                        )
-                                      }
-                                    />
-                                    <FormControlLabel
-                                      value="student"
-                                      control={<Radio />}
-                                      label="Student"
-                                      disabled={
-                                        this.state.secondaryProfilesData[profileIndex]
-                                          .lifestyle &&
-                                        this.props.lifestyles.find(
-                                          element =>
-                                            element.title ==
-                                            this.state.secondaryProfilesData[
-                                              profileIndex
-                                            ].lifestyle && !element.discountStudent,
-                                        )
-                                      }
-                                    />
-                                    <FormControlLabel
-                                      value="senior"
-                                      control={<Radio />}
-                                      label="Senior"
-                                      disabled={
-                                        this.state.secondaryProfilesData[profileIndex]
-                                          .lifestyle &&
-                                        this.props.lifestyles.find(
-                                          element =>
-                                            element.title ==
-                                            this.state.secondaryProfilesData[
-                                              profileIndex
-                                            ].lifestyle && !element.discountSenior,
-                                        )
-                                      }
-                                    />
-                                  </RadioGroup>
-                                </FormControl>
-                              </Grid>
-                            </Grid>
-
-                            <Grid container>
-                              <Grid item sm={6} xs={12}>
-                                <FormControl component="fieldset">
-                                  <FormLabel component="legend">
-                                    <Typography
-                                      type="body1"
-                                      className="text-uppercase font-medium"
-                                    >
-                                      Type
-                                    </Typography>
-                                  </FormLabel>
-                                  <RadioGroup
-                                    aria-label="adultOrChild"
-                                    name={`adultOrChild${profileIndex + 1}`}
-                                    value={
-                                      this.state.secondaryProfilesData[profileIndex]
-                                        .adultOrChild
-                                    }
-                                    onChange={this.handleChangeRadioAdultOrChild.bind(
-                                      this,
-                                      profileIndex,
-                                    )}
-                                    style={{ flexDirection: 'row' }}
-                                  >
-                                    <FormControlLabel
-                                      value={'adult'}
-                                      control={<Radio />}
-                                      label={'Adult'}
-                                    />
-
-                                    <FormControlLabel
-                                      value={'child'}
-                                      control={<Radio />}
-                                      label={'Child'}
-                                    />
-                                  </RadioGroup>
-                                </FormControl>
-                              </Grid>
-                            </Grid>
-
-                            <Stepper
-                              activeStep={
-                                this.state.secondaryProfilesData[profileIndex]
-                                  .activeMealScheduleStep
-                              }
-                              style={{
-                                marginTop: '40px',
-                                marginBottom: '20px',
-                                background: 'none !important',
-                              }}
-                            >
-                              {mealSteps.map((label, index) => {
-                                const props = {};
-                                const stepLabel = `${label} ${moment(
-                                  this.state.subscriptionStartDateRaw,
-                                )
-                                  .add(index, 'd')
-                                  .format('DD')}`;
-
-                                return (
-                                  <Step key={index} {...props}>
-                                    <StepLabel>{stepLabel}</StepLabel>
-                                  </Step>
-                                );
-                              })}
-                            </Stepper>
-
-                            <div style={{ marginBottom: '30px' }}>
-                              {this.renderMealStepsContentSecondary(
-                                profileIndex,
-                                this.state.secondaryProfilesData[profileIndex]
-                                  .activeMealScheduleStep,
-                              )}
-
-                              {this.state.secondaryProfilesData[profileIndex]
-                                .activeMealScheduleStep >= 1 ? (
-                                  <Button
-                                    onClick={this.handleBackMealScheduleSecondary.bind(
-                                      this,
-                                      profileIndex,
-                                    )}
-                                    style={{ marginTop: '20px' }}
-                                  >
-                                    Back
-                                  </Button>
-                                ) : (
-                                  ''
-                                )}
-
-                              {this.state.secondaryProfilesData[profileIndex]
-                                .activeMealScheduleStep < 6 ? (
-                                  <Button
-                                    onClick={this.handleNextMealScheduleSecondary.bind(
-                                      this,
-                                      profileIndex,
-                                    )}
-                                    style={{ marginTop: '20px' }}
-                                  >
-                                    Next
-                                  </Button>
-                                ) : (
-                                  ''
-                                )}
-                            </div>
-
-                            <Grid container>
-                              <Grid item xs={12} style={{ marginTop: '25px' }}>
-                                <Typography
-                                  type="body1"
-                                  className="text-uppercase font-medium"
-                                >
-                                  Restrictions
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={4}>
-                                <FormControl component="fieldset">
-                                  <FormLabel component="legend">Allergies</FormLabel>
-                                  <FormGroup>
-                                    {this.props.restrictions
-                                      .filter(e => e.restrictionType === 'allergy')
-                                      .map((e, i) => {
-                                        const isSelected = this.state
-                                          .secondaryProfilesData[profileIndex]
-                                          .restrictions
-                                          ? this.state.secondaryProfilesData[
-                                            profileIndex
-                                          ].restrictions.indexOf(e._id) != -1
-                                          : false;
-
-                                        const isAlreadyChecked = this.state
-                                          .secondaryProfilesData[profileIndex]
-                                          .lifestyleRestrictions
-                                          ? this.state.secondaryProfilesData[
-                                            profileIndex
-                                          ].lifestyleRestrictions.indexOf(e._id) !=
-                                          -1
-                                          : false;
-                                        return (
-                                          <FormControlLabel
-                                            key={i}
-                                            disabled={isAlreadyChecked}
-                                            control={
-                                              <Checkbox
-                                                checked={
-                                                  isSelected || isAlreadyChecked
-                                                }
-                                                onChange={this.handleChangeSecondary.bind(
-                                                  this,
-                                                  profileIndex,
-                                                  e._id,
-                                                )}
-                                                value={e.title.toLowerCase()}
-                                              />
-                                            }
-                                            label={e.title}
-                                          />
-                                        );
-                                      })}
-                                  </FormGroup>
-                                </FormControl>
-                              </Grid>
-                              <Grid item xs={4}>
-                                <FormControl component="fieldset">
-                                  <FormLabel component="legend">Dietary</FormLabel>
-                                  <FormGroup>
-                                    {this.props.restrictions
-                                      .filter(e => e.restrictionType === 'dietary')
-                                      .map((e, i) => {
-                                        const isSelected = this.state
-                                          .secondaryProfilesData[profileIndex]
-                                          .restrictions
-                                          ? this.state.secondaryProfilesData[
-                                            profileIndex
-                                          ].restrictions.indexOf(e._id) != -1
-                                          : false;
-                                        const isAlreadyChecked = this.state
-                                          .secondaryProfilesData[profileIndex]
-                                          .lifestyleRestrictions
-                                          ? this.state.secondaryProfilesData[
-                                            profileIndex
-                                          ].lifestyleRestrictions.indexOf(e._id) !=
-                                          -1
-                                          : false;
-
-                                        return (
-                                          <FormControlLabel
-                                            key={i}
-                                            disabled={isAlreadyChecked}
-                                            control={
-                                              <Checkbox
-                                                checked={
-                                                  isSelected || isAlreadyChecked
-                                                }
-                                                onChange={this.handleChangeSecondary.bind(
-                                                  this,
-                                                  profileIndex,
-                                                  e._id,
-                                                )}
-                                                value={e.title.toLowerCase()}
-                                              />
-                                            }
-                                            label={e.title}
-                                          />
-                                        );
-                                      })}
-                                  </FormGroup>
-                                </FormControl>
-                              </Grid>
-                              <Grid item xs={4}>
-                                <FormControl component="fieldset">
-                                  <FormLabel component="legend">Religious</FormLabel>
-                                  <FormGroup>
-                                    {this.props.restrictions
-                                      .filter(e => e.restrictionType === 'religious')
-                                      .map((e, i) => {
-                                        const isSelected = this.state
-                                          .secondaryProfilesData[profileIndex]
-                                          .restrictions
-                                          ? this.state.secondaryProfilesData[
-                                            profileIndex
-                                          ].restrictions.indexOf(e._id) != -1
-                                          : false;
-                                        const isAlreadyChecked = this.state
-                                          .secondaryProfilesData[profileIndex]
-                                          .lifestyleRestrictions
-                                          ? this.state.secondaryProfilesData[
-                                            profileIndex
-                                          ].lifestyleRestrictions.indexOf(e._id) !=
-                                          -1
-                                          : false;
-                                        return (
-                                          <FormControlLabel
-                                            key={i}
-                                            disabled={isAlreadyChecked}
-                                            control={
-                                              <Checkbox
-                                                checked={
-                                                  isSelected || isAlreadyChecked
-                                                }
-                                                onChange={this.handleChangeSecondary.bind(
-                                                  this,
-                                                  profileIndex,
-                                                  e._id,
-                                                )}
-                                                value={e.title.toLowerCase()}
-                                              />
-                                            }
-                                            label={e.title}
-                                          />
-                                        );
-                                      })}
-                                  </FormGroup>
-                                </FormControl>
-                              </Grid>
-                            </Grid>
-
-                            <Dialog
-                              open={this.state.secondaryProfilesData[profileIndex].deleteDialogOpen}
-                              onClose={this.deleteDialogHandleRequestCloseSecondary.bind(
-                                this,
-                                profileIndex,
-                              )}
-                            >
-                              <Typography
-                                style={{
-                                  flex: '0 0 auto',
-                                  margin: '0',
-                                  padding: '24px 24px 20px 24px',
+                              }'s Profile`
+                              : `Profile ${profileIndex + 2}`
+                          }
+                        />
+                        {this.state.secondaryCollapses[profileIndex] ? (
+                          <ExpandLess />
+                        ) : (
+                            <ExpandMore />
+                          )}
+                      </ListItem>
+                      <Collapse
+                        in={this.state.secondaryCollapses[profileIndex]}
+                        transitionDuration="auto"
+                        component="div"
+                      >
+                        <div style={{ paddingLeft: '16px', paddingRight: '16px' }}>
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                margin="normal"
+                                id="first_name"
+                                label="First name"
+                                name={`first_name${profileIndex + 1}`}
+                                fullWidth
+                                value={this.state.secondaryProfilesData[profileIndex].first_name}
+                                data-rule-required="true"
+                                inputProps={{}}
+                                onChange={(event) => {
+                                  this.state.secondaryProfilesData[
+                                    profileIndex
+                                  ].first_name =
+                                    event.target.value;
+                                  this.forceUpdate();
                                 }}
-                                className="title font-medium"
-                                type="title"
-                              >
-                                Add a restriction
-                              </Typography>
-
-                              <DialogContent>
-                                <DialogContentText>
-                                  Select if it's a preference or if it's a restriction
-                                </DialogContentText>
-                                <FormControl component="fieldset">
-                                  <RadioGroup
-                                    aria-label="restritionOrPref"
-                                    name="restritionOrPref"
-                                    value={this.state.addRestrictionType}
-                                    onChange={this.handleChangeRadioRestriction.bind(
-                                      this,
-                                    )}
-                                    style={{ flexDirection: 'row' }}
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <TextField
+                                margin="normal"
+                                id="last_name"
+                                label="Last name"
+                                name={`last_name${profileIndex + 1}`}
+                                data-rule-required="true"
+                                value={this.state.secondaryProfilesData[profileIndex].last_name}
+                                fullWidth
+                                onChange={(event) => {
+                                  this.state.secondaryProfilesData[
+                                    profileIndex
+                                  ].last_name = event.target.value;
+                                  this.forceUpdate();
+                                }}
+                                inputProps={{}}
+                              />
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  <Typography
+                                    type="body1"
+                                    className="text-uppercase font-medium"
                                   >
-                                    <FormControlLabel
-                                      value="Restriction"
-                                      control={<Radio selected />}
-                                      label="Restriction"
-                                    />
-                                    <FormControlLabel
-                                      value="Preference"
-                                      control={<Radio />}
-                                      label="Preference"
-                                      selected
-                                    />
-                                  </RadioGroup>
-                                </FormControl>
-
-                                <Autosuggest
-                                  id="2"
-                                  className="autosuggest"
-                                  theme={{
-                                    container: {
-                                      flexGrow: 1,
-                                      position: 'relative',
-                                      marginBottom: '2em',
-                                    },
-                                    suggestionsContainerOpen: {
-                                      position: 'absolute',
-                                      left: 0,
-                                      right: 0,
-                                    },
-                                    suggestion: {
-                                      display: 'block',
-                                    },
-                                    suggestionsList: {
-                                      margin: 0,
-                                      padding: 0,
-                                      listStyleType: 'none',
-                                    },
-                                  }}
-                                  renderInputComponent={this.renderInput.bind(this)}
-                                  suggestions={this.state.suggestions}
-                                  onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                                    this,
-                                  )}
-                                  onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                                    this,
-                                  )}
-                                  onSuggestionSelected={this.onSuggestionSelectedSecondary.bind(
+                                    Plan
+                                    </Typography>
+                                </FormLabel>
+                                <RadioGroup
+                                  aria-label="lifestyle"
+                                  name={`lifestyle${profileIndex + 1}`}
+                                  value={this.state.secondaryProfilesData[profileIndex].lifestyle}
+                                  onChange={this.handleChangeRadioLifestyleSecondary.bind(
                                     this,
                                     profileIndex,
                                   )}
-                                  getSuggestionValue={this.getSuggestionValue.bind(
-                                    this,
-                                  )}
-                                  renderSuggestion={this.renderSuggestion.bind(this)}
-                                  renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                                    this,
-                                  )}
-                                  fullWidth
-                                  focusInputOnSuggestionClick={false}
-                                  inputProps={{
-                                    placeholder: 'Search',
-                                    value: this.state.value,
-                                    onChange: this.onChange.bind(this),
-                                    className: 'autoinput',
-                                  }}
-                                />
-                              </DialogContent>
-                              <DialogActions>
-                                <Button onClick={this.deleteDialogHandleRequestClose.bind(this, profileIndex)} color="default">Close</Button>
-                              </DialogActions>
-                            </Dialog>
-
-                            <Grid container>
-                              <Grid item xs={12} sm={6}>
-                                <Typography
-                                  type="body1"
-                                  className="text-uppercase font-medium"
-                                  style={{ marginTop: '25px' }}
+                                  style={{ flexDirection: 'row' }}
+                                  data-rule-required="true"
                                 >
-                                  Preferences
+                                  {this.props.lifestyles.map(e => (
+                                    <FormControlLabel
+                                      value={e._id}
+                                      control={<Radio />}
+                                      label={e.title}
+                                      selected
+                                    />
+                                  ))}
+                                </RadioGroup>
+                              </FormControl>
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  <Typography
+                                    type="body1"
+                                    className="text-uppercase font-medium"
+                                  >
+                                    Discount
+                                    </Typography>
+                                </FormLabel>
+                                <RadioGroup
+                                  aria-label="discount"
+                                  name="discount"
+                                  value={
+                                    this.state.secondaryProfilesData[profileIndex]
+                                      .discount
+                                  }
+                                  onChange={this.handleChangeRadioDiscountSecondary.bind(
+                                    this,
+                                    profileIndex,
+                                  )}
+                                  style={{ flexDirection: 'row' }}
+                                >
+                                  <FormControlLabel
+                                    value="none"
+                                    control={<Radio />}
+                                    label="None"
+                                    selected
+                                    disabled={
+                                      this.state.secondaryProfilesData[profileIndex]
+                                        .lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                          this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].lifestyle &&
+                                          !element.discountStudent &&
+                                          !element.discountSenior,
+                                      )
+                                    }
+                                  />
+                                  <FormControlLabel
+                                    value="student"
+                                    control={<Radio />}
+                                    label="Student"
+                                    disabled={
+                                      this.state.secondaryProfilesData[profileIndex]
+                                        .lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                          this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].lifestyle && !element.discountStudent,
+                                      )
+                                    }
+                                  />
+                                  <FormControlLabel
+                                    value="senior"
+                                    control={<Radio />}
+                                    label="Senior"
+                                    disabled={
+                                      this.state.secondaryProfilesData[profileIndex]
+                                        .lifestyle &&
+                                      this.props.lifestyles.find(
+                                        element =>
+                                          element.title ==
+                                          this.state.secondaryProfilesData[
+                                            profileIndex
+                                          ].lifestyle && !element.discountSenior,
+                                      )
+                                    }
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+
+                          <Grid container>
+                            <Grid item sm={6} xs={12}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">
+                                  <Typography
+                                    type="body1"
+                                    className="text-uppercase font-medium"
+                                  >
+                                    Type
+                                    </Typography>
+                                </FormLabel>
+                                <RadioGroup
+                                  aria-label="adultOrChild"
+                                  name={`adultOrChild${profileIndex + 1}`}
+                                  value={
+                                    this.state.secondaryProfilesData[profileIndex]
+                                      .adultOrChild
+                                  }
+                                  onChange={this.handleChangeRadioAdultOrChild.bind(
+                                    this,
+                                    profileIndex,
+                                  )}
+                                  style={{ flexDirection: 'row' }}
+                                >
+                                  <FormControlLabel
+                                    value={'adult'}
+                                    control={<Radio />}
+                                    label={'Adult'}
+                                  />
+
+                                  <FormControlLabel
+                                    value={'child'}
+                                    control={<Radio />}
+                                    label={'Child'}
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+
+                          <Stepper
+                            activeStep={
+                              this.state.secondaryProfilesData[profileIndex]
+                                .activeMealScheduleStep
+                            }
+                            style={{
+                              marginTop: '40px',
+                              marginBottom: '20px',
+                              background: 'none !important',
+                            }}
+                          >
+                            {mealSteps.map((label, index) => {
+                              const props = {};
+                              const stepLabel = `${label} ${moment(
+                                this.state.subscriptionStartDateRaw,
+                              )
+                                .add(index, 'd')
+                                .format('DD')}`;
+
+                              return (
+                                <Step key={index} {...props}>
+                                  <StepLabel>{stepLabel}</StepLabel>
+                                </Step>
+                              );
+                            })}
+                          </Stepper>
+
+                          <div style={{ marginBottom: '30px' }}>
+                            {this.renderMealStepsContentSecondary(
+                              profileIndex,
+                              this.state.secondaryProfilesData[profileIndex]
+                                .activeMealScheduleStep,
+                            )}
+
+                            {this.state.secondaryProfilesData[profileIndex]
+                              .activeMealScheduleStep >= 1 ? (
+                                <Button
+                                  onClick={this.handleBackMealScheduleSecondary.bind(
+                                    this,
+                                    profileIndex,
+                                  )}
+                                  style={{ marginTop: '20px' }}
+                                >
+                                  Back
+                                  </Button>
+                              ) : (
+                                ''
+                              )}
+
+                            {this.state.secondaryProfilesData[profileIndex]
+                              .activeMealScheduleStep < 6 ? (
+                                <Button
+                                  onClick={this.handleNextMealScheduleSecondary.bind(
+                                    this,
+                                    profileIndex,
+                                  )}
+                                  style={{ marginTop: '20px' }}
+                                >
+                                  Next
+                                  </Button>
+                              ) : (
+                                ''
+                              )}
+                          </div>
+
+                          <Grid container>
+                            <Grid item xs={12} style={{ marginTop: '25px' }}>
+                              <Typography
+                                type="body1"
+                                className="text-uppercase font-medium"
+                              >
+                                Restrictions
+                                </Typography>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">Allergies</FormLabel>
+                                <FormGroup>
+                                  {this.props.restrictions
+                                    .filter(e => e.restrictionType === 'allergy')
+                                    .map((e, i) => {
+                                      const isSelected = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .restrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].restrictions.indexOf(e._id) != -1
+                                        : false;
+
+                                      const isAlreadyChecked = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .lifestyleRestrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].lifestyleRestrictions.indexOf(e._id) !=
+                                        -1
+                                        : false;
+                                      return (
+                                        <FormControlLabel
+                                          key={i}
+                                          disabled={isAlreadyChecked}
+                                          control={
+                                            <Checkbox
+                                              checked={
+                                                isSelected || isAlreadyChecked
+                                              }
+                                              onChange={this.handleChangeSecondary.bind(
+                                                this,
+                                                profileIndex,
+                                                e._id,
+                                              )}
+                                              value={e.title.toLowerCase()}
+                                            />
+                                          }
+                                          label={e.title}
+                                        />
+                                      );
+                                    })}
+                                </FormGroup>
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">Dietary</FormLabel>
+                                <FormGroup>
+                                  {this.props.restrictions
+                                    .filter(e => e.restrictionType === 'dietary')
+                                    .map((e, i) => {
+                                      const isSelected = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .restrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].restrictions.indexOf(e._id) != -1
+                                        : false;
+                                      const isAlreadyChecked = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .lifestyleRestrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].lifestyleRestrictions.indexOf(e._id) !=
+                                        -1
+                                        : false;
+
+                                      return (
+                                        <FormControlLabel
+                                          key={i}
+                                          disabled={isAlreadyChecked}
+                                          control={
+                                            <Checkbox
+                                              checked={
+                                                isSelected || isAlreadyChecked
+                                              }
+                                              onChange={this.handleChangeSecondary.bind(
+                                                this,
+                                                profileIndex,
+                                                e._id,
+                                              )}
+                                              value={e.title.toLowerCase()}
+                                            />
+                                          }
+                                          label={e.title}
+                                        />
+                                      );
+                                    })}
+                                </FormGroup>
+                              </FormControl>
+                            </Grid>
+                            <Grid item xs={4}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">Religious</FormLabel>
+                                <FormGroup>
+                                  {this.props.restrictions
+                                    .filter(e => e.restrictionType === 'religious')
+                                    .map((e, i) => {
+                                      const isSelected = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .restrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].restrictions.indexOf(e._id) != -1
+                                        : false;
+                                      const isAlreadyChecked = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .lifestyleRestrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].lifestyleRestrictions.indexOf(e._id) !=
+                                        -1
+                                        : false;
+                                      return (
+                                        <FormControlLabel
+                                          key={i}
+                                          disabled={isAlreadyChecked}
+                                          control={
+                                            <Checkbox
+                                              checked={
+                                                isSelected || isAlreadyChecked
+                                              }
+                                              onChange={this.handleChangeSecondary.bind(
+                                                this,
+                                                profileIndex,
+                                                e._id,
+                                              )}
+                                              value={e.title.toLowerCase()}
+                                            />
+                                          }
+                                          label={e.title}
+                                        />
+                                      );
+                                    })}
+                                </FormGroup>
+                              </FormControl>
+                            </Grid>
+                          </Grid>
+
+                          <Dialog
+                            open={this.state.secondaryProfilesData[profileIndex].deleteDialogOpen}
+                            onClose={this.deleteDialogHandleRequestCloseSecondary.bind(
+                              this,
+                              profileIndex,
+                            )}
+                          >
+                            <Typography
+                              style={{
+                                flex: '0 0 auto',
+                                margin: '0',
+                                padding: '24px 24px 20px 24px',
+                              }}
+                              className="title font-medium"
+                              type="title"
+                            >
+                              Add a restriction
+                              </Typography>
+
+                            <DialogContent>
+                              <DialogContentText>
+                                Select if it's a preference or if it's a restriction
+                                </DialogContentText>
+                              <FormControl component="fieldset">
+                                <RadioGroup
+                                  aria-label="restritionOrPref"
+                                  name="restritionOrPref"
+                                  value={this.state.addRestrictionType}
+                                  onChange={this.handleChangeRadioRestriction.bind(
+                                    this,
+                                  )}
+                                  style={{ flexDirection: 'row' }}
+                                >
+                                  <FormControlLabel
+                                    value="Restriction"
+                                    control={<Radio selected />}
+                                    label="Restriction"
+                                  />
+                                  <FormControlLabel
+                                    value="Preference"
+                                    control={<Radio />}
+                                    label="Preference"
+                                    selected
+                                  />
+                                </RadioGroup>
+                              </FormControl>
+
+                              <Autosuggest
+                                id="2"
+                                className="autosuggest"
+                                theme={{
+                                  container: {
+                                    flexGrow: 1,
+                                    position: 'relative',
+                                    marginBottom: '2em',
+                                  },
+                                  suggestionsContainerOpen: {
+                                    position: 'absolute',
+                                    left: 0,
+                                    right: 0,
+                                  },
+                                  suggestion: {
+                                    display: 'block',
+                                  },
+                                  suggestionsList: {
+                                    margin: 0,
+                                    padding: 0,
+                                    listStyleType: 'none',
+                                  },
+                                }}
+                                renderInputComponent={this.renderInput.bind(this)}
+                                suggestions={this.state.suggestions}
+                                onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
+                                  this,
+                                )}
+                                onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
+                                  this,
+                                )}
+                                onSuggestionSelected={this.onSuggestionSelectedSecondary.bind(
+                                  this,
+                                  profileIndex,
+                                )}
+                                getSuggestionValue={this.getSuggestionValue.bind(
+                                  this,
+                                )}
+                                renderSuggestion={this.renderSuggestion.bind(this)}
+                                renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
+                                  this,
+                                )}
+                                fullWidth
+                                focusInputOnSuggestionClick={false}
+                                inputProps={{
+                                  placeholder: 'Search',
+                                  value: this.state.value,
+                                  onChange: this.onChange.bind(this),
+                                  className: 'autoinput',
+                                }}
+                              />
+                            </DialogContent>
+                            <DialogActions>
+                              <Button onClick={this.deleteDialogHandleRequestClose.bind(this, profileIndex)} color="default">Close</Button>
+                            </DialogActions>
+                          </Dialog>
+
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <Typography
+                                type="body1"
+                                className="text-uppercase font-medium"
+                                style={{ marginTop: '25px' }}
+                              >
+                                Preferences
                                 </Typography>
 
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    flexWrap: 'wrap',
-                                    marginTop: '25px',
-                                  }}
-                                >
-                                  {this.state.secondaryProfilesData[profileIndex].subIngredients && this.state.secondaryProfilesData[profileIndex].subIngredients.length ? (
-                                    this.state.secondaryProfilesData[profileIndex].subIngredients.map((subIngredient, i) => (
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  flexWrap: 'wrap',
+                                  marginTop: '25px',
+                                }}
+                              >
+                                {this.state.secondaryProfilesData[profileIndex].subIngredients && this.state.secondaryProfilesData[profileIndex].subIngredients.length ? (
+                                  this.state.secondaryProfilesData[profileIndex].subIngredients.map((subIngredient, i) => (
+                                    <Chip
+                                      avatar={
+                                        <Avatar>
+                                          {' '}
+                                          {this.getSubIngredientAvatar(
+                                            subIngredient,
+                                          )}{' '}
+                                        </Avatar>
+                                      }
+                                      style={{
+                                        marginRight: '8px',
+                                        marginBottom: '8px',
+                                      }}
+                                      label={this.getSubIngredientTitle(
+                                        subIngredient,
+                                      )}
+                                      key={i}
+                                      onDelete={this.handleSubIngredientChipDelete.bind(
+                                        this,
+                                        subIngredient,
+                                      )}
+                                    />
+                                  ))
+                                ) : (
+                                    <Chip
+                                      className="chip--bordered"
+                                      label="Ingredient"
+                                    />
+                                  )}
+                              </div>
+                            </Grid>
+
+                            <Grid item xs={12} sm={6}>
+                              <Typography
+                                type="body1"
+                                className="text-uppercase font-medium"
+                              >
+                                Restrictions
+                                </Typography>
+
+                              <div
+                                style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  flexWrap: 'wrap',
+                                  marginTop: '25px',
+                                }}
+                              >
+                                {this.state.secondaryProfilesData[profileIndex]
+                                  .specificRestrictions.length ? (
+                                    this.state.secondaryProfilesData[
+                                      profileIndex
+                                    ].specificRestrictions.map((subIngredient, i) => (
                                       <Chip
                                         avatar={
                                           <Avatar>
@@ -7824,474 +7879,367 @@ class CurrentCustomerEditor extends React.Component {
                                           subIngredient,
                                         )}
                                         key={i}
-                                        onDelete={this.handleSubIngredientChipDelete.bind(
+                                        onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
                                           this,
                                           subIngredient,
                                         )}
                                       />
                                     ))
                                   ) : (
-                                      <Chip
-                                        className="chip--bordered"
-                                        label="Ingredient"
-                                      />
-                                    )}
-                                </div>
-                              </Grid>
-
-                              <Grid item xs={12} sm={6}>
-                                <Typography
-                                  type="body1"
-                                  className="text-uppercase font-medium"
-                                >
-                                  Restrictions
-                                </Typography>
-
-                                <div
-                                  style={{
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    flexWrap: 'wrap',
-                                    marginTop: '25px',
-                                  }}
-                                >
-                                  {this.state.secondaryProfilesData[profileIndex]
-                                    .specificRestrictions.length ? (
-                                      this.state.secondaryProfilesData[
-                                        profileIndex
-                                      ].specificRestrictions.map((subIngredient, i) => (
-                                        <Chip
-                                          avatar={
-                                            <Avatar>
-                                              {' '}
-                                              {this.getSubIngredientAvatar(
-                                                subIngredient,
-                                              )}{' '}
-                                            </Avatar>
-                                          }
-                                          style={{
-                                            marginRight: '8px',
-                                            marginBottom: '8px',
-                                          }}
-                                          label={this.getSubIngredientTitle(
-                                            subIngredient,
-                                          )}
-                                          key={i}
-                                          onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
-                                            this,
-                                            subIngredient,
-                                          )}
-                                        />
-                                      ))
-                                    ) : (
-                                      <Chip
-                                        className="chip--bordered"
-                                        label="Ingredient"
-                                      />
-                                    )}
-                                </div>
-                              </Grid>
+                                    <Chip
+                                      className="chip--bordered"
+                                      label="Ingredient"
+                                    />
+                                  )}
+                              </div>
                             </Grid>
+                          </Grid>
 
-                            <Grid container>
-                              <Grid item xs={12}>
-                                <Button
-                                  color="primary"
-                                  onClick={this.deleteDialogHandleOpenSecondary.bind(this, profileIndex)}
-                                >
-                                  Add a restriction
+                          <Grid container>
+                            <Grid item xs={12}>
+                              <Button
+                                color="primary"
+                                onClick={this.deleteDialogHandleOpenSecondary.bind(this, profileIndex)}
+                              >
+                                Add a restriction
                                 </Button>
-                              </Grid>
                             </Grid>
+                          </Grid>
 
-                            <Grid container style={{ marginTop: '25px' }}>
-                              <Grid item xs={12} sm={12}>
-                                <TextField
-                                  label="Plating notes"
-                                  id="platingNotes"
-                                  name="platingNotes"
-                                  value={this.state.secondaryProfilesData[profileIndex].platingNotes}
-                                  fullWidth
-                                  multiline
-                                  onChange={this.handlePlatingNotesChangeSecondary.bind(this, profileIndex)}
-                                />
-                              </Grid>
+                          <Grid container style={{ marginTop: '25px' }}>
+                            <Grid item xs={12} sm={12}>
+                              <TextField
+                                label="Plating notes"
+                                id="platingNotes"
+                                name="platingNotes"
+                                value={this.state.secondaryProfilesData[profileIndex].platingNotes}
+                                fullWidth
+                                multiline
+                                onChange={this.handlePlatingNotesChangeSecondary.bind(this, profileIndex)}
+                              />
                             </Grid>
+                          </Grid>
 
-                            <Button
-                              raised
-                              onClick={this.removeProfile.bind(this, profileIndex)}
-                              style={{ float: 'right', marginTop: '25px' }}
-                            >
-                              Remove profile
+                          <Button
+                            raised
+                            onClick={this.removeProfile.bind(this, profileIndex)}
+                            style={{ float: 'right', marginTop: '25px' }}
+                          >
+                            Remove profile
                             </Button>
-                          </div>
-                        </Collapse>
-                      </div>
-                    ))
-                      : ''}
+                        </div>
+                      </Collapse>
+                    </div>
+                  ))
+                    : ''}
 
-                    {this.props.customer.secondary == undefined ? (
-                      <Button color="danger" onClick={this.increaseProfileCount.bind(this)} style={{ marginTop: '50px', marginBottom: '50px' }}>
-                        Add a profile
+                  {this.props.customer.secondary == undefined ? (
+                    <Button color="danger" onClick={this.increaseProfileCount.bind(this)} style={{ marginTop: '50px', marginBottom: '50px' }}>
+                      Add a profile
                     </Button>) : ''}
 
-                    <Grid container>
-                      <Grid item xs={12}>
-                        <Typography type="body1" className="text-uppercase font-medium">Address Type</Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <FormControl component="fieldset">
-                          <RadioGroup
-                            aria-label="account-type"
-                            name="addressType"
-                            value={this.state.addressType}
-                            onChange={this.handleChangeRadioAddressType.bind(this)}
-                            style={{ flexDirection: 'row' }}
-                          >
-                            <FormControlLabel
-                              value="house"
-                              control={<Radio />}
-                              label="House"
-                            />
-
-                            <FormControlLabel
-                              value="apartment"
-                              control={<Radio />}
-                              label="Apartment"
-                            />
-                            <FormControlLabel
-                              value="business"
-                              control={<Radio />}
-                              label="Business"
-                            />
-
-                            <FormControlLabel
-                              value="dormitory"
-                              control={<Radio />}
-                              label="Dormitory"
-                            />
-
-                            <FormControlLabel
-                              value="hotel"
-                              control={<Radio />}
-                              label="Hotel"
-                            />
-
-
-                          </RadioGroup>
-                        </FormControl>
-                      </Grid>
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <Typography type="body1" className="text-uppercase font-medium">Address Type</Typography>
                     </Grid>
+                    <Grid item xs={12}>
+                      <FormControl component="fieldset">
+                        <RadioGroup
+                          aria-label="account-type"
+                          name="addressType"
+                          value={this.state.addressType}
+                          onChange={this.handleChangeRadioAddressType.bind(this)}
+                          style={{ flexDirection: 'row' }}
+                        >
+                          <FormControlLabel
+                            value="house"
+                            control={<Radio />}
+                            label="House"
+                          />
 
-                    {this.state.addressType == 'apartment' ? (
-                      <div>
-                        <Grid container>
-                          <Grid item xs={12}>
-                            <Typography type="subheading" className="font-uppercase">
-                              Apartment
-                            </Typography>
+                          <FormControlLabel
+                            value="apartment"
+                            control={<Radio />}
+                            label="Apartment"
+                          />
+                          <FormControlLabel
+                            value="business"
+                            control={<Radio />}
+                            label="Business"
+                          />
 
-                          </Grid>
-                          <Grid item xs={12}>
-                            <TextField
-                              margin="normal"
-                              id="apartmentName"
-                              label="Apartment name"
-                              name="apartment_name"
-                              fullWidth
-                              value={this.state.apartmentName}
-                              onChange={(event) => { this.setState({ apartmentName: event.target.value }); }}
+                          <FormControlLabel
+                            value="dormitory"
+                            control={<Radio />}
+                            label="Dormitory"
+                          />
 
-                              inputProps={{}}
-                            />
-                          </Grid>
-                        </Grid>
-                        <Grid container>
-                          <Grid item xs={12} sm={6}>
-                            <TextField
-                              margin="normal"
-                              id="unit"
-                              label="Unit"
-                              name="apartmentUnit"
-                              fullWidth
-                              value={this.state.unit}
-                              onChange={(event) => { this.setState({ unit: event.target.value }); }}
-                              inputProps={{}}
-                            />
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <TextField
-                              margin="normal"
-                              id="buzzer"
-                              label="Buzzer"
-                              name="buzzer"
-                              value={this.state.buzzer}
-                              fullWidth
-                              onChange={(event) => { this.setState({ buzzer: event.target.value }); }}
-                              inputProps={{}}
-                            />
-                          </Grid>
-                        </Grid>
-                      </div>
-                    ) : (
-                        ''
-                      )}
-
-                    {this.state.addressType == 'business' ? (
-                      <div>
-                        <Grid container>
-                          <Grid item xs={12}>
-                            <Typography type="subheading" className="font-uppercase">
-                              Business
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12}>
-                            <TextField
-                              margin="normal"
-                              id="businessName"
-                              label="Business name"
-                              name="business_name"
-                              value={this.state.businessName}
-
-                              fullWidth
-                              onChange={(event) => { this.setState({ businessName: event.target.value }); }}
-                              inputProps={{}}
-                            />
-                          </Grid>
-                        </Grid>
-                        <Grid container>
-                          <Grid item xs={12} sm={6}>
-                            <TextField
-                              margin="normal"
-                              id="businessUnit"
-                              label="Unit"
-                              name="businessUnit"
-                              value={this.state.unit}
-
-                              fullWidth
-                              onChange={(event) => { this.setState({ unit: event.target.value }); }}
-                              inputProps={{}}
-                            />
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <TextField
-                              margin="normal"
-                              id="businessBuzzer"
-                              label="Buzzer"
-                              name="businessBuzzer"
-                              value={this.state.buzzer}
-                              fullWidth
-                              onChange={(event) => { this.setState({ buzzer: event.target.value }); }}
-                              inputProps={{}}
-                            />
-                          </Grid>
-                        </Grid>
-                      </div>
-                    ) : (
-                        ''
-                      )}
-
-                    {this.state.addressType == 'dormitory' ? (
-                      <div>
-                        <Grid container>
-                          <Grid item xs={12}>
-                            <Typography type="subheading" className="font-uppercase">
-                              Dormitory
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12}>
-                            <TextField
-                              margin="normal"
-                              id="dormitoryName"
-                              label="Dormitory name"
-                              name="dormitory_name"
-                              select
-                              value={
-                                this.state.dormName
-                                  ? this.state.dormName
-                                  : 'Algonquin College'
-                              }
-                              onChange={this.changeDormName.bind(this)}
-                              fullWidth
-                              SelectProps={{ native: false }}
-                            >
-                              <MenuItem key={1} value="Algonquin College">
-                                Algonquin College
-                              </MenuItem>
-
-                              <MenuItem key={3} value="Carleton University">
-                                Carleton University
-                              </MenuItem>
-                              <MenuItem key={4} value="University of Ottawa">
-                                University of Ottawa
-                              </MenuItem>
-                            </TextField>
-                          </Grid>
-
-                          <Grid item xs={12}>
-                            {this.state.dormName &&
-                              this.state.dormName === 'Algonquin College' ? (
-                                <TextField
-                                  margin="normal"
-                                  id="dormResidence"
-                                  label="Dormitory Residence"
-                                  name="dormitory_residence"
-                                  select
-                                  value={
-                                    this.state.dormResidence
-                                    // ? this.state.dormResidence
-                                    // : "Student Residence"
-                                  }
-                                  fullWidth
-                                  onChange={this.changeDormResidence.bind(this)}
-                                >
-
-                                  <MenuItem key={1} value="Student Residence">
-                                    Student Residence
-                                  </MenuItem>
-
-                                </TextField>
-                              ) : (
-                                ''
-                              )}
-                            {this.state.dormName &&
-                              this.state.dormName === 'Carleton University' ? (
-                                <TextField
-                                  margin="normal"
-                                  id="dormResidence"
-                                  label="Dormitory Residence"
-                                  name="dormitory_residence"
-                                  select
-                                  value={
-                                    this.state.dormResidence
-                                    // ? this.state.dormResidence
-                                    // : "Dundas House"
-                                  }
-                                  fullWidth
-                                  onChange={this.changeDormResidence.bind(this)}
-                                >
-                                  <MenuItem key={1} value="Dundas House">
-                                    Dundas House
-                                  </MenuItem>
-                                  <MenuItem key={2} value="Glengarry House">
-                                    Glengarry House
-                                  </MenuItem>
-                                  <MenuItem key={3} value="Grenville House">
-                                    Grenville House
-                                  </MenuItem>
-                                  <MenuItem key={4} value="Lanark House">
-                                    Lanark House
-                                  </MenuItem>
-                                  <MenuItem key={5} value="Lennox & Addington House">
-                                    Lennox & Addington House
-                                  </MenuItem>
-                                  <MenuItem key={6} value="Renfrew House">
-                                    Renfrew House
-                                  </MenuItem>
-                                  <MenuItem key={7} value="Russell House">
-                                    Russell House
-                                  </MenuItem>
-                                  <MenuItem key={8} value="Stormont House">
-                                    Stormont House
-                                  </MenuItem>
-                                </TextField>
-                              ) : (
-                                ''
-                              )}
-
-                            {this.state.dormName &&
-                              this.state.dormName === 'University of Ottawa' ? (
-                                <TextField
-                                  margin="normal"
-                                  id="dormResidence"
-                                  label="Dormitory Residence"
-                                  name="dormitory_residence"
-                                  select
-                                  value={
-                                    this.state.dormResidence
-                                    // ? this.state.dormResidence
-                                    // : "90 U Residence"
-                                  }
-                                  fullWidth
-                                  onChange={this.changeDormResidence.bind(this)}
-                                >
-                                  <MenuItem key={1} value="90 U Residence">
-                                    90 U Residence
-                                  </MenuItem>
-                                  <MenuItem key={2} value="Hyman Soloway Residence">
-                                    Hyman Soloway Residence
-                                  </MenuItem>
-                                  <MenuItem key={3} value="Marchand Residence">
-                                    Marchand Residence
-                                  </MenuItem>
-                                  <MenuItem key={4} value="Stanton Residence">
-                                    Stanton Residence
-                                  </MenuItem>
-                                  <MenuItem key={5} value="Thompson Residence">
-                                    Thompson Residence
-                                  </MenuItem>
-                                </TextField>
-                              ) : (
-                                ''
-                              )}
-                          </Grid>
-                        </Grid>
-                        <Grid container>
-                          <Grid item xs={12} sm={6}>
-                            <TextField
-                              margin="normal"
-                              id="roomNumber"
-                              label="Room number"
-                              name="roomNumber"
-                              value={this.state.roomNumber}
-                              fullWidth
-                              onChange={(event) => { this.setState({ roomNumber: event.target.value }); }}
+                          <FormControlLabel
+                            value="hotel"
+                            control={<Radio />}
+                            label="Hotel"
+                          />
 
 
-                              inputProps={{}}
-                            />
-                          </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <TextField
-                              margin="normal"
-                              id="buzzer"
-                              label="Buzzer"
-                              name="buzzer"
-                              fullWidth
-                              value={this.state.roomNumber}
-                              onChange={(event) => { this.setState({ buzzer: event.target.value }); }}
+                        </RadioGroup>
+                      </FormControl>
+                    </Grid>
+                  </Grid>
 
-                              inputProps={{}}
-                            />
-                          </Grid>
-                        </Grid>
-                      </div>
-                    ) : (
-                        ''
-                      )}
-
-                    {this.state.addressType && this.state.addressType === 'hotel' ? (
+                  {this.state.addressType == 'apartment' ? (
+                    <div>
                       <Grid container>
                         <Grid item xs={12}>
                           <Typography type="subheading" className="font-uppercase">
-                            Hotel
-                          </Typography>
+                            Apartment
+                            </Typography>
+
                         </Grid>
-                        <Grid item xs={12} sm={6}>
+                        <Grid item xs={12}>
                           <TextField
                             margin="normal"
-                            id="hotelName"
-                            label="Hotel name"
-                            name="hotelName"
-                            value={this.state.hotelName}
-
+                            id="apartmentName"
+                            label="Apartment name"
+                            name="apartment_name"
                             fullWidth
-                            onChange={(event) => { this.setState({ hotelNumber: event.target.value }); }}
+                            value={this.state.apartmentName}
+                            onChange={(event) => { this.setState({ apartmentName: event.target.value }); }}
 
                             inputProps={{}}
                           />
                         </Grid>
+                      </Grid>
+                      <Grid container>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="unit"
+                            label="Unit"
+                            name="apartmentUnit"
+                            fullWidth
+                            value={this.state.unit}
+                            onChange={(event) => { this.setState({ unit: event.target.value }); }}
+                            inputProps={{}}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="buzzer"
+                            label="Buzzer"
+                            name="buzzer"
+                            value={this.state.buzzer}
+                            fullWidth
+                            onChange={(event) => { this.setState({ buzzer: event.target.value }); }}
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ) : (
+                      ''
+                    )}
+
+                  {this.state.addressType == 'business' ? (
+                    <div>
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <Typography type="subheading" className="font-uppercase">
+                            Business
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            margin="normal"
+                            id="businessName"
+                            label="Business name"
+                            name="business_name"
+                            value={this.state.businessName}
+
+                            fullWidth
+                            onChange={(event) => { this.setState({ businessName: event.target.value }); }}
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                      <Grid container>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="businessUnit"
+                            label="Unit"
+                            name="businessUnit"
+                            value={this.state.unit}
+
+                            fullWidth
+                            onChange={(event) => { this.setState({ unit: event.target.value }); }}
+                            inputProps={{}}
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="businessBuzzer"
+                            label="Buzzer"
+                            name="businessBuzzer"
+                            value={this.state.buzzer}
+                            fullWidth
+                            onChange={(event) => { this.setState({ buzzer: event.target.value }); }}
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ) : (
+                      ''
+                    )}
+
+                  {this.state.addressType == 'dormitory' ? (
+                    <div>
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <Typography type="subheading" className="font-uppercase">
+                            Dormitory
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            margin="normal"
+                            id="dormitoryName"
+                            label="Dormitory name"
+                            name="dormitory_name"
+                            select
+                            value={
+                              this.state.dormName
+                                ? this.state.dormName
+                                : 'Algonquin College'
+                            }
+                            onChange={this.changeDormName.bind(this)}
+                            fullWidth
+                            SelectProps={{ native: false }}
+                          >
+                            <MenuItem key={1} value="Algonquin College">
+                              Algonquin College
+                              </MenuItem>
+
+                            <MenuItem key={3} value="Carleton University">
+                              Carleton University
+                              </MenuItem>
+                            <MenuItem key={4} value="University of Ottawa">
+                              University of Ottawa
+                              </MenuItem>
+                          </TextField>
+                        </Grid>
+
+                        <Grid item xs={12}>
+                          {this.state.dormName &&
+                            this.state.dormName === 'Algonquin College' ? (
+                              <TextField
+                                margin="normal"
+                                id="dormResidence"
+                                label="Dormitory Residence"
+                                name="dormitory_residence"
+                                select
+                                value={
+                                  this.state.dormResidence
+                                  // ? this.state.dormResidence
+                                  // : "Student Residence"
+                                }
+                                fullWidth
+                                onChange={this.changeDormResidence.bind(this)}
+                              >
+
+                                <MenuItem key={1} value="Student Residence">
+                                  Student Residence
+                                  </MenuItem>
+
+                              </TextField>
+                            ) : (
+                              ''
+                            )}
+                          {this.state.dormName &&
+                            this.state.dormName === 'Carleton University' ? (
+                              <TextField
+                                margin="normal"
+                                id="dormResidence"
+                                label="Dormitory Residence"
+                                name="dormitory_residence"
+                                select
+                                value={
+                                  this.state.dormResidence
+                                  // ? this.state.dormResidence
+                                  // : "Dundas House"
+                                }
+                                fullWidth
+                                onChange={this.changeDormResidence.bind(this)}
+                              >
+                                <MenuItem key={1} value="Dundas House">
+                                  Dundas House
+                                  </MenuItem>
+                                <MenuItem key={2} value="Glengarry House">
+                                  Glengarry House
+                                  </MenuItem>
+                                <MenuItem key={3} value="Grenville House">
+                                  Grenville House
+                                  </MenuItem>
+                                <MenuItem key={4} value="Lanark House">
+                                  Lanark House
+                                  </MenuItem>
+                                <MenuItem key={5} value="Lennox & Addington House">
+                                  Lennox & Addington House
+                                  </MenuItem>
+                                <MenuItem key={6} value="Renfrew House">
+                                  Renfrew House
+                                  </MenuItem>
+                                <MenuItem key={7} value="Russell House">
+                                  Russell House
+                                  </MenuItem>
+                                <MenuItem key={8} value="Stormont House">
+                                  Stormont House
+                                  </MenuItem>
+                              </TextField>
+                            ) : (
+                              ''
+                            )}
+
+                          {this.state.dormName &&
+                            this.state.dormName === 'University of Ottawa' ? (
+                              <TextField
+                                margin="normal"
+                                id="dormResidence"
+                                label="Dormitory Residence"
+                                name="dormitory_residence"
+                                select
+                                value={
+                                  this.state.dormResidence
+                                  // ? this.state.dormResidence
+                                  // : "90 U Residence"
+                                }
+                                fullWidth
+                                onChange={this.changeDormResidence.bind(this)}
+                              >
+                                <MenuItem key={1} value="90 U Residence">
+                                  90 U Residence
+                                  </MenuItem>
+                                <MenuItem key={2} value="Hyman Soloway Residence">
+                                  Hyman Soloway Residence
+                                  </MenuItem>
+                                <MenuItem key={3} value="Marchand Residence">
+                                  Marchand Residence
+                                  </MenuItem>
+                                <MenuItem key={4} value="Stanton Residence">
+                                  Stanton Residence
+                                  </MenuItem>
+                                <MenuItem key={5} value="Thompson Residence">
+                                  Thompson Residence
+                                  </MenuItem>
+                              </TextField>
+                            ) : (
+                              ''
+                            )}
+                        </Grid>
+                      </Grid>
+                      <Grid container>
                         <Grid item xs={12} sm={6}>
                           <TextField
                             margin="normal"
@@ -8299,434 +8247,530 @@ class CurrentCustomerEditor extends React.Component {
                             label="Room number"
                             name="roomNumber"
                             value={this.state.roomNumber}
-
                             fullWidth
                             onChange={(event) => { this.setState({ roomNumber: event.target.value }); }}
+
 
                             inputProps={{}}
                           />
                         </Grid>
+                        <Grid item xs={12} sm={6}>
+                          <TextField
+                            margin="normal"
+                            id="buzzer"
+                            label="Buzzer"
+                            name="buzzer"
+                            fullWidth
+                            value={this.state.roomNumber}
+                            onChange={(event) => { this.setState({ buzzer: event.target.value }); }}
+
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ) : (
+                      ''
+                    )}
+
+                  {this.state.addressType && this.state.addressType === 'hotel' ? (
+                    <Grid container>
+                      <Grid item xs={12}>
+                        <Typography type="subheading" className="font-uppercase">
+                          Hotel
+                          </Typography>
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          margin="normal"
+                          id="hotelName"
+                          label="Hotel name"
+                          name="hotelName"
+                          value={this.state.hotelName}
+
+                          fullWidth
+                          onChange={(event) => { this.setState({ hotelNumber: event.target.value }); }}
+
+                          inputProps={{}}
+                        />
+                      </Grid>
+                      <Grid item xs={12} sm={6}>
+                        <TextField
+                          margin="normal"
+                          id="roomNumber"
+                          label="Room number"
+                          name="roomNumber"
+                          value={this.state.roomNumber}
+
+                          fullWidth
+                          onChange={(event) => { this.setState({ roomNumber: event.target.value }); }}
+
+                          inputProps={{}}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <FormGroup>
+                          <FormControlLabel
+                            control={<Checkbox checked />}
+                            disabled
+                            checked
+                            label="Leave at front desk"
+                          />
+                        </FormGroup>
+                      </Grid>
+                    </Grid>
+                  ) : (
+                      ''
+                    )}
+
+                  {this.state.addressType && this.state.addressType === 'house' ? (
+                    <div>
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <Typography type="subheading" className="font-uppercase">
+                            House
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <TextField
+                            margin="normal"
+                            id="unitHouse"
+                            label="Unit"
+                            name="unitHouse"
+                            value={this.state.unit}
+
+                            fullWidth
+                            onChange={(event) => { this.setState({ unit: event.target.value }); }}
+                            inputProps={{}}
+                          />
+                        </Grid>
+                      </Grid>
+                    </div>
+                  ) : (
+                      ''
+                    )}
+
+                  {this.state.addressType ? (
+                    <div>
+                      <Grid container>
+                        <Grid item xs={12} sm={8}>
+
+                          <Geosuggest
+                            className="geosuggest-input-material"
+                            placeholder="Street address"
+                            initialValue={this.state.streetAddress}
+                            onChange={(value) => { this.setState({ streetAddress: value }); }}
+                            onSuggestSelect={(suggest) => { this.setState({ streetAddress: suggest.label }); }}
+                            name="streetAddress"
+                          />
+                        </Grid>
+                        <Grid item xs={12} sm={4}>
+                          <TextField
+                            label="Postal Code"
+                            id="postalCode"
+                            name="postalCode"
+                            value={this.state.postalCode}
+                            fullWidth
+                            readOnly
+                            disabled
+                          />
+                        </Grid>
+                      </Grid>
+
+                      <Grid container>
+                        <Grid item xs={12} sm={12}>
+                          <TextField
+                            label="Notes"
+                            id="notes"
+                            name="notes"
+                            value={this.state.notes}
+                            fullWidth
+                            multiline
+                            onChange={(event) => { this.setState({ notes: event.target.value }); }}
+                          />
+                        </Grid>
+                      </Grid>
+
+                      <Grid container>
                         <Grid item xs={12}>
                           <FormGroup>
                             <FormControlLabel
-                              control={<Checkbox checked />}
-                              disabled
-                              checked
-                              label="Leave at front desk"
+                              control={<Checkbox
+                                checked={this.state.coolerBag}
+                                onChange={this.setCoolerbagCheckbox.bind(this)}
+                              />}
+                              label="Cooler bag (One time fee - $20)"
                             />
                           </FormGroup>
                         </Grid>
                       </Grid>
-                    ) : (
-                        ''
-                      )}
 
-                    {this.state.addressType && this.state.addressType === 'house' ? (
-                      <div>
-                        <Grid container>
-                          <Grid item xs={12}>
-                            <Typography type="subheading" className="font-uppercase">
-                              House
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12}>
-                            <TextField
-                              margin="normal"
-                              id="unitHouse"
-                              label="Unit"
-                              name="unitHouse"
-                              value={this.state.unit}
+                      <Grid item xs={12} style={{ marginTop: '25px' }}>
+                        <Typography
+                          type="body1"
+                          className="text-uppercase font-medium"
+                        >
+                          Delivery Notifications
+                          </Typography>
+                      </Grid>
 
-                              fullWidth
-                              onChange={(event) => { this.setState({ unit: event.target.value }); }}
-                              inputProps={{}}
+                      <Grid container>
+                        <Grid item sm={6} xs={12}>
+                          <Typography type="body2">Email</Typography>
+                          <FormControl component="fieldset">
+                            <Switch
+                              checked={this.state.deliveryNotifcations.email}
+                              onChange={this.handleDeliveryNotification.bind(this, 'email')}
                             />
-                          </Grid>
+                          </FormControl>
                         </Grid>
-                      </div>
-                    ) : (
-                        ''
-                      )}
-
-                    {this.state.addressType ? (
-                      <div>
-                        <Grid container>
-                          <Grid item xs={12} sm={8}>
-
-                            <Geosuggest
-                              className="geosuggest-input-material"
-                              placeholder="Street address"
-                              initialValue={this.state.streetAddress}
-                              onChange={(value) => { this.setState({ streetAddress: value }); }}
-                              onSuggestSelect={(suggest) => { this.setState({ streetAddress: suggest.label }); }}
-                              name="streetAddress"
+                        <Grid item sm={6} xs={12}>
+                          <Typography type="body2">SMS</Typography>
+                          <FormControl component="fieldset">
+                            <Switch
+                              checked={this.state.deliveryNotifcations.sms}
+                              onChange={this.handleDeliveryNotification.bind(this, 'sms')}
                             />
-                          </Grid>
-                          <Grid item xs={12} sm={4}>
-                            <TextField
-                              label="Postal Code"
-                              id="postalCode"
-                              name="postalCode"
-                              value={this.state.postalCode}
-                              fullWidth
-                              readOnly
-                              disabled
-                            />
-                          </Grid>
+                          </FormControl>
                         </Grid>
+                      </Grid>
 
-                        <Grid container>
-                          <Grid item xs={12} sm={12}>
-                            <TextField
-                              label="Notes"
-                              id="notes"
-                              name="notes"
-                              value={this.state.notes}
-                              fullWidth
-                              multiline
-                              onChange={(event) => { this.setState({ notes: event.target.value }); }}
-                            />
-                          </Grid>
-                        </Grid>
-
-                        <Grid container>
-                          <Grid item xs={12}>
-                            <FormGroup>
-                              <FormControlLabel
-                                control={<Checkbox
-                                  checked={this.state.coolerBag}
-                                  onChange={this.setCoolerbagCheckbox.bind(this)}
-                                />}
-                                label="Cooler bag (One time fee - $20)"
-                              />
-                            </FormGroup>
-                          </Grid>
-                        </Grid>
-
+                      <Grid container>
                         <Grid item xs={12} style={{ marginTop: '25px' }}>
                           <Typography
                             type="body1"
                             className="text-uppercase font-medium"
                           >
-                            Delivery Notifications
-                          </Typography>
-                        </Grid>
-
-                        <Grid container>
-                          <Grid item sm={6} xs={12}>
-                            <Typography type="body2">Email</Typography>
-                            <FormControl component="fieldset">
-                              <Switch
-                                checked={this.state.deliveryNotifcations.email}
-                                onChange={this.handleDeliveryNotification.bind(this, 'email')}
-                              />
-                            </FormControl>
-                          </Grid>
-                          <Grid item sm={6} xs={12}>
-                            <Typography type="body2">SMS</Typography>
-                            <FormControl component="fieldset">
-                              <Switch
-                                checked={this.state.deliveryNotifcations.sms}
-                                onChange={this.handleDeliveryNotification.bind(this, 'sms')}
-                              />
-                            </FormControl>
-                          </Grid>
-                        </Grid>
-
-                        <Grid container>
-                          <Grid item xs={12} style={{ marginTop: '25px' }}>
-                            <Typography
-                              type="body1"
-                              className="text-uppercase font-medium"
-                            >
-                              Complete Schedule
+                            Complete Schedule
                             </Typography>
-                          </Grid>
-                          <Grid item xs={12}>
-                            <Table className="table-lifestyles">
-                              <TableHead>
-                                <TableRow>
-                                  <TableCell />
-
-                                  <TableCell style={{ textAlign: 'center' }}>
-                                    <Typography
-                                      type="subheading"
-                                      className="font-medium font-uppercase"
-                                    >
-                                      Breakfast
-                                    </Typography>
-                                  </TableCell>
-
-                                  <TableCell style={{ textAlign: 'center' }}>
-                                    <Typography
-                                      type="subheading"
-                                      className="font-medium font-uppercase"
-                                    >
-                                      Lunch
-                                    </Typography>
-                                  </TableCell>
-
-                                  <TableCell style={{ textAlign: 'center' }}>
-                                    <Typography
-                                      type="subheading"
-                                      className="font-medium font-uppercase"
-                                    >
-                                      Dinner
-                                    </Typography>
-                                  </TableCell>
-                                </TableRow>
-                              </TableHead>
-                              <TableBody>
-                                {this.state.completeSchedule.map((e, i) => {
-                                  const days = [
-                                    'Monday',
-                                    'Tuesday',
-                                    'Wednesday',
-                                    'Thursday',
-                                    'Friday',
-                                    'Saturday',
-                                    'Sunday',
-                                  ];
-
-                                  return (
-                                    <TableRow key={i}>
-                                      <TableCell>
-                                        <Typography
-                                          type="subheading"
-                                          style={{ marginTop: '10px' }}
-                                        >
-                                          {days[i]}
-                                        </Typography>
-                                      </TableCell>
-
-                                      <TableCell style={{ textAlign: 'center' }}>
-                                        <TextField
-                                          fullWidth
-                                          margin="normal"
-                                          style={{
-                                            fontSize: '1rem',
-                                            maxWidth: '100px',
-                                            minWidth: '100px',
-                                          }}
-                                          disabled
-                                          value={
-                                            this.state.completeSchedule[i]
-                                              .breakfast
-                                          }
-                                          name={`all_breakfast_${i}`}
-                                        />
-                                      </TableCell>
-
-                                      <TableCell style={{ textAlign: 'center' }}>
-                                        <TextField
-                                          fullWidth
-                                          margin="normal"
-                                          style={{
-                                            fontSize: '1rem',
-                                            maxWidth: '100px',
-                                            minWidth: '100px',
-                                          }}
-                                          disabled
-                                          value={
-                                            this.state.completeSchedule[i].lunch
-                                          }
-                                          name={`all_lunch_${i}`}
-                                        />
-                                      </TableCell>
-
-                                      <TableCell style={{ textAlign: 'center' }}>
-                                        <TextField
-                                          fullWidth
-                                          margin="normal"
-                                          style={{
-                                            fontSize: '1rem',
-                                            maxWidth: '100px',
-                                            minWidth: '100px',
-                                          }}
-                                          disabled
-                                          value={
-                                            this.state.completeSchedule[i].dinner
-                                          }
-                                          name={`all_dinner_${i}`}
-                                        />
-                                      </TableCell>
-                                    </TableRow>
-                                  );
-                                })}
-                              </TableBody>
-                            </Table>
-                          </Grid>
                         </Grid>
+                        <Grid item xs={12}>
+                          <Table className="table-lifestyles">
+                            <TableHead>
+                              <TableRow>
+                                <TableCell />
 
-                        <Grid container style={{ marginTop: '25px' }}>
-                          <Grid item xs={12}>
-                            <Typography
-                              type="body1"
-                              className="text-uppercase font-medium"
-                            >
-                              Delivery type
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={12}>
+                                <TableCell style={{ textAlign: 'center' }}>
+                                  <Typography
+                                    type="subheading"
+                                    className="font-medium font-uppercase"
+                                  >
+                                    Breakfast
+                                    </Typography>
+                                </TableCell>
 
-                            <Stepper
-                              activeStep={activeDeliveryScheduleStep}
-                              style={{ background: 'none !important' }}
-                            >
-                              {steps.map((label, index) => {
-                                const props = {};
+                                <TableCell style={{ textAlign: 'center' }}>
+                                  <Typography
+                                    type="subheading"
+                                    className="font-medium font-uppercase"
+                                  >
+                                    Lunch
+                                    </Typography>
+                                </TableCell>
+
+                                <TableCell style={{ textAlign: 'center' }}>
+                                  <Typography
+                                    type="subheading"
+                                    className="font-medium font-uppercase"
+                                  >
+                                    Dinner
+                                    </Typography>
+                                </TableCell>
+                              </TableRow>
+                            </TableHead>
+                            <TableBody>
+                              {this.state.completeSchedule.map((e, i) => {
+                                const days = [
+                                  'Monday',
+                                  'Tuesday',
+                                  'Wednesday',
+                                  'Thursday',
+                                  'Friday',
+                                  'Saturday',
+                                  'Sunday',
+                                ];
 
                                 return (
-                                  <Step key={index} {...props}>
-                                    <StepLabel>{label}</StepLabel>
-                                  </Step>
+                                  <TableRow key={i}>
+                                    <TableCell>
+                                      <Typography
+                                        type="subheading"
+                                        style={{ marginTop: '10px' }}
+                                      >
+                                        {days[i]}
+                                      </Typography>
+                                    </TableCell>
+
+                                    <TableCell style={{ textAlign: 'center' }}>
+                                      <TextField
+                                        fullWidth
+                                        margin="normal"
+                                        style={{
+                                          fontSize: '1rem',
+                                          maxWidth: '100px',
+                                          minWidth: '100px',
+                                        }}
+                                        disabled
+                                        value={
+                                          this.state.completeSchedule[i]
+                                            .breakfast
+                                        }
+                                        name={`all_breakfast_${i}`}
+                                      />
+                                    </TableCell>
+
+                                    <TableCell style={{ textAlign: 'center' }}>
+                                      <TextField
+                                        fullWidth
+                                        margin="normal"
+                                        style={{
+                                          fontSize: '1rem',
+                                          maxWidth: '100px',
+                                          minWidth: '100px',
+                                        }}
+                                        disabled
+                                        value={
+                                          this.state.completeSchedule[i].lunch
+                                        }
+                                        name={`all_lunch_${i}`}
+                                      />
+                                    </TableCell>
+
+                                    <TableCell style={{ textAlign: 'center' }}>
+                                      <TextField
+                                        fullWidth
+                                        margin="normal"
+                                        style={{
+                                          fontSize: '1rem',
+                                          maxWidth: '100px',
+                                          minWidth: '100px',
+                                        }}
+                                        disabled
+                                        value={
+                                          this.state.completeSchedule[i].dinner
+                                        }
+                                        name={`all_dinner_${i}`}
+                                      />
+                                    </TableCell>
+                                  </TableRow>
                                 );
                               })}
-                            </Stepper>
+                            </TableBody>
+                          </Table>
+                        </Grid>
+                      </Grid>
 
-                            {this.state.completeSchedule.map((label, index) => {
-                              if (index >= 1) {
-                                return;
-                              }
+                      <Grid container style={{ marginTop: '25px' }}>
+                        <Grid item xs={12}>
+                          <Typography
+                            type="body1"
+                            className="text-uppercase font-medium"
+                          >
+                            Delivery type
+                            </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
 
-                              return this.renderOptionsForTheDay(
-                                activeDeliveryScheduleStep,
+                          <Stepper
+                            activeStep={activeDeliveryScheduleStep}
+                            style={{ background: 'none !important' }}
+                          >
+                            {steps.map((label, index) => {
+                              const props = {};
+
+                              return (
+                                <Step key={index} {...props}>
+                                  <StepLabel>{label}</StepLabel>
+                                </Step>
                               );
                             })}
+                          </Stepper>
 
-                            {activeDeliveryScheduleStep >= 1 ? (
-                              <Button
-                                onClick={this.handleBackDeliverySchedule.bind(this)}
-                              >
-                                Back
-                              </Button>
-                            ) : (
-                                ''
-                              )}
+                          {this.state.completeSchedule.map((label, index) => {
+                            if (index >= 1) {
+                              return;
+                            }
 
-                            {activeDeliveryScheduleStep < 5 ? (
-                              <Button
-                                onClick={this.handleNextDeliverySchedule.bind(this)}
-                              >
-                                Next
+                            return this.renderOptionsForTheDay(
+                              activeDeliveryScheduleStep,
+                            );
+                          })}
+
+                          {activeDeliveryScheduleStep >= 1 ? (
+                            <Button
+                              onClick={this.handleBackDeliverySchedule.bind(this)}
+                            >
+                              Back
                               </Button>
-                            ) : (
-                                ''
-                              )}
-                          </Grid>
+                          ) : (
+                              ''
+                            )}
+
+                          {activeDeliveryScheduleStep < 5 ? (
+                            <Button
+                              onClick={this.handleNextDeliverySchedule.bind(this)}
+                            >
+                              Next
+                              </Button>
+                          ) : (
+                              ''
+                            )}
                         </Grid>
-                      </div>
-                    ) : (
-                        ''
-                      )}
-
-                  </Paper>
-                  <Button
-                    style={{ marginTop: '25px' }}
-                    disabled={this.state.submitLoading}
-                    raised
-                    className={`${buttonClassname}`}
-                    color="primary"
-                    type="submit"
-                    onClick={() => this.saveSecondStep()}
-                  >
-                    Update
-                  {this.state.submitLoading && (
-                      <CircularProgress
-                        size={24}
-                        className={this.props.classes.buttonProgress}
-                      />
+                      </Grid>
+                    </div>
+                  ) : (
+                      ''
                     )}
-                  </Button>
-                </form>
 
-                {/* Add dialog here */}
-
-                <Dialog
-                  maxWidth="md"
-                  fullWidth
-                  open={this.state.orderSummaryDialogOpen}
-                  onClose={this.handleClose}
+                </Paper>
+                <Button
+                  style={{ marginTop: '25px' }}
+                  disabled={this.state.submitLoading}
+                  raised
+                  className={`${buttonClassname}`}
+                  color="primary"
+                  type="submit"
+                  onClick={() => this.saveSecondStep()}
                 >
-                  <AppBar className={this.props.classes.appBar}>
-                    <Toolbar>
-                      <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
-                        <CloseIcon />
-                      </IconButton>
-                      <Typography type="title" color="inherit" className={this.props.classes.flex}>
-                        Subscription update
+                  Update
+                  {this.state.submitLoading && (
+                    <CircularProgress
+                      size={24}
+                      className={this.props.classes.buttonProgress}
+                    />
+                  )}
+                </Button>
+              </form>
+
+              {/* Add dialog here */}
+
+              <Dialog
+                maxWidth="md"
+                fullWidth
+                open={this.state.orderSummaryDialogOpen}
+                onClose={this.handleClose}
+              >
+                <AppBar className={this.props.classes.appBar}>
+                  <Toolbar>
+                    <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
+                      <CloseIcon />
+                    </IconButton>
+                    <Typography type="title" color="inherit" className={this.props.classes.flex}>
+                      Subscription update
                     </Typography>
-                      <Button color="inherit" onClick={() => this.saveSecondStep()}>Save</Button>
-                    </Toolbar>
-                  </AppBar>
-                  <OrderSummary
-                    primaryProfileBilling={this.state.primaryProfileBilling}
-                    secondaryProfilesBilling={this.state.secondaryProfilesBilling}
-                    postalCodes={this.props.postalCodes}
-                    customerInfo={this.props.customer}
-                    discounts={this.props.discounts}
-                    discountSelected={this.state.discountCode}
-                    subscription={this.props.subscription}
-                  />
-                </Dialog>
-              </div>
-            )}
+                    <Button color="inherit" onClick={() => this.saveSecondStep()}>Save</Button>
+                  </Toolbar>
+                </AppBar>
+                <OrderSummary
+                  primaryProfileBilling={this.state.primaryProfileBilling}
+                  secondaryProfilesBilling={this.state.secondaryProfilesBilling}
+                  postalCodes={this.props.postalCodes}
+                  customerInfo={this.props.customer}
+                  discounts={this.props.discounts}
+                  discountSelected={this.state.discountCode}
+                  subscription={this.props.subscription}
+                />
+              </Dialog>
+            </div>
+          )}
 
-            {this.state.currentTab == 2 && (
-              <div>
-                <Typography type="headline" >Activity</Typography>
-              </div>
-            )}
+          {this.state.currentTab == 2 && (
 
-            {(this.state.currentTab === 3 && this.props.customer && this.props.subscription != undefined && this.props.customer.secondary == undefined) ? (
-              <Step4CheckoutCurrent
-                secondaryAccounts={this.props.secondaryAccounts}
-                activeStep={this.state.currentTab}
-                customer={this.props.customer}
-                subscription={this.props.subscription}
-                popTheSnackbar={this.props.popTheSnackbar.bind(this)}
-                lifestyles={this.props.lifestyles}
-                restrictions={this.props.restrictions}
-                ingredients={this.props.potentialSubIngredients}
-                postalCodes={this.props.postalCodes}
-                history={this.props.history}
-                discounts={this.props.discounts}
-                // step2Data={{
-                //   id: this.props.customer._id,
-                //   address: this.props.customer.address,
-                //   subscriptionId: this.props.subscription ? this.props.subscription._id : '',
-                //   subIngredients: this.state.subIngredients,
-                //   specificRestrictions: this.state.specificRestrictions,
-                //   lifestyle: this.props.lifestyles.find(e => e.title === this.state.lifestyle)._id,
-                //   discount: this.state.discount,
-                //   discountCode: this.state.discountCode,
-                //   restrictions: this.state.restrictions,
-                //   scheduleReal: this.state.scheduleReal,
-                //   platingNotes: this.state.platingNotes,
-                //   secondary: this.props.customer.secondary != undefined,
-                //   secondaryProfiles: this.state.secondaryProfilesData,
-                //   secondaryProfilesRemoved: this.state.secondaryProfilesRemoved,
-                //   completeSchedule: this.state.completeSchedule,
-                //   delivery: this.state.deliveryType,
-                //   coolerBag: this.state.coolerBag,
-                //   notifications: {
-                //     delivery: {
-                //       sms: this.state.deliveryNotifcations.sms,
-                //       email: this.state.deliveryNotifcations.email
-                //     }
-                //   }
-                // }}
+            <Paper elevation={2} style={{ width: '100%' }} className="paper-for-fields">
+              <Typography type="headline" style={{ marginBottom: "1em" }}>Activity</Typography>
 
-              />
-            ) : this.state.currentTab === 3 ? (
-              <Typography type="subheading">
-                This account doesn't have a subscription yet.
+
+              {this.props.jobs && this.props.jobs.sort((a, b) => b.created - a.created).map((e, i) => {
+
+                return (
+                  <Grid container justify="space-between">
+                    <Grid item xs={12}
+                    justify="space-between" 
+                    style={{display: 'flex',cursor: 'pointer'}} 
+                    onClick={() => this.setState({ [e._id]: !this.state[e._id], })} >
+                      <Typography type="body1">
+                        {e.type == "editSubscriptionJob" ? 'Edit subscription' : e.type
+                          === "editSubscriptionJobNonCard" ? 'Edit subscription (non card)' : e.type
+                          === "setSubscriptionCancelledJob" ? 'Cancel subscription (non card)' : e.type
+                          === "setSubscriptionCancelledCardJob" ? 'Cancel subscription' : e.type
+                          === "setSubscriptionActiveJob" ? 'Activate subscription (non card)' :  e.type
+                          === "setSubscriptionActiveCardJob" ? 'Activate subscription' : e.type
+                          === "setSubscriptionActive" ? 'Activate subscription' : ''}
+                        {" "}({e.status}) {`runs ${moment(e.after).format('dddd, MMMM D YYYY h:m A')}`}
+                        {e.data.hasOwnProperty('jobCreatedBy') && (
+                          <React.Fragment>
+                            {e.data.jobCreatedBy == "customer" ? (
+                            ` by customer`
+                            ) : ''}
+                          </React.Fragment>
+                        )}
+                      </Typography>
+
+                      <Typography>{`Added ${moment(e.created).format('dddd, MMMM D YYYY h:m A')}`}</Typography>
+                    </Grid>
+                    <Collapse
+                      in={Boolean(this.state[e._id])}
+                      transitionDuration="auto"
+                      component="div"
+                    >
+                      {e.type =="editSubscriptionJob" || e.type == "editSubscriptionJobNonCard" ? (
+                        <React.Fragment>
+                          {e.data.completeSchedule.map((compScheuleDay, compScheduleIndex) => (
+                            <div>
+                              <Typography type="body2">
+                                {`${moment().isoWeekday(compScheduleIndex + 1).format("dddd")} `}
+                                {`Breakfast: ${compScheuleDay.breakfast} `}
+                                {`Lunch: ${compScheuleDay.lunch} `}
+                                {`Dinner: ${compScheuleDay.dinner} `}
+                                {`Chef's choice: ${compScheuleDay.chefsChoice || 0} `}
+                              </Typography>
+                            </div>
+                          ))}
+
+                          {e.data.delivery.map((deliveryVal, deliveryIndex) => (
+                            <div>
+                              <Typography type="body2">
+                                {`${moment().isoWeekday(deliveryIndex + 1).format("dddd")}: ${deliveryVal == "false" || deliveryVal == "" ? "N/A" : deliveryVal}`}
+                              </Typography>
+                            </div>
+                          ))}
+                        </React.Fragment>
+                      ) : (
+                        <div></div>
+                      )}
+                     
+                    </Collapse>
+                  </Grid>
+                )
+
+              })}
+
+            </Paper>
+          )}
+
+          {(this.state.currentTab === 3 && this.props.customer && this.props.subscription != undefined && this.props.customer.secondary == undefined) ? (
+            <Step4CheckoutCurrent
+              secondaryAccounts={this.props.secondaryAccounts}
+              activeStep={this.state.currentTab}
+              customer={this.props.customer}
+              subscription={this.props.subscription}
+              popTheSnackbar={this.props.popTheSnackbar.bind(this)}
+              lifestyles={this.props.lifestyles}
+              restrictions={this.props.restrictions}
+              ingredients={this.props.potentialSubIngredients}
+              postalCodes={this.props.postalCodes}
+              history={this.props.history}
+              discounts={this.props.discounts}
+            />
+          ) : this.state.currentTab === 3 ? (
+            <Typography type="subheading">
+              This account doesn't have a subscription yet.
             </Typography>
-            ) : ''}
+          ) : ''}
 
-          </Grid>
-        </div>
-      );
+        </Grid>
+      </div>
+    );
 
   }
 }

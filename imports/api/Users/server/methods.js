@@ -467,6 +467,13 @@ Meteor.methods({
           throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for update on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
         }
 
+        data.change = {
+          lifestyle: [],
+          restrictions: [],
+          preferences: [],
+          schedule: {},
+        };
+
         const job = new Job(
           Jobs,
           'editSubscriptionJob', // type of job
@@ -504,7 +511,7 @@ Meteor.methods({
               primaryAccount: data.id,
               subscriptionId: data.subscriptionId,
 
-              lifestyle: Lifestyles.findOne({ title: e.lifestyle })._id,
+              lifestyle: Lifestyles.findOne({ $or: [{ title: e.lifestyle }, { _id: e.lifestyle }] })._id,
               discount: e.discount,
               restrictions: e.restrictions,
               specificRestrictions: e.specificRestrictions,
@@ -531,7 +538,7 @@ Meteor.methods({
             primaryAccount: data.id,
             subscriptionId: data.subscriptionId,
             username: Random.id(),
-            lifestyle: Lifestyles.findOne({ title: e.lifestyle })._id,
+            lifestyle: Lifestyles.findOne({ $or: [{ title: e.lifestyle }, { _id: e.lifestyle }] })._id,
             discount: e.discount,
             restrictions: e.restrictions,
             specificRestrictions: e.specificRestrictions,

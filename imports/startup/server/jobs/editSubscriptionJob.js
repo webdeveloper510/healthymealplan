@@ -76,7 +76,7 @@ const worker = Job.processJobs(
             primaryAccount: data.id,
             subscriptionId: data.subscriptionId,
             username: Random.id(),
-            lifestyle: Lifestyles.findOne({ title: e.lifestyle })._id,
+            lifestyle: Lifestyles.findOne({ $or: [{ title: e.lifestyle }, { _id: e.lifestyle }] })._id,
             discount: e.discount,
             restrictions: e.restrictions,
             specificRestrictions: e.specificRestrictions,
@@ -134,12 +134,8 @@ const worker = Job.processJobs(
       return e;
     });
 
-
-    // console.log(data.discountCode);
-    // console.log(data);
-
-    let keysToUnset = {};
-    let keysToSet = {
+    const keysToUnset = {};
+    const keysToSet = {
       completeSchedule: data.completeSchedule,
       delivery: newDeliveryType,
       amount: billing.actualTotal,
@@ -148,13 +144,13 @@ const worker = Job.processJobs(
 
     if (data.hasOwnProperty('discountCodeRemove')) {
       if (data.discountCodeRemove) {
-        console.log("Going in discountCodeRemove inner if statement");
+        console.log('Going in discountCodeRemove inner if statement');
         keysToUnset.discountApplied = 1;
       }
     }
 
     if (data.hasOwnProperty('discountCode') && !keysToUnset.hasOwnProperty('discountApplied')) {
-      console.log("Going in discountCode inner KEY SET statement");
+      console.log('Going in discountCode inner KEY SET statement');
 
       keysToSet.discountApplied = Discounts.findOne({ $or: [{ title: data.discountCode }, { _id: data.discountCode }] })._id;
     }
@@ -164,9 +160,9 @@ const worker = Job.processJobs(
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-        $set: keysToSet,
-        $unset: keysToUnset,
-      });
+      $set: keysToSet,
+      $unset: keysToUnset,
+    });
 
     console.log('Inside editSubscriptionJob: Updated subscription on Vittle');
 
