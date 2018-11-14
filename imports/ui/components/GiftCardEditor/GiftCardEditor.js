@@ -339,19 +339,13 @@ class GiftCardEditor extends React.Component {
     };
 
     if(existingGiftCard){
-      giftCard._id = existingGiftCard._id;
+      giftCard._id = existingGiftCard;
     }
-
-    // if(giftCard.customer.length == 0) {
-    //   this.props.popTheSnackbar({
-    //     message: 'You need to select at least one customer'
-    //   });
-    // }
 
     if (this.state.initialAmountPreset == 'custom') {
       giftCard.initialAmount = parseFloat(this.state.initialAmount);
     } else {
-      console.log(this.state.initialAmountPreset);
+      // console.log(this.state.initialAmountPreset);
       // console.log(this.state.initialAmountPreset.toFixed(2))
       giftCard.initialAmount = parseFloat(this.state.initialAmountPreset);
     }
@@ -362,13 +356,13 @@ class GiftCardEditor extends React.Component {
       submitLoading: true,
     });
 
-    if(!this.props.newGiftCard){
-      if(this.props.giftCard.balance < this.props.giftCard.initialAmount){
-        popTheSnackbar({
-          message: "Can modify this card as it seems it's already in use."
-        });
-      }
-    }
+    // if(!this.props.newGiftCard){
+    //   if(this.props.giftCard.balance < this.props.giftCard.initialAmount){
+    //     popTheSnackbar({
+    //       message: "Can modify this card as it seems it's already in use."
+    //     });
+    //   }
+    // }
 
     Meteor.call(methodToCall, giftCard, (error, giftCardId) => {
       console.log('Inside Method');
