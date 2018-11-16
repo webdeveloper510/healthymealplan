@@ -13,7 +13,6 @@ import Typography from 'material-ui/Typography';
 import Radio, { RadioGroup } from 'material-ui/Radio';
 import Geosuggest from 'react-geosuggest';
 import './GeoSuggest.scss';
-
 import Payment from 'payment';
 
 import Checkbox from 'material-ui/Checkbox';
@@ -139,6 +138,7 @@ class Step4Checkout extends React.Component {
         breakfastPrice: 0,
         lunchPrice: 0,
         dinnerPrice: 0,
+        chefsChoicePrice: 0,
         breakfast: {
           totalQty: 0,
           regularQty: 0,
@@ -152,6 +152,12 @@ class Step4Checkout extends React.Component {
           bodybuilderQty: 0,
         },
         dinner: {
+          totalQty: 0,
+          regularQty: 0,
+          athleticQty: 0,
+          bodybuilderQty: 0,
+        },
+        chefsChoice: {
           totalQty: 0,
           regularQty: 0,
           athleticQty: 0,
@@ -251,6 +257,24 @@ class Step4Checkout extends React.Component {
           thisDaysQty += parseInt(e.dinner.quantity, 10);
         }
 
+        if (e.chefsChoice.active) {
+          primaryCustomer.chefsChoice.totalQty =
+            primaryCustomer.chefsChoice.totalQty + parseInt(e.chefsChoice.quantity, 10);
+
+          if (e.chefsChoice.portions == 'regular') {
+            primaryCustomer.chefsChoice.regularQty += parseInt(e.chefsChoice.quantity, 10);
+          } else if (e.chefsChoice.portions == 'athletic') {
+            primaryCustomer.chefsChoice.athleticQty += parseInt(e.chefsChoice.quantity, 10);
+          } else if ((e.chefsChoice.portions = 'bodybuilder')) {
+            primaryCustomer.chefsChoice.bodybuilderQty += parseInt(
+              e.chefsChoice.quantity,
+              10,
+            );
+          }
+
+          thisDaysQty += parseInt(e.chefsChoice.quantity, 10);
+        }
+
         customerScheduleTotals.push(thisDaysQty);
       });
 
@@ -288,6 +312,10 @@ class Step4Checkout extends React.Component {
               thisDaysQty += parseInt(e.dinner.quantity, 10);
             }
 
+            if (e.chefsChoice.active) {
+              thisDaysQty += parseInt(e.chefsChoice.quantity, 10);
+            }
+
             return thisDaysQty;
           });
 
@@ -322,11 +350,15 @@ class Step4Checkout extends React.Component {
       primaryCustomer.dinnerPrice =
         primaryCustomer.lifestyle.prices.dinner[metCriteria];
 
+      primaryCustomer.chefsChoicePrice =
+        primaryCustomer.lifestyle.prices.chefsChoice[metCriteria];
+
       // total base price based on per meal type base price, (before restrictions and extras and discounts)
       primaryCustomer.baseMealPriceTotal =
         primaryCustomer.breakfast.totalQty * primaryCustomer.breakfastPrice +
         primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-        primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
+        primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice +
+        primaryCustomer.chefsChoice.totalQty * primaryCustomer.chefsChoicePrice;
 
       // discounted basePrice -- this is the actual base price to add up in the total
 
@@ -388,7 +420,8 @@ class Step4Checkout extends React.Component {
               primaryCustomer.breakfast.totalQty *
               primaryCustomer.breakfastPrice +
               primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-              primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
+              primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice +
+              primaryCustomer.chefsChoice.totalQty * primaryCustomer.chefsChoicePrice;
 
             if (e.discountOrExtraType == 'Percentage') {
               totalRestrictionsSurcharge = e.extra / 100 * totalBaseMealsCharge;
@@ -398,7 +431,8 @@ class Step4Checkout extends React.Component {
               totalRestrictionsSurcharge =
                 (primaryCustomer.breakfast.totalQty +
                   primaryCustomer.lunch.totalQty +
-                  primaryCustomer.dinner.totalQty) *
+                  primaryCustomer.dinner.totalQty +
+                  primaryCustomer.chefsChoice.totalQty) *
                 e.extra;
             }
 
@@ -453,7 +487,8 @@ class Step4Checkout extends React.Component {
       if (
         primaryCustomer.breakfast.athleticQty > 0 ||
         primaryCustomer.lunch.athleticQty > 0 ||
-        primaryCustomer.dinner.athleticQty > 0
+        primaryCustomer.dinner.athleticQty > 0 ||
+        primaryCustomer.chefsChoice.athleticQty > 0
       ) {
         let totalAthleticSurcharge = 0;
 
@@ -521,7 +556,30 @@ class Step4Checkout extends React.Component {
             'Fixed amount'
           ) {
             totalAthleticSurcharge +=
-              primaryCustomer.breakfast.athleticQty *
+              primaryCustomer.dinner.athleticQty *
+              primaryCustomer.lifestyle.extraAthletic;
+          }
+        }
+
+        if (primaryCustomer.chefsChoice.athleticQty > 0) {
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
+          ) {
+            const extraAthleticPerDinner =
+              primaryCustomer.lifestyle.extraAthletic /
+              100 *
+              primaryCustomer.chefsChoicePrice;
+
+            totalAthleticSurcharge +=
+              primaryCustomer.chefsChoice.athleticQty * extraAthleticPerDinner;
+          }
+
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            'Fixed amount'
+          ) {
+            totalAthleticSurcharge +=
+              primaryCustomer.chefsChoice.athleticQty *
               primaryCustomer.lifestyle.extraAthletic;
           }
         }
@@ -533,7 +591,8 @@ class Step4Checkout extends React.Component {
       if (
         primaryCustomer.breakfast.bodybuilderQty > 0 ||
         primaryCustomer.lunch.bodybuilderQty > 0 ||
-        primaryCustomer.dinner.bodybuilderQty > 0
+        primaryCustomer.dinner.bodybuilderQty > 0 ||
+        primaryCustomer.chefsChoice.bodybuilderQty > 0
       ) {
         let totalBodybuilderSurcharge = 0;
 
@@ -582,6 +641,16 @@ class Step4Checkout extends React.Component {
             primaryCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
         }
 
+        if (primaryCustomer.chefsChoice.bodybuilderQty > 0) {
+          const extraBodybuilderPerDinner =
+            primaryCustomer.lifestyle.extraBodybuilder /
+            100 *
+            primaryCustomer.chefsChoicePrice;
+
+          totalBodybuilderSurcharge +=
+            primaryCustomer.chefsChoice.bodybuilderQty * extraBodybuilderPerDinner;
+        }
+
         primaryCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
       }
 
@@ -596,6 +665,7 @@ class Step4Checkout extends React.Component {
             breakfastPrice: 0,
             lunchPrice: 0,
             dinnerPrice: 0,
+            chefsChoicePrice: 0,
             breakfast: {
               totalQty: 0,
               regularQty: 0,
@@ -609,6 +679,12 @@ class Step4Checkout extends React.Component {
               bodybuilderQty: 0,
             },
             dinner: {
+              totalQty: 0,
+              regularQty: 0,
+              athleticQty: 0,
+              bodybuilderQty: 0,
+            },
+            chefsChoice: {
               totalQty: 0,
               regularQty: 0,
               athleticQty: 0,
@@ -647,6 +723,9 @@ class Step4Checkout extends React.Component {
 
           currentCustomer.dinnerPrice =
             currentCustomer.lifestyle.prices.dinner[metCriteria];
+
+          currentCustomer.chefsChoicePrice =
+            currentCustomer.lifestyle.prices.chefsChoice[metCriteria];
 
           el.scheduleReal.forEach((e, i) => {
             if (e.breakfast.active) {
@@ -715,13 +794,36 @@ class Step4Checkout extends React.Component {
                 );
               }
             }
+
+            if (e.chefsChoice.active) {
+              currentCustomer.chefsChoice.totalQty =
+                currentCustomer.chefsChoice.totalQty + parseInt(e.chefsChoice.quantity, 10);
+
+              if (e.chefsChoice.portions == 'regular') {
+                currentCustomer.chefsChoice.regularQty += parseInt(
+                  e.chefsChoice.quantity,
+                  10,
+                );
+              } else if (e.chefsChoice.portions == 'athletic') {
+                currentCustomer.chefsChoice.athleticQty += parseInt(
+                  e.chefsChoice.quantity,
+                  10,
+                );
+              } else if ((e.chefsChoice.portions = 'bodybuilder')) {
+                currentCustomer.chefsChoice.bodybuilderQty += parseInt(
+                  e.chefsChoice.quantity,
+                  10,
+                );
+              }
+            }
           });
 
           // total base price based on per meal type base price, (before restrictions and extras and discounts)
           currentCustomer.baseMealPriceTotal =
             currentCustomer.breakfast.totalQty * currentCustomer.breakfastPrice +
             currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-            currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
+            currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice +
+            currentCustomer.chefsChoice.totalQty * currentCustomer.chefsChoicePrice;
 
           // discounted basePrice -- this is the actual base price to add up in the total
           if (currentCustomer.discount == 'senior') {
@@ -785,7 +887,8 @@ class Step4Checkout extends React.Component {
                   currentCustomer.breakfast.totalQty *
                   currentCustomer.breakfastPrice +
                   currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-                  currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
+                  currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice +
+                  currentCustomer.chefsChoice.totalQty * currentCustomer.chefsChoicePrice;
 
                 if (e.discountOrExtraType == 'Percentage') {
                   totalRestrictionsSurcharge =
@@ -796,7 +899,8 @@ class Step4Checkout extends React.Component {
                   totalRestrictionsSurcharge =
                     (currentCustomer.breakfast.totalQty +
                       currentCustomer.lunch.totalQty +
-                      currentCustomer.dinner.totalQty) *
+                      currentCustomer.dinner.totalQty +
+                      currentCustomer.chefsChoice.totalQty) *
                     e.extra;
                 }
 
@@ -859,7 +963,8 @@ class Step4Checkout extends React.Component {
           if (
             currentCustomer.breakfast.athleticQty > 0 ||
             currentCustomer.lunch.athleticQty > 0 ||
-            currentCustomer.dinner.athleticQty > 0
+            currentCustomer.dinner.athleticQty > 0 ||
+            currentCustomer.chefsChoice.athleticQty > 0
           ) {
             let totalAthleticSurcharge = 0;
 
@@ -931,7 +1036,31 @@ class Step4Checkout extends React.Component {
                 'Fixed amount'
               ) {
                 totalAthleticSurcharge +=
-                  currentCustomer.breakfast.athleticQty *
+                  currentCustomer.dinner.athleticQty *
+                  currentCustomer.lifestyle.extraAthletic;
+              }
+            }
+
+            if (currentCustomer.chefsChoice.athleticQty > 0) {
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                'Percentage'
+              ) {
+                const extraAthleticPerChefsChoice =
+                  currentCustomer.lifestyle.extraAthletic /
+                  100 *
+                  currentCustomer.chefsChoicePrice;
+
+                totalAthleticSurcharge +=
+                  currentCustomer.chefsChoice.athleticQty * extraAthleticPerChefsChoice;
+              }
+
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                'Fixed amount'
+              ) {
+                totalAthleticSurcharge +=
+                  currentCustomer.chefsChoice.athleticQty *
                   currentCustomer.lifestyle.extraAthletic;
               }
             }
@@ -943,7 +1072,8 @@ class Step4Checkout extends React.Component {
           if (
             currentCustomer.breakfast.bodybuilderQty > 0 ||
             currentCustomer.lunch.bodybuilderQty > 0 ||
-            currentCustomer.dinner.bodybuilderQty > 0
+            currentCustomer.dinner.bodybuilderQty > 0 ||
+            currentCustomer.chefsChoice.bodybuilderQty > 0
           ) {
             let totalBodybuilderSurcharge = 0;
 
@@ -990,6 +1120,16 @@ class Step4Checkout extends React.Component {
 
               totalBodybuilderSurcharge +=
                 currentCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
+            }
+
+            if (currentCustomer.chefsChoice.bodybuilderQty > 0) {
+              const extraBodybuilderPerDinner =
+                currentCustomer.lifestyle.extraBodybuilder /
+                100 *
+                currentCustomer.chefsChoicePrice;
+
+              totalBodybuilderSurcharge +=
+                currentCustomer.chefsChoice.bodybuilderQty * extraBodybuilderPerDinner;
             }
 
             currentCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
@@ -1042,6 +1182,10 @@ class Step4Checkout extends React.Component {
           ) +
           parseInt(
             this.props.customerInfo.completeSchedule[delivIndex].dinner,
+            10,
+          ) +
+          parseInt(
+            this.props.customerInfo.completeSchedule[delivIndex].chefsChoice,
             10,
           );
 
@@ -1531,6 +1675,8 @@ class Step4Checkout extends React.Component {
                               this.state.primaryProfileBilling.lunch
                                 .totalQty +
                               this.state.primaryProfileBilling.dinner
+                                .totalQty +
+                              this.state.primaryProfileBilling.chefsChoice
                                 .totalQty} meals`
                               : ''}
                           </Typography>
@@ -1550,7 +1696,9 @@ class Step4Checkout extends React.Component {
                               this.state.primaryProfileBilling.lunchPrice +
                               this.state.primaryProfileBilling.dinner
                                 .totalQty *
-                              this.state.primaryProfileBilling.dinnerPrice
+                              this.state.primaryProfileBilling.dinnerPrice +
+                              this.state.primaryProfileBilling.chefsChoice
+                                .totalQty * this.state.primaryProfileBilling.chefsChoicePrice
                               : ''}
                           </Typography>
                         </Grid>
@@ -1787,7 +1935,8 @@ class Step4Checkout extends React.Component {
                                 <Typography type="subheading">
                                   {`${e.breakfast.totalQty +
                                     e.lunch.totalQty +
-                                    e.dinner.totalQty} meals`}
+                                    e.dinner.totalQty +
+                                    e.chefsChoice.totalQty} meals`}
                                 </Typography>
                               </Grid>
                               <Grid item xs={6}>
@@ -1797,7 +1946,8 @@ class Step4Checkout extends React.Component {
                                 >
                                   ${e.breakfast.totalQty * e.breakfastPrice +
                                     e.lunch.totalQty * e.lunchPrice +
-                                    e.dinner.totalQty * e.dinnerPrice}
+                                    e.dinner.totalQty * e.dinnerPrice +
+                                    e.chefsChoice.totalQty * e.chefsChoicePrice}
                                 </Typography>
                               </Grid>
                             </Grid>

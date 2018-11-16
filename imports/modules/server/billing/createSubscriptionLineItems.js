@@ -12,7 +12,8 @@ export default function createSubscriptionLineItems(
       meals:
         primaryProfileBilling.breakfast.totalQty +
         primaryProfileBilling.lunch.totalQty +
-        primaryProfileBilling.dinner.totalQty,
+        primaryProfileBilling.dinner.totalQty +
+        primaryProfileBilling.chefsChoice.totalQty,
 
       price:
         primaryProfileBilling.breakfast.totalQty *
@@ -20,7 +21,9 @@ export default function createSubscriptionLineItems(
         primaryProfileBilling.lunch.totalQty *
         primaryProfileBilling.lunchPrice +
         primaryProfileBilling.dinner.totalQty *
-        primaryProfileBilling.dinnerPrice,
+        primaryProfileBilling.dinnerPrice +
+        primaryProfileBilling.chefsChoice.totalQty *
+        primaryProfileBilling.chefsChoicePrice,
     },
     restrictions: [],
   };
@@ -110,7 +113,8 @@ export default function createSubscriptionLineItems(
           meals:
             secondaryProfilesBilling[i].breakfast.totalQty +
             secondaryProfilesBilling[i].lunch.totalQty +
-            secondaryProfilesBilling[i].dinner.totalQty,
+            secondaryProfilesBilling[i].dinner.totalQty +
+            secondaryProfilesBilling[i].chefsChoice.totalQty,
 
           price:
             secondaryProfilesBilling[i].breakfast.totalQty *
@@ -118,7 +122,9 @@ export default function createSubscriptionLineItems(
             secondaryProfilesBilling[i].lunch.totalQty *
             secondaryProfilesBilling[i].lunchPrice +
             secondaryProfilesBilling[i].dinner.totalQty *
-            secondaryProfilesBilling[i].dinnerPrice,
+            secondaryProfilesBilling[i].dinnerPrice +
+            secondaryProfilesBilling[i].chefsChoice.totalQty *
+            secondaryProfilesBilling[i].chefsChoicePrice,
         },
         restrictions: [],
       };
@@ -196,6 +202,6 @@ export default function createSubscriptionLineItems(
       subscriptionItemsReal.push(currentProfileLineItems);
     });
   }
-  
+
   return subscriptionItemsReal;
 }

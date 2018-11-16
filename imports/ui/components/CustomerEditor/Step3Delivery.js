@@ -191,7 +191,7 @@ class Step3Delivery extends React.Component {
 
   handleSubmitStep() {
 
-    const check = this.state.completeSchedule.map(day => (day.breakfast + day.lunch + day.dinner) > 0);
+    const check = this.state.completeSchedule.map(day => (day.breakfast + day.lunch + day.dinner + day.chefsChoice) > 0);
 
     console.log(check);
 
@@ -338,22 +338,26 @@ class Step3Delivery extends React.Component {
     const dayBeforeYestMealSum = step >= 2 ?
       parseInt(this.state.completeSchedule[previousIndex - 1].breakfast, 10) +
       parseInt(this.state.completeSchedule[previousIndex - 1].lunch, 10) +
-      parseInt(this.state.completeSchedule[previousIndex - 1].dinner, 10) : null;
+      parseInt(this.state.completeSchedule[previousIndex - 1].dinner, 10) + 
+      parseInt(this.state.completeSchedule[previousIndex - 1].chefsChoice, 10) : null;
 
     const previousDaysMealSum = step == 0 ? null :
       parseInt(this.state.completeSchedule[previousIndex].breakfast, 10) +
       parseInt(this.state.completeSchedule[previousIndex].lunch, 10) +
-      parseInt(this.state.completeSchedule[previousIndex].dinner, 10);
+      parseInt(this.state.completeSchedule[previousIndex].dinner, 10)+
+      parseInt(this.state.completeSchedule[previousIndex].chefsChoice, 10);
 
     const daysMealSum =
       parseInt(this.state.completeSchedule[step].breakfast, 10) +
       parseInt(this.state.completeSchedule[step].lunch, 10) +
-      parseInt(this.state.completeSchedule[step].dinner, 10);
+      parseInt(this.state.completeSchedule[step].dinner, 10) +
+      parseInt(this.state.completeSchedule[step].chefsChoice, 10);
 
     const nextDaysSum =
       parseInt(this.state.completeSchedule[step + 1].breakfast, 10) +
       parseInt(this.state.completeSchedule[step + 1].lunch, 10) +
-      parseInt(this.state.completeSchedule[step + 1].dinner, 10);
+      parseInt(this.state.completeSchedule[step + 1].dinner, 10) +
+      parseInt(this.state.completeSchedule[step + 1].chefsChoice, 10);
 
     let radioGroup = (
       <RadioGroup
@@ -4956,6 +4960,14 @@ class Step3Delivery extends React.Component {
                                 Dinner
                               </Typography>
                             </TableCell>
+                            <TableCell style={{ textAlign: 'center' }}>
+                              <Typography
+                                type="subheading"
+                                className="font-medium font-uppercase"
+                              >
+                                Chef's Choice
+                              </Typography>
+                            </TableCell>
                           </TableRow>
                         </TableHead>
                         <TableBody>
@@ -5030,6 +5042,22 @@ class Step3Delivery extends React.Component {
                                       this.state.completeSchedule[i].dinner
                                     }
                                     name={`all_dinner_${i}`}
+                                  />
+                                </TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>
+                                  <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    style={{
+                                      fontSize: '1rem',
+                                      maxWidth: '100px',
+                                      minWidth: '100px',
+                                    }}
+                                    disabled
+                                    value={
+                                      this.state.completeSchedule[i].chefsChoice
+                                    }
+                                    name={`all_chefsChoice_${i}`}
                                   />
                                 </TableCell>
                               </TableRow>

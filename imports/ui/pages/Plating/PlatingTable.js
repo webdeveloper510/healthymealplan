@@ -130,7 +130,10 @@ function renderUserDetailsOnPage(doc, userData, currentPlate, mealType, mealPort
     userData.bodybuilderLunch +
     userData.dinner +
     userData.athleticDinner +
-    userData.bodybuilderDinner;
+    userData.bodybuilderDinner +
+    userData.chefsChoice +
+    userData.athleticChefsChoice +
+    userData.bodybuilderChefsChoice;
 
   doc.text(`${totalMeals}`, 0.25, 0.38);
 
@@ -533,6 +536,26 @@ class PlatingTable extends React.Component {
             }
           }
         } // Lunch
+
+        if (this.state.mealTitle === 'Chefs Choice') {
+          if (userData.bodybuilderChefsChoice > 0 && upperIndex == 0) {
+            for (let i = 1; i <= userData.bodybuilderChefsChoice; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Chef\'s Choice (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+            }
+          }
+
+          if (userData.athleticChefsChoice > 0 && upperIndex == 1) {
+            for (let i = 1; i <= userData.athleticChefsChoice; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Chef\'s Choice (Athletic)', 'athletic', this.props.currentSelectorDate);
+            }
+          }
+
+          if (userData.chefsChoice > 0 && upperIndex == 2) {
+            for (let i = 1; i <= userData.chefsChoice; i++) {
+              renderUserDetailsOnPage(doc, userData, currentPlate, 'Chef\'s Choice', 'regular', this.props.currentSelectorDate);
+            }
+          }
+        } // Lunch
       }); // map
     });
 
@@ -604,9 +627,13 @@ class PlatingTable extends React.Component {
     const plateSubtitle = this.getCurrentSelectionPlate('subtitle');
     const plateIngredients = this.getCurrentSelectionPlate('ingredients');
 
-    const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
-    const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
-
+    if (this.state.mealTitle == "Chefs Choice") {
+      const lifestylePlates = this.props.plates.find(e => e._id === this.state.lifestyleSelected);
+      console.log(lifestylePlates)
+    } else {
+      const lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
+      const currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
+    }
     if (lifestylePlates.length === 0 || !currentPlate) {
       this.props.popTheSnackbar({
         message: `Could not find a dish for ${this.state.lifestyleTitle} ${this.state.mealTitle}. Please assign a dish.`,
@@ -784,68 +811,72 @@ class PlatingTable extends React.Component {
                 this.props.lifestyles && !this.state.aggregateDataLoading && this.props.lifestyles.map((lifestyle) => {
                   const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === lifestyle._id);
 
-                  const mealTypeOrder = ['Breakfast', 'Lunch', 'Dinner'];
+                  const mealTypeOrder = ['Breakfast', 'Lunch', 'Dinner', 'Chefs Choice'];
                   const mapBy = [];
 
-                  mealTypeOrder.forEach(e => {
+                  mealTypeOrder.forEach((e) => {
                     mapBy.push(this.props.meals.find(el => el.title == e));
                   });
 
                   return (
 
-                    this.props.meals && mapBy.map(meal => (
+                    this.props.meals && mapBy.map(meal => {
 
-                      <TableRow hover key={`${lifestyle._id} ${meal._id} `}>
+                      const mealTitle = meal.title == "Chefs Choice" ? 'chefsChoice' : meal.title.toLowerCase();
 
-                        <TableCell padding="none" style={{ width: '16.66%' }}>
-                          <Typography className="subheading" type="subheading">{lifestyle.title}</Typography>
+                      return (
 
-                        </TableCell>
+                        <TableRow hover key={`${lifestyle._id} ${meal._id} `}>
 
-                        <TableCell
-                          style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
-                          padding="none"
-                        >
+                          <TableCell padding="none" style={{ width: '16.66%' }}>
+                            <Typography className="subheading" type="subheading">{lifestyle.title}</Typography>
 
-                          <Typography className="subheading" type="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }} >
-                            {meal.title}
-                          </Typography>
+                          </TableCell>
 
-                        </TableCell>
+                          <TableCell
+                            style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
+                            padding="none"
+                          >
 
-                        <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                          <Typography type="subheading">
-                            {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].regular}
-                          </Typography>
-                        </TableCell>
+                            <Typography className="subheading" type="subheading" style={{ color: 'rgba(0, 0, 0, .54)' }} >
+                              {meal.title}
+                            </Typography>
 
-                        <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                          <Typography type="subheading">
-                            {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].athletic}
+                          </TableCell>
 
-                          </Typography>
-                        </TableCell>
+                          <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                            <Typography type="subheading">
+                              {dataCurrentLifestyle && dataCurrentLifestyle[mealTitle] && dataCurrentLifestyle[mealTitle].regular}
+                            </Typography>
+                          </TableCell>
 
-                        <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
-                          <Typography type="subheading">
-                            {dataCurrentLifestyle && dataCurrentLifestyle[meal.title.toLowerCase()] && dataCurrentLifestyle[meal.title.toLowerCase()].bodybuilder}
-                          </Typography>
-                        </TableCell>
+                          <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                            <Typography type="subheading">
+                              {dataCurrentLifestyle && dataCurrentLifestyle[mealTitle] && dataCurrentLifestyle[mealTitle].athletic}
 
-                        <TableCell
-                          style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
-                          padding="none"
-                        >
+                            </Typography>
+                          </TableCell>
 
-                          <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                            <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>View</Button>
-                          </Typography>
+                          <TableCell padding="none" style={{ width: '16.66%' }} onClick={() => this.props.sortByOptions('title')}>
+                            <Typography type="subheading">
+                              {dataCurrentLifestyle && dataCurrentLifestyle[mealTitle] && dataCurrentLifestyle[mealTitle].bodybuilder}
+                            </Typography>
+                          </TableCell>
 
-                        </TableCell>
+                          <TableCell
+                            style={{ paddingTop: '10px', paddingBottom: '10px', width: '16.66%' }}
+                            padding="none"
+                          >
 
-                      </TableRow>
+                            <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                              <Button onClick={() => this.openAssignDialog(lifestyle._id, meal._id)}>View</Button>
+                            </Typography>
 
-                    )));
+                          </TableCell>
+
+                        </TableRow>
+                      )
+                    }));
                 })
               ) : (
                   <CircularProgress />

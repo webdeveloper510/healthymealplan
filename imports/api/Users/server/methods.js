@@ -67,13 +67,13 @@ Meteor.methods({
     return empId;
   },
 
-  getCustomersTable(selector, options, skip, limit){
+  getCustomersTable(selector, options, skip, limit) {
 
     check(selector, Object);
     check(options, Object);
     check(limit, Number);
     check(skip, Number);
-  
+
     const data = Meteor.users.aggregate([
       {
         $lookup: {
@@ -121,11 +121,11 @@ Meteor.methods({
         $limit: limit,
       },
     ], {
-      collation: {
-        locale: 'en_US',
-        strength: 1,
-      },
-    });
+        collation: {
+          locale: 'en_US',
+          strength: 1,
+        },
+      });
 
     return data;
   },
@@ -322,8 +322,8 @@ Meteor.methods({
       discountCodeToSend = data.discountCode;
     }
 
-    if(data.hasOwnProperty('removeDiscount')){
-      if(data.removeDiscount){
+    if (data.hasOwnProperty('removeDiscount')) {
+      if (data.removeDiscount) {
         discountCodeRemove = true;
       }
     }
@@ -718,8 +718,8 @@ Meteor.methods({
       console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
 
       // this changes subscription amount immediately if first charge hasn't happened
-      if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute')) 
-      && sub.status == "paused") {
+      if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))
+        && sub.status == "paused") {
 
         console.log("Subscription hasn't been charged");
 
@@ -737,17 +737,17 @@ Meteor.methods({
 
         if (jobExists) {
           // throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for update on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
-          
+
           console.log('Going in job exists');
-  
+
           Jobs.update({ _id: jobExists._id }, { $set: { 'data.discountCodeRemove': discountCodeRemove, 'data.discountCode': discountCodeToSend } })
-          
+
           return {
             subUpdateScheduled: true,
           };
         }
 
-        const job = new Job(Jobs,'editSubscriptionJob', billingData);
+        const job = new Job(Jobs, 'editSubscriptionJob', billingData);
         job.priority('normal').after(friday).save(); // Commit it to the server
 
         return {
@@ -973,7 +973,8 @@ Meteor.methods({
         meals:
           customerInfo.primaryProfileBilling.breakfast.totalQty +
           customerInfo.primaryProfileBilling.lunch.totalQty +
-          customerInfo.primaryProfileBilling.dinner.totalQty,
+          customerInfo.primaryProfileBilling.dinner.totalQty +
+          customerInfo.primaryProfileBilling.chefsChoice.totalQty,
 
         price:
           customerInfo.primaryProfileBilling.breakfast.totalQty *
@@ -981,7 +982,9 @@ Meteor.methods({
           customerInfo.primaryProfileBilling.lunch.totalQty *
           customerInfo.primaryProfileBilling.lunchPrice +
           customerInfo.primaryProfileBilling.dinner.totalQty *
-          customerInfo.primaryProfileBilling.dinnerPrice,
+          customerInfo.primaryProfileBilling.dinnerPrice +
+          customerInfo.primaryProfileBilling.chefsChoice.totalQty *
+          customerInfo.primaryProfileBilling.chefsChoicePrice,
       },
       restrictions: [],
     };
@@ -1064,7 +1067,8 @@ Meteor.methods({
             meals:
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty +
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty +
-              customerInfo.secondaryProfilesBilling[i].dinner.totalQty,
+              customerInfo.secondaryProfilesBilling[i].dinner.totalQty +
+              customerInfo.secondaryProfilesBilling[i].chefsChoice.totalQty,
 
             price:
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty *
@@ -1072,7 +1076,9 @@ Meteor.methods({
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty *
               customerInfo.secondaryProfilesBilling[i].lunchPrice +
               customerInfo.secondaryProfilesBilling[i].dinner.totalQty *
-              customerInfo.secondaryProfilesBilling[i].dinnerPrice,
+              customerInfo.secondaryProfilesBilling[i].dinnerPrice +
+              customerInfo.secondaryProfilesBilling[i].chefsChoice.totalQty *
+              customerInfo.secondaryProfilesBilling[i].chefsChoicePrice,
           },
           restrictions: [],
         };
@@ -1386,7 +1392,8 @@ Meteor.methods({
         meals:
           customerInfo.primaryProfileBilling.breakfast.totalQty +
           customerInfo.primaryProfileBilling.lunch.totalQty +
-          customerInfo.primaryProfileBilling.dinner.totalQty,
+          customerInfo.primaryProfileBilling.dinner.totalQty +
+          customerInfo.primaryProfileBilling.chefsChoice.totalQty,
 
         price:
           customerInfo.primaryProfileBilling.breakfast.totalQty *
@@ -1394,7 +1401,9 @@ Meteor.methods({
           customerInfo.primaryProfileBilling.lunch.totalQty *
           customerInfo.primaryProfileBilling.lunchPrice +
           customerInfo.primaryProfileBilling.dinner.totalQty *
-          customerInfo.primaryProfileBilling.dinnerPrice,
+          customerInfo.primaryProfileBilling.dinnerPrice +
+          customerInfo.primaryProfileBilling.chefsChoice.totalQty *
+          customerInfo.primaryProfileBilling.chefsChoicePrice,
       },
       restrictions: [],
     };
@@ -1477,7 +1486,8 @@ Meteor.methods({
             meals:
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty +
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty +
-              customerInfo.secondaryProfilesBilling[i].dinner.totalQty,
+              customerInfo.secondaryProfilesBilling[i].dinner.totalQty + 
+              customerInfo.secondaryProfilesBilling[i].chefsChoice.totalQty,
 
             price:
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty *
@@ -1485,7 +1495,9 @@ Meteor.methods({
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty *
               customerInfo.secondaryProfilesBilling[i].lunchPrice +
               customerInfo.secondaryProfilesBilling[i].dinner.totalQty *
-              customerInfo.secondaryProfilesBilling[i].dinnerPrice,
+              customerInfo.secondaryProfilesBilling[i].dinnerPrice + 
+              customerInfo.secondaryProfilesBilling[i].chefsChoice.totalQty *
+              customerInfo.secondaryProfilesBilling[i].chefsChoicePrice,
           },
           restrictions: [],
         };

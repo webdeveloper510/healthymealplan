@@ -62,46 +62,40 @@ Meteor.methods({
     let nextSeqItem = getNextSequence('plates');
     nextSeqItem = nextSeqItem.toString();
 
-    const plateToInsert = {
-      ...plate,
-      SKU: nextSeqItem,
-      createdBy: this.userId,
-    };
-
     if (plate.hasOwnProperty('instructionId')) {
-      plateToInsert.instructionId = plate.instructionId;
+      plate.instructionId = plate.instructionId;
     }
 
     if (plate.hasOwnProperty('substitutePlate')) {
-      plateToInsert.substitutePlate = plate.substitutePlate;
+      plate.substitutePlate = plate.substitutePlate;
     }
 
     if (plate.hasOwnProperty('generatedTags')) {
-      plateToInsert.generatedTags = plate.generatedTags;
+      plate.generatedTags = plate.generatedTags;
     }
 
 
-    if (plateToInsert.subtitle.length > 0) {
+    if (plate.subtitle.length > 0) {
       const slug = `${plate.title} ${plate.subtitle}`;
-      plateToInsert.slug = slugify(slug, { remove: /[*+~.(),'"!:@]/g, lower: true });
+      plate.slug = slugify(slug, { remove: /[*+~.(),'"!:@]/g, lower: true });
     } else {
       const slug = `${plate.title}`;
-      plateToInsert.slug = slugify(slug, { remove: /[*+~.(),'"!:@]/g, lower: true });
+      plate.slug = slugify(slug, { remove: /[*+~.(),'"!:@]/g, lower: true });
     }
 
-    plateToInsert.title = plateToInsert.title.toLowerCase();
-    plateToInsert.subtitle = plateToInsert.subtitle.toLowerCase();
+    plate.title = plate.title.toLowerCase();
+    plate.subtitle = plate.subtitle.toLowerCase();
 
-    plateToInsert.title = plateToInsert.title.replace(/&/gm, 'and');
-    plateToInsert.subtitle = plateToInsert.subtitle.replace(/&/gm, 'and');
+    plate.title = plate.title.replace(/&/gm, 'and');
+    plate.subtitle = plate.subtitle.replace(/&/gm, 'and');
 
-    plateToInsert.title = plateToInsert.title.split(" ")
-    .map((e) => (e.toLowerCase() == "b.b.q." || e == "B.b.q.") ? e.toUpperCase() : (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
-    plateToInsert.subtitle = plateToInsert.subtitle.split(" ")
-    .map((e) => (e.toLowerCase() == "b.b.q." || e == "B.b.q.") ? e.toUpperCase() : (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+    plate.title = plate.title.split(" ")
+      .map((e) => (e.toLowerCase() == "b.b.q." || e == "B.b.q.") ? e.toUpperCase() : (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+    plate.subtitle = plate.subtitle.split(" ")
+      .map((e) => (e.toLowerCase() == "b.b.q." || e == "B.b.q.") ? e.toUpperCase() : (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
 
     try {
-      return Plates.insert(plateToInsert);
+      return Plates.insert({ ...plate, SKU: nextSeqItem });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }

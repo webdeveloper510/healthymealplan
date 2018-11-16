@@ -37,6 +37,11 @@ function setUpLifestyles() {
         athletic: 0,
         bodybuilder: 0,
       },
+      chefsChoice: {
+        regular: 0,
+        athletic: 0,
+        bodybuilder: 0,
+      },
     });
   });
 
@@ -143,6 +148,10 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       if (e.dinner.active) {
         this.dataByLifestyle[lifestyleIndex].dinner[e.dinner.portions] += parseInt(e.dinner.quantity, 10);
       }
+
+      if (e.chefsChoice.active) {
+        this.dataByLifestyle[lifestyleIndex].chefsChoice[e.chefsChoice.portions] += parseInt(e.chefsChoice.quantity, 10);
+      }
     });
   };
 
@@ -176,6 +185,11 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       athleticDinner: 0,
       bodybuilderDinner: 0,
       dinnerPlate: null,
+
+      chefsChoice: 0,
+      athleticChefsChoice: 0,
+      bodybuilderChefsChoice: 0,
+      chefsChoicePlate: null,
 
       schedule: customer.schedule,
       delivery,
@@ -211,6 +225,16 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
           customerToAdd.bodybuilderDinner += parseInt(e.dinner.quantity, 10);
         } else if (e.dinner.portions == 'regular') {
           customerToAdd.dinner += parseInt(e.dinner.quantity, 10);
+        }
+      }
+
+      if (e.chefsChoice.active) {
+        if (e.chefsChoice.portions == 'athletic') {
+          customerToAdd.athleticDinner += parseInt(e.chefsChoice.quantity, 10);
+        } else if (e.chefsChoice.portions == 'bodybuilder') {
+          customerToAdd.bodybuilderDinner += parseInt(e.chefsChoice.quantity, 10);
+        } else if (e.chefsChoice.portions == 'regular') {
+          customerToAdd.chefsChoice += parseInt(e.chefsChoice.quantity, 10);
         }
       }
     });
