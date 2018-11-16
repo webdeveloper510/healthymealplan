@@ -1,5 +1,5 @@
 import { Meteor } from 'meteor/meteor';
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import Table, {
   TableBody,
@@ -40,12 +40,11 @@ import CloseIcon from 'material-ui-icons/Close';
 import LaunchIcon from 'material-ui-icons/Launch';
 import EditIcon from 'material-ui-icons/Edit';
 
-import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
 
 import './MealPlannerTable.scss';
 
-class MealPlannerTable extends React.Component {
+class MealPlannerTable extends Component {
   constructor(props) {
     super(props);
 
@@ -368,50 +367,6 @@ class MealPlannerTable extends React.Component {
     });
   }
 
-  renderFormattedAllergy(allergy) {
-    switch (allergy) {
-      case 'vegetarian':
-        return 'Vegetarian';
-        break;
-
-      case 'vegan':
-        return 'Vegan';
-        break;
-
-      case 'halal':
-        return 'Halal';
-        break;
-
-      case 'glutenFree':
-        return 'Gluten-free';
-        break;
-
-      case 'noEgg':
-        return 'No egg';
-        break;
-
-      case 'noNut':
-        return 'Nut-free';
-        break;
-
-      case 'dairyFree':
-        return 'Dairy-free';
-        break;
-
-      case 'soyFree':
-        return 'Soy-free';
-        break;
-
-      case 'noShellfish':
-        return 'No shellfish';
-        break;
-
-      default:
-        return '';
-        break;
-    }
-  }
-
   render() {
     if (this.props.loading) {
       return <Loading />;
@@ -423,7 +378,7 @@ class MealPlannerTable extends React.Component {
         {this.props.lifestyles && this.props.lifestyles.map((lifestyle) => {
           const mealTypeOrder = ['Breakfast', 'Lunch', 'Dinner'];
           const mapBy = [];
-
+          const mainLifestyles = lifestyle.title == 'Traditional' || lifestyle.title == 'No meat' || lifestyle.title == 'Flex';
           mealTypeOrder.forEach((e) => {
             mapBy.push(this.props.meals.find(el => el.title == e));
           });
@@ -456,7 +411,7 @@ class MealPlannerTable extends React.Component {
                       (
                         <Grid item xs={12} sm={6} md={4} lg={4} key={assignedPlannerId}>
                           <Card style={{ width: '100%' }}>
-                            {(lifestyle.title == "Traditional" || lifestyle.title == "No meat" || lifestyle.title == "Flex") && (
+                            {mainLifestyles && (
                               <CardMedia
                                 style={{ height: '400px' }}
                                 image={dish.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${dish.imageUrl}` : 'https://via.placeholder.com/460x540?text=+'}

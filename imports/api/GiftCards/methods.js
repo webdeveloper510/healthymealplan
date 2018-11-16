@@ -55,13 +55,14 @@ Meteor.methods({
 
   'giftcards.update': function giftCardsUpdate(giftCard) {
     check(giftCard, {
+      _id: String,
       code: String,
       codeType: String,
       initialAmountPreset: Match.OneOf(String, Number),
       initialAmount: Match.OneOf(String, Number),
 
-      customerType: String,
-      customer: String,
+      customerType: Match.Optional(String),
+      customer: Match.Optional(String),
 
       status: String,
       note: Match.Optional(String),

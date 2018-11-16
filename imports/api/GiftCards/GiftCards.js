@@ -32,6 +32,7 @@ GiftCards.schema = new SimpleSchema({
   customerType: {
     type: String,
     label: 'Existing or email customer',
+    optional: true,
   },
 
   customer: {

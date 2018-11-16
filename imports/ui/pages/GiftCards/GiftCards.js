@@ -186,7 +186,6 @@ class GiftCards extends React.Component {
               history={this.props.history}
               sortByOptions={this.sortByOption.bind(this)}
             />
-
           </ListContainer>
 
 

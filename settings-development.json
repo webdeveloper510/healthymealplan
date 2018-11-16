@@ -1,15 +1,18 @@
 {
   "public": {
-    "filesURL": "/Healthy Meal Plan/data",
     "apiLoginKey": "47cmd9F3DJ",
     "clientKey": "73C59E6vwX3c5DzP8Z5M3dCbr5LrRpQV2wm93297ff4HcbPH562PtN2Aw6tkDAat",
     "twilioAccountSid": "AC373a0b7bd7e166370ae5d68bc612e6ef",
-    "S3BucketDomain": "https://s3-ca-central-1.amazonaws.com/vittle-bucket"
+    "S3BucketDomain": "https://s3.amazonaws.com/vittle-new"
   },
   "private": {
     "twilioAuthToken": "3c6f7d2d34dd42fa6ad02cc11b19bf4a",
     "transactionKey": "48CaN593a5Ece9Vq",
-    "MAIL_URL": "smtp://postmaster@mg.vittle.ca:0fba0353495c1f6fb8a8a7cd830b100c@smtp.mailgun.org:587",
+    "MAIL_URL": "smtp://AhP9OY0jgk%2FBVCpFqggVrWRBtIN4bqOUD9zWAFW%2FUSM5:AhP9OY0jgk%2FBVCpFqggVrWRBtIN4bqOUD9zWAFW%2FUSM5@email-smtp.us-east-1.amazonaws.com:587",
+    "SMTP_USER": "AKIAJIC3HSHEJJZDBBZA",
+    "SMTP_PASSWORD": "AhP9OY0jgk/BVCpFqggVrWRBtIN4bqOUD9zWAFW/USM5",
+    "SMTP_HOST": "email-smtp.us-east-1.amazonaws.com",
+    "SMTP_PORT": "465",
     "OAuth": {
       "facebook": {
         "appId": "",

@@ -36,7 +36,7 @@ import Containers from 'meteor/jivanysh:react-list-container';
 const ListContainer = Containers.ListContainer;
 
 const deliveriesData = new ReactiveVar({
-  onDate: moment().format('YYYY-MM-DD')
+  onDate: moment().format('YYYY-MM-DD'),
 });
 
 class Directions extends React.Component {
@@ -111,13 +111,13 @@ class Directions extends React.Component {
       this.setState({
         currentSelectorDate: formattedDate,
       });
-      deliveriesData.set({ onDate: formattedDate })
+      deliveriesData.set({ onDate: formattedDate });
     } else {
       const formattedDate = moment(this.state.currentSelectorDate).subtract(1, 'd').format('YYYY-MM-DD');
       this.setState({
         currentSelectorDate: formattedDate,
       });
-      deliveriesData.set({ onDate: formattedDate })
+      deliveriesData.set({ onDate: formattedDate });
     }
   }
 
@@ -230,8 +230,20 @@ class Directions extends React.Component {
               routeId: { $regex: new RegExp(this.state.currentTabValue), $options: 'i' },
               $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }],
             }}
+            component={DirectionsTable}
+            componentProps={{
+              popTheSnackbar: this.props.popTheSnackbar,
+              searchTerm: this.state.searchSelector,
+              rowsLimit: this.state.rowsVisible,
+              history: this.props.history,
+              sortByOptions: this.sortByOption.bind(this),
+              currentSelectorDate: this.state.currentSelectorDate,
+              searchSelector: this.state.searchSelector,
+              routeSelector: this.state.currentTabValue,
+              routes: this.props.routes,
+            }}
           >
-            <DirectionsTable
+            {/* <DirectionsTable
               popTheSnackbar={this.props.popTheSnackbar}
               searchTerm={this.state.searchSelector}
               rowsLimit={this.state.rowsVisible}
@@ -241,7 +253,7 @@ class Directions extends React.Component {
               searchSelector={this.state.searchSelector}
               routeSelector={this.state.currentTabValue}
               routes={this.props.routes}
-            />
+            /> */}
 
           </ListContainer>
 
@@ -260,7 +272,6 @@ Directions.propTypes = {
 };
 
 export default withTracker(() => {
-
   const deliveriesDataVar = deliveriesData.get();
 
   const subscription = Meteor.subscribe('deliveries.onDate', deliveriesDataVar.onDate);

@@ -170,8 +170,21 @@ class MealPlanner extends React.Component {
             selector={{
               onDate: this.state.currentSelectorDate,
             }}
+            component={MealPlannerTable}
+            componentProps={{
+              popTheSnackbar: this.props.popTheSnackbar,
+              searchTerm: this.state.searchSelector,
+              rowsLimit: this.state.rowsVisible,
+              history: this.props.history,
+              sortByOptions: this.sortByOption,
+              currentSelectorDate: this.state.currentSelectorDate,
+              lifestyles: this.props.lifestyles,
+              meals: this.props.meals,
+              plates: this.props.plates,
+              loading: this.props.loading,
+            }}
           >
-            <MealPlannerTable
+            {/* <MealPlannerTable
               popTheSnackbar={this.props.popTheSnackbar}
               searchTerm={this.state.searchSelector}
               rowsLimit={this.state.rowsVisible}
@@ -182,8 +195,7 @@ class MealPlanner extends React.Component {
               meals={this.props.meals}
               plates={this.props.plates}
               loading={this.props.loading}
-            // forDate={moment(this.state.currentSelectorDate).format('dddd, MMMM D')}
-            />
+            /> */}
           </ListContainer>
         </Grid>
       </div >
