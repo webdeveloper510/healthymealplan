@@ -230,9 +230,9 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
 
       if (e.chefsChoice.active) {
         if (e.chefsChoice.portions == 'athletic') {
-          customerToAdd.athleticDinner += parseInt(e.chefsChoice.quantity, 10);
+          customerToAdd.athleticChefsChoice += parseInt(e.chefsChoice.quantity, 10);
         } else if (e.chefsChoice.portions == 'bodybuilder') {
-          customerToAdd.bodybuilderDinner += parseInt(e.chefsChoice.quantity, 10);
+          customerToAdd.bodybuilderChefsChoice += parseInt(e.chefsChoice.quantity, 10);
         } else if (e.chefsChoice.portions == 'regular') {
           customerToAdd.chefsChoice += parseInt(e.chefsChoice.quantity, 10);
         }
@@ -272,7 +272,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       const customerSchedule = customer.schedule;
       const customerLifestyleId = customer.lifestyle;
       const lifestyleIndex = this.dataByLifestyle.findIndex(e => e.id === customerLifestyleId);
-      // console.log(`Lifestyle Index${lifestyleIndex}`);
+      // console.log(customerId);
 
       for (let index = 0; index < delivery.length; index++) {
         const e = delivery[index];

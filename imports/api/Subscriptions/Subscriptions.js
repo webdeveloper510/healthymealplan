@@ -47,6 +47,9 @@ Subscriptions.schema = new SimpleSchema({
   'completeSchedule.$.dinner': {
     type: Number,
   },
+  'completeSchedule.$.chefsChoice': {
+    type: Number,
+  },
   authorizeSubscriptionId: {
     type: String,
     label: 'Authorize.Net subscriptionId (Card only)',

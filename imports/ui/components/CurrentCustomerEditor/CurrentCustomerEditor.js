@@ -168,36 +168,43 @@ class CurrentCustomerEditor extends React.Component {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
       ],
 
@@ -606,7 +613,7 @@ class CurrentCustomerEditor extends React.Component {
     }
 
     if (
-      this.state.scheduleReal.find(el => el.breakfast.active || el.lunch.active || el.dinner.active) === undefined
+      this.state.scheduleReal.find(el => el.breakfast.active || el.lunch.active || el.dinner.active || el.chefsChoice.active) === undefined
     ) {
       this.props.popTheSnackbar({
         message:
@@ -625,7 +632,7 @@ class CurrentCustomerEditor extends React.Component {
         const element = this.state.secondaryProfilesData[index];
         if (
           element.scheduleReal.find(
-            el => el.breakfast.active || el.lunch.active || el.dinner.active,
+            el => el.breakfast.active || el.lunch.active || el.dinner.active || el.chefsChoice.active,
           ) === undefined
         ) {
           this.props.popTheSnackbar({
@@ -639,13 +646,13 @@ class CurrentCustomerEditor extends React.Component {
     }
 
     const scheduleSummation = [
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
     ];
 
 
@@ -660,6 +667,10 @@ class CurrentCustomerEditor extends React.Component {
 
       if (e.dinner.active) {
         scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+      }
+
+      if (e.chefsChoice.active) {
+        scheduleSummation[i].chefsChoice += parseInt(e.chefsChoice.quantity, 10);
       }
     });
 
@@ -679,10 +690,14 @@ class CurrentCustomerEditor extends React.Component {
         if (el.dinner.active) {
           scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
         }
+
+        if (el.chefsChoice.active) {
+          scheduleSummation[index].chefsChoice += parseInt(el.chefsChoice.quantity, 10);
+        }
       });
     });
 
-    const check = this.state.completeSchedule.map(day => (day.breakfast + day.lunch + day.dinner) > 0);
+    const check = this.state.completeSchedule.map(day => (day.breakfast + day.lunch + day.dinner + day.chefsChoice) > 0);
 
     console.log(check);
 
@@ -933,13 +948,13 @@ class CurrentCustomerEditor extends React.Component {
     scheduleRealCopy[index][mealType].quantity = event.target.value;
 
     const scheduleSummation = [
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
     ];
 
     this.state.scheduleReal.forEach((e, i) => {
@@ -953,6 +968,10 @@ class CurrentCustomerEditor extends React.Component {
 
       if (e.dinner.active) {
         scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+      }
+
+      if (e.chefsChoice.active) {
+        scheduleSummation[i].chefsChoice += parseInt(e.chefsChoice.quantity, 10);
       }
     });
 
@@ -971,6 +990,10 @@ class CurrentCustomerEditor extends React.Component {
 
         if (el.dinner.active) {
           scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+        }
+        
+        if (el.chefsChoice.active) {
+          scheduleSummation[index].chefsChoice += parseInt(el.chefsChoice.quantity, 10);
         }
       });
     });
@@ -997,23 +1020,19 @@ class CurrentCustomerEditor extends React.Component {
   handleScheduleMealTypeCheck(index, mealType, event) {
     const scheduleRealCopy = this.state.scheduleReal.slice();
 
-    scheduleRealCopy[index][mealType].active = !scheduleRealCopy[index][
-      mealType
-    ].active;
-
-
+    scheduleRealCopy[index][mealType].active = !scheduleRealCopy[index][mealType].active;
 
     this.setState({
       scheduleReal: scheduleRealCopy,
     }, () => {
       const scheduleSummation = [
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
       ];
 
       this.state.scheduleReal.forEach((e, i) => {
@@ -1027,6 +1046,10 @@ class CurrentCustomerEditor extends React.Component {
 
         if (e.dinner.active) {
           scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+        }
+
+        if (e.chefsChoice.active) {
+          scheduleSummation[i].chefsChoice += parseInt(e.chefsChoice.quantity, 10);
         }
       });
 
@@ -1045,6 +1068,10 @@ class CurrentCustomerEditor extends React.Component {
 
           if (el.dinner.active) {
             scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+          }
+
+          if (el.chefsChoice.active) {
+            scheduleSummation[index].chefsChoice += parseInt(el.chefsChoice.quantity, 10);
           }
         });
       });
@@ -1251,7 +1278,7 @@ class CurrentCustomerEditor extends React.Component {
   renderMealStepsContent(index) {
     return (
       <Grid container>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Typography type="body1" className="text-uppercase">
             Breakfast
           </Typography>
@@ -1333,7 +1360,7 @@ class CurrentCustomerEditor extends React.Component {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Typography type="body1" className="text-uppercase">
             Lunch
           </Typography>
@@ -1418,7 +1445,7 @@ class CurrentCustomerEditor extends React.Component {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Typography type="body1" className="text-uppercase">
             Dinner
           </Typography>
@@ -1502,6 +1529,91 @@ class CurrentCustomerEditor extends React.Component {
 
           </FormControl>
         </Grid>
+
+        <Grid item xs={12} sm={3}>
+          <Typography type="body1" className="text-uppercase">
+            Chef's Choice
+          </Typography>
+          <FormControl component="fieldset">
+            <FormGroup>
+              <FormControlLabel
+                key={index}
+                checked={this.state.scheduleReal[index].chefsChoice.active}
+                onChange={this.handleScheduleMealTypeCheck.bind(
+                  this,
+                  index,
+                  'chefsChoice',
+                )}
+                control={<Checkbox value={'value'} />}
+                label={'Chef\'s Choice'}
+              />
+            </FormGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">
+            Portion
+          </Typography>
+          <FormControl component="fieldset">
+            <RadioGroup
+              aria-label=""
+              name=""
+              value={this.state.scheduleReal[index].chefsChoice.portions}
+              onChange={this.handleChangeRadioSchedulePortion.bind(
+                this,
+                index,
+                'chefsChoice',
+              )}
+              disabled={!this.state.scheduleReal[index].chefsChoice.active}
+              style={{ flexDirection: 'row' }}
+            >
+              <FormControlLabel
+                key={index}
+                value={'regular'}
+                disabled={!this.state.scheduleReal[index].chefsChoice.active}
+                control={<Radio />}
+                label={'Regular'}
+              />
+
+              <FormControlLabel
+                key={index}
+                value={'athletic'}
+                disabled={!this.state.scheduleReal[index].chefsChoice.active}
+                control={<Radio />}
+                label={'Athletic'}
+              />
+
+              <FormControlLabel
+                key={index}
+                value={'bodybuilder'}
+                disabled={!this.state.scheduleReal[index].chefsChoice.active}
+                control={<Radio />}
+                label={'Bodybuilder'}
+              />
+            </RadioGroup>
+          </FormControl>
+          <Typography type="body1" className="text-uppercase">
+            Quantity
+          </Typography>
+          <FormControl component="fieldset">
+            <TextField
+              name=""
+              disabled={!this.state.scheduleReal[index].chefsChoice.active}
+              value={this.state.scheduleReal[index].chefsChoice.quantity}
+              onChange={this.handleChangeRadioScheduleQuantity.bind(
+                this,
+                index,
+                'chefsChoice',
+              )}
+
+              inputProps={{
+                type: 'number',
+                min: 1,
+              }}
+
+            />
+
+          </FormControl>
+        </Grid>
       </Grid >
     );
   }
@@ -1549,36 +1661,43 @@ class CurrentCustomerEditor extends React.Component {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
           lunch: { active: false, portions: 'regular', quantity: '1' },
           dinner: { active: false, portions: 'regular', quantity: '1' },
+          chefsChoice: { active: false, portions: 'regular', quantity: '1' },
         },
       ],
       platingNotes: '',
@@ -1609,13 +1728,13 @@ class CurrentCustomerEditor extends React.Component {
     console.log(toBeRemoved);
 
     const scheduleSummation = [
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0,  chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0,  chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0,  chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0,  chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0,  chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0,  chefsChoice: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0,  chefsChoice: 0 },
     ];
 
     this.state.scheduleReal.forEach((e, i) => {
@@ -1629,6 +1748,10 @@ class CurrentCustomerEditor extends React.Component {
 
       if (e.dinner.active) {
         scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+      }
+
+      if (e.chefsChoice.active) {
+        scheduleSummation[i].chefsChoice += parseInt(e.chefsChoice.quantity, 10);
       }
     });
 
@@ -1647,6 +1770,10 @@ class CurrentCustomerEditor extends React.Component {
 
         if (el.dinner.active) {
           scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+        }
+
+        if (el.chefsChoice.active) {
+          scheduleSummation[index].chefsChoice += parseInt(el.chefsChoice.quantity, 10);
         }
       });
     });
@@ -1694,13 +1821,13 @@ class CurrentCustomerEditor extends React.Component {
     }, () => {
 
       const scheduleSummation = [
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
       ];
 
       this.state.scheduleReal.forEach((e, i) => {
@@ -1714,6 +1841,10 @@ class CurrentCustomerEditor extends React.Component {
 
         if (e.dinner.active) {
           scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+        }
+
+        if (e.chefsChoice.active) {
+          scheduleSummation[i].chefsChoice += parseInt(e.chefsChoice.quantity, 10);
         }
       });
 
@@ -1732,6 +1863,10 @@ class CurrentCustomerEditor extends React.Component {
 
           if (el.dinner.active) {
             scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+          }
+
+          if (el.chefsChoice.active) {
+            scheduleSummation[index].chefsChoice += parseInt(el.chefsChoice.quantity, 10);
           }
         });
       });
@@ -1774,13 +1909,13 @@ class CurrentCustomerEditor extends React.Component {
       secondaryProfilesData: secondaryProfilesDataCopy,
     }, () => {
       const scheduleSummation = [
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
       ];
 
       this.state.scheduleReal.forEach((e, i) => {
@@ -1794,6 +1929,10 @@ class CurrentCustomerEditor extends React.Component {
 
         if (e.dinner.active) {
           scheduleSummation[i].dinner += parseInt(e.dinner.quantity, 10);
+        }
+
+        if (e.chefsChoice.active) {
+          scheduleSummation[i].chefsChoice += parseInt(e.chefsChoice.quantity, 10);
         }
       });
 
@@ -1812,6 +1951,10 @@ class CurrentCustomerEditor extends React.Component {
 
           if (el.dinner.active) {
             scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
+          }
+
+          if (el.chefsChoice.active) {
+            scheduleSummation[index].chefsChoice += parseInt(el.chefsChoice.quantity, 10);
           }
         });
       });
@@ -1954,7 +2097,7 @@ class CurrentCustomerEditor extends React.Component {
   renderMealStepsContentSecondary(profileIndex, stepIndex) {
     return (
       <Grid container>
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Typography type="body1" className="text-uppercase">
             Breakfast
           </Typography>
@@ -2072,7 +2215,7 @@ class CurrentCustomerEditor extends React.Component {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Typography type="body1" className="text-uppercase">
             Lunch
           </Typography>
@@ -2191,7 +2334,7 @@ class CurrentCustomerEditor extends React.Component {
           </FormControl>
         </Grid>
 
-        <Grid item xs={12} sm={4}>
+        <Grid item xs={12} sm={3}>
           <Typography type="body1" className="text-uppercase">
             Dinner
           </Typography>
@@ -2298,6 +2441,124 @@ class CurrentCustomerEditor extends React.Component {
                 profileIndex,
                 stepIndex,
                 'dinner',
+              )}
+
+              inputProps={{
+                type: 'number',
+                min: 1,
+              }}
+            />
+
+          </FormControl>
+        </Grid>
+
+        <Grid item xs={12} sm={3}>
+          <Typography type="body1" className="text-uppercase">
+            Chef's Choice
+          </Typography>
+          <FormControl component="fieldset">
+            <FormGroup>
+              <FormControlLabel
+                key={stepIndex}
+                checked={
+                  this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].chefsChoice.active
+                }
+                onChange={this.handleScheduleMealTypeCheckSecondary.bind(
+                  this,
+                  profileIndex,
+                  stepIndex,
+                  'chefsChoice',
+                )}
+                control={<Checkbox value={'value'} />}
+                label={'Chef\'s Choice'}
+              />
+            </FormGroup>
+          </FormControl>
+
+          <Typography type="body1" className="text-uppercase">
+            Portion
+          </Typography>
+          <FormControl component="fieldset">
+            <RadioGroup
+              aria-label=""
+              name=""
+              value={
+                this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].chefsChoice.portions
+              }
+              onChange={this.handleChangeRadioSchedulePortionSecondary.bind(
+                this,
+                profileIndex,
+                stepIndex,
+                'chefsChoice',
+              )}
+              disabled={
+                !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].chefsChoice.active
+              }
+              style={{ flexDirection: 'row' }}
+            >
+              <FormControlLabel
+                key={stepIndex}
+                value={'regular'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].chefsChoice.active
+                }
+                control={<Radio />}
+                label={'Regular'}
+              />
+
+              <FormControlLabel
+                key={stepIndex}
+                value={'athletic'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].chefsChoice.active
+                }
+                control={<Radio />}
+                label={'Athletic'}
+              />
+
+              <FormControlLabel
+                key={stepIndex}
+                value={'bodybuilder'}
+                disabled={
+                  !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                    stepIndex
+                  ].chefsChoice.active
+                }
+                control={<Radio />}
+                label={'Bodybuilder'}
+              />
+            </RadioGroup>
+          </FormControl>
+          <Typography type="body1" className="text-uppercase">
+            Quantity
+          </Typography>
+          <FormControl component="fieldset">
+            <TextField
+              disabled={
+                !this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].chefsChoice.active
+              }
+              value={
+                this.state.secondaryProfilesData[profileIndex].scheduleReal[
+                  stepIndex
+                ].chefsChoice.quantity
+              }
+              onChange={this.handleChangeRadioScheduleQuantitySecondary.bind(
+                this,
+                profileIndex,
+                stepIndex,
+                'chefsChoice',
               )}
 
               inputProps={{
@@ -8458,7 +8719,6 @@ class CurrentCustomerEditor extends React.Component {
                                     Breakfast
                                     </Typography>
                                 </TableCell>
-
                                 <TableCell style={{ textAlign: 'center' }}>
                                   <Typography
                                     type="subheading"
@@ -8467,13 +8727,20 @@ class CurrentCustomerEditor extends React.Component {
                                     Lunch
                                     </Typography>
                                 </TableCell>
-
                                 <TableCell style={{ textAlign: 'center' }}>
                                   <Typography
                                     type="subheading"
                                     className="font-medium font-uppercase"
                                   >
                                     Dinner
+                                    </Typography>
+                                </TableCell>
+                                <TableCell style={{ textAlign: 'center' }}>
+                                  <Typography
+                                    type="subheading"
+                                    className="font-medium font-uppercase"
+                                  >
+                                    Chef's Choice
                                     </Typography>
                                 </TableCell>
                               </TableRow>
@@ -8550,6 +8817,22 @@ class CurrentCustomerEditor extends React.Component {
                                           this.state.completeSchedule[i].dinner
                                         }
                                         name={`all_dinner_${i}`}
+                                      />
+                                    </TableCell>
+                                    <TableCell style={{ textAlign: 'center' }}>
+                                      <TextField
+                                        fullWidth
+                                        margin="normal"
+                                        style={{
+                                          fontSize: '1rem',
+                                          maxWidth: '100px',
+                                          minWidth: '100px',
+                                        }}
+                                        disabled
+                                        value={
+                                          this.state.completeSchedule[i].chefsChoice
+                                        }
+                                        name={`all_chefsChoice_${i}`}
                                       />
                                     </TableCell>
                                   </TableRow>
