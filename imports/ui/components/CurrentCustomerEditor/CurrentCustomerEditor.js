@@ -395,8 +395,6 @@ class CurrentCustomerEditor extends React.Component {
       submitSuccessReset: false,
     })
 
-    console.log(this.props.customer._id)
-
     Meteor.call('users.resetPassword', this.props.customer._id, (err, res) => {
       if (err) {
         this.setState({
@@ -546,7 +544,6 @@ class CurrentCustomerEditor extends React.Component {
         },
       });
     }
-
   }
 
   saveFirstStep() {
@@ -565,8 +562,6 @@ class CurrentCustomerEditor extends React.Component {
       birthMonth: this.state.birthMonth,
     };
 
-
-
     if (this.props.customer.secondary) {
       step1Data.username = $('[name="username"]').val().trim();
       step1Data.secondary = true;
@@ -575,7 +570,6 @@ class CurrentCustomerEditor extends React.Component {
     }
 
     console.log(step1Data);
-
 
     Meteor.call('edit.customer.step1', step1Data, (err, res) => {
       if (err) {
@@ -654,7 +648,6 @@ class CurrentCustomerEditor extends React.Component {
       { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
       { breakfast: 0, lunch: 0, dinner: 0, chefsChoice: 0 },
     ];
-
 
     this.state.scheduleReal.forEach((e, i) => {
       if (e.breakfast.active) {
