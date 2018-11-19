@@ -1330,12 +1330,12 @@ class Step4CheckoutCurrent extends React.Component {
                       <Grid item xs={6}>
                         <Typography type="subheading">
                           {this.state.primaryProfileBilling
-                            ? `${this.state.primaryProfileBilling.breakfast
-                              .totalQty +
-                            this.state.primaryProfileBilling.lunch
-                              .totalQty +
-                            this.state.primaryProfileBilling.dinner
-                              .totalQty} meals`
+                            ? `${this.state.primaryProfileBilling.breakfast.totalQty +
+                            this.state.primaryProfileBilling.lunch.totalQty +
+                            this.state.primaryProfileBilling.dinner.totalQty  +
+                            this.state.primaryProfileBilling.chefsChoiceBreakfast.totalQty  +
+                            this.state.primaryProfileBilling.chefsChoiceLunch.totalQty  +
+                            this.state.primaryProfileBilling.chefsChoiceDinner.totalQty} meals`
                             : ''}
                         </Typography>
                       </Grid>
@@ -1345,16 +1345,12 @@ class Step4CheckoutCurrent extends React.Component {
                           style={{ textAlign: 'right' }}
                         >
                           ${this.state.primaryProfileBilling
-                            ? this.state.primaryProfileBilling.breakfast
-                              .totalQty *
-                            this.state.primaryProfileBilling
-                              .breakfastPrice +
-                            this.state.primaryProfileBilling.lunch
-                              .totalQty *
-                            this.state.primaryProfileBilling.lunchPrice +
-                            this.state.primaryProfileBilling.dinner
-                              .totalQty *
-                            this.state.primaryProfileBilling.dinnerPrice
+                            ? this.state.primaryProfileBilling.breakfast.totalQty * this.state.primaryProfileBilling.breakfastPrice +
+                            this.state.primaryProfileBilling.lunch.totalQty * this.state.primaryProfileBilling.lunchPrice + 
+                            this.state.primaryProfileBilling.dinner.totalQty * this.state.primaryProfileBilling.dinnerPrice +
+                            this.state.primaryProfileBilling.chefsChoiceBreakfast.totalQty * this.state.primaryProfileBilling.chefsChoiceBreakfastPrice +
+                            this.state.primaryProfileBilling.chefsChoiceLunch.totalQty * this.state.primaryProfileBilling.chefsChoiceLunchPrice + 
+                            this.state.primaryProfileBilling.chefsChoiceDinner.totalQty * this.state.primaryProfileBilling.chefsChoiceDinnerPrice 
                             : ''}
                         </Typography>
                       </Grid>
@@ -1590,9 +1586,8 @@ class Step4CheckoutCurrent extends React.Component {
                           <Grid container>
                             <Grid item xs={6}>
                               <Typography type="subheading">
-                                {`${e.breakfast.totalQty +
-                                  e.lunch.totalQty +
-                                  e.dinner.totalQty} meals`}
+                                {`${e.breakfast.totalQty + e.lunch.totalQty + e.dinner.totalQty +
+                                  e.chefsChoiceBreakfast.totalQty + e.chefsChoiceLunch.totalQty + e.chefsChoiceDinner.totalQty} meals`}
                               </Typography>
                             </Grid>
                             <Grid item xs={6}>
@@ -1601,8 +1596,11 @@ class Step4CheckoutCurrent extends React.Component {
                                 style={{ textAlign: 'right' }}
                               >
                                 ${e.breakfast.totalQty * e.breakfastPrice +
-                                  e.lunch.totalQty * e.lunchPrice +
-                                  e.dinner.totalQty * e.dinnerPrice}
+                                  e.lunch.totalQty * e.lunchPrice + 
+                                  e.dinner.totalQty * e.dinnerPrice +
+                                  e.chefsChoiceBreakfast.totalQty * e.chefsChoiceBreakfastPrice + 
+                                  e.chefsChoiceLunch.totalQty * e.chefsChoiceLunchPrice + 
+                                  e.chefsChoiceDinner.totalQty * e.chefsChoiceDinnerPrice}
                               </Typography>
                             </Grid>
                           </Grid>

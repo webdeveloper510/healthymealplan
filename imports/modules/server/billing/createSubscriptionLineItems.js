@@ -13,7 +13,9 @@ export default function createSubscriptionLineItems(
         primaryProfileBilling.breakfast.totalQty +
         primaryProfileBilling.lunch.totalQty +
         primaryProfileBilling.dinner.totalQty +
-        primaryProfileBilling.chefsChoice.totalQty,
+        primaryProfileBilling.chefsChoiceBreakfast.totalQty +
+        primaryProfileBilling.chefsChoiceLunch.totalQty +
+        primaryProfileBilling.chefsChoiceDinner.totalQty,
 
       price:
         primaryProfileBilling.breakfast.totalQty *
@@ -22,8 +24,12 @@ export default function createSubscriptionLineItems(
         primaryProfileBilling.lunchPrice +
         primaryProfileBilling.dinner.totalQty *
         primaryProfileBilling.dinnerPrice +
-        primaryProfileBilling.chefsChoice.totalQty *
-        primaryProfileBilling.chefsChoicePrice,
+        primaryProfileBilling.chefsChoiceBreakfast.totalQty *
+        primaryProfileBilling.chefsChoiceBreakfastPrice +
+        primaryProfileBilling.chefsChoiceLunch.totalQty *
+        primaryProfileBilling.chefsChoiceLunchPrice +
+        primaryProfileBilling.chefsChoiceDinner.totalQty *
+        primaryProfileBilling.chefsChoiceDinnerPrice,
     },
     restrictions: [],
   };
@@ -114,7 +120,9 @@ export default function createSubscriptionLineItems(
             secondaryProfilesBilling[i].breakfast.totalQty +
             secondaryProfilesBilling[i].lunch.totalQty +
             secondaryProfilesBilling[i].dinner.totalQty +
-            secondaryProfilesBilling[i].chefsChoice.totalQty,
+            secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty +
+            secondaryProfilesBilling[i].chefsChoiceLunch.totalQty +
+            secondaryProfilesBilling[i].chefsChoiceDinner.totalQty,
 
           price:
             secondaryProfilesBilling[i].breakfast.totalQty *
@@ -123,8 +131,12 @@ export default function createSubscriptionLineItems(
             secondaryProfilesBilling[i].lunchPrice +
             secondaryProfilesBilling[i].dinner.totalQty *
             secondaryProfilesBilling[i].dinnerPrice +
-            secondaryProfilesBilling[i].chefsChoice.totalQty *
-            secondaryProfilesBilling[i].chefsChoicePrice,
+            secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty *
+            secondaryProfilesBilling[i].chefsChoiceBreakfastPrice +
+            secondaryProfilesBilling[i].chefsChoiceLunch.totalQty *
+            secondaryProfilesBilling[i].chefsChoiceLunchPrice +
+            secondaryProfilesBilling[i].chefsChoiceDinner.totalQty *
+            secondaryProfilesBilling[i].chefsChoiceDinnerPrice,
         },
         restrictions: [],
       };

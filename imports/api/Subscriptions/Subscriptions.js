@@ -47,7 +47,13 @@ Subscriptions.schema = new SimpleSchema({
   'completeSchedule.$.dinner': {
     type: Number,
   },
-  'completeSchedule.$.chefsChoice': {
+  'completeSchedule.$.chefsChoiceBreakfast': {
+    type: Number,
+  },
+  'completeSchedule.$.chefsChoiceLunch': {
+    type: Number,
+  },
+  'completeSchedule.$.chefsChoiceDinner': {
     type: Number,
   },
   authorizeSubscriptionId: {

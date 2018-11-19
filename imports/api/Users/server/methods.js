@@ -981,7 +981,9 @@ Meteor.methods({
           customerInfo.primaryProfileBilling.breakfast.totalQty +
           customerInfo.primaryProfileBilling.lunch.totalQty +
           customerInfo.primaryProfileBilling.dinner.totalQty +
-          customerInfo.primaryProfileBilling.chefsChoice.totalQty,
+          customerInfo.primaryProfileBilling.chefsChoiceBreakfast.totalQty +
+          customerInfo.primaryProfileBilling.chefsChoiceLunch.totalQty +
+          customerInfo.primaryProfileBilling.chefsChoiceDinner.totalQty , 
 
         price:
           customerInfo.primaryProfileBilling.breakfast.totalQty *
@@ -990,8 +992,12 @@ Meteor.methods({
           customerInfo.primaryProfileBilling.lunchPrice +
           customerInfo.primaryProfileBilling.dinner.totalQty *
           customerInfo.primaryProfileBilling.dinnerPrice +
-          customerInfo.primaryProfileBilling.chefsChoice.totalQty *
-          customerInfo.primaryProfileBilling.chefsChoicePrice,
+          customerInfo.primaryProfileBilling.chefsChoiceBreakfast.totalQty *
+          customerInfo.primaryProfileBilling.chefsChoiceBreakfastPrice +
+          customerInfo.primaryProfileBilling.chefsChoiceLunch.totalQty *
+          customerInfo.primaryProfileBilling.chefsChoiceLunchPrice +
+          customerInfo.primaryProfileBilling.chefsChoiceDinner.totalQty *
+          customerInfo.primaryProfileBilling.chefsChoiceDinnerPrice,
       },
       restrictions: [],
     };
@@ -1075,7 +1081,9 @@ Meteor.methods({
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty +
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty +
               customerInfo.secondaryProfilesBilling[i].dinner.totalQty +
-              customerInfo.secondaryProfilesBilling[i].chefsChoice.totalQty,
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty +
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceLunch.totalQty +
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceDinner.totalQty,
 
             price:
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty *
@@ -1084,8 +1092,12 @@ Meteor.methods({
               customerInfo.secondaryProfilesBilling[i].lunchPrice +
               customerInfo.secondaryProfilesBilling[i].dinner.totalQty *
               customerInfo.secondaryProfilesBilling[i].dinnerPrice +
-              customerInfo.secondaryProfilesBilling[i].chefsChoice.totalQty *
-              customerInfo.secondaryProfilesBilling[i].chefsChoicePrice,
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty *
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfastPrice +
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceLunch.totalQty *
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceLunchPrice +
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceDinner.totalQty *
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceDinnerPrice,
           },
           restrictions: [],
         };
@@ -1409,8 +1421,12 @@ Meteor.methods({
           customerInfo.primaryProfileBilling.lunchPrice +
           customerInfo.primaryProfileBilling.dinner.totalQty *
           customerInfo.primaryProfileBilling.dinnerPrice +
-          customerInfo.primaryProfileBilling.chefsChoice.totalQty *
-          customerInfo.primaryProfileBilling.chefsChoicePrice,
+          customerInfo.primaryProfileBilling.chefsChoiceBreakfast.totalQty *
+          customerInfo.primaryProfileBilling.chefsChoiceBreakfastPrice +
+          customerInfo.primaryProfileBilling.chefsChoiceLunch.totalQty *
+          customerInfo.primaryProfileBilling.chefsChoiceLunchPrice +
+          customerInfo.primaryProfileBilling.chefsChoiceDinner.totalQty *
+          customerInfo.primaryProfileBilling.chefsChoiceDinnerPrice,
       },
       restrictions: [],
     };
@@ -1494,7 +1510,9 @@ Meteor.methods({
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty +
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty +
               customerInfo.secondaryProfilesBilling[i].dinner.totalQty + 
-              customerInfo.secondaryProfilesBilling[i].chefsChoice.totalQty,
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty + 
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceLunch.totalQty + 
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceDinner.totalQty,
 
             price:
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty *
@@ -1503,8 +1521,12 @@ Meteor.methods({
               customerInfo.secondaryProfilesBilling[i].lunchPrice +
               customerInfo.secondaryProfilesBilling[i].dinner.totalQty *
               customerInfo.secondaryProfilesBilling[i].dinnerPrice + 
-              customerInfo.secondaryProfilesBilling[i].chefsChoice.totalQty *
-              customerInfo.secondaryProfilesBilling[i].chefsChoicePrice,
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty *
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfastPrice + 
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceLunch.totalQty *
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceLunchPrice + 
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceDinner.totalQty *
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceDinnerPrice,
           },
           restrictions: [],
         };

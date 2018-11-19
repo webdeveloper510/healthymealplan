@@ -138,7 +138,9 @@ class Step4Checkout extends React.Component {
         breakfastPrice: 0,
         lunchPrice: 0,
         dinnerPrice: 0,
-        chefsChoicePrice: 0,
+        chefsChoiceBreakfastPrice: 0,
+        chefsChoiceLunchPrice: 0,
+        chefsChoiceDinnerPrice: 0,
         breakfast: {
           totalQty: 0,
           regularQty: 0,
@@ -157,7 +159,19 @@ class Step4Checkout extends React.Component {
           athleticQty: 0,
           bodybuilderQty: 0,
         },
-        chefsChoice: {
+        chefsChoiceBreakfast: {
+          totalQty: 0,
+          regularQty: 0,
+          athleticQty: 0,
+          bodybuilderQty: 0,
+        },
+        chefsChoiceLunch: {
+          totalQty: 0,
+          regularQty: 0,
+          athleticQty: 0,
+          bodybuilderQty: 0,
+        },
+        chefsChoiceDinner: {
           totalQty: 0,
           regularQty: 0,
           athleticQty: 0,
@@ -257,22 +271,58 @@ class Step4Checkout extends React.Component {
           thisDaysQty += parseInt(e.dinner.quantity, 10);
         }
 
-        if (e.chefsChoice.active) {
-          primaryCustomer.chefsChoice.totalQty =
-            primaryCustomer.chefsChoice.totalQty + parseInt(e.chefsChoice.quantity, 10);
+        if (e.chefsChoiceBreakfast.active) {
+          primaryCustomer.chefsChoiceBreakfast.totalQty =
+            primaryCustomer.chefsChoiceBreakfast.totalQty + parseInt(e.chefsChoiceBreakfast.quantity, 10);
 
-          if (e.chefsChoice.portions == 'regular') {
-            primaryCustomer.chefsChoice.regularQty += parseInt(e.chefsChoice.quantity, 10);
-          } else if (e.chefsChoice.portions == 'athletic') {
-            primaryCustomer.chefsChoice.athleticQty += parseInt(e.chefsChoice.quantity, 10);
-          } else if ((e.chefsChoice.portions = 'bodybuilder')) {
-            primaryCustomer.chefsChoice.bodybuilderQty += parseInt(
-              e.chefsChoice.quantity,
+          if (e.chefsChoiceBreakfast.portions == 'regular') {
+            primaryCustomer.chefsChoiceBreakfast.regularQty += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+          } else if (e.chefsChoiceBreakfast.portions == 'athletic') {
+            primaryCustomer.chefsChoiceBreakfast.athleticQty += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+          } else if ((e.chefsChoiceBreakfast.portions = 'bodybuilder')) {
+            primaryCustomer.chefsChoiceBreakfast.bodybuilderQty += parseInt(
+              e.chefsChoiceBreakfast.quantity,
               10,
             );
           }
 
-          thisDaysQty += parseInt(e.chefsChoice.quantity, 10);
+          thisDaysQty += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+        }
+
+        if (e.chefsChoiceLunch.active) {
+          primaryCustomer.chefsChoiceLunch.totalQty =
+            primaryCustomer.chefsChoiceLunch.totalQty + parseInt(e.chefsChoiceLunch.quantity, 10);
+
+          if (e.chefsChoiceLunch.portions == 'regular') {
+            primaryCustomer.chefsChoiceLunch.regularQty += parseInt(e.chefsChoiceLunch.quantity, 10);
+          } else if (e.chefsChoiceLunch.portions == 'athletic') {
+            primaryCustomer.chefsChoiceLunch.athleticQty += parseInt(e.chefsChoiceLunch.quantity, 10);
+          } else if ((e.chefsChoiceLunch.portions = 'bodybuilder')) {
+            primaryCustomer.chefsChoiceLunch.bodybuilderQty += parseInt(
+              e.chefsChoiceLunch.quantity,
+              10,
+            );
+          }
+
+          thisDaysQty += parseInt(e.chefsChoiceLunch.quantity, 10);
+        }
+
+        if (e.chefsChoiceDinner.active) {
+          primaryCustomer.chefsChoiceDinner.totalQty =
+            primaryCustomer.chefsChoiceDinner.totalQty + parseInt(e.chefsChoiceDinner.quantity, 10);
+
+          if (e.chefsChoiceDinner.portions == 'regular') {
+            primaryCustomer.chefsChoiceDinner.regularQty += parseInt(e.chefsChoiceDinner.quantity, 10);
+          } else if (e.chefsChoiceDinner.portions == 'athletic') {
+            primaryCustomer.chefsChoiceDinner.athleticQty += parseInt(e.chefsChoiceDinner.quantity, 10);
+          } else if ((e.chefsChoiceDinner.portions = 'bodybuilder')) {
+            primaryCustomer.chefsChoiceDinner.bodybuilderQty += parseInt(
+              e.chefsChoiceDinner.quantity,
+              10,
+            );
+          }
+
+          thisDaysQty += parseInt(e.chefsChoiceDinner.quantity, 10);
         }
 
         customerScheduleTotals.push(thisDaysQty);
@@ -312,8 +362,16 @@ class Step4Checkout extends React.Component {
               thisDaysQty += parseInt(e.dinner.quantity, 10);
             }
 
-            if (e.chefsChoice.active) {
-              thisDaysQty += parseInt(e.chefsChoice.quantity, 10);
+            if (e.chefsChoiceBreakfast.active) {
+              thisDaysQty += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+            }
+
+            if (e.chefsChoiceLunch.active) {
+              thisDaysQty += parseInt(e.chefsChoiceLunch.quantity, 10);
+            }
+
+            if (e.chefsChoiceDinner.active) {
+              thisDaysQty += parseInt(e.chefsChoiceDinner.quantity, 10);
             }
 
             return thisDaysQty;
@@ -350,15 +408,23 @@ class Step4Checkout extends React.Component {
       primaryCustomer.dinnerPrice =
         primaryCustomer.lifestyle.prices.dinner[metCriteria];
 
-      primaryCustomer.chefsChoicePrice =
-        primaryCustomer.lifestyle.prices.chefsChoice[metCriteria];
+      primaryCustomer.chefsChoiceBreakfastPrice =
+        primaryCustomer.lifestyle.prices.chefsChoiceBreakfast[metCriteria];
+
+      primaryCustomer.chefsChoiceLunchPrice =
+        primaryCustomer.lifestyle.prices.chefsChoiceLunch[metCriteria];
+
+      primaryCustomer.chefsChoiceDinnerPrice =
+        primaryCustomer.lifestyle.prices.chefsChoiceDinner[metCriteria];
 
       // total base price based on per meal type base price, (before restrictions and extras and discounts)
       primaryCustomer.baseMealPriceTotal =
         primaryCustomer.breakfast.totalQty * primaryCustomer.breakfastPrice +
         primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
         primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice +
-        primaryCustomer.chefsChoice.totalQty * primaryCustomer.chefsChoicePrice;
+        primaryCustomer.chefsChoiceBreakfast.totalQty * primaryCustomer.chefsChoiceBreakfastPrice +
+        primaryCustomer.chefsChoiceLunch.totalQty * primaryCustomer.chefsChoiceLunchPrice +
+        primaryCustomer.chefsChoiceDinner.totalQty * primaryCustomer.chefsChoiceDinnerPrice;
 
       // discounted basePrice -- this is the actual base price to add up in the total
 
@@ -421,7 +487,9 @@ class Step4Checkout extends React.Component {
               primaryCustomer.breakfastPrice +
               primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
               primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice +
-              primaryCustomer.chefsChoice.totalQty * primaryCustomer.chefsChoicePrice;
+              primaryCustomer.chefsChoiceBreakfast.totalQty * primaryCustomer.chefsChoiceBreakfastPrice +
+              primaryCustomer.chefsChoiceLunch.totalQty * primaryCustomer.chefsChoiceLunchPrice +
+              primaryCustomer.chefsChoiceDinner.totalQty * primaryCustomer.chefsChoiceDinnerPrice;
 
             if (e.discountOrExtraType == 'Percentage') {
               totalRestrictionsSurcharge = e.extra / 100 * totalBaseMealsCharge;
@@ -432,7 +500,9 @@ class Step4Checkout extends React.Component {
                 (primaryCustomer.breakfast.totalQty +
                   primaryCustomer.lunch.totalQty +
                   primaryCustomer.dinner.totalQty +
-                  primaryCustomer.chefsChoice.totalQty) *
+                  primaryCustomer.chefsChoiceBreakfast.totalQty +
+                  primaryCustomer.chefsChoiceLunch.totalQty +
+                  primaryCustomer.chefsChoiceDinner.totalQty) *
                 e.extra;
             }
 
@@ -488,7 +558,9 @@ class Step4Checkout extends React.Component {
         primaryCustomer.breakfast.athleticQty > 0 ||
         primaryCustomer.lunch.athleticQty > 0 ||
         primaryCustomer.dinner.athleticQty > 0 ||
-        primaryCustomer.chefsChoice.athleticQty > 0
+        primaryCustomer.chefsChoiceBreakfast.athleticQty > 0 ||
+        primaryCustomer.chefsChoiceLunch.athleticQty > 0 ||
+        primaryCustomer.chefsChoiceDinner.athleticQty > 0
       ) {
         let totalAthleticSurcharge = 0;
 
@@ -561,17 +633,17 @@ class Step4Checkout extends React.Component {
           }
         }
 
-        if (primaryCustomer.chefsChoice.athleticQty > 0) {
+        if (primaryCustomer.chefsChoiceBreakfast.athleticQty > 0) {
           if (
             primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
           ) {
             const extraAthleticPerDinner =
               primaryCustomer.lifestyle.extraAthletic /
               100 *
-              primaryCustomer.chefsChoicePrice;
+              primaryCustomer.chefsChoiceBreakfastPrice;
 
             totalAthleticSurcharge +=
-              primaryCustomer.chefsChoice.athleticQty * extraAthleticPerDinner;
+              primaryCustomer.chefsChoiceBreakfast.athleticQty * extraAthleticPerDinner;
           }
 
           if (
@@ -579,7 +651,53 @@ class Step4Checkout extends React.Component {
             'Fixed amount'
           ) {
             totalAthleticSurcharge +=
-              primaryCustomer.chefsChoice.athleticQty *
+              primaryCustomer.chefsChoiceBreakfast.athleticQty *
+              primaryCustomer.lifestyle.extraAthletic;
+          }
+        }
+
+        if (primaryCustomer.chefsChoiceLunch.athleticQty > 0) {
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
+          ) {
+            const extraAthleticPerDinner =
+              primaryCustomer.lifestyle.extraAthletic /
+              100 *
+              primaryCustomer.chefsChoiceLunchPrice;
+
+            totalAthleticSurcharge +=
+              primaryCustomer.chefsChoiceLunch.athleticQty * extraAthleticPerDinner;
+          }
+
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            'Fixed amount'
+          ) {
+            totalAthleticSurcharge +=
+              primaryCustomer.chefsChoiceLunch.athleticQty *
+              primaryCustomer.lifestyle.extraAthletic;
+          }
+        }
+
+        if (primaryCustomer.chefsChoiceDinner.athleticQty > 0) {
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
+          ) {
+            const extraAthleticPerDinner =
+              primaryCustomer.lifestyle.extraAthletic /
+              100 *
+              primaryCustomer.chefsChoiceDinnerPrice;
+
+            totalAthleticSurcharge +=
+              primaryCustomer.chefsChoiceDinner.athleticQty * extraAthleticPerDinner;
+          }
+
+          if (
+            primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            'Fixed amount'
+          ) {
+            totalAthleticSurcharge +=
+              primaryCustomer.chefsChoiceDinner.athleticQty *
               primaryCustomer.lifestyle.extraAthletic;
           }
         }
@@ -592,7 +710,9 @@ class Step4Checkout extends React.Component {
         primaryCustomer.breakfast.bodybuilderQty > 0 ||
         primaryCustomer.lunch.bodybuilderQty > 0 ||
         primaryCustomer.dinner.bodybuilderQty > 0 ||
-        primaryCustomer.chefsChoice.bodybuilderQty > 0
+        primaryCustomer.chefsChoiceBreakfast.bodybuilderQty > 0 ||
+        primaryCustomer.chefsChoiceLunch.bodybuilderQty > 0 ||
+        primaryCustomer.chefsChoiceDinner.bodybuilderQty > 0
       ) {
         let totalBodybuilderSurcharge = 0;
 
@@ -641,14 +761,34 @@ class Step4Checkout extends React.Component {
             primaryCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
         }
 
-        if (primaryCustomer.chefsChoice.bodybuilderQty > 0) {
+        if (primaryCustomer.chefsChoiceBreakfast.bodybuilderQty > 0) {
           const extraBodybuilderPerDinner =
             primaryCustomer.lifestyle.extraBodybuilder /
             100 *
-            primaryCustomer.chefsChoicePrice;
+            primaryCustomer.chefsChoiceBreakfastPrice;
 
           totalBodybuilderSurcharge +=
-            primaryCustomer.chefsChoice.bodybuilderQty * extraBodybuilderPerDinner;
+            primaryCustomer.chefsChoiceBreakfast.bodybuilderQty * extraBodybuilderPerDinner;
+        }
+
+        if (primaryCustomer.chefsChoiceLunch.bodybuilderQty > 0) {
+          const extraBodybuilderPerDinner =
+            primaryCustomer.lifestyle.extraBodybuilder /
+            100 *
+            primaryCustomer.chefsChoiceLunchPrice;
+
+          totalBodybuilderSurcharge +=
+            primaryCustomer.chefsChoiceLunch.bodybuilderQty * extraBodybuilderPerDinner;
+        }
+
+        if (primaryCustomer.chefsChoiceDinner.bodybuilderQty > 0) {
+          const extraBodybuilderPerDinner =
+            primaryCustomer.lifestyle.extraBodybuilder /
+            100 *
+            primaryCustomer.chefsChoiceDinnerPrice;
+
+          totalBodybuilderSurcharge +=
+            primaryCustomer.chefsChoiceDinner.bodybuilderQty * extraBodybuilderPerDinner;
         }
 
         primaryCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
@@ -665,7 +805,9 @@ class Step4Checkout extends React.Component {
             breakfastPrice: 0,
             lunchPrice: 0,
             dinnerPrice: 0,
-            chefsChoicePrice: 0,
+            chefsChoiceBreakfastPrice: 0,
+            chefsChoiceLunchPrice: 0,
+            chefsChoiceDinnerPrice: 0,
             breakfast: {
               totalQty: 0,
               regularQty: 0,
@@ -684,7 +826,19 @@ class Step4Checkout extends React.Component {
               athleticQty: 0,
               bodybuilderQty: 0,
             },
-            chefsChoice: {
+            chefsChoiceBreakfast: {
+              totalQty: 0,
+              regularQty: 0,
+              athleticQty: 0,
+              bodybuilderQty: 0,
+            },
+            chefsChoiceLunch: {
+              totalQty: 0,
+              regularQty: 0,
+              athleticQty: 0,
+              bodybuilderQty: 0,
+            },
+            chefsChoiceDinner: {
               totalQty: 0,
               regularQty: 0,
               athleticQty: 0,
@@ -724,8 +878,14 @@ class Step4Checkout extends React.Component {
           currentCustomer.dinnerPrice =
             currentCustomer.lifestyle.prices.dinner[metCriteria];
 
-          currentCustomer.chefsChoicePrice =
-            currentCustomer.lifestyle.prices.chefsChoice[metCriteria];
+          currentCustomer.chefsChoiceBreakfastPrice =
+            currentCustomer.lifestyle.prices.chefsChoiceBreakfast[metCriteria];
+
+          currentCustomer.chefsChoiceLunchPrice =
+            currentCustomer.lifestyle.prices.chefsChoiceLunch[metCriteria];
+
+          currentCustomer.chefsChoiceDinnerPrice =
+            currentCustomer.lifestyle.prices.chefsChoiceDinner[metCriteria];
 
           el.scheduleReal.forEach((e, i) => {
             if (e.breakfast.active) {
@@ -795,23 +955,67 @@ class Step4Checkout extends React.Component {
               }
             }
 
-            if (e.chefsChoice.active) {
-              currentCustomer.chefsChoice.totalQty =
-                currentCustomer.chefsChoice.totalQty + parseInt(e.chefsChoice.quantity, 10);
+            if (e.chefsChoiceBreakfast.active) {
+              currentCustomer.chefsChoiceBreakfast.totalQty =
+                currentCustomer.chefsChoiceBreakfast.totalQty + parseInt(e.chefsChoiceBreakfast.quantity, 10);
 
-              if (e.chefsChoice.portions == 'regular') {
-                currentCustomer.chefsChoice.regularQty += parseInt(
-                  e.chefsChoice.quantity,
+              if (e.chefsChoiceBreakfast.portions == 'regular') {
+                currentCustomer.chefsChoiceBreakfast.regularQty += parseInt(
+                  e.chefsChoiceBreakfast.quantity,
                   10,
                 );
-              } else if (e.chefsChoice.portions == 'athletic') {
-                currentCustomer.chefsChoice.athleticQty += parseInt(
-                  e.chefsChoice.quantity,
+              } else if (e.chefsChoiceBreakfast.portions == 'athletic') {
+                currentCustomer.chefsChoiceBreakfast.athleticQty += parseInt(
+                  e.chefsChoiceBreakfast.quantity,
                   10,
                 );
-              } else if ((e.chefsChoice.portions = 'bodybuilder')) {
-                currentCustomer.chefsChoice.bodybuilderQty += parseInt(
-                  e.chefsChoice.quantity,
+              } else if ((e.chefsChoiceBreakfast.portions = 'bodybuilder')) {
+                currentCustomer.chefsChoiceBreakfast.bodybuilderQty += parseInt(
+                  e.chefsChoiceBreakfast.quantity,
+                  10,
+                );
+              }
+            }
+
+            if (e.chefsChoiceLunch.active) {
+              currentCustomer.chefsChoiceLunch.totalQty =
+                currentCustomer.chefsChoiceLunch.totalQty + parseInt(e.chefsChoiceLunch.quantity, 10);
+
+              if (e.chefsChoiceLunch.portions == 'regular') {
+                currentCustomer.chefsChoiceLunch.regularQty += parseInt(
+                  e.chefsChoiceLunch.quantity,
+                  10,
+                );
+              } else if (e.chefsChoiceLunch.portions == 'athletic') {
+                currentCustomer.chefsChoiceLunch.athleticQty += parseInt(
+                  e.chefsChoiceLunch.quantity,
+                  10,
+                );
+              } else if ((e.chefsChoiceLunch.portions = 'bodybuilder')) {
+                currentCustomer.chefsChoiceLunch.bodybuilderQty += parseInt(
+                  e.chefsChoiceLunch.quantity,
+                  10,
+                );
+              }
+            }
+
+            if (e.chefsChoiceDinner.active) {
+              currentCustomer.chefsChoiceDinner.totalQty =
+                currentCustomer.chefsChoiceDinner.totalQty + parseInt(e.chefsChoiceDinner.quantity, 10);
+
+              if (e.chefsChoiceDinner.portions == 'regular') {
+                currentCustomer.chefsChoiceDinner.regularQty += parseInt(
+                  e.chefsChoiceDinner.quantity,
+                  10,
+                );
+              } else if (e.chefsChoiceDinner.portions == 'athletic') {
+                currentCustomer.chefsChoiceDinner.athleticQty += parseInt(
+                  e.chefsChoiceDinner.quantity,
+                  10,
+                );
+              } else if ((e.chefsChoiceDinner.portions = 'bodybuilder')) {
+                currentCustomer.chefsChoiceDinner.bodybuilderQty += parseInt(
+                  e.chefsChoiceDinner.quantity,
                   10,
                 );
               }
@@ -823,7 +1027,9 @@ class Step4Checkout extends React.Component {
             currentCustomer.breakfast.totalQty * currentCustomer.breakfastPrice +
             currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
             currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice +
-            currentCustomer.chefsChoice.totalQty * currentCustomer.chefsChoicePrice;
+            currentCustomer.chefsChoiceBreakfast.totalQty * currentCustomer.chefsChoiceBreakfastPrice +
+            currentCustomer.chefsChoiceLunch.totalQty * currentCustomer.chefsChoiceLunchPrice +
+            currentCustomer.chefsChoiceDinner.totalQty * currentCustomer.chefsChoiceDinnerPrice;
 
           // discounted basePrice -- this is the actual base price to add up in the total
           if (currentCustomer.discount == 'senior') {
@@ -888,7 +1094,9 @@ class Step4Checkout extends React.Component {
                   currentCustomer.breakfastPrice +
                   currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
                   currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice +
-                  currentCustomer.chefsChoice.totalQty * currentCustomer.chefsChoicePrice;
+                  currentCustomer.chefsChoiceBreakfast.totalQty * currentCustomer.chefsChoiceBreakfastPrice +
+                  currentCustomer.chefsChoiceLunch.totalQty * currentCustomer.chefsChoiceLunchPrice +
+                  currentCustomer.chefsChoiceDinner.totalQty * currentCustomer.chefsChoiceDinnerPrice;
 
                 if (e.discountOrExtraType == 'Percentage') {
                   totalRestrictionsSurcharge =
@@ -900,7 +1108,9 @@ class Step4Checkout extends React.Component {
                     (currentCustomer.breakfast.totalQty +
                       currentCustomer.lunch.totalQty +
                       currentCustomer.dinner.totalQty +
-                      currentCustomer.chefsChoice.totalQty) *
+                      currentCustomer.chefsChoiceBreakfast.totalQty +
+                      currentCustomer.chefsChoiceLunch.totalQty +
+                      currentCustomer.chefsChoiceDinner.totalQty) *
                     e.extra;
                 }
 
@@ -964,7 +1174,9 @@ class Step4Checkout extends React.Component {
             currentCustomer.breakfast.athleticQty > 0 ||
             currentCustomer.lunch.athleticQty > 0 ||
             currentCustomer.dinner.athleticQty > 0 ||
-            currentCustomer.chefsChoice.athleticQty > 0
+            currentCustomer.chefsChoiceBreakfast.athleticQty > 0 ||
+            currentCustomer.chefsChoiceLunch.athleticQty > 0 ||
+            currentCustomer.chefsChoiceDinner.athleticQty > 0
           ) {
             let totalAthleticSurcharge = 0;
 
@@ -1041,7 +1253,7 @@ class Step4Checkout extends React.Component {
               }
             }
 
-            if (currentCustomer.chefsChoice.athleticQty > 0) {
+            if (currentCustomer.chefsChoiceBreakfast.athleticQty > 0) {
               if (
                 currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
                 'Percentage'
@@ -1049,10 +1261,10 @@ class Step4Checkout extends React.Component {
                 const extraAthleticPerChefsChoice =
                   currentCustomer.lifestyle.extraAthletic /
                   100 *
-                  currentCustomer.chefsChoicePrice;
+                  currentCustomer.chefsChoiceBreakfastPrice;
 
                 totalAthleticSurcharge +=
-                  currentCustomer.chefsChoice.athleticQty * extraAthleticPerChefsChoice;
+                  currentCustomer.chefsChoiceBreakfast.athleticQty * extraAthleticPerChefsChoice;
               }
 
               if (
@@ -1060,7 +1272,55 @@ class Step4Checkout extends React.Component {
                 'Fixed amount'
               ) {
                 totalAthleticSurcharge +=
-                  currentCustomer.chefsChoice.athleticQty *
+                  currentCustomer.chefsChoiceBreakfast.athleticQty *
+                  currentCustomer.lifestyle.extraAthletic;
+              }
+            }
+
+            if (currentCustomer.chefsChoiceLunch.athleticQty > 0) {
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                'Percentage'
+              ) {
+                const extraAthleticPerChefsChoice =
+                  currentCustomer.lifestyle.extraAthletic /
+                  100 *
+                  currentCustomer.chefsChoiceLunchPrice;
+
+                totalAthleticSurcharge +=
+                  currentCustomer.chefsChoiceLunch.athleticQty * extraAthleticPerChefsChoice;
+              }
+
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                'Fixed amount'
+              ) {
+                totalAthleticSurcharge +=
+                  currentCustomer.chefsChoiceLunch.athleticQty *
+                  currentCustomer.lifestyle.extraAthletic;
+              }
+            }
+
+            if (currentCustomer.chefsChoiceDinner.athleticQty > 0) {
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                'Percentage'
+              ) {
+                const extraAthleticPerChefsChoice =
+                  currentCustomer.lifestyle.extraAthletic /
+                  100 *
+                  currentCustomer.chefsChoiceDinnerPrice;
+
+                totalAthleticSurcharge +=
+                  currentCustomer.chefsChoiceDinner.athleticQty * extraAthleticPerChefsChoice;
+              }
+
+              if (
+                currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+                'Fixed amount'
+              ) {
+                totalAthleticSurcharge +=
+                  currentCustomer.chefsChoiceDinner.athleticQty *
                   currentCustomer.lifestyle.extraAthletic;
               }
             }
@@ -1073,7 +1333,9 @@ class Step4Checkout extends React.Component {
             currentCustomer.breakfast.bodybuilderQty > 0 ||
             currentCustomer.lunch.bodybuilderQty > 0 ||
             currentCustomer.dinner.bodybuilderQty > 0 ||
-            currentCustomer.chefsChoice.bodybuilderQty > 0
+            currentCustomer.chefsChoiceBreakfast.bodybuilderQty > 0 ||
+            currentCustomer.chefsChoiceLunch.bodybuilderQty > 0 ||
+            currentCustomer.chefsChoiceDinner.bodybuilderQty > 0
           ) {
             let totalBodybuilderSurcharge = 0;
 
@@ -1122,14 +1384,34 @@ class Step4Checkout extends React.Component {
                 currentCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
             }
 
-            if (currentCustomer.chefsChoice.bodybuilderQty > 0) {
+            if (currentCustomer.chefsChoiceBreakfast.bodybuilderQty > 0) {
               const extraBodybuilderPerDinner =
                 currentCustomer.lifestyle.extraBodybuilder /
                 100 *
-                currentCustomer.chefsChoicePrice;
+                currentCustomer.chefsChoiceBreakfastPrice;
 
               totalBodybuilderSurcharge +=
-                currentCustomer.chefsChoice.bodybuilderQty * extraBodybuilderPerDinner;
+                currentCustomer.chefsChoiceBreakfast.bodybuilderQty * extraBodybuilderPerDinner;
+            }
+
+            if (currentCustomer.chefsChoiceLunch.bodybuilderQty > 0) {
+              const extraBodybuilderPerDinner =
+                currentCustomer.lifestyle.extraBodybuilder /
+                100 *
+                currentCustomer.chefsChoiceLunchPrice;
+
+              totalBodybuilderSurcharge +=
+                currentCustomer.chefsChoiceLunch.bodybuilderQty * extraBodybuilderPerDinner;
+            }
+
+            if (currentCustomer.chefsChoiceDinner.bodybuilderQty > 0) {
+              const extraBodybuilderPerDinner =
+                currentCustomer.lifestyle.extraBodybuilder /
+                100 *
+                currentCustomer.chefsChoiceDinnerPrice;
+
+              totalBodybuilderSurcharge +=
+                currentCustomer.chefsChoiceDinner.bodybuilderQty * extraBodybuilderPerDinner;
             }
 
             currentCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
@@ -1185,7 +1467,15 @@ class Step4Checkout extends React.Component {
             10,
           ) +
           parseInt(
-            this.props.customerInfo.completeSchedule[delivIndex].chefsChoice,
+            this.props.customerInfo.completeSchedule[delivIndex].chefsChoiceBreakfast,
+            10,
+          ) +
+          parseInt(
+            this.props.customerInfo.completeSchedule[delivIndex].chefsChoiceLunch,
+            10,
+          ) +
+          parseInt(
+            this.props.customerInfo.completeSchedule[delivIndex].chefsChoiceDinner,
             10,
           );
 
@@ -1676,7 +1966,11 @@ class Step4Checkout extends React.Component {
                                 .totalQty +
                               this.state.primaryProfileBilling.dinner
                                 .totalQty +
-                              this.state.primaryProfileBilling.chefsChoice
+                              this.state.primaryProfileBilling.chefsChoiceBreakfast
+                                .totalQty +
+                              this.state.primaryProfileBilling.chefsChoiceLunch
+                                .totalQty +
+                              this.state.primaryProfileBilling.chefsChoiceDinner
                                 .totalQty} meals`
                               : ''}
                           </Typography>
@@ -1697,8 +1991,12 @@ class Step4Checkout extends React.Component {
                               this.state.primaryProfileBilling.dinner
                                 .totalQty *
                               this.state.primaryProfileBilling.dinnerPrice +
-                              this.state.primaryProfileBilling.chefsChoice
-                                .totalQty * this.state.primaryProfileBilling.chefsChoicePrice
+                              this.state.primaryProfileBilling.chefsChoiceBreakfast
+                                .totalQty * this.state.primaryProfileBilling.chefsChoiceBreakfastPrice +
+                              this.state.primaryProfileBilling.chefsChoiceLunch
+                                .totalQty * this.state.primaryProfileBilling.chefsChoiceLunchPrice +
+                              this.state.primaryProfileBilling.chefsChoiceDinner
+                                .totalQty * this.state.primaryProfileBilling.chefsChoiceDinnerPrice
                               : ''}
                           </Typography>
                         </Grid>
@@ -1936,7 +2234,9 @@ class Step4Checkout extends React.Component {
                                   {`${e.breakfast.totalQty +
                                     e.lunch.totalQty +
                                     e.dinner.totalQty +
-                                    e.chefsChoice.totalQty} meals`}
+                                    e.chefsChoiceBreakfast.totalQty +
+                                    e.chefsChoiceLunch.totalQty +
+                                    e.chefsChoiceDinner.totalQty} meals`}
                                 </Typography>
                               </Grid>
                               <Grid item xs={6}>
@@ -1947,7 +2247,9 @@ class Step4Checkout extends React.Component {
                                   ${e.breakfast.totalQty * e.breakfastPrice +
                                     e.lunch.totalQty * e.lunchPrice +
                                     e.dinner.totalQty * e.dinnerPrice +
-                                    e.chefsChoice.totalQty * e.chefsChoicePrice}
+                                    e.chefsChoiceBreakfast.totalQty * e.chefsChoiceBreakfastPrice +
+                                    e.chefsChoiceLunch.totalQty * e.chefsChoiceLunchPrice +
+                                    e.chefsChoiceDinner.totalQty * e.chefsChoiceDinnerPrice}
                                 </Typography>
                               </Grid>
                             </Grid>
