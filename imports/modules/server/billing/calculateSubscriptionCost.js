@@ -1218,7 +1218,7 @@ export default function calculateSubscriptionCost(customerInfo) {
           }
         }
 
-        if (currentCustomer.chefsChoiceBreakfastLunch.athleticQty > 0) {
+        if (currentCustomer.chefsChoiceLunch.athleticQty > 0) {
           if (
             currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
             'Percentage'
@@ -1226,10 +1226,10 @@ export default function calculateSubscriptionCost(customerInfo) {
             const extraAthleticPerDinner =
               currentCustomer.lifestyle.extraAthletic /
               100 *
-              currentCustomer.chefsChoiceBreakfastLunchPrice;
+              currentCustomer.chefsChoiceLunchPrice;
 
             totalAthleticSurcharge +=
-              currentCustomer.chefsChoiceBreakfastLunch.athleticQty * extraAthleticPerDinner;
+              currentCustomer.chefsChoiceLunch.athleticQty * extraAthleticPerDinner;
           }
 
           if (
@@ -1237,7 +1237,7 @@ export default function calculateSubscriptionCost(customerInfo) {
             'Fixed amount'
           ) {
             totalAthleticSurcharge +=
-              currentCustomer.chefsChoiceBreakfastLunch.athleticQty *
+              currentCustomer.chefsChoiceLunch.athleticQty *
               currentCustomer.lifestyle.extraAthletic;
           }
         }
