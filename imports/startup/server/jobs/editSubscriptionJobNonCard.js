@@ -148,23 +148,24 @@ const worker = Job.processJobs(
 
     if (data.hasOwnProperty('discountCodeRemove')) {
       if (data.discountCodeRemove) {
-        console.log("Going in discountCodeRemove inner if statement");
+        console.log('Going in discountCodeRemove inner if statement');
         keysToUnset.discountApplied = 1;
       }
     }
 
     if (data.hasOwnProperty('discountCode') && !keysToUnset.hasOwnProperty('discountApplied')) {
-      console.log("Going in discountCode inner KEY SET statement");
-
-      keysToSet.discountApplied = Discounts.findOne({ $or: [{ title: data.discountCode }, { _id: data.discountCode }] })._id;
+      console.log('Going in discountCode inner KEY SET statement');
+      if (data.discountCode.length > 0) {
+        keysToSet.discountApplied = Discounts.findOne({ $or: [{ title: data.discountCode }, { _id: data.discountCode }] })._id;
+      }
     }
 
     Subscriptions.update({
       _id: data.subscriptionId,
     }, {
-        $set: keysToSet,
-        $unset: keysToUnset,
-      });
+      $set: keysToSet,
+      $unset: keysToUnset,
+    });
 
     console.log('Inside editSubscriptionJobNonCard: Updated subscription on Vittle');
 

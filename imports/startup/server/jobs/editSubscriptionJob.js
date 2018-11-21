@@ -152,7 +152,9 @@ const worker = Job.processJobs(
     if (data.hasOwnProperty('discountCode') && !keysToUnset.hasOwnProperty('discountApplied')) {
       console.log('Going in discountCode inner KEY SET statement');
 
-      keysToSet.discountApplied = Discounts.findOne({ $or: [{ title: data.discountCode }, { _id: data.discountCode }] })._id;
+      if (data.discountCode.length > 0) {
+        keysToSet.discountApplied = Discounts.findOne({ $or: [{ title: data.discountCode }, { _id: data.discountCode }] })._id;
+      }
     }
 
     // console.log(keysToSet);
