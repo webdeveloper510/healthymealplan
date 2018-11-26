@@ -35,6 +35,7 @@ S3.config = {
   bucket: 'vittle-new',
 };
 
+import './jobs/masterBillingJob';
 
 // const cost = calculateSubscriptionCost({});
 
