@@ -123,9 +123,10 @@ class GiftCards extends React.Component {
             <AppBar position="static" className="appbar--no-background appbar--no-shadow">
               <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
                 <Tab label="All" onClick={() => this.searchByKey('', '')} />
-                <Tab label="Used" onClick={() => this.searchByKey('status', 'used')} />
-                <Tab label="Partially used" onClick={() => this.searchByKey('status', 'partiallyUsed')} />
+                <Tab label="Active" onClick={() => this.searchByKey('status', 'active')} />
                 <Tab label="Disabled" onClick={() => this.searchByKey('status', 'disabled')} />
+                <Tab label="Used" onClick={() => this.searchByKey('depleted', true)} />
+                <Tab label="Partially used" onClick={() => this.searchByKey('$expr', { $lt: ['$balance', '$initialAmount'] })} />
               </Tabs>
             </AppBar>
           </div>
@@ -202,7 +203,7 @@ GiftCards.propTypes = {
   history: PropTypes.isRequired,
 };
 
-export default withTracker(() => 
+export default withTracker(() =>
 
 
   // return {
@@ -210,7 +211,7 @@ export default withTracker(() =>
   //   lifestyles: GiftCardsCollection.find().fetch(),
   // };
 
-   ({
+  ({
 
-  })
+  }),
 )(GiftCards);

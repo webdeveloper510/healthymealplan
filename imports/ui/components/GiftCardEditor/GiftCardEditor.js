@@ -19,6 +19,7 @@ import autoBind from 'react-autobind';
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
+import Select from 'material-ui/Select';
 import Input, { InputLabel, InputAdornment } from 'material-ui/Input';
 import {
   FormControl,
@@ -329,13 +330,14 @@ class GiftCardEditor extends React.Component {
     const giftCard = {
       code: this.state.code.trim(),
       codeType: this.state.codeType,
+      
       initialAmountPreset: this.state.initialAmountPreset,
 
       customerType: this.state.customerType,
       customer: this.state.customer || '',
 
       note: this.state.note,
-      status: 'active',
+      status: this.state.status,
     };
 
     if(existingGiftCard){
@@ -399,6 +401,13 @@ class GiftCardEditor extends React.Component {
 
         history.push('/gift-cards');
       }
+    });
+  }
+
+  handleStatusChange(event, value) {
+    this.setState({
+      status: event.target.value,
+      hasFormChanged: true,
     });
   }
 
@@ -556,11 +565,13 @@ class GiftCardEditor extends React.Component {
                 style={{ fontWeight: 500 }}
               >
                 {this.props.giftCard && this.props.giftCard._id
-                  ? `${this.props.giftCard.code}`
+                  ? `${this.props.giftCard.code.replace(/(\w{4})/g, '$1 ').replace(/(^\s+|\s+$)/, '')}`
                   : 'Create gift card'}
               </Typography>
               {this.props.giftCard && this.props.giftCard._id ? (
-                <Button size="small" onClick={this.props.giftCard.status == 'expired' ? this.enableGiftCard : this.disableGiftCard}>{this.props.giftCard.status == 'expired' ? 'Enable' : 'Disable'}</Button>
+                <Button size="small" onClick={this.props.giftCard.status == 'disabled' ? this.enableGiftCard : this.disableGiftCard}>
+                {this.props.giftCard.status == 'disabled' ? 'Enable' : 'Disable'}
+                </Button>
               ) : ''}
 
             </Grid>
@@ -680,6 +691,38 @@ class GiftCardEditor extends React.Component {
                       </RadioGroup>
                     </FormControl>
 
+                  </Paper>
+                </Grid>
+              </Grid>
+            </Grid>
+          </Grid>
+
+          <Divider light className="divider--space-x" />
+
+          <Grid container justify="center" style={{ marginBottom: '50px' }}>
+            <Grid item xs={12}>
+              <Grid container>
+                <Grid item xs={12} sm={4}>
+                  <Typography
+                    type="subheading"
+                    className="subheading font-medium"
+                  >
+                    Status
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                  <Paper elevation={2} className="paper-for-fields">
+                    
+                  <Select fullWidth onChange={this.handleStatusChange} value={this.state.status}>
+                    <MenuItem key={2134} value={'active'}>
+                      Active
+                    </MenuItem>
+                    <MenuItem key={4312} value={'disabled'}>
+                      Disabled
+                    </MenuItem>
+                  </Select>
+
+                    
                   </Paper>
                 </Grid>
               </Grid>

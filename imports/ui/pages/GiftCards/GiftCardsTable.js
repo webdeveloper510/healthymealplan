@@ -220,7 +220,7 @@ class GiftCardsTable extends React.Component {
                     >
 
                       <Typography type="subheading" className="subheading">
-                        {e.code}
+                        {e.code.replace(/(\w{4})/g, '$1 ').replace(/(^\s+|\s+$)/, '')}
                       </Typography>
 
                     </TableCell>
