@@ -14,6 +14,7 @@ import '../../api/GiftCards/methods';
 import '../../api/GiftCards/server/publications';
 
 import '../../api/Ingredients/methods';
+import '../../api/Ingredients/server/indexes';
 import '../../api/Ingredients/server/publications';
 
 import '../../api/Instructions/methods';
@@ -48,6 +49,7 @@ import '../../api/Plates/server/publications';
 import '../../api/Plating/methods';
 
 import '../../api/PostalCodes/methods';
+import '../../api/PostalCodes/server/indexes';
 import '../../api/PostalCodes/server/publications';
 
 import '../../api/Restrictions/methods';
@@ -66,6 +68,7 @@ import '../../api/Transactions/methods';
 import '../../api/Transactions/server/publications';
 
 import '../../api/Users/server/methods';
+import '../../api/Users/server/indexes';
 import '../../api/Users/server/publications';
 
 import '../../api/Utility/server/methods';
