@@ -106,7 +106,11 @@ Job.processJobs(
   },
 );
 
-const masterBillingJobExists = Jobs.findOne({ type: 'masterBillingJob' }, { sort: { created: -1 } });
+const masterBillingJobExists = Jobs.findOne({
+  type: 'masterBillingJob', status: 'waiting',
+}, {
+  sort: { created: -1 },
+});
 
 // console.log(masterBillingJobExists);
 
