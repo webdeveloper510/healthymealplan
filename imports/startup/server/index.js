@@ -24,6 +24,9 @@ import './jobs/disableDiscountJob';
 import './jobs/sendFirstRecoveryEmailJob';
 
 import '../../modules/server/authorize/webhooks/';
+
+import './jobs/masterBillingJob';
+import './jobs/slaveChargeJob';
 // import calculateSubscriptionCost from '../../modules/server/billing/calculateSubscriptionCost';
 // import createSubscriptionFromCustomerProfile from '../../modules/server/authorize/createSubscriptionFromCustomerProfile';
 
@@ -34,8 +37,6 @@ S3.config = {
   secret: 'PtCHGgf7e7LWKJ7u2kFRAXYp7aBVzzaLCFkvZmXx',
   bucket: 'vittle-new',
 };
-
-import './jobs/masterBillingJob';
 
 // const cost = calculateSubscriptionCost({});
 

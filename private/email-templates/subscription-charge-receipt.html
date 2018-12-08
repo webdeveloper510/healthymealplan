@@ -1,0 +1,275 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html lang="en">
+
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="format-detection" content="telephone=no">
+
+  <style type="text/css">
+    body {
+      margin: 0;
+      padding: 0;
+      -ms-text-size-adjust: 100%;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    table {
+      border-spacing: 0;
+    }
+
+    table td {
+      border-collapse: collapse;
+    }
+
+    .ExternalClass {
+      width: 100%;
+    }
+
+    .ExternalClass,
+    .ExternalClass p,
+    .ExternalClass span,
+    .ExternalClass font,
+    .ExternalClass td,
+    .ExternalClass div {
+      line-height: 100%;
+    }
+
+    .ReadMsgBody {
+      width: 100%;
+      background-color: #ebebeb;
+    }
+
+    table {
+      mso-table-lspace: 0pt;
+      mso-table-rspace: 0pt;
+    }
+
+    img {
+      -ms-interpolation-mode: bicubic;
+    }
+
+    .yshortcuts a {
+      border-bottom: none !important;
+    }
+
+    @media screen and (max-width: 680px) {
+
+      .force-row,
+      .container {
+        width: 95% !important;
+        max-width: 95% !important;
+      }
+
+    }
+
+    @media screen and (max-width: 680px) {
+      .header-text {
+        float: left !important;
+      }
+
+    }
+
+    @media screen and (max-width: 450px) {
+      .header {
+        text-align: center;
+      }
+
+    }
+
+    @media screen and (max-width: 450px) {
+
+      .logo,
+      .header-text {
+        float: none !important;
+      }
+
+    }
+
+    @media screen and (max-width: 450px) {
+      .header-text {
+        width: 100% !important;
+      }
+
+    }
+
+    @media screen and (max-width: 450px) {
+      .container-padding {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
+        padding-top: 20px !important;
+        padding-bottom: 20px !important;
+      }
+
+    }
+
+    @media screen and (max-width: 450px) {
+      .call-to-action {
+        padding-top: 20px !important;
+        margin-top: 20px !important;
+      }
+
+    }
+
+    @media screen and (max-width: 450px) {
+      .logo {
+        width: 125px;
+        height: auto;
+        margin-bottom: 20px;
+        margin-right: 0px !important;
+        margin-left: 0px !important;
+      }
+
+    }
+
+    .ios-footer a {
+      color: #aaaaaa !important;
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<meta itemprop="name" content="Your gift card from Vittle is ready" />
+<table style="font-family: Arial, Helvetica, sans-serif;" border="0" width="100%" height="100%" cellpadding="0"
+  cellspacing="0" bgcolor="#ffffff">
+  <tr>
+    <td align="center" valign="top" bgcolor="#ffffff" style="background-color: #ffffff;">
+      <br>
+      <!-- 600px container (white background) -->
+      <img class="logo" width="140px" height="auto" src="https://www.vittle.ca/Vittle-Email-Logo.png" alt="Vittle">
+      <table border="0" width="600" cellpadding="0" cellspacing="0" class="container" style="width:600px;max-width:600px;border-radius:3px;">
+        <tr>
+          <td class="container-padding header" align="left" style="padding-top:40px;padding-bottom:40px;">
+            <div class="header-text" style="text-align: left; font-family: Arial, Helvetica, sans-serif;">
+              <h2 style="font-weight: bold;">Customer Receipt</h2>
+              {{#if paymentMethodIsCard }}
+              <p style="margin: 8px 0">Transaction ID: {{ authorizeTransactionId }}</p>
+              {{/if}}
+              <p style="margin: 8px 0">Customer ID {{customerId}}</p>
+              <p style="margin: 8px 0">Subscription ID {{subscriptionId}}</p>
+              <p style="margin: 8px 0">{{ chargeDate }}</p>
+
+            </div>
+          </td>
+        </tr>
+      </table>
+
+      <table border="0" width="600" cellpadding="0" cellspacing="0" class="container" style="width:600px;max-width:600px;border-radius:3px;">
+        <tbody style="padding: 0 40px">
+          <tr>
+            <td>
+              <p style="font-size: 18px; font-weight: bold; margin-bottom: 12px">Customer details</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233)">
+              <p style="font-size: 16px; color: #999; margin-bottom: 5px">Name</p>
+            </td>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233);text-align: right;">
+              <p style="font-size: 16px; margin-bottom: 5px">{{ customerName }}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233)">
+              <p style="font-size: 16px; color: #999; margin-bottom: 5px">Email</p>
+            </td>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233);text-align: right;">
+              <p style="font-size: 16px; margin-bottom: 5px">{{ customerEmail }}</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233)">
+              <p style="font-size: 16px; color: #999; margin-bottom: 5px">Subscription</p>
+            </td>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233);text-align: right;">
+              <p style="font-size: 16px; margin-bottom: 5px">${{ subscriptionAmount }}</p>
+            </td>
+          </tr>
+          {{#if giftCardPresent}}
+          <tr>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233)">
+              <p style="font-size: 16px; color: #999; margin-bottom: 5px">Gift card</p>
+            </td>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233);text-align: right;">
+              <p style="font-size: 16px; margin-bottom: 5px">{{ giftCardCode }}</p>
+            </td>
+          </tr>
+          {{/if}}
+
+
+        </tbody>
+      </table>
+
+      <table border="0" width="600" cellpadding="0" cellspacing="0" class="container" style="margin-top: 50px;width:600px;max-width:600px;border-radius:3px;">
+        <tbody>
+          <tr>
+            <td>
+              <p style="font-size: 18px; font-weight: bold; margin-bottom: 12px">Payment details</p>
+            </td>
+          </tr>
+          <tr>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233)">
+              <p style="font-size: 16px; color: #999; margin-bottom: 5px">${{subscriptionAmount}} CAD x 1</p>
+            </td>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233);text-align: right;">
+              <p style="font-size: 16px; margin-bottom: 5px">${{ subscriptionAmount }} CAD</p>
+            </td>
+          </tr>
+          {{#if partialCharge}}
+          <tr>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233)">
+              <p style="font-size: 16px; color: #999; margin-bottom: 5px">Gift Card</p>
+            </td>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233);text-align: right;">
+              <p style="font-size: 16px; margin-bottom: 5px">-${{ giftCardDeductionAmount }} CAD</p>
+            </td>
+          </tr>
+          {{/if}}
+          <tr>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233)">
+              <p style="font-size: 16px; color: #999; margin-bottom: 5px"></p>
+            </td>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233);text-align: right;">
+              <p style="font-size: 16px; margin-bottom: 5px">Total ${{ totalCharge }} CAD</p>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <table border="0" width="600" cellpadding="0" cellspacing="0" class="container" style="margin-top: 50px;width:600px;max-width:600px;border-radius:3px;">
+        <tbody>
+          <tr style="border-bottom: 1px solid #ccc">
+            <td style="border-bottom: 1px solid rgb(233, 233, 233)">
+              <p style="font-size: 16px; color: #999; margin-bottom: 5px">Payment ({{ accountType }} ending with
+                {{ accountNumber }})</p>
+            </td>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233); text-align: right;">
+              <p style="font-size: 16px; margin-bottom: 5px">${{ totalCharge }} CAD</p>
+            </td>
+          </tr>
+          <tr style="border-bottom: 1px solid #ccc">
+            <td style="border-bottom: 1px solid rgb(233, 233, 233)">
+              <p style="font-size: 16px; color: #999; margin-bottom: 5px"></p>
+            </td>
+            <td style="border-bottom: 1px solid rgb(233, 233, 233); text-align: right;">
+              <p style="font-size: 16px; margin-bottom: 5px">Balance $0.00 CAD</p>
+            </td>
+          </tr>
+
+        </tbody>
+      </table>
+
+      <table border="0" width="600" cellpadding="0" cellspacing="0" class="container" style="width:600px;max-width:600px;border-radius:3px;">
+        <tr>
+          <td class="container-padding footer-text" align="left" style="font-family:Helvetica, Arial, sans-serif;font-size:13px;line-height:19px;color:#aaaaaa;padding-top:20px;text-align:center;">
+            <p style="font-size: 14px; color: #444">If you have any questions, reply to this email.</p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+</body>
+
+</html>

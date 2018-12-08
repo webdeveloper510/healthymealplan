@@ -6,19 +6,20 @@ import GiftCards from '../../../api/GiftCards/GiftCards';
 import Discounts from '../../../api/Discounts/Discounts';
 import Jobs from '../../../api/Jobs/Jobs';
 
+import GiftCard from '../../../modules/GiftCard/GiftCard';
+
 import sendSubscriptionsChargeSummaryEmail from '../../../modules/server/billing/sendSubscriptionChargeSummaryEmail';
 
 Job.processJobs(
   'coreJobQueue',
   'masterBillingJob',
+  {
+    errorCallback(err) {
+      console.log('MASTER BILLING JOB ERROR');
+      console.log(err);
+    },
+  },
   (job, cb) => {
-    // const insertData = job.data;
-
-    console.log(job);
-    console.log(job._doc._id);
-
-    // find all the active subscriptions
-
     const activeSubs = Subscriptions.aggregate([
       {
         $match: {
@@ -76,7 +77,10 @@ Job.processJobs(
         paymentMethod: e.paymentMethod,
       });
 
-      new Job(Jobs, 'slaveChargeJob', { subscriptionId: e._id }).save();
+      const slaveJob = new Job(Jobs, 'slaveChargeJob', { subscriptionId: e._id });
+
+      slaveJob.priority('normal').save();
+
     });
 
     // create an email that gives a summary of active subscriptions and their charges
@@ -85,7 +89,7 @@ Job.processJobs(
     });
 
     // add all the subscriptions to the master job that should be charged this week, model below
-    Jobs.update({ _id: job._doc._id }, {
+    Jobs.update({ runId: job._doc.runId }, {
       $set: {
         'data.subscriptionToBeCharged': subscriptionToBeCharged,
       },
@@ -109,8 +113,8 @@ Job.processJobs(
 const masterBillingJobExists = Jobs.findOne({
   type: 'masterBillingJob', status: 'waiting',
 }, {
-  sort: { created: -1 },
-});
+    sort: { created: -1 },
+  });
 
 // console.log(masterBillingJobExists);
 

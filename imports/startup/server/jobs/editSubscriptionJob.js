@@ -8,7 +8,7 @@ import Lifestyles from '../../../api/Lifestyles/Lifestyles';
 import Discounts from '../../../api/Discounts/Discounts';
 
 import calculateSubscriptionCost from '../../../modules/server/billing/calculateSubscriptionCost';
-import updateSubscription from '../../../modules/server/authorize/updateSubscription';
+// import updateSubscription from '../../../modules/server/authorize/updateSubscription';
 
 const worker = Job.processJobs(
   'coreJobQueue',
@@ -24,14 +24,14 @@ const worker = Job.processJobs(
 
     const sub = Subscriptions.findOne({ customerId: data.id });
 
-    const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
-    const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
+    // const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
+    // const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
 
-    if (updateSubscriptionRes.messages.resultCode != 'Ok') {
-      job.fail('Could not update subscription on [Authorize.net]');
-    }
+    // if (updateSubscriptionRes.messages.resultCode != 'Ok') {
+    //   job.fail('Could not update subscription on [Authorize.net]');
+    // }
 
-    console.log('Inside editSubscriptionJob: Updated subscription on authorize end');
+    // console.log('Inside editSubscriptionJob: Updated subscription on authorize end');
 
     if (data.secondaryProfiles && data.secondaryProfiles.length > 0) {
       data.secondaryProfiles.forEach((e) => {

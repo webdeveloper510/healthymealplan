@@ -79,7 +79,7 @@ Subscriptions.schema = new SimpleSchema({
   paymentMethod: {
     type: String,
     label: 'The payment method for the subscription',
-  },
+  },  
 
   amount: {
     type: Number,
@@ -106,6 +106,12 @@ Subscriptions.schema = new SimpleSchema({
   discountApplied: {
     type: String,
     label: 'The id of the discount applied to the subscription',
+    optional: true,
+  },
+
+  giftCardApplied: {
+    type: String,
+    label: 'The id of the gift card applied to the subscription',
     optional: true,
   },
 

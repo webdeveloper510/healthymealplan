@@ -14,6 +14,7 @@ import Restrictions from '../../../api/Restrictions/Restrictions';
 import Ingredients from '../../../api/Ingredients/Ingredients';
 import PostalCodes from '../../../api/PostalCodes/PostalCodes';
 import Discounts from '../../../api/Discounts/Discounts';
+import GiftCards from '../../../api/GiftCards/GiftCards';
 import Jobs from '../../../api/Jobs/JobsClient';
 
 const EditCustomer = ({
@@ -29,6 +30,7 @@ const EditCustomer = ({
   loading,
   discounts,
   jobs,
+  giftCards,
 }) => (loading ? <Loading /> : customer ? (
   <div className="EditCurrentCustomer">
     <Grid container className="EditCategory SideContent SideContent--spacer-2x--horizontal">
@@ -45,6 +47,7 @@ const EditCustomer = ({
         loading={loading}
         discounts={discounts}
         jobs={jobs}
+        giftCards={giftCards}
       />
     </Grid>
   </div>
@@ -69,11 +72,12 @@ export default withTracker(({ match }) => {
   const subscription7 = Meteor.subscribe('postalcodes');
   const subscription8 = Meteor.subscribe('discounts');
   const subscription9 = Meteor.subscribe('jobs.subscription', customerId);
+  const subscription10 = Meteor.subscribe('giftcards');
 
 
   return {
     loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready()
-      && !subscription6.ready() && !subscription7.ready() && !subscription8.ready() && !subscription9.ready(),
+      && !subscription6.ready() && !subscription7.ready() && !subscription8.ready() && !subscription9.ready() && !subscription10.ready(),
     customer: Meteor.users.findOne(customerId),
     subscription: Subscriptions.findOne({ customerId }),
     secondaryAccounts: Meteor.users.find({ secondary: true, primaryAccount: customerId }).fetch(),
@@ -83,5 +87,6 @@ export default withTracker(({ match }) => {
     postalCodes: PostalCodes.find().fetch(),
     discounts: Discounts.find().fetch(),
     jobs: Jobs.find().fetch(),
+    giftCards: GiftCards.find().fetch(),
   };
 })(EditCustomer);

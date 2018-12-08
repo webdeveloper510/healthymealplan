@@ -20,6 +20,7 @@ import FolderIcon from 'material-ui-icons/Folder';
 import LifestylesIcon from 'material-ui-icons/FitnessCenter';
 import PlatingIcon from 'material-ui-icons/RoomService';
 import SubscriptionsIcon from 'material-ui-icons/CreditCard';
+import ReceiptIcon from 'material-ui-icons/Receipt';
 import DiscountsIcon from 'material-ui-icons/LocalOffer';
 
 import RestrictionsIcon from 'material-ui-icons/DoNotDisturbAlt';
@@ -171,6 +172,15 @@ class AuthenticatedSideNav extends Component {
                   <SubscriptionsIcon className="side-nav-icon" />
                 </ListItemIcon>
                 <ListItemText className="subheading" primary="Invoices" />
+              </ListItem>
+            </NavLink>
+
+            <NavLink onClick={this.props.handleDrawerToggle} to="/billing">
+              <ListItem className="padding-left-nested-item" button>
+                <ListItemIcon>
+                  <ReceiptIcon className="side-nav-icon" />
+                </ListItemIcon>
+                <ListItemText className="subheading" primary="Billing" />
               </ListItem>
             </NavLink>
 
