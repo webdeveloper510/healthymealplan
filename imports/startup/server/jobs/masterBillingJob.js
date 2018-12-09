@@ -6,7 +6,7 @@ import GiftCards from '../../../api/GiftCards/GiftCards';
 import Discounts from '../../../api/Discounts/Discounts';
 import Jobs from '../../../api/Jobs/Jobs';
 
-import GiftCard from '../../../modules/GiftCard/GiftCard';
+// import GiftCard from '../../../modules/GiftCard/GiftCard';
 
 import sendSubscriptionsChargeSummaryEmail from '../../../modules/server/billing/sendSubscriptionChargeSummaryEmail';
 
@@ -113,8 +113,8 @@ Job.processJobs(
 const masterBillingJobExists = Jobs.findOne({
   type: 'masterBillingJob', status: 'waiting',
 }, {
-    sort: { created: -1 },
-  });
+  sort: { created: -1 },
+});
 
 // console.log(masterBillingJobExists);
 
