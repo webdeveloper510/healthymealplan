@@ -46,6 +46,8 @@ import AuthenticatedNavigation from '../../components/AuthenticatedNavigation/Au
 import Public from '../../components/Public/Public';
 import Index from '../../pages/Index/Index';
 
+import Billing from '../../pages/Billing/Billing';
+
 import Blog from '../../pages/Blog/Blog';
 import NewBlog from '../../pages/NewBlog/NewBlog';
 import EditBlog from '../../pages/EditBlog/EditBlog';
@@ -509,6 +511,13 @@ class App extends React.Component {
               >
                 {!this.props.loading ? (
                   <Switch key={this.props.key} location={this.props.location}>
+                    <Authenticated
+                      exact
+                      path="/billing"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={Billing}
+                      {...this.props}
+                    />
 
                     <Authenticated
                       exact

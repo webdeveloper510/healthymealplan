@@ -191,7 +191,7 @@ class Step3Delivery extends React.Component {
 
   handleSubmitStep() {
 
-    const check = this.state.completeSchedule.map(day => (day.breakfast + day.lunch + day.dinner) > 0);
+    const check = this.state.completeSchedule.map(day => (day.breakfast + day.lunch + day.dinner + day.chefsChoiceBreakfast + day.chefsChoiceLunch + day.chefsChoiceDinner) > 0);
 
     console.log(check);
 
@@ -338,22 +338,34 @@ class Step3Delivery extends React.Component {
     const dayBeforeYestMealSum = step >= 2 ?
       parseInt(this.state.completeSchedule[previousIndex - 1].breakfast, 10) +
       parseInt(this.state.completeSchedule[previousIndex - 1].lunch, 10) +
-      parseInt(this.state.completeSchedule[previousIndex - 1].dinner, 10) : null;
+      parseInt(this.state.completeSchedule[previousIndex - 1].dinner, 10) + 
+      parseInt(this.state.completeSchedule[previousIndex - 1].chefsChoiceBreakfast, 10) + 
+      parseInt(this.state.completeSchedule[previousIndex - 1].chefsChoiceLunch, 10) + 
+      parseInt(this.state.completeSchedule[previousIndex - 1].chefsChoiceDinner, 10) : null;
 
     const previousDaysMealSum = step == 0 ? null :
       parseInt(this.state.completeSchedule[previousIndex].breakfast, 10) +
       parseInt(this.state.completeSchedule[previousIndex].lunch, 10) +
-      parseInt(this.state.completeSchedule[previousIndex].dinner, 10);
+      parseInt(this.state.completeSchedule[previousIndex].dinner, 10) +
+      parseInt(this.state.completeSchedule[previousIndex].chefsChoiceBreakfast, 10) +
+      parseInt(this.state.completeSchedule[previousIndex].chefsChoiceLunch, 10) +
+      parseInt(this.state.completeSchedule[previousIndex].chefsChoiceDinner, 10);
 
     const daysMealSum =
       parseInt(this.state.completeSchedule[step].breakfast, 10) +
       parseInt(this.state.completeSchedule[step].lunch, 10) +
-      parseInt(this.state.completeSchedule[step].dinner, 10);
+      parseInt(this.state.completeSchedule[step].dinner, 10) +
+      parseInt(this.state.completeSchedule[step].chefsChoiceBreakfast, 10) +
+      parseInt(this.state.completeSchedule[step].chefsChoiceLunch, 10)  +
+      parseInt(this.state.completeSchedule[step].chefsChoiceDinner, 10);
 
     const nextDaysSum =
       parseInt(this.state.completeSchedule[step + 1].breakfast, 10) +
       parseInt(this.state.completeSchedule[step + 1].lunch, 10) +
-      parseInt(this.state.completeSchedule[step + 1].dinner, 10);
+      parseInt(this.state.completeSchedule[step + 1].dinner, 10) +
+      parseInt(this.state.completeSchedule[step + 1].chefsChoiceBreakfast, 10) +
+      parseInt(this.state.completeSchedule[step + 1].chefsChoiceLunch, 10) +
+      parseInt(this.state.completeSchedule[step + 1].chefsChoiceDinner, 10);
 
     let radioGroup = (
       <RadioGroup
@@ -5030,6 +5042,124 @@ class Step3Delivery extends React.Component {
                                       this.state.completeSchedule[i].dinner
                                     }
                                     name={`all_dinner_${i}`}
+                                  />
+                                </TableCell>
+                              </TableRow>
+                            );
+                          })}
+                        </TableBody>
+                      </Table>
+                      <Typography
+                        type="body2"
+                        className="text-uppercase font-medium"
+                      >
+                        
+                      </Typography>
+                      <Table className="table-lifestyles">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell />
+
+                            <TableCell style={{ textAlign: 'center' }}>
+                              <Typography
+                                type="subheading"
+                                className="font-medium font-uppercase"
+                              >
+                                Chefs Choice Breakfast
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: 'center' }}>
+                              <Typography
+                                type="subheading"
+                                className="font-medium font-uppercase"
+                              >
+                                Chefs Choice Lunch
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: 'center' }}>
+                              <Typography
+                                type="subheading"
+                                className="font-medium font-uppercase"
+                              >
+                                Chefs Choice Dinner
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          {this.state.completeSchedule.map((e, i) => {
+                            const days = [
+                              'Monday',
+                              'Tuesday',
+                              'Wednesday',
+                              'Thursday',
+                              'Friday',
+                              'Saturday',
+                              'Sunday',
+                            ];
+
+                            return (
+                              <TableRow key={i}>
+                                <TableCell>
+                                  <Typography
+                                    type="subheading"
+                                    style={{ marginTop: '10px' }}
+                                  >
+                                    {days[i]}
+                                  </Typography>
+                                </TableCell>
+
+                                <TableCell style={{ textAlign: 'center' }}>
+                                  <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    style={{
+                                      fontSize: '1rem',
+                                      maxWidth: '100px',
+                                      minWidth: '100px',
+                                    }}
+                                    disabled
+                                    value={
+                                      this.state.completeSchedule[i]
+                                        .chefsChoiceBreakfast
+                                    }
+                                    name={`all_chefsChoicebreakfast_${i}`}
+                                  />
+                                </TableCell>
+
+                                <TableCell style={{ textAlign: 'center' }}>
+                                  <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    style={{
+                                      fontSize: '1rem',
+                                      maxWidth: '100px',
+                                      minWidth: '100px',
+                                    }}
+                                    disabled
+                                    value={
+                                      this.state.completeSchedule[i].chefsChoiceLunch
+                                    }
+                                    name={`all_chefsChoiceLunch_${i}`}
+                                  />
+                                </TableCell>
+
+                                <TableCell style={{ textAlign: 'center' }}>
+                                  <TextField
+                                    fullWidth
+                                    margin="normal"
+                                    style={{
+                                      fontSize: '1rem',
+                                      maxWidth: '100px',
+                                      minWidth: '100px',
+                                    }}
+                                    disabled
+                                    value={
+                                      this.state.completeSchedule[i].chefsChoiceDinner
+                                    }
+                                    name={`all_chefsChoiceDinner_${i}`}
                                   />
                                 </TableCell>
                               </TableRow>

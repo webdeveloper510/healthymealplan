@@ -18,6 +18,9 @@ export default function calculateSubscriptionCost(customerInfo) {
     breakfastPrice: 0,
     lunchPrice: 0,
     dinnerPrice: 0,
+    chefsChoiceBreakfastPrice: 0,
+    chefsChoiceLunchPrice: 0,
+    chefsChoiceDinnerPrice: 0,
     breakfast: {
       totalQty: 0,
       regularQty: 0,
@@ -31,6 +34,24 @@ export default function calculateSubscriptionCost(customerInfo) {
       bodybuilderQty: 0,
     },
     dinner: {
+      totalQty: 0,
+      regularQty: 0,
+      athleticQty: 0,
+      bodybuilderQty: 0,
+    },
+    chefsChoiceBreakfast: {
+      totalQty: 0,
+      regularQty: 0,
+      athleticQty: 0,
+      bodybuilderQty: 0,
+    },
+    chefsChoiceLunch: {
+      totalQty: 0,
+      regularQty: 0,
+      athleticQty: 0,
+      bodybuilderQty: 0,
+    },
+    chefsChoiceDinner: {
       totalQty: 0,
       regularQty: 0,
       athleticQty: 0,
@@ -159,6 +180,60 @@ export default function calculateSubscriptionCost(customerInfo) {
       thisDaysQty += parseInt(e.dinner.quantity, 10);
     }
 
+    if (e.chefsChoiceBreakfast.active) {
+      primaryCustomer.chefsChoiceBreakfast.totalQty =
+        primaryCustomer.chefsChoiceBreakfast.totalQty + parseInt(e.chefsChoiceBreakfast.quantity, 10);
+
+      if (e.chefsChoiceBreakfast.portions == 'regular') {
+        primaryCustomer.chefsChoiceBreakfast.regularQty += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+      } else if (e.chefsChoiceBreakfast.portions == 'athletic') {
+        primaryCustomer.chefsChoiceBreakfast.athleticQty += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+      } else if ((e.chefsChoiceBreakfast.portions = 'bodybuilder')) {
+        primaryCustomer.chefsChoiceBreakfast.bodybuilderQty += parseInt(
+          e.chefsChoiceBreakfast.quantity,
+          10,
+        );
+      }
+
+      thisDaysQty += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+    }
+
+    if (e.chefsChoiceLunch.active) {
+      primaryCustomer.chefsChoiceLunch.totalQty =
+        primaryCustomer.chefsChoiceLunch.totalQty + parseInt(e.chefsChoiceLunch.quantity, 10);
+
+      if (e.chefsChoiceLunch.portions == 'regular') {
+        primaryCustomer.chefsChoiceLunch.regularQty += parseInt(e.chefsChoiceLunch.quantity, 10);
+      } else if (e.chefsChoiceLunch.portions == 'athletic') {
+        primaryCustomer.chefsChoiceLunch.athleticQty += parseInt(e.chefsChoiceLunch.quantity, 10);
+      } else if ((e.chefsChoiceLunch.portions = 'bodybuilder')) {
+        primaryCustomer.chefsChoiceLunch.bodybuilderQty += parseInt(
+          e.chefsChoiceLunch.quantity,
+          10,
+        );
+      }
+
+      thisDaysQty += parseInt(e.chefsChoiceLunch.quantity, 10);
+    }
+
+    if (e.chefsChoiceDinner.active) {
+      primaryCustomer.chefsChoiceDinner.totalQty =
+        primaryCustomer.chefsChoiceDinner.totalQty + parseInt(e.chefsChoiceDinner.quantity, 10);
+
+      if (e.chefsChoiceDinner.portions == 'regular') {
+        primaryCustomer.chefsChoiceDinner.regularQty += parseInt(e.chefsChoiceDinner.quantity, 10);
+      } else if (e.chefsChoiceDinner.portions == 'athletic') {
+        primaryCustomer.chefsChoiceDinner.athleticQty += parseInt(e.chefsChoiceDinner.quantity, 10);
+      } else if ((e.chefsChoiceDinner.portions = 'bodybuilder')) {
+        primaryCustomer.chefsChoiceDinner.bodybuilderQty += parseInt(
+          e.chefsChoiceDinner.quantity,
+          10,
+        );
+      }
+
+      thisDaysQty += parseInt(e.chefsChoiceDinner.quantity, 10);
+    }
+
     customerScheduleTotals.push(thisDaysQty);
   });
 
@@ -196,6 +271,18 @@ export default function calculateSubscriptionCost(customerInfo) {
           thisDaysQty += parseInt(e.dinner.quantity, 10);
         }
 
+        if (e.chefsChoiceBreakfast.active) {
+          thisDaysQty += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+        }
+
+        if (e.chefsChoiceLunch.active) {
+          thisDaysQty += parseInt(e.chefsChoiceLunch.quantity, 10);
+        }
+
+        if (e.chefsChoiceDinner.active) {
+          thisDaysQty += parseInt(e.chefsChoiceDinner.quantity, 10);
+        }
+
         return thisDaysQty;
       });
 
@@ -230,11 +317,23 @@ export default function calculateSubscriptionCost(customerInfo) {
   primaryCustomer.dinnerPrice =
     primaryCustomer.lifestyle.prices.dinner[metCriteria];
 
+  primaryCustomer.chefsChoiceBreakfastPrice =
+    primaryCustomer.lifestyle.prices.chefsChoiceBreakfast[metCriteria];
+
+  primaryCustomer.chefsChoiceLunchPrice =
+    primaryCustomer.lifestyle.prices.chefsChoiceLunch[metCriteria];
+
+  primaryCustomer.chefsChoiceDinnerPrice =
+    primaryCustomer.lifestyle.prices.chefsChoiceDinner[metCriteria];
+
   // total base price based on per meal type base price, (before restrictions and extras and discounts)
   primaryCustomer.baseMealPriceTotal =
     primaryCustomer.breakfast.totalQty * primaryCustomer.breakfastPrice +
     primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-    primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
+    primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice +
+    primaryCustomer.chefsChoiceBreakfast.totalQty * primaryCustomer.chefsChoiceBreakfastPrice +
+    primaryCustomer.chefsChoiceLunch.totalQty * primaryCustomer.chefsChoiceLunchPrice +
+    primaryCustomer.chefsChoiceDinner.totalQty * primaryCustomer.chefsChoiceDinnerPrice;
 
   // discounted basePrice -- this is the actual base price to add up in the total
 
@@ -296,7 +395,10 @@ export default function calculateSubscriptionCost(customerInfo) {
           primaryCustomer.breakfast.totalQty *
           primaryCustomer.breakfastPrice +
           primaryCustomer.lunch.totalQty * primaryCustomer.lunchPrice +
-          primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice;
+          primaryCustomer.dinner.totalQty * primaryCustomer.dinnerPrice +
+          primaryCustomer.chefsChoiceBreakfast.totalQty * primaryCustomer.chefsChoiceBreakfastPrice +
+          primaryCustomer.chefsChoiceLunch.totalQty * primaryCustomer.chefsChoiceLunchPrice +
+          primaryCustomer.chefsChoiceDinner.totalQty * primaryCustomer.chefsChoiceDinnerPrice;
 
         if (e.discountOrExtraType == 'Percentage') {
           totalRestrictionsSurcharge = e.extra / 100 * totalBaseMealsCharge;
@@ -306,7 +408,10 @@ export default function calculateSubscriptionCost(customerInfo) {
           totalRestrictionsSurcharge =
             (primaryCustomer.breakfast.totalQty +
               primaryCustomer.lunch.totalQty +
-              primaryCustomer.dinner.totalQty) *
+              primaryCustomer.dinner.totalQty +
+              primaryCustomer.chefsChoiceBreakfast.totalQty +
+              primaryCustomer.chefsChoiceLunch.totalQty +
+              primaryCustomer.chefsChoiceDinner.totalQty) *
             e.extra;
         }
 
@@ -361,8 +466,10 @@ export default function calculateSubscriptionCost(customerInfo) {
   if (
     primaryCustomer.breakfast.athleticQty > 0 ||
     primaryCustomer.lunch.athleticQty > 0 ||
-    primaryCustomer.dinner.athleticQty > 0
-  ) {
+    primaryCustomer.dinner.athleticQty > 0 ||
+    primaryCustomer.chefsChoiceBreakfast.athleticQty > 0 ||
+    primaryCustomer.chefsChoiceLunch.athleticQty > 0 ||
+    primaryCustomer.chefsChoiceDinner.athleticQty > 0) {
     let totalAthleticSurcharge = 0;
 
     if (primaryCustomer.breakfast.athleticQty > 0) {
@@ -429,7 +536,76 @@ export default function calculateSubscriptionCost(customerInfo) {
         'Fixed amount'
       ) {
         totalAthleticSurcharge +=
-          primaryCustomer.breakfast.athleticQty *
+          primaryCustomer.dinner.athleticQty *
+          primaryCustomer.lifestyle.extraAthletic;
+      }
+    }
+
+    if (primaryCustomer.chefsChoiceBreakfast.athleticQty > 0) {
+      if (
+        primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
+      ) {
+        const extraAthleticPerDinner =
+          primaryCustomer.lifestyle.extraAthletic /
+          100 *
+          primaryCustomer.chefsChoiceBreakfastPrice;
+
+        totalAthleticSurcharge +=
+          primaryCustomer.chefsChoiceBreakfast.athleticQty * extraAthleticPerDinner;
+      }
+
+      if (
+        primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
+        'Fixed amount'
+      ) {
+        totalAthleticSurcharge +=
+          primaryCustomer.chefsChoiceBreakfast.athleticQty *
+          primaryCustomer.lifestyle.extraAthletic;
+      }
+    }
+
+    if (primaryCustomer.chefsChoiceLunch.athleticQty > 0) {
+      if (
+        primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
+      ) {
+        const extraAthleticPerDinner =
+          primaryCustomer.lifestyle.extraAthletic /
+          100 *
+          primaryCustomer.chefsChoiceLunchPrice;
+
+        totalAthleticSurcharge +=
+          primaryCustomer.chefsChoiceLunch.athleticQty * extraAthleticPerDinner;
+      }
+
+      if (
+        primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
+        'Fixed amount'
+      ) {
+        totalAthleticSurcharge +=
+          primaryCustomer.chefsChoiceLunch.athleticQty *
+          primaryCustomer.lifestyle.extraAthletic;
+      }
+    }
+
+    if (primaryCustomer.chefsChoiceDinner.athleticQty > 0) {
+      if (
+        primaryCustomer.lifestyle.discountOrExtraTypeAthletic == 'Percentage'
+      ) {
+        const extraAthleticPerDinner =
+          primaryCustomer.lifestyle.extraAthletic /
+          100 *
+          primaryCustomer.chefsChoiceDinnerPrice;
+
+        totalAthleticSurcharge +=
+          primaryCustomer.chefsChoiceDinner.athleticQty * extraAthleticPerDinner;
+      }
+
+      if (
+        primaryCustomer.lifestyle.discountOrExtraTypeAthletic ==
+        'Fixed amount'
+      ) {
+        totalAthleticSurcharge +=
+          primaryCustomer.chefsChoiceDinner.athleticQty *
           primaryCustomer.lifestyle.extraAthletic;
       }
     }
@@ -441,7 +617,10 @@ export default function calculateSubscriptionCost(customerInfo) {
   if (
     primaryCustomer.breakfast.bodybuilderQty > 0 ||
     primaryCustomer.lunch.bodybuilderQty > 0 ||
-    primaryCustomer.dinner.bodybuilderQty > 0
+    primaryCustomer.dinner.bodybuilderQty > 0 ||
+    primaryCustomer.chefsChoiceBreakfast.bodybuilderQty > 0 ||
+    primaryCustomer.chefsChoiceLunch.bodybuilderQty > 0 ||
+    primaryCustomer.chefsChoiceDinner.bodybuilderQty > 0
   ) {
     let totalBodybuilderSurcharge = 0;
 
@@ -490,6 +669,36 @@ export default function calculateSubscriptionCost(customerInfo) {
         primaryCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
     }
 
+    if (primaryCustomer.chefsChoiceBreakfast.bodybuilderQty > 0) {
+      const extraBodybuilderPerDinner =
+        primaryCustomer.lifestyle.extraBodybuilder /
+        100 *
+        primaryCustomer.chefsChoiceBreakfastPrice;
+
+      totalBodybuilderSurcharge +=
+        primaryCustomer.chefsChoiceBreakfast.bodybuilderQty * extraBodybuilderPerDinner;
+    }
+
+    if (primaryCustomer.chefsChoiceLunch.bodybuilderQty > 0) {
+      const extraBodybuilderPerDinner =
+        primaryCustomer.lifestyle.extraBodybuilder /
+        100 *
+        primaryCustomer.chefsChoiceLunchPrice;
+
+      totalBodybuilderSurcharge +=
+        primaryCustomer.chefsChoiceLunch.bodybuilderQty * extraBodybuilderPerDinner;
+    }
+
+    if (primaryCustomer.chefsChoiceDinner.bodybuilderQty > 0) {
+      const extraBodybuilderPerDinner =
+        primaryCustomer.lifestyle.extraBodybuilder /
+        100 *
+        primaryCustomer.chefsChoiceDinnerPrice;
+
+      totalBodybuilderSurcharge +=
+        primaryCustomer.chefsChoiceDinner.bodybuilderQty * extraBodybuilderPerDinner;
+    }
+
     primaryCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
   }
 
@@ -534,6 +743,9 @@ export default function calculateSubscriptionCost(customerInfo) {
         breakfastPrice: 0,
         lunchPrice: 0,
         dinnerPrice: 0,
+        chefsChoiceBreakfastPrice: 0,
+        chefsChoiceLunchPrice: 0,
+        chefsChoiceDinnerPrice: 0,
         breakfast: {
           totalQty: 0,
           regularQty: 0,
@@ -547,6 +759,24 @@ export default function calculateSubscriptionCost(customerInfo) {
           bodybuilderQty: 0,
         },
         dinner: {
+          totalQty: 0,
+          regularQty: 0,
+          athleticQty: 0,
+          bodybuilderQty: 0,
+        },
+        chefsChoiceBreakfast: {
+          totalQty: 0,
+          regularQty: 0,
+          athleticQty: 0,
+          bodybuilderQty: 0,
+        },
+        chefsChoiceLunch: {
+          totalQty: 0,
+          regularQty: 0,
+          athleticQty: 0,
+          bodybuilderQty: 0,
+        },
+        chefsChoiceDinner: {
           totalQty: 0,
           regularQty: 0,
           athleticQty: 0,
@@ -588,6 +818,15 @@ export default function calculateSubscriptionCost(customerInfo) {
 
       currentCustomer.dinnerPrice =
         currentCustomer.lifestyle.prices.dinner[metCriteria];
+
+      currentCustomer.chefsChoiceBreakfastPrice =
+        currentCustomer.lifestyle.prices.chefsChoiceBreakfast[metCriteria];
+
+      currentCustomer.chefsChoiceLunchPrice =
+        currentCustomer.lifestyle.prices.chefsChoiceLunch[metCriteria];
+
+      currentCustomer.chefsChoiceDinnerPrice =
+        currentCustomer.lifestyle.prices.chefsChoiceDinner[metCriteria];
 
       el.scheduleReal.forEach((e, i) => {
         if (e.breakfast.active) {
@@ -656,13 +895,82 @@ export default function calculateSubscriptionCost(customerInfo) {
             );
           }
         }
+
+        if (e.chefsChoiceBreakfast.active) {
+          currentCustomer.chefsChoiceBreakfast.totalQty =
+            currentCustomer.chefsChoiceBreakfast.totalQty + parseInt(e.chefsChoiceBreakfast.quantity, 10);
+
+          if (e.chefsChoiceBreakfast.portions == 'regular') {
+            currentCustomer.chefsChoiceBreakfast.regularQty += parseInt(
+              e.chefsChoiceBreakfast.quantity,
+              10,
+            );
+          } else if (e.chefsChoiceBreakfast.portions == 'athletic') {
+            currentCustomer.chefsChoiceBreakfast.athleticQty += parseInt(
+              e.chefsChoiceBreakfast.quantity,
+              10,
+            );
+          } else if ((e.chefsChoiceBreakfast.portions = 'bodybuilder')) {
+            currentCustomer.chefsChoiceBreakfast.bodybuilderQty += parseInt(
+              e.chefsChoiceBreakfast.quantity,
+              10,
+            );
+          }
+        }
+
+        if (e.chefsChoiceLunch.active) {
+          currentCustomer.chefsChoiceLunch.totalQty =
+            currentCustomer.chefsChoiceLunch.totalQty + parseInt(e.chefsChoiceLunch.quantity, 10);
+
+          if (e.chefsChoiceLunch.portions == 'regular') {
+            currentCustomer.chefsChoiceLunch.regularQty += parseInt(
+              e.chefsChoiceLunch.quantity,
+              10,
+            );
+          } else if (e.chefsChoiceLunch.portions == 'athletic') {
+            currentCustomer.chefsChoiceLunch.athleticQty += parseInt(
+              e.chefsChoiceLunch.quantity,
+              10,
+            );
+          } else if ((e.chefsChoiceLunch.portions = 'bodybuilder')) {
+            currentCustomer.chefsChoiceLunch.bodybuilderQty += parseInt(
+              e.chefsChoiceLunch.quantity,
+              10,
+            );
+          }
+        }
+
+        if (e.chefsChoiceDinner.active) {
+          currentCustomer.chefsChoiceDinner.totalQty =
+            currentCustomer.chefsChoiceDinner.totalQty + parseInt(e.chefsChoiceDinner.quantity, 10);
+
+          if (e.chefsChoiceDinner.portions == 'regular') {
+            currentCustomer.chefsChoiceDinner.regularQty += parseInt(
+              e.chefsChoiceDinner.quantity,
+              10,
+            );
+          } else if (e.chefsChoiceDinner.portions == 'athletic') {
+            currentCustomer.chefsChoiceDinner.athleticQty += parseInt(
+              e.chefsChoiceDinner.quantity,
+              10,
+            );
+          } else if ((e.chefsChoiceDinner.portions = 'bodybuilder')) {
+            currentCustomer.chefsChoiceDinner.bodybuilderQty += parseInt(
+              e.chefsChoiceDinner.quantity,
+              10,
+            );
+          }
+        }
       });
 
       // total base price based on per meal type base price, (before restrictions and extras and discounts)
       currentCustomer.baseMealPriceTotal =
         currentCustomer.breakfast.totalQty * currentCustomer.breakfastPrice +
         currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-        currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
+        currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice +
+        currentCustomer.chefsChoiceBreakfast.totalQty * currentCustomer.chefsChoiceBreakfastPrice +
+        currentCustomer.chefsChoiceLunch.totalQty * currentCustomer.chefsChoiceLunchPrice +
+        currentCustomer.chefsChoiceDinner.totalQty * currentCustomer.chefsChoiceDinnerPrice;
 
       // discounted basePrice -- this is the actual base price to add up in the total
       if (currentCustomer.discount == 'senior') {
@@ -726,7 +1034,10 @@ export default function calculateSubscriptionCost(customerInfo) {
               currentCustomer.breakfast.totalQty *
               currentCustomer.breakfastPrice +
               currentCustomer.lunch.totalQty * currentCustomer.lunchPrice +
-              currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice;
+              currentCustomer.dinner.totalQty * currentCustomer.dinnerPrice +
+              currentCustomer.chefsChoiceBreakfast.totalQty * currentCustomer.chefsChoiceBreakfastPrice +
+              currentCustomer.chefsChoiceLunch.totalQty * currentCustomer.chefsChoiceLunchPrice +
+              currentCustomer.chefsChoiceDinner.totalQty * currentCustomer.chefsChoiceDinnerPrice;
 
             if (e.discountOrExtraType == 'Percentage') {
               totalRestrictionsSurcharge =
@@ -737,7 +1048,10 @@ export default function calculateSubscriptionCost(customerInfo) {
               totalRestrictionsSurcharge =
                 (currentCustomer.breakfast.totalQty +
                   currentCustomer.lunch.totalQty +
-                  currentCustomer.dinner.totalQty) *
+                  currentCustomer.dinner.totalQty +
+                  currentCustomer.chefsChoiceBreakfast.totalQty +
+                  currentCustomer.chefsChoiceLunch.totalQty +
+                  currentCustomer.chefsChoiceDinner.totalQty) *
                 e.extra;
             }
 
@@ -800,7 +1114,10 @@ export default function calculateSubscriptionCost(customerInfo) {
       if (
         currentCustomer.breakfast.athleticQty > 0 ||
         currentCustomer.lunch.athleticQty > 0 ||
-        currentCustomer.dinner.athleticQty > 0
+        currentCustomer.dinner.athleticQty > 0 ||
+        currentCustomer.chefsChoiceBreakfast.athleticQty > 0 ||
+        currentCustomer.chefsChoiceLunch.athleticQty > 0 ||
+        currentCustomer.chefsChoiceDinner.athleticQty > 0
       ) {
         let totalAthleticSurcharge = 0;
 
@@ -872,7 +1189,79 @@ export default function calculateSubscriptionCost(customerInfo) {
             'Fixed amount'
           ) {
             totalAthleticSurcharge +=
-              currentCustomer.breakfast.athleticQty *
+              currentCustomer.dinner.athleticQty *
+              currentCustomer.lifestyle.extraAthletic;
+          }
+        }
+
+        if (currentCustomer.chefsChoiceBreakfast.athleticQty > 0) {
+          if (
+            currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            'Percentage'
+          ) {
+            const extraAthleticPerDinner =
+              currentCustomer.lifestyle.extraAthletic /
+              100 *
+              currentCustomer.chefsChoiceBreakfastPrice;
+
+            totalAthleticSurcharge +=
+              currentCustomer.chefsChoiceBreakfast.athleticQty * extraAthleticPerDinner;
+          }
+
+          if (
+            currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            'Fixed amount'
+          ) {
+            totalAthleticSurcharge +=
+              currentCustomer.chefsChoiceBreakfast.athleticQty *
+              currentCustomer.lifestyle.extraAthletic;
+          }
+        }
+
+        if (currentCustomer.chefsChoiceLunch.athleticQty > 0) {
+          if (
+            currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            'Percentage'
+          ) {
+            const extraAthleticPerDinner =
+              currentCustomer.lifestyle.extraAthletic /
+              100 *
+              currentCustomer.chefsChoiceLunchPrice;
+
+            totalAthleticSurcharge +=
+              currentCustomer.chefsChoiceLunch.athleticQty * extraAthleticPerDinner;
+          }
+
+          if (
+            currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            'Fixed amount'
+          ) {
+            totalAthleticSurcharge +=
+              currentCustomer.chefsChoiceLunch.athleticQty *
+              currentCustomer.lifestyle.extraAthletic;
+          }
+        }
+
+        if (currentCustomer.chefsChoiceDinner.athleticQty > 0) {
+          if (
+            currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            'Percentage'
+          ) {
+            const extraAthleticPerDinner =
+              currentCustomer.lifestyle.extraAthletic /
+              100 *
+              currentCustomer.chefsChoiceDinnerPrice;
+
+            totalAthleticSurcharge +=
+              currentCustomer.chefsChoiceDinner.athleticQty * extraAthleticPerDinner;
+          }
+
+          if (
+            currentCustomer.lifestyle.discountOrExtraTypeAthletic ==
+            'Fixed amount'
+          ) {
+            totalAthleticSurcharge +=
+              currentCustomer.chefsChoiceDinner.athleticQty *
               currentCustomer.lifestyle.extraAthletic;
           }
         }
@@ -884,7 +1273,10 @@ export default function calculateSubscriptionCost(customerInfo) {
       if (
         currentCustomer.breakfast.bodybuilderQty > 0 ||
         currentCustomer.lunch.bodybuilderQty > 0 ||
-        currentCustomer.dinner.bodybuilderQty > 0
+        currentCustomer.dinner.bodybuilderQty > 0 ||
+        currentCustomer.chefsChoiceBreakfast.bodybuilderQty > 0 ||
+        currentCustomer.chefsChoiceLunch.bodybuilderQty > 0 ||
+        currentCustomer.chefsChoiceDinner.bodybuilderQty > 0
       ) {
         let totalBodybuilderSurcharge = 0;
 
@@ -931,6 +1323,36 @@ export default function calculateSubscriptionCost(customerInfo) {
 
           totalBodybuilderSurcharge +=
             currentCustomer.dinner.bodybuilderQty * extraBodybuilderPerDinner;
+        }
+
+        if (currentCustomer.chefsChoiceBreakfast.bodybuilderQty > 0) {
+          const extraBodybuilderPerDinner =
+            currentCustomer.lifestyle.extraBodybuilder /
+            100 *
+            currentCustomer.chefsChoiceBreakfastPrice;
+
+          totalBodybuilderSurcharge +=
+            currentCustomer.chefsChoiceBreakfast.bodybuilderQty * extraBodybuilderPerDinner;
+        }
+
+        if (currentCustomer.chefsChoiceLunch.bodybuilderQty > 0) {
+          const extraBodybuilderPerDinner =
+            currentCustomer.lifestyle.extraBodybuilder /
+            100 *
+            currentCustomer.chefsChoiceLunchPrice;
+
+          totalBodybuilderSurcharge +=
+            currentCustomer.chefsChoiceLunch.bodybuilderQty * extraBodybuilderPerDinner;
+        }
+
+        if (currentCustomer.chefsChoiceDinner.bodybuilderQty > 0) {
+          const extraBodybuilderPerDinner =
+            currentCustomer.lifestyle.extraBodybuilder /
+            100 *
+            currentCustomer.chefsChoiceDinnerPrice;
+
+          totalBodybuilderSurcharge +=
+            currentCustomer.chefsChoiceDinner.bodybuilderQty * extraBodybuilderPerDinner;
         }
 
         currentCustomer.totalBodybuilderSurcharge = totalBodybuilderSurcharge;
@@ -1019,6 +1441,18 @@ export default function calculateSubscriptionCost(customerInfo) {
       ) +
       parseInt(
         customerInfo.completeSchedule[delivIndex].dinner,
+        10,
+      ) +
+      parseInt(
+        customerInfo.completeSchedule[delivIndex].chefsChoiceBreakfast,
+        10,
+      ) +
+      parseInt(
+        customerInfo.completeSchedule[delivIndex].chefsChoiceLunch,
+        10,
+      ) +
+      parseInt(
+        customerInfo.completeSchedule[delivIndex].chefsChoiceDinner,
         10,
       );
 
@@ -1174,10 +1608,10 @@ export default function calculateSubscriptionCost(customerInfo) {
   console.log('after calculating taxexempt');
 
   const lineItems = createSubscriptionLineItems(primaryCustomer,
-  secondaryCustomers,
-  customerInfo.secondaryProfiles.length,
-  taxExempt,
-  customerInfo.delivery);
+    secondaryCustomers,
+    customerInfo.secondaryProfiles.length,
+    taxExempt,
+    customerInfo.delivery);
 
   console.log(lineItems);
 

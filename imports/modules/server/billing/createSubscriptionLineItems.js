@@ -12,7 +12,10 @@ export default function createSubscriptionLineItems(
       meals:
         primaryProfileBilling.breakfast.totalQty +
         primaryProfileBilling.lunch.totalQty +
-        primaryProfileBilling.dinner.totalQty,
+        primaryProfileBilling.dinner.totalQty +
+        primaryProfileBilling.chefsChoiceBreakfast.totalQty +
+        primaryProfileBilling.chefsChoiceLunch.totalQty +
+        primaryProfileBilling.chefsChoiceDinner.totalQty,
 
       price:
         primaryProfileBilling.breakfast.totalQty *
@@ -20,7 +23,13 @@ export default function createSubscriptionLineItems(
         primaryProfileBilling.lunch.totalQty *
         primaryProfileBilling.lunchPrice +
         primaryProfileBilling.dinner.totalQty *
-        primaryProfileBilling.dinnerPrice,
+        primaryProfileBilling.dinnerPrice +
+        primaryProfileBilling.chefsChoiceBreakfast.totalQty *
+        primaryProfileBilling.chefsChoiceBreakfastPrice +
+        primaryProfileBilling.chefsChoiceLunch.totalQty *
+        primaryProfileBilling.chefsChoiceLunchPrice +
+        primaryProfileBilling.chefsChoiceDinner.totalQty *
+        primaryProfileBilling.chefsChoiceDinnerPrice,
     },
     restrictions: [],
   };
@@ -110,7 +119,10 @@ export default function createSubscriptionLineItems(
           meals:
             secondaryProfilesBilling[i].breakfast.totalQty +
             secondaryProfilesBilling[i].lunch.totalQty +
-            secondaryProfilesBilling[i].dinner.totalQty,
+            secondaryProfilesBilling[i].dinner.totalQty +
+            secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty +
+            secondaryProfilesBilling[i].chefsChoiceLunch.totalQty +
+            secondaryProfilesBilling[i].chefsChoiceDinner.totalQty,
 
           price:
             secondaryProfilesBilling[i].breakfast.totalQty *
@@ -118,7 +130,13 @@ export default function createSubscriptionLineItems(
             secondaryProfilesBilling[i].lunch.totalQty *
             secondaryProfilesBilling[i].lunchPrice +
             secondaryProfilesBilling[i].dinner.totalQty *
-            secondaryProfilesBilling[i].dinnerPrice,
+            secondaryProfilesBilling[i].dinnerPrice +
+            secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty *
+            secondaryProfilesBilling[i].chefsChoiceBreakfastPrice +
+            secondaryProfilesBilling[i].chefsChoiceLunch.totalQty *
+            secondaryProfilesBilling[i].chefsChoiceLunchPrice +
+            secondaryProfilesBilling[i].chefsChoiceDinner.totalQty *
+            secondaryProfilesBilling[i].chefsChoiceDinnerPrice,
         },
         restrictions: [],
       };
@@ -196,6 +214,6 @@ export default function createSubscriptionLineItems(
       subscriptionItemsReal.push(currentProfileLineItems);
     });
   }
-  
+
   return subscriptionItemsReal;
 }

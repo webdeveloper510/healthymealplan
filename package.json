@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@babel/core": "^7.0.0-beta.55",
-    "@babel/runtime": "^7.0.0-beta.55",
+    "@babel/runtime": "^7.2.0",
     "@cleverbeagle/dates": "^0.5.1",
     "@cleverbeagle/seeder": "^1.2.0",
     "authorizenet": "^1.0.4",

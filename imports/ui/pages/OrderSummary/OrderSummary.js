@@ -57,7 +57,13 @@ class OrderSummary extends React.Component {
                     this.state.primaryProfileBilling.lunch
                       .totalQty +
                     this.state.primaryProfileBilling.dinner
-                      .totalQty} meals`
+                      .totalQty +
+                      this.state.primaryProfileBilling.chefsChoiceBreakfast
+                        .totalQty +
+                        this.state.primaryProfileBilling.chefsChoiceLunch
+                          .totalQty +
+                          this.state.primaryProfileBilling.chefsChoiceDinner
+                            .totalQty} meals`
                     : ''}
                 </Typography>
               </Grid>
@@ -76,7 +82,16 @@ class OrderSummary extends React.Component {
                     this.state.primaryProfileBilling.lunchPrice +
                     this.state.primaryProfileBilling.dinner
                       .totalQty *
-                    this.state.primaryProfileBilling.dinnerPrice
+                    this.state.primaryProfileBilling.dinnerPrice +
+                    this.state.primaryProfileBilling.chefsChoiceBreakfast
+                      .totalQty *
+                    this.state.primaryProfileBilling.chefsChoiceBreakfastPrice +
+                    this.state.primaryProfileBilling.chefsChoiceLunch
+                      .totalQty *
+                    this.state.primaryProfileBilling.chefsChoiceLunchPrice +
+                    this.state.primaryProfileBilling.chefsChoiceDinner
+                      .totalQty *
+                    this.state.primaryProfileBilling.chefsChoiceDinnerPrice
                     : ''}
                 </Typography>
               </Grid>
@@ -314,7 +329,10 @@ class OrderSummary extends React.Component {
                       <Typography type="subheading">
                         {`${e.breakfast.totalQty +
                           e.lunch.totalQty +
-                          e.dinner.totalQty} meals`}
+                          e.dinner.totalQty +
+                          e.chefsChoiceBreakfast.totalQty +
+                          e.chefsChoiceLunch.totalQty +
+                          e.chefsChoiceDinner.totalQty} meals`}
                       </Typography>
                     </Grid>
                     <Grid item xs={6}>
@@ -324,7 +342,10 @@ class OrderSummary extends React.Component {
                       >
                         ${e.breakfast.totalQty * e.breakfastPrice +
                           e.lunch.totalQty * e.lunchPrice +
-                          e.dinner.totalQty * e.dinnerPrice}
+                          e.dinner.totalQty * e.dinnerPrice +
+                          e.chefsChoiceBreakfast.totalQty * e.chefsChoiceBreakfastPrice +
+                          e.chefsChoiceLunch.totalQty * e.chefsChoiceLunchPrice +
+                          e.chefsChoiceDinner.totalQty * e.chefsChoiceDinnerPrice}
                       </Typography>
                     </Grid>
                   </Grid>

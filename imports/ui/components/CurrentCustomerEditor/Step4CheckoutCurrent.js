@@ -85,26 +85,6 @@ const styles = theme => ({
   },
 });
 
-function verifyDiscountCode(discountId) {
-
-
-  // IF DISCOUNT CODE IS ACTIVE
-
-  // IF USAGE LIMIT HAS EXCEEDED
-
-  // IF APPLIES TO A PARTICULAR CUSTOMER
-  // IS THIS THAT CUSTOMER
-
-  // IF APPLIES TO A PARTICULAR LIFESTYLE
-  // CHECK IF THE LIFESTYLE IS SAME AS SELECTED ON THE DISCOUNT
-
-
-}
-
-function calculateDiscountAmount(discountId, meals) {
-
-}
-
 class Step4CheckoutCurrent extends React.Component {
   constructor(props) {
     super(props);
@@ -134,8 +114,15 @@ class Step4CheckoutCurrent extends React.Component {
       valueTypes: '',
       suggestionsTypes: [],
 
+      valueGiftCards: '',
+      suggestionsGiftCards: [],
+
       discountSelected: '',
       discountApplied: this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '',
+
+      giftCardSelected: '',
+      giftCardApplied: this.props.subscription && this.props.subscription.hasOwnProperty('giftCardApplied') ? this.props.subscription.giftCardApplied : '',
+
       secondTime: '',
       discountBeingRemoved: false,
 
@@ -192,25 +179,25 @@ class Step4CheckoutCurrent extends React.Component {
         getSubscriptionDetailsLoading: true,
         paymentProfileLoading: true,
 
-      })
-
-      Meteor.call('getSubscriptionDetails', this.props.subscription.authorizeSubscriptionId, (err, res) => {
-        if (err) {
-          console.log(err);
-
-          this.setState({
-            getSubscriptionDetailsLoading: false,
-          });
-
-        } else {
-          console.log(res);
-
-          this.setState({
-            subscriptionDetails: res.subscription,
-            getSubscriptionDetailsLoading: false,
-          });
-        }
       });
+
+      // Meteor.call('getSubscriptionDetails', this.props.subscription.authorizeSubscriptionId, (err, res) => {
+      //   if (err) {
+      //     console.log(err);
+
+      //     this.setState({
+      //       getSubscriptionDetailsLoading: false,
+      //     });
+
+      //   } else {
+      //     console.log(res);
+
+      //     this.setState({
+      //       subscriptionDetails: res.subscription,
+      //       getSubscriptionDetailsLoading: false,
+      //     });
+      //   }
+      // });
 
       Meteor.call('getCustomerPaymentProfile', this.props.subscription.authorizeCustomerProfileId, this.props.subscription.authorizePaymentProfileId, (err, res) => {
         if (err) {
@@ -228,7 +215,7 @@ class Step4CheckoutCurrent extends React.Component {
 
     this.setState({
       summaryLoading: true,
-    })
+    });
 
     Meteor.call('customer.getBillingData', { customerId: this.props.customer._id }, (err, res) => {
       if (err) {
@@ -436,6 +423,13 @@ class Step4CheckoutCurrent extends React.Component {
     });
   }
 
+  onChangeGiftCards(event, { newValue }) {
+    this.setState({
+      giftCardSelected: newValue,
+      valueGiftCards: newValue,
+    });
+  }
+
   onSuggestionSelectedTypes(
     event,
     { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
@@ -468,6 +462,38 @@ class Step4CheckoutCurrent extends React.Component {
     });
   }
 
+  onSuggestionSelectedGiftCards(
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
+  ) {
+    let clonedRestrictions = this.state.giftCardApplied != ''
+      ? this.state.giftCardApplied
+      : [];
+
+    const isThere = false;
+
+    if (clonedRestrictions.length > 0) {
+      // isThere = clonedRestrictions.filter(
+      //   present => suggestion._id === present._id,
+      // );
+      this.props.popTheSnackbar({
+        message: 'Cannot add more than one gift card',
+      });
+      return;
+    }
+
+    if (isThere != false) {
+      return;
+    }
+
+    clonedRestrictions = suggestion.code;
+
+    this.setState({
+      hasFormChanged: true,
+      giftCardSelected: clonedRestrictions,
+    });
+  }
+
   // Autosuggest will call this function every time you need to update suggestions.
   // You already implemented this logic above, so just use it.
 
@@ -477,12 +503,23 @@ class Step4CheckoutCurrent extends React.Component {
     });
   }
 
+  onSuggestionsFetchRequestedGiftCards({ value }) {
+    this.setState({
+      suggestionsGiftCards: this.getSuggestionsGiftCards(value),
+    });
+  }
+
   onSuggestionsClearRequestedTypes() {
     this.setState({
       suggestionsTypes: [],
     });
   }
 
+  onSuggestionsClearRequestedGiftCards() {
+    this.setState({
+      suggestionsGiftCards: [],
+    });
+  }
   // Teach Autosuggest how to calculate suggestions for any given input value.
   getSuggestionsTypes(value) {
     const inputValue = value.trim().toLowerCase();
@@ -512,6 +549,34 @@ class Step4CheckoutCurrent extends React.Component {
       </MenuItem>
     );
   }
+
+  getSuggestionsGiftCards(value) {
+    const inputValue = value.trim();
+    const inputLength = inputValue.length;
+
+
+    return inputLength === 0
+      ? []
+      : this.props.giftCards.filter(
+        card => card.code.slice(0, inputLength) === inputValue,
+      );
+  }
+
+  // When suggestion is clicked, Autosuggest needs to populate the input
+  // based on the clicked suggestion. Teach Autosuggest how to calculate the
+  // input value for every given suggestion.
+  getSuggestionValueGiftCards(suggestion) {
+    return suggestion.code;
+  }
+
+  renderSuggestionGiftCards(suggestion) {
+    return (
+      <MenuItem component="div">
+        <Typography type="subheading">{suggestion.code}</Typography>
+      </MenuItem>
+    );
+  }
+
 
   renderInputTypes(inputProps) {
     const { value, ...other } = inputProps;
@@ -622,6 +687,38 @@ class Step4CheckoutCurrent extends React.Component {
     });
   }
 
+  handleApplyGiftCard() {
+
+    if (this.props.subscription.hasOwnProperty('giftCardApplied')) {
+      this.props.popTheSnackbar({
+        message: 'There is already a gift card present on the subscription.',
+      });
+
+      return;
+    }
+
+    const giftCardDetails = {
+      code: this.state.giftCardSelected,
+      customerId: this.props.customer._id,
+    };
+
+    // console.log(discountDetails)
+
+    Meteor.call('giftcards.addToCustomer', giftCardDetails, (err, res) => {
+
+      if (err) {
+        this.props.popTheSnackbar({
+          message: err.reason,
+        });
+      } else {
+        this.props.popTheSnackbar({
+          message: 'Gift card added successfully.',
+        });
+      }
+    });
+  }
+
+
   handleSaveDiscount() {
 
     const discountDetails = {
@@ -656,11 +753,11 @@ class Step4CheckoutCurrent extends React.Component {
               message: 'Discount added successfully.',
             });
           }
-          
+
           this.setState({
             orderSummaryDialogOpen: false,
           });
-        
+
         });
       }
     });
@@ -715,6 +812,11 @@ class Step4CheckoutCurrent extends React.Component {
   openDiscountDeleteConfirmDialog(type) {
 
     this.openDiscountDeleteDialog();
+  }
+
+  openGiftCardRemoveConfirmDialog(type) {
+
+    this.openGiftCardRemoveDialog();
   }
 
   handleRemoveDiscountConfirmed() {
@@ -911,31 +1013,31 @@ class Step4CheckoutCurrent extends React.Component {
                   {this.state.paymentProfileLoading ? (
                     <CircularProgress size={30} />
                   ) : (
-                      this.state.paymentMethod === 'card' && this.state.paymentProfileDetails != null && (
-                        <div>
-                          <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <div>
-                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Visa' && (<img width="80" src="/visa.svg" />)}
+                    this.state.paymentMethod === 'card' && this.state.paymentProfileDetails != null && (
+                      <div>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div>
+                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Visa' && (<img width="80" src="/visa.svg" />)}
 
-                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Mastercard' && (<img width="80" src="/mastercard.svg" />)}
+                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Mastercard' && (<img width="80" src="/mastercard.svg" />)}
 
-                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'AmericanExpress' && (<img width="80" src="/amex.svg" />)}
+                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'AmericanExpress' && (<img width="80" src="/amex.svg" />)}
 
-                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Discover' && (<img width="80" src="/discover.svg" />)}
+                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Discover' && (<img width="80" src="/discover.svg" />)}
 
-                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'JCB' && (<img width="80" src="/jcb.svg" />)}
+                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'JCB' && (<img width="80" src="/jcb.svg" />)}
 
-                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'DinersClub' && (<img width="80" src="/diners.svg" />)}
-                            </div>
-                            <div style={{ marginLeft: '10px' }}>
-                              <Typography type="body2">Card {this.state.paymentProfileDetails.payment.creditCard.cardNumber}</Typography>
-                              <Typography type="body2">Expiry {this.state.paymentProfileDetails.payment.creditCard.expirationDate}</Typography>
-                            </div>
-                            <Button onClick={this.openEditPaymentMethodDialog} style={{ marginLeft: '1em' }}>Edit</Button>
+                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'DinersClub' && (<img width="80" src="/diners.svg" />)}
                           </div>
+                          <div style={{ marginLeft: '10px' }}>
+                            <Typography type="body2">Card {this.state.paymentProfileDetails.payment.creditCard.cardNumber}</Typography>
+                            <Typography type="body2">Expiry {this.state.paymentProfileDetails.payment.creditCard.expirationDate}</Typography>
+                          </div>
+                          <Button onClick={this.openEditPaymentMethodDialog} style={{ marginLeft: '1em' }}>Edit</Button>
                         </div>
-                      )
-                    )}
+                      </div>
+                    )
+                  )}
 
                   {this.state.paymentMethod === 'cash' ? (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -1089,8 +1191,107 @@ class Step4CheckoutCurrent extends React.Component {
                         />
                       ))
                     ) : (
-                        <Chip className="chip--bordered" label="Discount code" />
-                      )}
+                      <Chip className="chip--bordered" label="Discount code" />
+                    )}
+                  </div>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography type="headline" style={{ margin: '25px 0', display: 'flex', alignItems: 'center' }}>Gift card</Typography>
+                  <Typography type="body1">Configure the gift card balance before applying</Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+
+                  <Grid container>
+                    <Grid item xs={8} style={{ position: 'relative' }}>
+                      <Search
+                        className="autoinput-icon"
+                        style={{ right: '0 !important' }}
+                      />
+                      <Autosuggest
+                        id="1"
+                        className="autosuggest"
+                        theme={{
+                          container: {
+                            flexGrow: 1,
+                            position: 'relative',
+                          },
+                          suggestionsContainerOpen: {
+                            position: 'absolute',
+                            left: 0,
+                            right: 0,
+                          },
+                          suggestion: {
+                            display: 'block',
+                          },
+                          suggestionsList: {
+                            margin: 0,
+                            padding: 0,
+                            listStyleType: 'none',
+                          },
+                        }}
+                        renderInputComponent={this.renderInputTypes.bind(this)}
+                        suggestions={this.state.suggestionsGiftCards}
+                        onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedGiftCards.bind(
+                          this,
+                        )}
+                        onSuggestionsClearRequested={this.onSuggestionsClearRequestedGiftCards.bind(
+                          this,
+                        )}
+                        onSuggestionSelected={this.onSuggestionSelectedGiftCards.bind(
+                          this,
+                        )}
+                        getSuggestionValue={this.getSuggestionValueGiftCards.bind(
+                          this,
+                        )}
+                        renderSuggestion={this.renderSuggestionGiftCards.bind(this)}
+                        renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(
+                          this,
+                        )}
+                        focusInputOnSuggestionClick={false}
+                        inputProps={{
+                          placeholder: 'Search',
+                          value: this.state.valueGiftCards,
+                          onChange: this.onChangeGiftCards.bind(this),
+                          className: 'auto type-autocomplete',
+                        }}
+                      />
+                    </Grid>
+                    <Grid item xs={4}>
+                      <Button
+                        onClick={this.handleApplyGiftCard}
+                        disabled={this.state.giftCardApplied.length > 0 || this.state.giftCardSelected == ''}
+                      >
+                        Apply
+                      </Button>
+                    </Grid>
+
+                  </Grid>
+
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      flexWrap: 'wrap',
+                      marginTop: '25px',
+                    }}
+                  >
+                    {this.state.giftCardApplied != '' ? (
+                      _.filter(this.props.giftCards, u => u._id == this.state.giftCardApplied).map((e, i) => (
+                        <Chip
+                          style={{ marginRight: '8px', marginBottom: '8px' }}
+                          label={`${e.code}`}
+                          key={i}
+                          onDelete={this.openGiftCardRemoveConfirmDialog.bind(
+                            this,
+                            e,
+                          )}
+                        />
+                      ))
+                    ) : (
+                      <Chip className="chip--bordered" label="Gift card" />
+                    )}
                   </div>
                 </Grid>
 
@@ -1295,7 +1496,7 @@ class Step4CheckoutCurrent extends React.Component {
           <Grid item xs={12} sm={5}>
             <Paper elevation={2} className="paper-for-fields">
 
-              {this.state.summaryLoading && ( <CircularProgress size={30} /> )}
+              {this.state.summaryLoading && (<CircularProgress size={30} />)}
 
               {this.state.summaryLoaded && (
                 <Grid container>
@@ -1330,12 +1531,12 @@ class Step4CheckoutCurrent extends React.Component {
                       <Grid item xs={6}>
                         <Typography type="subheading">
                           {this.state.primaryProfileBilling
-                            ? `${this.state.primaryProfileBilling.breakfast
-                              .totalQty +
-                            this.state.primaryProfileBilling.lunch
-                              .totalQty +
-                            this.state.primaryProfileBilling.dinner
-                              .totalQty} meals`
+                            ? `${this.state.primaryProfileBilling.breakfast.totalQty +
+                            this.state.primaryProfileBilling.lunch.totalQty +
+                            this.state.primaryProfileBilling.dinner.totalQty +
+                            this.state.primaryProfileBilling.chefsChoiceBreakfast.totalQty +
+                            this.state.primaryProfileBilling.chefsChoiceLunch.totalQty +
+                            this.state.primaryProfileBilling.chefsChoiceDinner.totalQty} meals`
                             : ''}
                         </Typography>
                       </Grid>
@@ -1345,16 +1546,12 @@ class Step4CheckoutCurrent extends React.Component {
                           style={{ textAlign: 'right' }}
                         >
                           ${this.state.primaryProfileBilling
-                            ? this.state.primaryProfileBilling.breakfast
-                              .totalQty *
-                            this.state.primaryProfileBilling
-                              .breakfastPrice +
-                            this.state.primaryProfileBilling.lunch
-                              .totalQty *
-                            this.state.primaryProfileBilling.lunchPrice +
-                            this.state.primaryProfileBilling.dinner
-                              .totalQty *
-                            this.state.primaryProfileBilling.dinnerPrice
+                            ? this.state.primaryProfileBilling.breakfast.totalQty * this.state.primaryProfileBilling.breakfastPrice +
+                            this.state.primaryProfileBilling.lunch.totalQty * this.state.primaryProfileBilling.lunchPrice +
+                            this.state.primaryProfileBilling.dinner.totalQty * this.state.primaryProfileBilling.dinnerPrice +
+                            this.state.primaryProfileBilling.chefsChoiceBreakfast.totalQty * this.state.primaryProfileBilling.chefsChoiceBreakfastPrice +
+                            this.state.primaryProfileBilling.chefsChoiceLunch.totalQty * this.state.primaryProfileBilling.chefsChoiceLunchPrice +
+                            this.state.primaryProfileBilling.chefsChoiceDinner.totalQty * this.state.primaryProfileBilling.chefsChoiceDinnerPrice
                             : ''}
                         </Typography>
                       </Grid>
@@ -1405,7 +1602,7 @@ class Step4CheckoutCurrent extends React.Component {
                         0 ||
                         this.state.primaryProfileBilling
                           .totalBodybuilderSurcharge > 0) ? (
-                        <Grid item xs={12}>
+                            <Grid item xs={12}>
                           <Typography
                             type="body2"
                             className="font-medium font-uppercase"
@@ -1456,7 +1653,7 @@ class Step4CheckoutCurrent extends React.Component {
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling
                         .totalBodybuilderSurcharge > 0 ? (
-                        <Grid container>
+                          <Grid container>
                           <Grid item xs={12} sm={6}>
                             <Typography type="subheading">
                               Bodybuilder
@@ -1494,17 +1691,17 @@ class Step4CheckoutCurrent extends React.Component {
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.restrictionsActual
                         .length > 0 && (
-                        <Typography
-                          type="body2"
-                          className="font-medium font-uppercase"
-                          style={{
-                            marginTop: '.75em',
-                            marginBottom: '.75em',
-                          }}
-                        >
+                      <Typography
+                        type="body2"
+                        className="font-medium font-uppercase"
+                        style={{
+                          marginTop: '.75em',
+                          marginBottom: '.75em',
+                        }}
+                      >
                           Restrictions
-                        </Typography>
-                      )}
+                      </Typography>
+                    )}
 
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.restrictionsActual
@@ -1590,9 +1787,8 @@ class Step4CheckoutCurrent extends React.Component {
                           <Grid container>
                             <Grid item xs={6}>
                               <Typography type="subheading">
-                                {`${e.breakfast.totalQty +
-                                  e.lunch.totalQty +
-                                  e.dinner.totalQty} meals`}
+                                {`${e.breakfast.totalQty + e.lunch.totalQty + e.dinner.totalQty +
+                                  e.chefsChoiceBreakfast.totalQty + e.chefsChoiceLunch.totalQty + e.chefsChoiceDinner.totalQty} meals`}
                               </Typography>
                             </Grid>
                             <Grid item xs={6}>
@@ -1602,43 +1798,46 @@ class Step4CheckoutCurrent extends React.Component {
                               >
                                 ${e.breakfast.totalQty * e.breakfastPrice +
                                   e.lunch.totalQty * e.lunchPrice +
-                                  e.dinner.totalQty * e.dinnerPrice}
+                                  e.dinner.totalQty * e.dinnerPrice +
+                                  e.chefsChoiceBreakfast.totalQty * e.chefsChoiceBreakfastPrice +
+                                  e.chefsChoiceLunch.totalQty * e.chefsChoiceLunchPrice +
+                                  e.chefsChoiceDinner.totalQty * e.chefsChoiceDinnerPrice}
                               </Typography>
                             </Grid>
                           </Grid>
                           {/* discount secondary = */}
                           {e.discountActual &&
                             e.discountActual > 0 && (
-                              <Grid container>
-                                <Grid item xs={12}>
-                                  <Typography
-                                    type="body2"
-                                    className="font-medium font-uppercase"
-                                    style={{ marginTop: '.75em' }}
-                                  >
+                            <Grid container>
+                              <Grid item xs={12}>
+                                <Typography
+                                  type="body2"
+                                  className="font-medium font-uppercase"
+                                  style={{ marginTop: '.75em' }}
+                                >
                                     Discount
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <Typography type="subheading">
-                                    {e.discount.charAt(0).toUpperCase() +
+                                </Typography>
+                              </Grid>
+                              <Grid item xs={12} sm={6}>
+                                <Typography type="subheading">
+                                  {e.discount.charAt(0).toUpperCase() +
                                       e.discount.substr(
                                         1,
                                         e.discount.length,
                                       )}
-                                  </Typography>
-                                </Grid>
-                                <Grid item xs={12} sm={6}>
-                                  <Typography
-                                    type="subheading"
-                                    style={{ textAlign: 'right' }}
-                                  >
-                                    -${e.discountActual}{' '}
-                                  </Typography>
-                                </Grid>
-
+                                </Typography>
                               </Grid>
-                            )}
+                              <Grid item xs={12} sm={6}>
+                                <Typography
+                                  type="subheading"
+                                  style={{ textAlign: 'right' }}
+                                >
+                                    -${e.discountActual}{' '}
+                                </Typography>
+                              </Grid>
+
+                            </Grid>
+                          )}
 
                           {e.totalAthleticSurcharge > 0 ||
                             e.totalBodybuilderSurcharge > 0 ? (
@@ -1682,8 +1881,8 @@ class Step4CheckoutCurrent extends React.Component {
                               </Grid>
                             </Grid>
                           ) : (
-                              ''
-                            )}
+                            ''
+                          )}
 
                           {e.totalBodybuilderSurcharge > 0 ? (
                             <Grid container>
@@ -1713,8 +1912,8 @@ class Step4CheckoutCurrent extends React.Component {
                               </Grid>
                             </Grid>
                           ) : (
-                              ''
-                            )}
+                            ''
+                          )}
 
                           {e.restrictionsActual.length > 0 && (
                             <Typography
@@ -1797,7 +1996,7 @@ class Step4CheckoutCurrent extends React.Component {
                           {this.state.primaryProfileBilling &&
                             this.state.primaryProfileBilling.deliveryCost > 0
                             ? `$${
-                            this.state.primaryProfileBilling.deliveryCost
+                              this.state.primaryProfileBilling.deliveryCost
                             }`
                             : 'Free'}
                         </Typography>
@@ -1807,85 +2006,85 @@ class Step4CheckoutCurrent extends React.Component {
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.deliverySurcharges >
                       0 && (
-                        <Grid container>
-                          <Grid item xs={6}>
-                            <Typography type="subheading">
+                      <Grid container>
+                        <Grid item xs={6}>
+                          <Typography type="subheading">
                               Delivery Surcharge (${
-                                this.props.postalCodes.find(
-                                  el =>
-                                    el.title ===
+                              this.props.postalCodes.find(
+                                el =>
+                                  el.title ===
                                     this.props.customer.postalCode.substring(
                                       0,
                                       3,
                                     ),
-                                ).extraSurcharge
-                              })
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={6}>
-                            <Typography
-                              type="subheading"
-                              style={{ textAlign: 'right' }}
-                            >
-                              {this.state.primaryProfileBilling &&
+                              ).extraSurcharge
+                            })
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={6}>
+                          <Typography
+                            type="subheading"
+                            style={{ textAlign: 'right' }}
+                          >
+                            {this.state.primaryProfileBilling &&
                                 this.state.primaryProfileBilling
                                   .deliverySurcharges > 0
-                                ? `$${
+                              ? `$${
                                 this.state.primaryProfileBilling
                                   .deliverySurcharges
-                                }`
-                                : ''}
-                            </Typography>
-                          </Grid>
+                              }`
+                              : ''}
+                          </Typography>
                         </Grid>
-                      )}
+                      </Grid>
+                    )}
                     {this.state.primaryProfileBilling.discountTotal > 0 && !this.state.discountBeingRemoved
-                    && this.props.subscription.hasOwnProperty('discountApplied') ? (
-                      <div style={{ marginTop: '25px' }}>
-                        <Grid container>
-                          <Grid item xs={12}>
-                            <Typography type="title">Discount</Typography>
+                      && this.props.subscription.hasOwnProperty('discountApplied') ? (
+                        <div style={{ marginTop: '25px' }}>
+                          <Grid container>
+                            <Grid item xs={12}>
+                              <Typography type="title">Discount</Typography>
+                            </Grid>
                           </Grid>
-                        </Grid>
-                        <Grid container>
-                          <Grid item xs={12} sm={6}>
-                            <Typography type="body2">
-                              {this.props.discounts && this.state.discountApplied && this.props.discounts.find(e => this.props.subscription.discountApplied == e._id).title}
-                            </Typography>
+                          <Grid container>
+                            <Grid item xs={12} sm={6}>
+                              <Typography type="body2">
+                                {this.props.discounts && this.state.discountApplied && this.props.discounts.find(e => this.props.subscription.discountApplied == e._id).title}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12} sm={6}>
+                              <Typography
+                                type="subheading"
+                                style={{ textAlign: 'right' }}
+                              >
+                                -${
+                                  this.state.primaryProfileBilling.discountTotal
+                                }{' '}
+                              </Typography>
+                            </Grid>
                           </Grid>
-                          <Grid item xs={12} sm={6}>
-                            <Typography
-                              type="subheading"
-                              style={{ textAlign: 'right' }}
-                            >
-                              -${
-                                this.state.primaryProfileBilling.discountTotal
-                              }{' '}
-                            </Typography>
-                          </Grid>
-                        </Grid>
-                      </div>
-                    ) : ''}
+                        </div>
+                      ) : ''}
 
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.coolerBag > 0 && (
-                        <Grid container>
-                          <Grid item xs={6}>
-                            <Typography type="subheading">
+                      <Grid container>
+                        <Grid item xs={6}>
+                          <Typography type="subheading">
                               Cooler bag
-                            </Typography>
-                          </Grid>
-                          <Grid item xs={6}>
-                            <Typography
-                              type="subheading"
-                              style={{ textAlign: 'right' }}
-                            >
-                              {/* $20.00 */}
-                              $0
-                            </Typography>
-                          </Grid>
+                          </Typography>
                         </Grid>
-                      )}
+                        <Grid item xs={6}>
+                          <Typography
+                            type="subheading"
+                            style={{ textAlign: 'right' }}
+                          >
+                            {/* $20.00 */}
+                              $0
+                          </Typography>
+                        </Grid>
+                      </Grid>
+                    )}
 
                     <Typography
                       type="title"
@@ -1911,8 +2110,8 @@ class Step4CheckoutCurrent extends React.Component {
                         </Grid>
                       </Grid>
                     ) : (
-                        ''
-                      )}
+                      ''
+                    )}
                     <Grid container>
                       <Grid item xs={12} sm={6}>
                         <Typography type="title">Total</Typography>
@@ -1932,7 +2131,7 @@ class Step4CheckoutCurrent extends React.Component {
                             this.state.primaryProfileBilling.taxes}/week`
                             : this.state.primaryProfileBilling &&
                             `$${
-                            this.state.primaryProfileBilling.groupTotal
+                              this.state.primaryProfileBilling.groupTotal
                             }/week`}
                         </Typography>
                       </Grid>
@@ -1957,8 +2156,10 @@ class Step4CheckoutCurrent extends React.Component {
                       <Typography type="title" color="inherit" className={this.props.classes.flex}>
                         Subscription update
                       </Typography>
-                      <Button color="inherit"
-                        onClick={this.state.discountBeingRemoved ? this.handleRemoveDiscount : this.handleSaveDiscount}>
+                      <Button
+color="inherit"
+                        onClick={this.state.discountBeingRemoved ? this.handleRemoveDiscount : this.handleSaveDiscount}
+                      >
                         Save</Button>
                     </Toolbar>
                   </AppBar>

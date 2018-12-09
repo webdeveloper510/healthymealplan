@@ -37,6 +37,21 @@ function setUpLifestyles() {
         athletic: 0,
         bodybuilder: 0,
       },
+      chefsChoiceBreakfast: {
+        regular: 0,
+        athletic: 0,
+        bodybuilder: 0,
+      },
+      chefsChoiceLunch: {
+        regular: 0,
+        athletic: 0,
+        bodybuilder: 0,
+      },
+      chefsChoiceDinner: {
+        regular: 0,
+        athletic: 0,
+        bodybuilder: 0,
+      },
     });
   });
 
@@ -143,6 +158,18 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       if (e.dinner.active) {
         this.dataByLifestyle[lifestyleIndex].dinner[e.dinner.portions] += parseInt(e.dinner.quantity, 10);
       }
+
+      if (e.chefsChoiceBreakfast.active) {
+        this.dataByLifestyle[lifestyleIndex].chefsChoiceBreakfast[e.chefsChoiceBreakfast.portions] += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+      }
+
+      if (e.chefsChoiceLunch.active) {
+        this.dataByLifestyle[lifestyleIndex].chefsChoiceLunch[e.chefsChoiceLunch.portions] += parseInt(e.chefsChoiceLunch.quantity, 10);
+      }
+
+      if (e.chefsChoiceDinner.active) {
+        this.dataByLifestyle[lifestyleIndex].chefsChoiceDinner[e.chefsChoiceDinner.portions] += parseInt(e.chefsChoiceDinner.quantity, 10);
+      }
     });
   };
 
@@ -176,6 +203,21 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       athleticDinner: 0,
       bodybuilderDinner: 0,
       dinnerPlate: null,
+
+      chefsChoiceBreakfast: 0,
+      athleticChefsChoiceBreakfast: 0,
+      bodybuilderChefsChoiceBreakfast: 0,
+      chefsChoiceBreakfastPlate: null,
+
+      chefsChoiceLunch: 0,
+      athleticChefsChoiceLunch: 0,
+      bodybuilderChefsChoiceLunch: 0,
+      chefsChoiceLunchPlate: null,
+
+      chefsChoiceDinner: 0,
+      athleticChefsChoiceDinner: 0,
+      bodybuilderChefsChoiceDinner: 0,
+      chefsChoiceDinnerPlate: null,
 
       schedule: customer.schedule,
       delivery,
@@ -213,6 +255,36 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
           customerToAdd.dinner += parseInt(e.dinner.quantity, 10);
         }
       }
+
+      if (e.chefsChoiceBreakfast.active) {
+        if (e.chefsChoiceBreakfast.portions == 'athletic') {
+          customerToAdd.athleticChefsChoiceBreakfast += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+        } else if (e.chefsChoiceBreakfast.portions == 'bodybuilder') {
+          customerToAdd.bodybuilderChefsChoiceBreakfast += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+        } else if (e.chefsChoiceBreakfast.portions == 'regular') {
+          customerToAdd.chefsChoiceBreakfast += parseInt(e.chefsChoiceBreakfast.quantity, 10);
+        }
+      }
+
+      if (e.chefsChoiceLunch.active) {
+        if (e.chefsChoiceLunch.portions == 'athletic') {
+          customerToAdd.athleticChefsChoiceLunch += parseInt(e.chefsChoiceLunch.quantity, 10);
+        } else if (e.chefsChoiceLunch.portions == 'bodybuilder') {
+          customerToAdd.bodybuilderChefsChoiceLunch += parseInt(e.chefsChoiceLunch.quantity, 10);
+        } else if (e.chefsChoiceLunch.portions == 'regular') {
+          customerToAdd.chefsChoiceLunch += parseInt(e.chefsChoiceLunch.quantity, 10);
+        }
+      }
+
+      if (e.chefsChoiceDinner.active) {
+        if (e.chefsChoiceDinner.portions == 'athletic') {
+          customerToAdd.athleticChefsChoiceDinner += parseInt(e.chefsChoiceDinner.quantity, 10);
+        } else if (e.chefsChoiceDinner.portions == 'bodybuilder') {
+          customerToAdd.bodybuilderChefsChoiceDinner += parseInt(e.chefsChoiceDinner.quantity, 10);
+        } else if (e.chefsChoiceDinner.portions == 'regular') {
+          customerToAdd.chefsChoiceDinner += parseInt(e.chefsChoiceDinner.quantity, 10);
+        }
+      }
     });
 
     if (customer.restrictions.length > 0) {
@@ -248,7 +320,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       const customerSchedule = customer.schedule;
       const customerLifestyleId = customer.lifestyle;
       const lifestyleIndex = this.dataByLifestyle.findIndex(e => e.id === customerLifestyleId);
-      // console.log(`Lifestyle Index${lifestyleIndex}`);
+      // console.log(customerId);
 
       for (let index = 0; index < delivery.length; index++) {
         const e = delivery[index];

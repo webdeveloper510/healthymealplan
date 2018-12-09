@@ -116,14 +116,44 @@ Meteor.methods({
     return updated;
   },
 
-  'giftcards.verify': function verifyDiscountCode(giftCardDetails) {
+
+  'giftcards.addToCustomer': function verifyDiscountCode(giftCardDetails) {
     check(giftCardDetails, {
       code: String,
-      customerEmail: Match.Optional(String),
+      customerId: String,
     });
 
     const giftCard = GiftCards.findOne({ code: giftCardDetails.code });
 
+    if (giftCard) {
+
+      if (giftCard.customerType == "specific" && giftCard.customer) {
+        throw new Meteor.Error(500, 'Gift card is already in use.')
+      }
+
+    }
+
+    const subscription = Subscriptions.findOne({ customerId: giftCardDetails.customerId })
+
+    try {
+      Subscriptions.update({ _id: subscription._id }, {
+        $set: {
+          giftCardApplied: giftCard._id,
+        }
+      });
+
+      GiftCards.update({
+        _id: giftCard._id
+      }, {
+          $set: {
+            customerType: 'specific',
+            customer: subscription.customerId,
+          }
+        })
+    } catch (error) {
+      console.log(error);
+      throw new Meteor.Error(500, 'There was a problem assigning gift cards');
+    }
 
     return true;
   },
