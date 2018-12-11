@@ -30,7 +30,10 @@ Meteor.methods({
     check(lifestyle.prices, {
       breakfast: [Number],
       lunch: [Number],
-      dinner: [Number]
+      dinner: [Number],
+      chefsChoiceBreakfast: [Number],
+      chefsChoiceLunch: [Number],
+      chefsChoiceDinner: [Number],
     });
 
     const existsLifestyle = Lifestyles.findOne({ title: lifestyle.title });
@@ -114,7 +117,10 @@ Meteor.methods({
     check(lifestyle.prices, {
       breakfast: [Number],
       lunch: [Number],
-      dinner: [Number]
+      dinner: [Number],
+      chefsChoiceBreakfast: [Number],
+      chefsChoiceLunch: [Number],
+      chefsChoiceDinner: [Number],
     });
 
     try {
