@@ -270,7 +270,6 @@ class LifestyleEditor extends React.Component {
     $('[name*="price_"]').on("change", () => {
       this.setState({
         hasFormChanged: true,
-        restrictions: clonedRestrictions
       });
     });
   }
@@ -520,7 +519,10 @@ class LifestyleEditor extends React.Component {
       prices: {
         breakfast: [],
         lunch: [],
-        dinner: []
+        dinner: [],
+        chefsChoiceBreakfast: [],
+        chefsChoiceLunch: [],
+        chefsChoiceDinner: []
       },
       custom: this.state.custom,
       disableRestrictions: this.state.disableRestrictions
@@ -598,13 +600,22 @@ class LifestyleEditor extends React.Component {
     }
 
     for (let i = 1; i <= 8; i += 1) {
-      const brekafastInput = `input[name='price_breakfast_${i}']`;
+      const breakfastInput = `input[name='price_breakfast_${i}']`;
       const lunchInput = `input[name='price_lunch_${i}']`;
       const dinnerInput = `input[name='price_dinner_${i}']`;
 
-      lifestyle.prices.breakfast.push(parseFloat($(brekafastInput).val()));
+      const chefsChoiceBreakfastInput = `input[name='price_chefsChoiceBreakfast_${i}']`;
+      const chefsChoiceLunchInput = `input[name='price_chefsChoiceLunch_${i}']`;
+      const chefsChoiceDinnerInput = `input[name='price_chefsChoiceDinner_${i}']`;
+
+      lifestyle.prices.breakfast.push(parseFloat($(breakfastInput).val()));
       lifestyle.prices.lunch.push(parseFloat($(lunchInput).val()));
       lifestyle.prices.dinner.push(parseFloat($(dinnerInput).val()));
+    
+      lifestyle.prices.chefsChoiceBreakfast.push(parseFloat($(chefsChoiceBreakfastInput).val()));
+      lifestyle.prices.chefsChoiceLunch.push(parseFloat($(chefsChoiceLunchInput).val()));
+      lifestyle.prices.chefsChoiceDinner.push(parseFloat($(chefsChoiceDinnerInput).val()));
+    
     }
 
     console.log(lifestyle);
@@ -1662,6 +1673,626 @@ class LifestyleEditor extends React.Component {
                                     : this.props.lifestyle.prices.dinner[7]
                                 }
                                 name="price_dinner_8"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                        </TableBody>
+                      </Table>
+                    </Grid>
+                  </Grid>
+                </Paper>
+              </Grid>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Divider light className="divider--space-x" />
+
+        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+          <Grid item xs={12}>
+            <Grid container>
+              <Grid item xs={12} sm={4}>
+                <Typography
+                  type="subheading"
+                  className="subheading font-medium"
+                >
+                  Chef's Choice Price
+                </Typography>
+              </Grid>
+              <Grid item xs={12} sm={8}>
+                <Paper elevation={2} className="paper-for-fields">
+                  <Grid container>
+                    <Grid item xs={12}>
+                      <Table className="table-lifestyles">
+                        <TableHead>
+                          <TableRow>
+                            <TableCell />
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <Typography
+                                type="subheading"
+                                className="font-medium font-uppercase"
+                              >
+                                Breakfast
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <Typography
+                                type="subheading"
+                                className="font-medium font-uppercase"
+                              >
+                                Lunch
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <Typography
+                                type="subheading"
+                                className="font-medium font-uppercase"
+                              >
+                                Dinner
+                              </Typography>
+                            </TableCell>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody>
+                          <TableRow>
+                            <TableCell>
+                              <Typography
+                                type="subheading"
+                                style={{ marginTop: "10px" }}
+                              >
+                                Individual
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceBreakfast[0]
+                                }
+                                name="price_chefsChoiceBreakfast_1"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceLunch[0]
+                                }
+                                name="price_chefsChoiceLunch_1"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceDinner[0]
+                                }
+                                name="price_chefsChoiceDinner_1"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>
+                              <Typography
+                                type="subheading"
+                                style={{ marginTop: "10px" }}
+                              >
+                                Two
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceBreakfast[1]
+                                }
+                                name="price_chefsChoiceBreakfast_2"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceLunch[1]
+                                }
+                                name="price_chefsChoiceLunch_2"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceDinner[1]
+                                }
+                                name="price_chefsChoiceDinner_2"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>
+                              <Typography
+                                type="subheading"
+                                style={{ marginTop: "10px" }}
+                              >
+                                Three
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceBreakfast[2]
+                                }
+                                name="price_chefsChoiceBreakfast_3"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceLunch[2]
+                                }
+                                name="price_chefsChoiceLunch_3"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceDinner[2]
+                                }
+                                name="price_chefsChoiceDinner_3"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>
+                              <Typography
+                                type="subheading"
+                                style={{ marginTop: "10px" }}
+                              >
+                                Four
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceBreakfast[3]
+                                }
+                                name="price_chefsChoiceBreakfast_4"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceLunch[3]
+                                }
+                                name="price_chefsChoiceLunch_4"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceDinner[3]
+                                }
+                                name="price_chefsChoiceDinner_4"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>
+                              <Typography
+                                type="subheading"
+                                style={{ marginTop: "10px" }}
+                              >
+                                Five
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceBreakfast[4]
+                                }
+                                name="price_chefsChoiceBreakfast_5"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceLunch[4]
+                                }
+                                name="price_chefsChoiceLunch_5"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceDinner[4]
+                                }
+                                name="price_chefsChoiceDinner_5"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>
+                              <Typography
+                                type="subheading"
+                                style={{ marginTop: "10px" }}
+                              >
+                                Six
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceBreakfast[5]
+                                }
+                                name="price_chefsChoiceBreakfast_6"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceLunch[5]
+                                }
+                                name="price_chefsChoiceLunch_6"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceDinner[5]
+                                }
+                                name="price_chefsChoiceDinner_6"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>
+                              <Typography
+                                type="subheading"
+                                style={{ marginTop: "10px" }}
+                              >
+                                Seven
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceBreakfast[6]
+                                }
+                                name="price_chefsChoiceBreakfast_7"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceLunch[6]
+                                }
+                                name="price_chefsChoiceLunch_7"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceDinner[6]
+                                }
+                                name="price_chefsChoiceDinner_7"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+                          </TableRow>
+                          <TableRow>
+                            <TableCell>
+                              <Typography
+                                type="subheading"
+                                style={{ marginTop: "10px" }}
+                              >
+                                Eight
+                              </Typography>
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceBreakfast[7]
+                                }
+                                name="price_chefsChoiceBreakfast_8"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceLunch[7]
+                                }
+                                name="price_chefsChoiceLunch_8"
+                                onChange={this.changeTableField.bind(this)}
+                              />
+                            </TableCell>
+
+                            <TableCell style={{ textAlign: "center" }}>
+                              <TextField
+                                fullWidth
+                                margin="normal"
+                                style={{
+                                  fontSize: "1rem",
+                                  maxWidth: "100px",
+                                  minWidth: "100px"
+                                }}
+                                inputProps={{ type: "number" }}
+                                defaultValue={
+                                  this.props.newLifestyle
+                                    ? ""
+                                    : this.props.lifestyle.prices.chefsChoiceDinner[7]
+                                }
+                                name="price_chefsChoiceDinner_8"
                                 onChange={this.changeTableField.bind(this)}
                               />
                             </TableCell>

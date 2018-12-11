@@ -1,158 +1,185 @@
 /* eslint-disable consistent-return */
 
-import { Mongo } from "meteor/mongo";
-import SimpleSchema from "simpl-schema";
+import { Mongo } from 'meteor/mongo';
+import SimpleSchema from 'simpl-schema';
 
-const Lifestyles = new Mongo.Collection("Lifestyles");
+const Lifestyles = new Mongo.Collection('Lifestyles');
 
 Lifestyles.allow({
   insert: () => false,
   update: () => false,
-  remove: () => false
+  remove: () => false,
 });
 
 Lifestyles.deny({
   insert: () => true,
   update: () => true,
-  remove: () => true
+  remove: () => true,
 });
 
 Lifestyles.schema = new SimpleSchema({
   SKU: {
     type: String,
-    label: "The SKU of the "
+    label: 'The SKU of the ',
   },
   title: {
     type: String,
-    label: "The title of the lifestyle."
+    label: 'The title of the lifestyle.',
   },
   custom: {
     type: Boolean,
-    label: "If it is a custom lifestyle."
+    label: 'If it is a custom lifestyle.',
   },
   restrictions: {
     type: Array,
-    label: "The restrictions that belong to the lifestyle"
+    label: 'The restrictions that belong to the lifestyle',
   },
-  "restrictions.$": {
+  'restrictions.$': {
     type: String,
-    label: "The id of each type"
+    label: 'The id of each type',
   },
   prices: {
     type: Object,
-    label: "Prices for this type of lifestyle."
+    label: 'Prices for this type of lifestyle.',
   },
-  "prices.breakfast": {
+  'prices.breakfast': {
     type: Array,
-    label: "Price for breakfast meal type"
+    label: 'Price for breakfast meal type',
   },
-  "prices.lunch": {
+  'prices.lunch': {
     type: Array,
-    label: "Price for lunch meal type."
+    label: 'Price for lunch meal type.',
   },
-  "prices.dinner": {
+  'prices.dinner': {
     type: Array,
-    label: "Price for breakfast dinner meal type."
+    label: 'Price for breakfast dinner meal type.',
   },
-  "prices.breakfast.$": {
+  'prices.breakfast.$': {
     type: Number,
     label:
-      "Price of the meal type for each person. Index is the number of people 0 - 7."
+      'Price of the meal type for each person. Index is the number of people 0 - 7.',
   },
-  "prices.lunch.$": {
+  'prices.lunch.$': {
     type: Number,
     label:
-      "Price of the meal type for each person. Index is the number of people 0 - 7."
+      'Price of the meal type for each person. Index is the number of people 0 - 7.',
   },
-  "prices.dinner.$": {
+  'prices.dinner.$': {
     type: Number,
     label:
-      "Price of the meal type for each person. Index is the number of people 0 - 7."
+      'Price of the meal type for each person. Index is the number of people 0 - 7.',
+  },
+  'prices.chefsChoiceBreakfast': {
+    type: Array,
+    label: 'Price for chefs choice breakfast meal type',
+  },
+  'prices.chefsChoiceLunch': {
+    type: Array,
+    label: 'Price for chefs choice lunch meal type.',
+  },
+  'prices.chefsChoiceDinner': {
+    type: Array,
+    label: 'Price for chefs choice dinner meal type.',
+  },
+  'prices.chefsChoiceBreakfast.$': {
+    type: Number,
+    label:
+      'Price of the meal type for each person. Index is the number of people 0 - 7.',
+  },
+  'prices.chefsChoiceLunch.$': {
+    type: Number,
+    label:
+      'Price of the meal type for each person. Index is the number of people 0 - 7.',
+  },
+  'prices.chefsChoiceDinner.$': {
+    type: Number,
+    label:
+      'Price of the meal type for each person. Index is the number of people 0 - 7.',
   },
   discountAthletic: {
     type: Number,
-    label: "The amount of discount",
-    optional: true
+    label: 'The amount of discount',
+    optional: true,
   },
   extraAthletic: {
     type: Number,
-    label: "The amount of extra",
-    optional: true
+    label: 'The amount of extra',
+    optional: true,
   },
   discountOrExtraTypeAthletic: {
     type: String,
-    label: "Percentage or Fixed amount",
-    optional: true
+    label: 'Percentage or Fixed amount',
+    optional: true,
   },
   discountBodybuilder: {
     type: Number,
-    label: "The amount of discount",
-    optional: true
+    label: 'The amount of discount',
+    optional: true,
   },
   extraBodybuilder: {
     type: Number,
-    label: "The amount of extra",
-    optional: true
+    label: 'The amount of extra',
+    optional: true,
   },
   discountOrExtraTypeBodybuilder: {
     type: String,
-    label: "Percentage or Fixed amount",
-    optional: true
+    label: 'Percentage or Fixed amount',
+    optional: true,
   },
   discountStudent: {
     type: Number,
-    label: "The amount of discount",
-    optional: true
+    label: 'The amount of discount',
+    optional: true,
   },
   extraStudent: {
     type: Number,
-    label: "The amount of extra",
-    optional: true
+    label: 'The amount of extra',
+    optional: true,
   },
   discountOrExtraTypeStudent: {
     type: String,
-    label: "Percentage or Fixed amount",
-    optional: true
+    label: 'Percentage or Fixed amount',
+    optional: true,
   },
   discountSenior: {
     type: Number,
-    label: "The amount of discount",
-    optional: true
+    label: 'The amount of discount',
+    optional: true,
   },
   extraSenior: {
     type: Number,
-    label: "The amount of extra",
-    optional: true
+    label: 'The amount of extra',
+    optional: true,
   },
   discountOrExtraTypeSenior: {
     type: String,
-    label: "Percentage or Fixed amount",
-    optional: true
+    label: 'Percentage or Fixed amount',
+    optional: true,
   },
   disableRestrictions: {
     type: Boolean,
-    label: "Disable restrictions for the lifestyle."
+    label: 'Disable restrictions for the lifestyle.',
   },
 
   owner: {
     type: String,
-    label: "The ID of the user this category belongs to."
+    label: 'The ID of the user this category belongs to.',
   },
 
   createdAt: {
     type: String,
-    label: "The date this category was created.",
+    label: 'The date this category was created.',
     autoValue() {
       if (this.isInsert) return new Date().toISOString();
-    }
+    },
   },
   updatedAt: {
     type: String,
-    label: "The date this category was last updated.",
+    label: 'The date this category was last updated.',
     autoValue() {
       if (this.isInsert || this.isUpdate) return new Date().toISOString();
-    }
-  }
+    },
+  },
 });
 
 Lifestyles.attachSchema(Lifestyles.schema);

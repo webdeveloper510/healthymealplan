@@ -18,6 +18,18 @@ function addMealsForTheDay(day) {
     sum += parseInt(day.dinner.quantity, 10);
   }
 
+  if (day.chefsChoiceBreakfast.active) {
+    sum += parseInt(day.chefsChoiceBreakfast.quantity, 10);
+  }
+
+  if (day.chefsChoiceLunch.active) {
+    sum += parseInt(day.chefsChoiceLunch.quantity, 10);
+  }
+
+  if (day.chefsChoiceDinner.active) {
+    sum += parseInt(day.chefsChoiceDinner.quantity, 10);
+  }
+
   return sum;
 }
 
@@ -596,18 +608,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           if (nextDay == "dayOfPaired") { // set delivery for tuesday and wednesday as monday day
 
             if (this.deliveryDay == 1) {
-              
+
               daysPaired.push(2);
 
               delivery.title = 'dayOf';
               delivery.onDate = currentDay;
-  
+
               // summation of tuesday meals
               delivery.meals.push({
                 name: primaryCustomerName,
                 total: addMealsForTheDay(primarySchedule[index]) + addMealsForTheDay(primarySchedule[index + 1]),
               });
-  
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -615,7 +627,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]) + addMealsForTheDay(secondarySchedule[index + 1]),
                   });
                 });
-  
+
                 // console.log(delivery.meals);
               }
             }
@@ -624,13 +636,13 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             if (this.deliveryDay == 1) {
               delivery.title = 'dayOf';
               delivery.onDate = currentDay;
-  
+
               // summation of tuesday meals
               delivery.meals.push({
                 name: primaryCustomerName,
                 total: addMealsForTheDay(primarySchedule[index]),
               });
-  
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -638,12 +650,12 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]),
                   });
                 });
-  
+
                 // console.log(delivery.meals);
               }
             }
           }
-       // set cooking as sunday
+          // set cooking as sunday
         }
       } // tuesday
 
