@@ -403,7 +403,7 @@ class PlatingTable extends React.Component {
       let lifestylePlates, 
 currentPlate;
 
-      if (this.state.mealTitle == 'Chefs Choice Brekafast' || this.state.mealTitle == 'Chefs Choice Lunch' || this.state.mealTitle == 'Chefs Choice Dinner') {
+      if (this.state.mealTitle == 'Chefs Choice Breakfast' || this.state.mealTitle == 'Chefs Choice Lunch' || this.state.mealTitle == 'Chefs Choice Dinner') {
         lifestylePlates = [1];
         if (this.state.mealTitle == 'Chefs Choice Breakfast') {
           currentPlate = this.props.plates.find(e => e.title == "Chef's Choice Breakfast");
@@ -500,7 +500,7 @@ currentPlate;
 currentPlate;
 
 
-    if (this.state.mealTitle == 'Chefs Choice Brekafast' || this.state.mealTitle == 'Chefs Choice Lunch' || this.state.mealTitle == 'Chefs Choice Dinner') {
+    if (this.state.mealTitle == 'Chefs Choice Breakfast' || this.state.mealTitle == 'Chefs Choice Lunch' || this.state.mealTitle == 'Chefs Choice Dinner') {
       lifestylePlates = [1];
 
       if (this.state.mealTitle == 'Chefs Choice Breakfast') {
@@ -729,7 +729,7 @@ currentPlate;
     let lifestylePlates, 
 currentPlate;
 
-    if (this.state.mealTitle == 'Chefs Choice Brekafast' || this.state.mealTitle == 'Chefs Choice Lunch' || this.state.mealTitle == 'Chefs Choice Dinner') {
+    if (this.state.mealTitle == 'Chefs Choice Breakfast' || this.state.mealTitle == 'Chefs Choice Lunch' || this.state.mealTitle == 'Chefs Choice Dinner') {
       lifestylePlates = [1];
       if (this.state.mealTitle == 'Chefs Choice Breakfast') {
         currentPlate = this.props.plates.find(e => e.title == "Chef's Choice Breakfast");
