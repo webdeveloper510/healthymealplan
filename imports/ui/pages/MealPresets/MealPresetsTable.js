@@ -42,9 +42,9 @@ import EditIcon from 'material-ui-icons/Edit';
 
 import Loading from '../../components/Loading/Loading';
 
-import './MealPlannerTable.scss';
+import './MealPresetsTable.scss';
 
-class MealPlannerTable extends Component {
+class MealPresetsTable extends Component {
   constructor(props) {
     super(props);
 
@@ -429,6 +429,22 @@ class MealPlannerTable extends Component {
                                 {dish.subtitle != undefined && dish.subtitle}
                               </Typography>
 
+                              {/* {dish.allergens && dish.allergens.length > 0 && (
+                                <div style={{ marginBottom: '10px' }}>
+                                  {dish.allergens.map(e => (
+                                    <Typography type="body2" style={{ display: 'inline-block', marginRight: '6px', textTransform: 'uppercase', color: 'rgba(0, 0, 0, .54)' }}>
+                                      {this.renderFormattedAllergy(e)}
+                                    </Typography>
+                                  ))}
+                                </div>
+                              )} */}
+
+                              {/* {dish.madeBy && (
+                                <Typography type="body2" style={{ marginBottom: '8px', color: 'rgba(0, 0, 0, .54)' }}>
+                                  Chef {dish.madeBy == 'mazen' ? 'Mazen Issa' : dish.madeBy == 'jansan' ? 'Jansan McCorkle' : ''}
+                                </Typography>
+                              )} */}
+
                             </CardContent>
                             <Divider />
                             <CardActions style={{ justifyContent: 'flex-end' }}>
@@ -621,7 +637,7 @@ class MealPlannerTable extends Component {
   }
 }
 
-MealPlannerTable.propTypes = {
+MealPresetsTable.propTypes = {
   results: PropTypes.isRequired,
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,
@@ -633,4 +649,4 @@ MealPlannerTable.propTypes = {
   plates: PropTypes.arrayOf(PropTypes.object).isRequired,
 };
 
-export default MealPlannerTable;
+export default MealPresetsTable;

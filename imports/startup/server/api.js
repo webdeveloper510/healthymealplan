@@ -38,6 +38,9 @@ import '../../api/Lifestyles/server/publications';
 import '../../api/MealPlanner/methods';
 import '../../api/MealPlanner/server/publications';
 
+import '../../api/MealPresets/methods';
+import '../../api/MealPresets/server/publications';
+
 import '../../api/Meals/methods';
 import '../../api/Meals/server/publications';
 
