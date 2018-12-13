@@ -42,14 +42,6 @@ MealPresets.schema = new SimpleSchema({
     type: String,
     label: 'The id of the meal',
   },
-  'weekPreset.$.onDate': {
-    type: String,
-    label: 'Date to be cooked on',
-  },
-  weekOf: {
-    type: Date,
-    label: 'Week start date',
-  },
   createdAt: {
     type: String,
     label: 'The date this delivery was created.',

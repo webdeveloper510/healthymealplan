@@ -3,11 +3,8 @@ import { check } from 'meteor/check';
 import MealPresets from './MealPresets';
 import rateLimit from '../../modules/rate-limit';
 
-import sumBy from 'lodash/sumBy';
-import moment from 'moment';
-
 Meteor.methods({
-  'mealPresets.insert': function mealPrestsInsert(date, lifestyle, meal, plate) {
+  'presets.insert': function mealPrestsInsert(date, lifestyle, meal, plate) {
     check(date, String);
     check(lifestyle, String);
     check(meal, String);
@@ -25,7 +22,7 @@ Meteor.methods({
     }
   },
 
-  'mealPresets.update': function mealPresetsUpdate(forDate, reassignPlannerId, plateIdNew) {
+  'presets.update': function presetsUpdate(forDate, reassignPlannerId, plateIdNew) {
     check(forDate, String);
     check(plateIdNew, String);
     check(reassignPlannerId, String);
@@ -39,11 +36,11 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
-  'mealPresets.remove': function mealPresetsUpdate(mealPresetsId) {
-    check(mealPresetsId, String);
+  'presets.remove': function presetsUpdate(presetId) {
+    check(presetId, String);
 
     try {
-      MealPlanner.remove({ _id: mealPresetsId });
+      MealPlanner.remove({ _id: presetId });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }

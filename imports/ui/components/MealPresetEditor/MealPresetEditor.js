@@ -5,40 +5,41 @@
   not a priority for now, but this is an itch that we should really scratch.
 */
 
-import React from "react";
-import PropTypes from "prop-types";
+import React from 'react';
+import PropTypes from 'prop-types';
 
-import Autosuggest from "react-autosuggest";
+import Autosuggest from 'react-autosuggest';
 
-import _ from "lodash";
+import sortBy from 'lodash/sortBy';
 
-import { Meteor } from "meteor/meteor";
+import { Meteor } from 'meteor/meteor';
 
-import Button from "material-ui/Button";
-import { MenuItem } from "material-ui/Menu";
-import TextField from "material-ui/TextField";
+import Button from 'material-ui/Button';
+import { MenuItem } from 'material-ui/Menu';
+import TextField from 'material-ui/TextField';
 // import Select from 'material-ui/Select';
 // import Input, { InputLabel } from 'material-ui/Input';
 // import { FormControl, FormHelperText } from 'material-ui/Form';
 import Dialog, {
   DialogActions,
   DialogContent,
-  DialogContentText
-} from "material-ui/Dialog";
+  DialogContentText,
+} from 'material-ui/Dialog';
 
-import Chip from "material-ui/Chip";
-import Paper from "material-ui/Paper";
+import Chip from 'material-ui/Chip';
+import Paper from 'material-ui/Paper';
 
-import Grid from "material-ui/Grid";
-import Typography from "material-ui/Typography";
-import Divider from "material-ui/Divider";
-import Avatar from "material-ui/Avatar";
+import Grid from 'material-ui/Grid';
+import Typography from 'material-ui/Typography';
+import Divider from 'material-ui/Divider';
+import Avatar from 'material-ui/Avatar';
 
-import { red } from "material-ui/colors";
-import ChevronLeft from "material-ui-icons/ChevronLeft";
-import Search from "material-ui-icons/Search";
+import { red } from 'material-ui/colors';
+import ChevronLeft from 'material-ui-icons/ChevronLeft';
+import Search from 'material-ui-icons/Search';
+import moment from 'moment';
 
-import validate from "../../../modules/validate";
+import validate from '../../../modules/validate';
 
 // const primary = teal[500];
 const danger = red[700];
@@ -50,25 +51,28 @@ class MealPresetEditor extends React.Component {
     super(props);
 
     this.state = {
+
+      title: !this.props.newPreset ? this.props.preset.title : '',
+
       // value: '', // Autosuggest
-      valueTypes: "",
+      valuePlates: '',
       // suggestions: [],
-      suggestionsTypes: [],
+      suggestionsPlates: [],
       types:
-        this.props.category &&
-          this.props.ingredientTypes &&
-          !this.props.newCategory
-          ? _.sortBy(
-            this.props.ingredientTypes.filter(
-              (e, i) => this.props.category.types.indexOf(e._id) !== -1
+        this.props.preset &&
+          this.props.plates &&
+          !this.props.newPreset
+          ? sortBy(
+            this.props.plates.filter(
+              (e, i) => this.props.preset.types.indexOf(e._id) !== -1,
             ),
-            "title"
+            'title',
           )
           : [],
-      // subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
+      // subIngredients: this.props.ingredient ? sortBy(this.props.ingredient.subIngredients, 'title') : [],
       // selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
-      hasFormChanged: false
+      hasFormChanged: false,
     };
   }
 
@@ -79,23 +83,23 @@ class MealPresetEditor extends React.Component {
         error.insertAfter(
           $(element)
             .parent()
-            .parent()
+            .parent(),
         );
       },
 
       rules: {
         title: {
-          required: true
-        }
+          required: true,
+        },
       },
       messages: {
         title: {
-          required: "Name required."
-        }
+          required: 'Name required.',
+        },
       },
       submitHandler() {
         component.handleSubmit();
-      }
+      },
     });
   }
 
@@ -111,19 +115,19 @@ class MealPresetEditor extends React.Component {
   // Use your imagination to render suggestions.
   onChange(event, { newValue }) {
     this.setState({
-      value: newValue
+      value: newValue,
     });
   }
 
-  onChangeTypes(event, { newValue }) {
+  onChangePlates(event, { newValue }) {
     this.setState({
-      valueTypes: newValue
+      valuePlates: newValue,
     });
   }
 
   onSuggestionSelected(
     event,
-    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
     const clonedSubIngredients = this.state.subIngredients
       ? this.state.subIngredients.slice()
@@ -133,7 +137,7 @@ class MealPresetEditor extends React.Component {
 
     if (clonedSubIngredients.length > 0) {
       isThere = clonedSubIngredients.filter(
-        present => suggestion._id === present._id
+        present => suggestion._id === present._id,
       );
     }
 
@@ -145,13 +149,13 @@ class MealPresetEditor extends React.Component {
 
     this.setState({
       subIngredients: clonedSubIngredients,
-      hasFormChanged: true
+      hasFormChanged: true,
     });
   }
 
-  onSuggestionSelectedTypes(
+  onSuggestionSelectedPlates(
     event,
-    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method },
   ) {
     console.log(suggestion);
 
@@ -171,7 +175,7 @@ class MealPresetEditor extends React.Component {
 
     this.setState({
       hasFormChanged: true,
-      types: clonedTypes
+      types: clonedTypes,
     });
   }
 
@@ -179,26 +183,26 @@ class MealPresetEditor extends React.Component {
   // You already implemented this logic above, so just use it.
   onSuggestionsFetchRequested({ value }) {
     this.setState({
-      suggestions: this.getSuggestions(value)
+      suggestions: this.getSuggestions(value),
     });
   }
 
-  onSuggestionsFetchRequestedTypes({ value }) {
+  onSuggestionsFetchRequestedPlates({ value }) {
     this.setState({
-      suggestionsTypes: this.getSuggestionsTypes(value)
+      suggestionsPlates: this.getSuggestionsPlates(value),
     });
   }
 
   // Autosuggest will call this function every time you need to clear suggestions.
   onSuggestionsClearRequested() {
     this.setState({
-      suggestions: []
+      suggestions: [],
     });
   }
 
-  onSuggestionsClearRequestedTypes() {
+  onSuggestionsClearRequestedPlates() {
     this.setState({
-      suggestionsTypes: []
+      suggestionsPlates: [],
     });
   }
 
@@ -209,20 +213,20 @@ class MealPresetEditor extends React.Component {
 
     return inputLength === 0
       ? []
-      : this.props.potentialSubIngredients.filter(
-        ingredient =>
-          ingredient.title.toLowerCase().slice(0, inputLength) === inputValue
+      : this.props.plates.filter(
+        plate =>
+          plate.title.toLowerCase().slice(0, inputLength) === inputValue,
       );
   }
 
-  getSuggestionsTypes(value) {
+  getSuggestionsPlates(value) {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
     return inputLength === 0
       ? []
-      : this.props.ingredientTypes.filter(
-        type => type.title.toLowerCase().slice(0, inputLength) === inputValue
+      : this.props.plates.filter(
+        plate => plate.title.toLowerCase().slice(0, inputLength) === inputValue,
       );
   }
 
@@ -233,32 +237,32 @@ class MealPresetEditor extends React.Component {
     return suggestion.title;
   }
 
-  getSuggestionValueTypes(suggestion) {
+  getSuggestionValuePlates(suggestion) {
     return suggestion.title;
   }
 
   handleRemoveActual() {
-    const { popTheSnackbar, history, category } = this.props;
+    const { popTheSnackbar, history, preset } = this.props;
 
-    const exisitingCategory = category && category._id;
-    localStorage.setItem("categoryDeleted", category.title);
-    const categoryDeletedMessage = `${localStorage.getItem(
-      "categoryDeleted"
-    )} deleted from categories.`;
+    const exisitingCategory = preset && preset._id;
+    localStorage.setItem('presetDeleted', preset.title);
+    const presetDeletedMessage = `${localStorage.getItem(
+      'presetDeleted',
+    )} deleted from presets.`;
 
     this.deleteDialogHandleRequestClose.bind(this);
 
-    Meteor.call("categories.remove", exisitingCategory, error => {
+    Meteor.call('presets.remove', exisitingCategory, (error) => {
       if (error) {
         popTheSnackbar({
-          message: error.reason
+          message: error.reason,
         });
       } else {
         popTheSnackbar({
-          message: categoryDeletedMessage
+          message: presetDeletedMessage,
         });
 
-        history.push("/categories");
+        history.push('/meal-planner-presets');
       }
     });
   }
@@ -269,55 +273,42 @@ class MealPresetEditor extends React.Component {
 
   handleSubmit() {
     const { history, popTheSnackbar } = this.props;
-    const existingCategory = this.props.category && this.props.category._id;
+    const existingCategory = this.props.preset && this.props.preset._id;
     const methodToCall = existingCategory
-      ? "categories.update"
-      : "categories.insert";
+      ? 'presets.update'
+      : 'presets.insert';
 
-    const category = {
-      title: document.querySelector("#title").value.trim(),
-      // subIngredients: this.state.subIngredients || [],
-      types: this.state.types.map((e, i) => e._id)
+    const preset = {
+      title: document.querySelector('#title').value.trim(),
     };
 
-    if (existingCategory) category._id = existingCategory;
+    if (existingCategory) preset._id = existingCategory;
 
-    console.log(category);
+    console.log(preset);
 
-    // const typeName = this.state.valueTypes.trim();
-    // let typeActual = null;
-
-    // if (typeName) {
-    //   typeActual = this.props.ingredientTypes.find(el => el.title === typeName);
-    // } else {
-    //   typeActual = this.props.ingredientTypes.find(el => el.title === 'N/A');
-    // }
-
-    // ingredient.typeId = typeActual._id;
-
-    Meteor.call(methodToCall, category, (error, categoryId) => {
+    Meteor.call(methodToCall, preset, (error, presetId) => {
       if (error) {
         popTheSnackbar({
-          message: error.reason
+          message: error.reason,
         });
       } else {
         localStorage.setItem(
-          "categoryForSnackbar",
-          category.title || $('[name="title"]').val()
+          'presetForSnackbar',
+          preset.title || $('[name="title"]').val(),
         );
 
         const confirmation = existingCategory
-          ? `${localStorage.getItem("categoryForSnackbar")} category updated.`
-          : `${localStorage.getItem("categoryForSnackbar")} category added.`;
+          ? `${localStorage.getItem('presetForSnackbar')} preset updated.`
+          : `${localStorage.getItem('presetForSnackbar')} preset added.`;
         // this.form.reset();
 
         popTheSnackbar({
           message: confirmation,
-          buttonText: "View",
-          buttonLink: `/categories/${categoryId}/edit`
+          buttonText: 'View',
+          buttonLink: `/meal-planner-presets/${presetId}/edit`,
         });
 
-        history.push("/categories");
+        history.push('/meal-planner-presets');
       }
     });
   }
@@ -330,22 +321,22 @@ class MealPresetEditor extends React.Component {
       >
         <Typography
           style={{
-            flex: "0 0 auto",
-            margin: "0",
-            padding: "24px 24px 20px 24px"
+            flex: '0 0 auto',
+            margin: '0',
+            padding: '24px 24px 20px 24px',
           }}
           className="title font-medium"
           type="title"
         >
-          Delete {this.props.category.title.toLowerCase()}?
+          Delete {this.props.preset.title.toLowerCase()}?
         </Typography>
         <DialogContent>
           <DialogContentText className="subheading">
-            Are you sure you want to delete{" "}
-            {this.props.category.title.toLowerCase()}{" "}
-            {this.props.category && this.props.category.typeMain
-              ? `from ${this.props.category.typeMain.title.toLowerCase()}?`
-              : "?"}
+            Are you sure you want to delete{' '}
+            {this.props.preset.title.toLowerCase()}{' '}
+            {this.props.preset && this.props.preset.typeMain
+              ? `from ${this.props.preset.typeMain.title.toLowerCase()}?`
+              : '?'}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
@@ -376,7 +367,7 @@ class MealPresetEditor extends React.Component {
     );
   }
 
-  renderSuggestionTypes(suggestion) {
+  renderSuggestionPlates(suggestion) {
     return (
       <MenuItem component="div">
         <div>{suggestion.title}</div>
@@ -391,30 +382,30 @@ class MealPresetEditor extends React.Component {
       <TextField
         className={styles.textField}
         value={value}
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         InputProps={{
           classes: {
-            input: styles.input
+            input: styles.input,
           },
-          ...other
+          ...other,
         }}
       />
     );
   }
 
-  renderInputTypes(inputProps) {
+  renderInputPlates(inputProps) {
     const { value, ...other } = inputProps;
 
     return (
       <TextField
         className={styles.textField}
         value={value}
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         InputProps={{
           classes: {
-            input: styles.input
+            input: styles.input,
           },
-          ...other
+          ...other,
         }}
       />
     );
@@ -430,7 +421,7 @@ class MealPresetEditor extends React.Component {
     );
   }
 
-  renderSuggestionsContainerTypes(options) {
+  renderSuggestionsContainerPlates(options) {
     const { containerProps, children } = options;
 
     return (
@@ -454,7 +445,7 @@ class MealPresetEditor extends React.Component {
 
     this.setState({
       subIngredients: stateCopy,
-      hasFormChanged: true
+      hasFormChanged: true,
     });
   }
 
@@ -467,7 +458,7 @@ class MealPresetEditor extends React.Component {
 
     this.setState({
       types: stateCopy,
-      hasFormChanged: true
+      hasFormChanged: true,
     });
   }
 
@@ -490,32 +481,32 @@ class MealPresetEditor extends React.Component {
 
     if (this.props.allIngredients) {
       const avatarToReturn = this.props.allIngredients.find(
-        el => el._id === subIngredient
+        el => el._id === subIngredient,
       );
       return avatarToReturn.title.charAt(0);
     }
   }
 
-  getTypeTitle(type) {
+  getPlateTitle(plate) {
     // console.log(type);
 
-    if (type.title) {
-      return type.title;
+    if (plate.title) {
+      return plate.title;
     }
 
-    if (this.props.ingredientTypes) {
-      return this.props.ingredientTypes.find(el => el._id === type);
+    if (this.props.plates) {
+      return this.props.plates.find(el => el._id === plate);
     }
   }
 
-  getTypeAvatar(type) {
-    if (type.title) {
+  getPlateAvatar(type) {
+    if (plate.title) {
       return type.title.charAt(0);
     }
 
-    if (this.props.ingredientTypes) {
-      const avatarToReturn = this.props.ingredientTypes.find(
-        el => el._id === type._id
+    if (this.props.plates) {
+      const avatarToReturn = this.props.plates.find(
+        el => el._id === plate._id,
       );
       return avatarToReturn.title.charAt(0);
     }
@@ -527,67 +518,63 @@ class MealPresetEditor extends React.Component {
     const hasFormChanged = e.currentTarget.value.length > 0;
 
     this.setState({
-      hasFormChanged
+      hasFormChanged,
     });
   }
 
   render() {
-    console.log(this.props);
-    const { category, ingredientTypes, history } = this.props;
-
-    if (!category || !ingredientTypes) {
-      return "<h1>Loading</h1>";
-    }
+    // console.log(this.props);
+    const { preset, history, plates, meals, lifestyles } = this.props;
 
     return (
       <form
-        style={{ width: "100%" }}
+        style={{ width: '100%' }}
         ref={form => (this.form = form)}
         onSubmit={event => event.preventDefault()}
       >
         <Grid container justify="center">
           <Grid item xs={12}>
             <Button
-              onClick={() => this.props.history.push("/meal-planner-presets")}
+              onClick={() => this.props.history.push('/meal-planner-presets')}
               className="button button-secondary button-secondary--top"
             >
               <Typography
                 type="subheading"
                 className="subheading font-medium"
                 style={{
-                  display: "flex",
-                  alignItems: "center",
-                  flexDirection: "row"
+                  display: 'flex',
+                  alignItems: 'center',
+                  flexDirection: 'row',
                 }}
               >
-                <ChevronLeft style={{ marginRight: "4px" }} /> Meal Presets
+                <ChevronLeft style={{ marginRight: '4px' }} /> Meal Presets
               </Typography>
             </Button>
           </Grid>
         </Grid>
 
-        <Grid container style={{ marginBottom: "50px" }}>
+        <Grid container style={{ marginBottom: '50px' }}>
           <Grid item xs={4}>
             <Typography
               type="headline"
               className="headline"
               style={{ fontWeight: 500 }}
             >
-              {preset && preset._id ? `${preset.title}` : "Add meal preset"}
+              {preset && preset._id ? `${preset.title}` : 'Add preset'}
             </Typography>
 
           </Grid>
           <Grid item xs={8}>
             <div
               style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "flex-end"
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'flex-end',
               }}
             >
               <Button
-                style={{ marginRight: "10px" }}
-                onClick={() => history.push("/meal-planner-presets")}
+                style={{ marginRight: '10px' }}
+                onClick={() => history.push('/meal-planner-presets')}
               >
                 Cancel
               </Button>
@@ -604,7 +591,7 @@ class MealPresetEditor extends React.Component {
           </Grid>
         </Grid>
 
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
@@ -635,7 +622,7 @@ class MealPresetEditor extends React.Component {
 
         <Divider light className="divider--space-x" />
 
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={12} sm={4}>
@@ -643,196 +630,152 @@ class MealPresetEditor extends React.Component {
                   type="subheading"
                   className="subheading font-medium"
                 >
-                  Type
+                  Presets
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
-                <Paper elevation={2} className="paper-for-fields">
-                  <Search className="autoinput-icon" />
-                  <Autosuggest
-                    id="1"
-                    className="autosuggest"
-                    theme={{
-                      container: {
-                        flexGrow: 1,
-                        position: "relative"
-                      },
-                      suggestionsContainerOpen: {
-                        position: "absolute",
-                        left: 0,
-                        right: 0
-                      },
-                      suggestion: {
-                        display: "block"
-                      },
-                      suggestionsList: {
-                        margin: 0,
-                        padding: 0,
-                        listStyleType: "none"
-                      }
-                    }}
-                    renderInputComponent={this.renderInputTypes.bind(this)}
-                    suggestions={this.state.suggestionsTypes}
-                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(
-                      this
-                    )}
-                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(
-                      this
-                    )}
-                    onSuggestionSelected={this.onSuggestionSelectedTypes.bind(
-                      this
-                    )}
-                    getSuggestionValue={this.getSuggestionValueTypes.bind(this)}
-                    renderSuggestion={this.renderSuggestionTypes.bind(this)}
-                    renderSuggestionsContainer={this.renderSuggestionsContainerTypes.bind(
-                      this
-                    )}
-                    focusInputOnSuggestionClick={false}
-                    inputProps={{
-                      placeholder: "Search",
-                      value: this.state.valueTypes,
-                      onChange: this.onChangeTypes.bind(this),
-                      className: "auto type-autocomplete"
-                    }}
-                  />
+                {this.props.lifestyles.map(lifestyle => (
 
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      flexWrap: "wrap",
-                      marginTop: "25px"
-                    }}
-                  >
-                    {this.state.types.length ? (
-                      this.state.types.map((type, i) => (
-                        <Chip
-                          avatar={<Avatar> {this.getTypeAvatar(type)} </Avatar>}
-                          style={{ marginRight: "8px", marginBottom: "8px" }}
-                          label={type.title}
-                          key={i}
-                          onDelete={this.handleTypeChipDelete.bind(
-                            this,
-                            type
-                          )}
-                        />
-                      ))
-                    ) : (
-                        <Chip className="chip--bordered" label="Type" />
-                      )}
-                  </div>
-                </Paper>
+                  <Paper style={{ padding: '2em', marginBottom: '2em' }}>
+                    <Typography type="headline" style={{ marginBottom: '2em' }}>
+                      {lifestyle.title}
+                    </Typography>
+
+                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'].map(weekday => (
+                      <div>
+                        <Typography type="body2">
+                          {weekday}
+                        </Typography>
+                        {['Breakfast', 'Lunch', 'Dinner'].map(meal => {
+                          const currentMeal = this.props.meals.find(e => meal == e.title);
+
+                          return (
+                            <div>
+                              <Typography type="body1">{meal}</Typography>
+
+                              <div style={{ margin: '1em 0', position: 'relative' }}>
+                                <Search className="autoinput-icon" />
+                                <Autosuggest
+                                  id="1"
+                                  className="autosuggest"
+                                  theme={{
+                                    container: {
+                                      flexGrow: 1,
+                                      position: 'relative',
+                                    },
+                                    suggestionsContainerOpen: {
+                                      position: 'absolute',
+                                      left: 0,
+                                      right: 0,
+                                    },
+                                    suggestion: {
+                                      display: 'block',
+                                    },
+                                    suggestionsList: {
+                                      margin: 0,
+                                      padding: 0,
+                                      listStyleType: 'none',
+                                    },
+                                  }}
+                                  renderInputComponent={this.renderInputPlates.bind(this)}
+                                  suggestions={this.state.suggestionsPlates}
+                                  onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedPlates.bind(
+                                    this,
+                                  )}
+                                  onSuggestionsClearRequested={this.onSuggestionsClearRequestedPlates.bind(
+                                    this,
+                                  )}
+                                  onSuggestionSelected={this.onSuggestionSelectedPlates.bind(
+                                    this,
+                                  )}
+                                  getSuggestionValue={this.getSuggestionValuePlates.bind(this)}
+                                  renderSuggestion={this.renderSuggestionPlates.bind(this)}
+                                  renderSuggestionsContainer={this.renderSuggestionsContainerPlates.bind(
+                                    this,
+                                  )}
+                                  focusInputOnSuggestionClick={false}
+                                  inputProps={{
+                                    placeholder: 'Search',
+                                    value: this.state.valuePlates,
+                                    onChange: this.onChangePlates.bind(this),
+                                    className: 'auto type-autocomplete',
+                                  }}
+                                />
+
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    flexWrap: 'wrap',
+                                    marginTop: '25px',
+                                  }}
+                                >
+                                  {this.state.types.length ? (
+                                    this.state.types.map((type, i) => (
+                                      <Chip
+                                        avatar={<Avatar> {this.getPlateAvatar(type)} </Avatar>}
+                                        style={{ marginRight: '8px', marginBottom: '8px' }}
+                                        label={type.title}
+                                        key={i}
+                                        onDelete={this.handlePlateChipDelete.bind(
+                                          this,
+                                          type,
+                                        )}
+                                      />
+                                    ))
+                                  ) : (
+                                      <Chip className="chip--bordered" label="Plate" />
+                                    )}
+                                </div>
+                              </div>
+                            </div>
+                          )
+                        })}
+                      </div>
+
+                    ))}
+
+                  </Paper>
+
+                ))}
+
               </Grid>
             </Grid>
           </Grid>
         </Grid>
 
-        {/* <Divider light className="divider--space-x" />
-
-        <Grid container justify="center" style={{ marginBottom: '75px' }}>
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid item xs={12} sm={4}>
-                <Typography type="subheading" className="subheading font-medium">
-                Sub-ingredients
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={8}>
-                <Paper elevation={2} className="paper-for-fields">
-
-
-                  <Search className="autoinput-icon" />
-                  <Autosuggest
-                    id="2"
-                    className="autosuggest"
-                    theme={{
-                      container: {
-                        flexGrow: 1,
-                        position: 'relative',
-                        marginBottom: '2em',
-                      },
-                      suggestionsContainerOpen: {
-                        position: 'absolute',
-                        left: 0,
-                        right: 0,
-                      },
-                      suggestion: {
-                        display: 'block',
-                      },
-                      suggestionsList: {
-                        margin: 0,
-                        padding: 0,
-                        listStyleType: 'none',
-                      },
-                    }}
-                    renderInputComponent={this.renderInput.bind(this)}
-                    suggestions={this.state.suggestions}
-                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(this)}
-                    onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(this)}
-                    onSuggestionSelected={this.onSuggestionSelected.bind(this)}
-                    getSuggestionValue={this.getSuggestionValue.bind(this)}
-                    renderSuggestion={this.renderSuggestion.bind(this)}
-                    renderSuggestionsContainer={this.renderSuggestionsContainer.bind(this)}
-
-                    focusInputOnSuggestionClick={false}
-
-                    inputProps={{
-                      placeholder: 'Search',
-                      value: this.state.value,
-                      onChange: this.onChange.bind(this),
-                      className: 'autoinput',
-                    }}
-                  />
-                  <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap' }}>
-                    {this.state.subIngredients ? this.state.subIngredients.map((subIngredient, i) => (
-                      <Chip
-                        avatar={<Avatar> {this.getSubIngredientAvatar(subIngredient)} </Avatar>}
-                        style={{ marginRight: '8px', marginBottom: '8px' }}
-                        label={this.getSubIngredientTitle(subIngredient)}
-                        key={i}
-                        onDelete={this.handleSubIngredientChipDelete.bind(this, subIngredient)}
-                      />)) : <Chip className="chip--bordered" label="Sub-ingredient" />}
-                  </div>
-
-                </Paper>
-              </Grid>
-
-            </Grid>
-          </Grid>
-        </Grid> */}
-
-        <Grid container justify="center" style={{ marginBottom: "50px" }}>
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
           <Grid item xs={12}>
             <Grid container>
               <Grid item xs={4}>
-                {this.props.newCategory ? (
-                  ""
+                {this.props.newPreset ? (
+                  ''
                 ) : (
                     <Button
-                      style={{ backgroundColor: danger, color: "#FFFFFF" }}
+                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
                       raised
                       onClick={
                         preset && preset._id
                           ? this.handleRemove.bind(this)
-                          : () => this.props.history.push("/meal-planner-presets")
+                          : () => this.props.history.push('/meal-planner-presets')
                       }
                     >
                       Delete
-                  </Button>
+                    </Button>
                   )}
               </Grid>
 
               <Grid item xs={8}>
                 <div
                   style={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "flex-end"
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'flex-end',
                   }}
                 >
                   <Button
-                    style={{ marginRight: "10px" }}
-                    onClick={() => history.push("/categories")}
+                    style={{ marginRight: '10px' }}
+                    onClick={() => history.push('/categories')}
                   >
                     Cancel
                   </Button>
@@ -851,22 +794,24 @@ class MealPresetEditor extends React.Component {
           </Grid>
         </Grid>
 
-        {this.renderDeleteDialog()}
+        {!this.props.newPreset && this.renderDeleteDialog()}
       </form>
     );
   }
 }
 
 MealPresetEditor.defaultProps = {
-  category: { title: "" }
+  presets: [],
 };
 
 MealPresetEditor.propTypes = {
-  category: PropTypes.object,
-  ingredientTypes: PropTypes.array.isRequired,
-  potentialSubIngredients: PropTypes.array.isRequired,
+  loading: PropTypes.object,
+  plates: PropTypes.array.isRequired,
+  meals: PropTypes.array.isRequired,
+  lifestyles: PropTypes.array.isRequired,
+  presets: PropTypes.array.isRequired,
   history: PropTypes.object.isRequired,
-  popTheSnackbar: PropTypes.func.isRequired
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 export default MealPresetEditor;
