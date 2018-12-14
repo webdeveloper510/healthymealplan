@@ -1732,8 +1732,8 @@ class Step4Checkout extends React.Component {
               });
 
               this.props.popTheSnackbar({
-                message: `Successfully created subscription with ID:${
-                  res.subscriptionId
+                message: `Successfully created customer profile with ID:${
+                  res.customerProfileId
                   }`
               });
 

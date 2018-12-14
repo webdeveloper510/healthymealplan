@@ -983,7 +983,7 @@ Meteor.methods({
           customerInfo.primaryProfileBilling.dinner.totalQty +
           customerInfo.primaryProfileBilling.chefsChoiceBreakfast.totalQty +
           customerInfo.primaryProfileBilling.chefsChoiceLunch.totalQty +
-          customerInfo.primaryProfileBilling.chefsChoiceDinner.totalQty , 
+          customerInfo.primaryProfileBilling.chefsChoiceDinner.totalQty,
 
         price:
           customerInfo.primaryProfileBilling.breakfast.totalQty *
@@ -1239,9 +1239,9 @@ Meteor.methods({
 
 
     const syncCreateCustomerProfile = Meteor.wrapAsync(createCustomerProfile);
-    const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(
-      createSubscriptionFromCustomerProfile,
-    );
+    // const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(
+    //   createSubscriptionFromCustomerProfile,
+    // );
 
     // create primary profile over on Authorize
     const createCustomerProfileRes = syncCreateCustomerProfile(
@@ -1267,6 +1267,11 @@ Meteor.methods({
     console.log(createCustomerProfileRes);
 
     // primary profile created successfully on authorize
+
+    const paymentProfileIdObject = createCustomerProfileRes.customerPaymentProfileIdList.numericString[0];
+    let paymentProfileIdString = "";
+    Object.keys(paymentProfileIdObject).map(e => { paymentProfileIdString += `${paymentProfileIdObject[e]}` })
+
 
     // start adding plan data to primary profile and each of the secondary profile(s)
     Meteor.users.update(
@@ -1351,7 +1356,7 @@ Meteor.methods({
       );
     }
 
-    Meteor._sleepForMs(10000);
+    // Meteor._sleepForMs(10000);
 
     // totaling
     let actualTotal = customerInfo.primaryProfileBilling.groupTotal;
@@ -1375,33 +1380,33 @@ Meteor.methods({
     console.log(lastWeeksSaturday);
 
     // subscription
-    const createSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
-      createCustomerProfileRes.customerProfileId,
-      createCustomerProfileRes.customerPaymentProfileIdList.numericString[0],
-      moment(lastWeeksSaturday).format('YYYY-MM-DD'),
-      actualTotal,
-    );
+    // const createSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
+    //   createCustomerProfileRes.customerProfileId,
+    //   createCustomerProfileRes.customerPaymentProfileIdList.numericString[0],
+    //   moment(lastWeeksSaturday).format('YYYY-MM-DD'),
+    //   actualTotal,
+    // );
 
-    console.log('Subscription data');
-    console.log(createSubscriptionFromCustomerProfileRes);
+    // console.log('Subscription data');
+    // console.log(createSubscriptionFromCustomerProfileRes);
 
-    if (
-      createSubscriptionFromCustomerProfileRes.messages.resultCode &&
-      createSubscriptionFromCustomerProfileRes.messages.resultCode != 'Ok'
-    ) {
-      throw new Meteor.Error(
-        500,
-        'There was a problem creating subscription from user profile.',
-      );
-    }
+    // if (
+    //   createSubscriptionFromCustomerProfileRes.messages.resultCode &&
+    //   createSubscriptionFromCustomerProfileRes.messages.resultCode != 'Ok'
+    // ) {
+    //   throw new Meteor.Error(
+    //     500,
+    //     'There was a problem creating subscription from user profile.',
+    //   );
+    // }
 
     console.log('create customer profile res');
 
     console.log(createCustomerProfileRes);
 
-    console.log('create subscription from profile res');
+    // console.log('create subscription from profile res');
 
-    console.log(createSubscriptionFromCustomerProfileRes);
+    // console.log(createSubscriptionFromCustomerProfileRes);
 
     const subscriptionItemsReal = [];
 
@@ -1412,7 +1417,9 @@ Meteor.methods({
           customerInfo.primaryProfileBilling.breakfast.totalQty +
           customerInfo.primaryProfileBilling.lunch.totalQty +
           customerInfo.primaryProfileBilling.dinner.totalQty +
-          customerInfo.primaryProfileBilling.chefsChoice.totalQty,
+          customerInfo.primaryProfileBilling.chefsChoiceBreakfast.totalQty +
+          customerInfo.primaryProfileBilling.chefsChoiceLunch.totalQty +
+          customerInfo.primaryProfileBilling.chefsChoiceDinner.totalQty,
 
         price:
           customerInfo.primaryProfileBilling.breakfast.totalQty *
@@ -1509,9 +1516,9 @@ Meteor.methods({
             meals:
               customerInfo.secondaryProfilesBilling[i].breakfast.totalQty +
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty +
-              customerInfo.secondaryProfilesBilling[i].dinner.totalQty + 
-              customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty + 
-              customerInfo.secondaryProfilesBilling[i].chefsChoiceLunch.totalQty + 
+              customerInfo.secondaryProfilesBilling[i].dinner.totalQty +
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty +
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceLunch.totalQty +
               customerInfo.secondaryProfilesBilling[i].chefsChoiceDinner.totalQty,
 
             price:
@@ -1520,11 +1527,11 @@ Meteor.methods({
               customerInfo.secondaryProfilesBilling[i].lunch.totalQty *
               customerInfo.secondaryProfilesBilling[i].lunchPrice +
               customerInfo.secondaryProfilesBilling[i].dinner.totalQty *
-              customerInfo.secondaryProfilesBilling[i].dinnerPrice + 
+              customerInfo.secondaryProfilesBilling[i].dinnerPrice +
               customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfast.totalQty *
-              customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfastPrice + 
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceBreakfastPrice +
               customerInfo.secondaryProfilesBilling[i].chefsChoiceLunch.totalQty *
-              customerInfo.secondaryProfilesBilling[i].chefsChoiceLunchPrice + 
+              customerInfo.secondaryProfilesBilling[i].chefsChoiceLunchPrice +
               customerInfo.secondaryProfilesBilling[i].chefsChoiceDinner.totalQty *
               customerInfo.secondaryProfilesBilling[i].chefsChoiceDinnerPrice,
           },
@@ -1612,14 +1619,9 @@ Meteor.methods({
     const subscriptionId = Subscriptions.insert({
       _id: subscriptionIdToSave,
       customerId: customerInfo.id,
-      authorizeSubscriptionId:
-        createSubscriptionFromCustomerProfileRes.subscriptionId,
       authorizeCustomerProfileId:
-        createSubscriptionFromCustomerProfileRes.profile.customerProfileId,
-      authorizePaymentProfileId:
-        createSubscriptionFromCustomerProfileRes.profile
-          .customerPaymentProfileId,
-
+      createCustomerProfileRes.customerProfileId,
+      authorizePaymentProfileId: paymentProfileIdString,
       status: 'paused',
       paymentMethod: customerInfo.paymentMethod,
       amount: actualTotal,
@@ -1629,7 +1631,7 @@ Meteor.methods({
       subscriptionItems: subscriptionItemsReal,
     });
 
-    return createSubscriptionFromCustomerProfileRes;
+    return createCustomerProfileRes;
   },
 
 
@@ -1667,10 +1669,10 @@ Meteor.methods({
     // if we haven't yet passed the day of the week that I need:
     if (moment().isoWeekday() <= 5) {
       // then just give me this week's instance of that day
-      saturday = moment().isoWeekday(6).toDate();
+      saturday = moment().isoWeekday(5).hour(23).toDate();
     } else {
       // otherwise, give me next week's instance of that day
-      saturday = moment().add(1, 'weeks').isoWeekday(6).toDate();
+      saturday = moment().add(1, 'weeks').isoWeekday(5).hour(23).toDate();
     }
 
     const subscription = Subscriptions.findOne({ customerId });
@@ -1683,53 +1685,54 @@ Meteor.methods({
       throw new Meteor.Error('500', 'Subscription is already in the cancelled state.');
     }
 
+    // if (subscription.paymentMethod == 'card') {
+    //   if (when == 'immediate') {
+    //     const syncCancelSubscription = Meteor.wrapAsync(cancelSubscription);
 
-    if (subscription.paymentMethod == 'card') {
-      if (when == 'immediate') {
-        const syncCancelSubscription = Meteor.wrapAsync(cancelSubscription);
+    //     const syncCancelSubscriptionRes = syncCancelSubscription(subscription.authorizeSubscriptionId);
 
-        const syncCancelSubscriptionRes = syncCancelSubscription(subscription.authorizeSubscriptionId);
+    //     if (syncCancelSubscriptionRes.messages.resultCode == 'Ok') {
 
-        if (syncCancelSubscriptionRes.messages.resultCode == 'Ok') {
+    //       const statusUpdate = Subscriptions.update({ customerId }, { $set: { status: 'cancelled' } });
 
-          const statusUpdate = Subscriptions.update({ customerId }, { $set: { status: 'cancelled' } });
+    //       const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
 
-          const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+    //       if (jobExists) {
+    //         Jobs.remove({ _id: jobExists._id });
+    //       }
 
-          if (jobExists) {
-            Jobs.remove({ _id: jobExists._id });
-          }
+    //       return true;
 
-          return true;
+    //     }
 
-        }
-
-        throw new Meteor.Error('500', syncCancelSubscriptionRes.messages.message[0].text);
+    //     throw new Meteor.Error('500', syncCancelSubscriptionRes.messages.message[0].text);
 
 
-      } else if (when == 'saturday') {
+    //   } else if (when == 'saturday') {
 
-        const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+    //     const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
 
-        if (jobExists) {
-          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for cancellation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
-        }
+    //     if (jobExists) {
+    //       throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for cancellation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+    //     }
 
-        const job = new Job(
-          Jobs,
-          'setSubscriptionCancelledCardJob', // type of job
-          {
-            subscriptionId: subscription._id,
-            customerId,
-          },
-        );
+    //     const job = new Job(
+    //       Jobs,
+    //       'setSubscriptionCancelledCardJob', // type of job
+    //       {
+    //         subscriptionId: subscription._id,
+    //         customerId,
+    //       },
+    //     );
 
-        // job.priority('normal').delay(60 * 500).save(); // Commit it to the server
-        job.priority('normal').after(saturday).save(); // Commit it to the server
+    //     // job.priority('normal').delay(60 * 500).save(); // Commit it to the server
+    //     job.priority('normal').after(saturday).save(); // Commit it to the server
 
-      }
+    //   }
 
-    } else if (subscription.paymentMethod == 'cash' || subscription.paymentMethod == 'interac') {
+    // } 
+    // else if (subscription.paymentMethod == 'cash' || subscription.paymentMethod == 'interac') {
+    if (subscription.paymentMethod == 'cash' || subscription.paymentMethod == 'interac' || subscription.paymentMethod == "card") {
       if (when == 'immediate') {
 
         const statusUpdate = Subscriptions.update({ customerId }, { $set: { status: 'cancelled' } });
@@ -1783,10 +1786,10 @@ Meteor.methods({
     // if we haven't yet passed the day of the week that I need:
     if (moment().isoWeekday() <= 5) {
       // then just give me this week's instance of that day
-      saturday = moment().isoWeekday(6).toDate();
+      saturday = moment().isoWeekday(5).hour(23).toDate();
     } else {
       // otherwise, give me next week's instance of that day
-      saturday = moment().add(1, 'weeks').isoWeekday(6).toDate();
+      saturday = moment().add(1, 'weeks').isoWeekday(5).hour(23).toDate();
     }
 
     const subscription = Subscriptions.findOne({ customerId });
@@ -1799,66 +1802,67 @@ Meteor.methods({
       throw new Meteor.Error('500', 'Subscription is already active.');
     }
 
-    if (subscription.paymentMethod == 'card') {
+    // if (subscription.paymentMethod == 'card') {
 
-      if (when == 'immediate') {
+    //   if (when == 'immediate') {
 
-        const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(createSubscriptionFromCustomerProfile);
+    //     const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(createSubscriptionFromCustomerProfile);
 
-        const syncCreateSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
-          subscription.authorizeCustomerProfileId,
-          subscription.authorizePaymentProfileId,
-          moment(saturday).format('YYYY-MM-DD'),
-          subscriptionAmount,
-        );
+    //     const syncCreateSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
+    //       subscription.authorizeCustomerProfileId,
+    //       subscription.authorizePaymentProfileId,
+    //       moment(saturday).format('YYYY-MM-DD'),
+    //       subscriptionAmount,
+    //     );
 
-        if (syncCreateSubscriptionFromCustomerProfileRes.messages.resultCode == 'Ok') {
+    //     if (syncCreateSubscriptionFromCustomerProfileRes.messages.resultCode == 'Ok') {
 
-          const newAuthSubId = syncCreateSubscriptionFromCustomerProfileRes.subscriptionId;
+    //       const newAuthSubId = syncCreateSubscriptionFromCustomerProfileRes.subscriptionId;
 
-          const statusUpdate = Subscriptions.update({ _id: subscription._id }, { $set: { status: 'paused', authorizeSubscriptionId: newAuthSubId, amount: subscriptionAmount } });
-
-
-          const jobExists = Jobs.findOne({ type: 'setSubscriptionActiveCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
-
-          if (jobExists) {
-            Jobs.remove({ _id: jobExists._id });
-          }
-
-          return true;
-
-        }
-
-        throw new Meteor.Error('500', syncCreateSubscriptionFromCustomerProfileRes.messages.message[0].text);
-
-      } else if (when == 'saturday') {
-
-        const jobExists = Jobs.findOne({ type: 'setSubscriptionActiveCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
-
-        if (jobExists) {
-          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for activation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
-        }
-
-        const job = new Job(
-          Jobs,
-          'setSubscriptionActiveCardJob', // type of job
-          {
-            subscriptionId: subscription._id,
-            customerId,
-            subscriptionAmount,
-            subDate: moment(saturday).format('YYYY-MM-DD'),
-          },
-        );
-
-        // job.priority('normal').delay(60 * 500).save(); // Commit it to the server
-
-        job.priority('normal').after(saturday).save(); // Commit it to the server
+    //       const statusUpdate = Subscriptions.update({ _id: subscription._id }, { $set: { status: 'paused', authorizeSubscriptionId: newAuthSubId, amount: subscriptionAmount } });
 
 
-      }
+    //       const jobExists = Jobs.findOne({ type: 'setSubscriptionActiveCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+
+    //       if (jobExists) {
+    //         Jobs.remove({ _id: jobExists._id });
+    //       }
+
+    //       return true;
+
+    //     }
+
+    //     throw new Meteor.Error('500', syncCreateSubscriptionFromCustomerProfileRes.messages.message[0].text);
+
+    //   } else if (when == 'saturday') {
+
+    //     const jobExists = Jobs.findOne({ type: 'setSubscriptionActiveCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+
+    //     if (jobExists) {
+    //       throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for activation on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+    //     }
+
+    //     const job = new Job(
+    //       Jobs,
+    //       'setSubscriptionActiveCardJob', // type of job
+    //       {
+    //         subscriptionId: subscription._id,
+    //         customerId,
+    //         subscriptionAmount,
+    //         subDate: moment(saturday).format('YYYY-MM-DD'),
+    //       },
+    //     );
+
+    //     // job.priority('normal').delay(60 * 500).save(); // Commit it to the server
+
+    //     job.priority('normal').after(saturday).save(); // Commit it to the server
 
 
-    } else if (subscription.paymentMethod == 'cash' || subscription.paymentMethod == 'interac') {
+    //   }
+
+
+    // } else if (subscription.paymentMethod == 'cash' || subscription.paymentMethod == 'interac') {
+    if (subscription.paymentMethod == 'cash' || subscription.paymentMethod == 'interac' || subscription.paymentMethod == "card") {
 
 
       if (when == 'immediate') {
@@ -1906,7 +1910,7 @@ Meteor.methods({
 
     let saturday = '';
     if (moment().isoWeekday() <= 5) {
-      saturday = moment().isoWeekday(6).toDate();
+      saturday = moment().isoWeekday(5).toDate();
     } else {
       saturday = moment().add(1, 'weeks').isoWeekday(6).toDate();
     }
@@ -1921,12 +1925,13 @@ Meteor.methods({
     check(userId, String);
 
     const userChange = Meteor.users.findOne({ _id: userId });
-    console.log(userChange);
+    const subscription = Subscriptions.findOne({ customerId: userId });
+    // console.log(userChange);
 
     const syncCreateCustomerProfile = Meteor.wrapAsync(createCustomerProfile);
-    const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(
-      createSubscriptionFromCustomerProfile,
-    );
+    // const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(
+    //   createSubscriptionFromCustomerProfile,
+    // );
 
     // create primary profile over on Authorize
     const createCustomerProfileRes = syncCreateCustomerProfile(
@@ -1951,38 +1956,41 @@ Meteor.methods({
     // console.log('Customer');
     // console.log(createCustomerProfileRes);
 
-    Meteor._sleepForMs(10000);
-
     // subscription
-    const createSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
-      createCustomerProfileRes.customerProfileId,
-      createCustomerProfileRes.customerPaymentProfileIdList.numericString[0],
-      moment(saturday).format('YYYY-MM-DD'),
-      subscriptionAmount,
-    );
+    // const createSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
+    //   createCustomerProfileRes.customerProfileId,
+    //   createCustomerProfileRes.customerPaymentProfileIdList.numericString[0],
+    //   moment(saturday).format('YYYY-MM-DD'),
+    //   subscriptionAmount,
+    // );
 
-    console.log('Subscription data');
-    console.log(createSubscriptionFromCustomerProfileRes);
+    // just use object values below instead of keys..
+    const paymentProfileIdObject = createCustomerProfileRes.customerPaymentProfileIdList.numericString[0];
+    let paymentProfileIdString = "";
+    Object.keys(paymentProfileIdObject).map(e => { paymentProfileIdString += `${paymentProfileIdObject[e]}` })
 
-    if (
-      createSubscriptionFromCustomerProfileRes.messages.resultCode &&
-      createSubscriptionFromCustomerProfileRes.messages.resultCode != 'Ok'
-    ) {
-      throw new Meteor.Error(
-        500,
-        'There was a problem creating subscription from user profile.',
-      );
-    }
+    // console.log('Subscription data');
+    // console.log(createSubscriptionFromCustomerProfileRes);
+
+    // if (
+    //   createSubscriptionFromCustomerProfileRes.messages.resultCode &&
+    //   createSubscriptionFromCustomerProfileRes.messages.resultCode != 'Ok'
+    // ) {
+    //   throw new Meteor.Error(
+    //     500,
+    //     'There was a problem creating subscription from user profile.',
+    //   );
+    // }
 
     Subscriptions.update({ customerId: userChange._id },
       {
         $set: {
           amount: subscriptionAmount,
           paymentMethod: 'card',
-          status: 'active',
-          authorizeSubscriptionId: createSubscriptionFromCustomerProfileRes.subscriptionId,
-          authorizeCustomerProfileId: createSubscriptionFromCustomerProfileRes.profile.customerProfileId,
-          authorizePaymentProfileId: createSubscriptionFromCustomerProfileRes.profile.customerPaymentProfileId,
+          status: subscription.status,
+          // authorizeSubscriptionId: createSubscriptionFromCustomerProfileRes.subscriptionId,
+          authorizeCustomerProfileId: createCustomerProfileRes.customerProfileId,
+          authorizePaymentProfileId: paymentProfileIdString,
         },
 
       },
@@ -2000,41 +2008,39 @@ Meteor.methods({
 
     if (subscription.paymentMethod == 'card') {
 
-      const syncCancelSubscription = Meteor.wrapAsync(cancelSubscription);
+      // const syncCancelSubscription = Meteor.wrapAsync(cancelSubscription);
 
-      const syncCancelSubscriptionRes = syncCancelSubscription(subscription.authorizeSubscriptionId);
+      // const syncCancelSubscriptionRes = syncCancelSubscription(subscription.authorizeSubscriptionId);
 
-      if (syncCancelSubscriptionRes.messages.resultCode == 'Ok') {
+      // if (syncCancelSubscriptionRes.messages.resultCode == 'Ok') {
 
-        const statusUpdate = Subscriptions.update({ _id: subscription._id }, { $set: { paymentMethod: type, status: 'active' } });
+      const statusUpdate = Subscriptions.update({ _id: subscription._id }, { $set: { paymentMethod: type, status: 'active' } });
 
-        const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
+      const jobExists = Jobs.findOne({ type: 'setSubscriptionCancelledCardJob', 'data.subscriptionId': subscription._id, status: 'waiting' });
 
-        if (jobExists) {
-          Jobs.remove({ _id: jobExists._id });
-        }
-
-        return true;
-
+      if (jobExists) {
+        Jobs.remove({ _id: jobExists._id });
       }
 
-      throw new Meteor.Error('500', syncCancelSubscriptionRes.messages.message[0].text);
+      // }
 
-    } else {
+      // throw new Meteor.Error('500', syncCancelSubscriptionRes.messages.message[0].text);
 
-      try {
-        Subscriptions.update({
-          _id: subscription._id,
-        }, {
-            $set: {
-              paymentMethod: type,
-            },
-          });
-      } catch (error) {
-        console.log(error);
-        throw new Meteor.Error(500, error);
-      }
     }
+
+    try {
+      Subscriptions.update({
+        _id: subscription._id,
+      }, {
+          $set: {
+            paymentMethod: type,
+          },
+        });
+    } catch (error) {
+      console.log(error);
+      throw new Meteor.Error(500, error);
+    }
+
 
   },
 });
