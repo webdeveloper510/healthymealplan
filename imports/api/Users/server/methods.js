@@ -413,13 +413,10 @@ Meteor.methods({
     // if we haven't yet passed the day of the week that I need:
     if (moment().isoWeekday() <= 5) {
       // then just give me this week's instance of that day
-      friday = moment().isoWeekday(5).hour(7).minute(30)
-        .toDate();
+      friday = moment().isoWeekday(5).hour(23).toDate();
     } else {
       // otherwise, give me next week's instance of that day
-      friday = moment().add(1, 'weeks').isoWeekday(5).hour(7)
-        .minute(30)
-        .toDate();
+      friday = moment().add(1, 'weeks').isoWeekday(5).hour(23).toDate();
     }
 
 
@@ -427,38 +424,38 @@ Meteor.methods({
 
       console.log('Inside card');
 
-      const syncGetSubscription = Meteor.wrapAsync(getSubscription);
+      // const syncGetSubscription = Meteor.wrapAsync(getSubscription);
 
-      const getSubscriptionRes = syncGetSubscription(sub.authorizeSubscriptionId);
+      // const getSubscriptionRes = syncGetSubscription(sub.authorizeSubscriptionId);
 
-      console.log(getSubscriptionRes);
+      // console.log(getSubscriptionRes);
 
-      if (getSubscriptionRes.messages.resultCode != 'Ok') {
-        throw new Meteor.Error(500, 'There was a problem fetching the subscription [Authorize.Net]');
-      }
+      // if (getSubscriptionRes.messages.resultCode != 'Ok') {
+      //   throw new Meteor.Error(500, 'There was a problem fetching the subscription [Authorize.Net]');
+      // }
 
-      const subscriptionStartDate = getSubscriptionRes.subscription.paymentSchedule.startDate;
-      const subscriptionTotalOccurrences = getSubscriptionRes.subscription.paymentSchedule.totalOccurrences;
-      console.log('Total: ' + '');
-      console.log(subscriptionTotalOccurrences);
-      console.log(moment(subscriptionStartDate).hour(23).minute(30));
-      console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
+      // const subscriptionStartDate = getSubscriptionRes.subscription.paymentSchedule.startDate;
+      // const subscriptionTotalOccurrences = getSubscriptionRes.subscription.paymentSchedule.totalOccurrences;
+      // console.log('Total: ' + '');
+      // console.log(subscriptionTotalOccurrences);
+      // console.log(moment(subscriptionStartDate).hour(23).minute(30));
+      // console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
 
-      // this changes subscription amount immediately if first charge hasn't happened
-      if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))) {
-        console.log('Inside card if');
+      // // this changes subscription amount immediately if first charge hasn't happened
+      // if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))) {
+      //   console.log('Inside card if');
 
-        console.log("Subscription hasn't been charged");
+      //   console.log("Subscription hasn't been charged");
 
-        const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
+      //   const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
 
-        const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
+      //   const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
 
-        if (updateSubscriptionRes.messages.resultCode != 'Ok') {
-          throw new Meteor.Error(500, 'There was a problem updating the subscription [Authorize.Net]');
-        }
+      //   if (updateSubscriptionRes.messages.resultCode != 'Ok') {
+      //     throw new Meteor.Error(500, 'There was a problem updating the subscription [Authorize.Net]');
+      //   }
 
-      } else {
+      // } else {
         console.log('Inside card else');
 
         const jobExists = Jobs.findOne({ type: 'editSubscriptionJob', 'data.id': data.id, status: 'waiting' });
@@ -488,7 +485,7 @@ Meteor.methods({
           subUpdateScheduled: true,
         };
 
-      }
+      // }
 
     }
 
