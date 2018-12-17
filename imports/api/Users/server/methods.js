@@ -456,34 +456,34 @@ Meteor.methods({
       //   }
 
       // } else {
-        console.log('Inside card else');
+      console.log('Inside card else');
 
-        const jobExists = Jobs.findOne({ type: 'editSubscriptionJob', 'data.id': data.id, status: 'waiting' });
+      const jobExists = Jobs.findOne({ type: 'editSubscriptionJob', 'data.id': data.id, status: 'waiting' });
 
-        if (jobExists) {
-          throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for update on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
-        }
+      if (jobExists) {
+        throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for update on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
+      }
 
-        data.change = {
-          lifestyle: [],
-          restrictions: [],
-          preferences: [],
-          schedule: {},
-        };
+      data.change = {
+        lifestyle: [],
+        restrictions: [],
+        preferences: [],
+        schedule: {},
+      };
 
-        const job = new Job(
-          Jobs,
-          'editSubscriptionJob', // type of job
-          {
-            ...data,
-          },
-        );
+      const job = new Job(
+        Jobs,
+        'editSubscriptionJob', // type of job
+        {
+          ...data,
+        },
+      );
 
-        job.priority('normal').after(friday).save(); // Commit it to the server
+      job.priority('normal').after(friday).save(); // Commit it to the server
 
-        return {
-          subUpdateScheduled: true,
-        };
+      return {
+        subUpdateScheduled: true,
+      };
 
       // }
 
@@ -1374,6 +1374,8 @@ Meteor.methods({
       customerInfo.subscriptionStartDateRaw,
     ).subtract(2, 'd');
 
+    const previousWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(3, 'd').hour(23).toDate();
+
     console.log(lastWeeksSaturday);
 
     // subscription
@@ -1617,7 +1619,7 @@ Meteor.methods({
       _id: subscriptionIdToSave,
       customerId: customerInfo.id,
       authorizeCustomerProfileId:
-      createCustomerProfileRes.customerProfileId,
+        createCustomerProfileRes.customerProfileId,
       authorizePaymentProfileId: paymentProfileIdString,
       status: 'paused',
       paymentMethod: customerInfo.paymentMethod,
@@ -1627,6 +1629,9 @@ Meteor.methods({
       delivery: newDeliveryType,
       subscriptionItems: subscriptionItemsReal,
     });
+
+    const job = new Job(Jobs, 'setSubscriptionActiveJob', { subscriptionId: subscriptionIdToSave });
+    job.priority('normal').after(previousWeeksFriday).save();
 
     return createCustomerProfileRes;
   },
