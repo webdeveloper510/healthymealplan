@@ -870,6 +870,16 @@ currentPlate;
     doc.save(`Plating_summary_${this.state.lifestyleTitle}_${this.state.mealTitle}_${moment(this.state.currentSelectorDate).format('dddd, MMMM D')}.pdf`);
   }
 
+  compareLifestyles(a, b) {
+    if (a.title > b.title) {
+      return -1
+    } else {
+      return 1
+    }
+
+    return 0
+  }
+
   render() {
     return (
       <div>
@@ -917,7 +927,7 @@ currentPlate;
 
               {!this.state.aggregateDataLoading ? (
 
-                this.props.lifestyles && !this.state.aggregateDataLoading && this.props.lifestyles.map((lifestyle) => {
+                this.props.lifestyles && !this.state.aggregateDataLoading && this.props.lifestyles.sort(this.compareLifestyles).map((lifestyle) => {
                   const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === lifestyle._id);
 
                   const mealTypeOrder = ['Breakfast', 'Lunch', 'Dinner', 'Chefs Choice Breakfast', 'Chefs Choice Lunch', 'Chefs Choice Dinner'];

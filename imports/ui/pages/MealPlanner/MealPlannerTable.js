@@ -367,6 +367,16 @@ class MealPlannerTable extends Component {
     });
   }
 
+  compareLifestyles(a, b) {
+    if (a.title > b.title) {
+      return -1
+    } else {
+      return 1
+    }
+
+    return 0
+  }
+
   render() {
     if (this.props.loading) {
       return <Loading />;
@@ -375,7 +385,7 @@ class MealPlannerTable extends Component {
     return (
       <div style={{ width: '100%' }}>
 
-        {this.props.lifestyles && this.props.lifestyles.map((lifestyle) => {
+        {this.props.lifestyles && this.props.lifestyles.sort(this.compareLifestyles).map((lifestyle) => {
           const mealTypeOrder = ['Breakfast', 'Lunch', 'Dinner'];
           const mapBy = [];
           const mainLifestyles = lifestyle.title == 'Traditional' || lifestyle.title == 'No meat' || lifestyle.title == 'Flex';
@@ -428,22 +438,6 @@ class MealPlannerTable extends Component {
                               <Typography type="body1" style={{ marginBottom: '12px', color: 'rgba(0, 0, 0, .54)' }}>
                                 {dish.subtitle != undefined && dish.subtitle}
                               </Typography>
-
-                              {/* {dish.allergens && dish.allergens.length > 0 && (
-                                <div style={{ marginBottom: '10px' }}>
-                                  {dish.allergens.map(e => (
-                                    <Typography type="body2" style={{ display: 'inline-block', marginRight: '6px', textTransform: 'uppercase', color: 'rgba(0, 0, 0, .54)' }}>
-                                      {this.renderFormattedAllergy(e)}
-                                    </Typography>
-                                  ))}
-                                </div>
-                              )} */}
-
-                              {/* {dish.madeBy && (
-                                <Typography type="body2" style={{ marginBottom: '8px', color: 'rgba(0, 0, 0, .54)' }}>
-                                  Chef {dish.madeBy == 'mazen' ? 'Mazen Issa' : dish.madeBy == 'jansan' ? 'Jansan McCorkle' : ''}
-                                </Typography>
-                              )} */}
 
                             </CardContent>
                             <Divider />

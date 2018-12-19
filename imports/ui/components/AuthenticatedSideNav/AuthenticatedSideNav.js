@@ -12,6 +12,7 @@ import KitchenIcon from 'material-ui-icons/Kitchen';
 import OrderIcon from 'material-ui-icons/AttachMoney';
 import MealsIcon from 'material-ui-icons/LocalDining';
 import MealPlannerIcon from 'material-ui-icons/DateRange';
+import EventIcon from 'material-ui-icons/Event';
 
 import IngredientsIcon from 'material-ui-icons/Layers';
 import TypesIcon from 'material-ui-icons/List';
@@ -234,6 +235,13 @@ class AuthenticatedSideNav extends Component {
                 <MealPlannerIcon className="side-nav-icon" />
               </ListItemIcon>
               <ListItemText className="subheading" primary="Meal Planner" />
+            </ListItem>
+
+            <ListItem className="padding-left-nested-item" button onClick={() => history.push('/meal-planner-presets')}>
+              <ListItemIcon>
+                <EventIcon className="side-nav-icon" />
+              </ListItemIcon>
+              <ListItemText className="subheading" primary="Meal Presets" />
             </ListItem>
 
             <NavLink onClick={this.props.handleDrawerToggle} to="/plates">

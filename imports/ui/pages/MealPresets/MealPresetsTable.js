@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
-import React from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { withTracker } from 'meteor/react-meteor-data';
 import Table, {
   TableBody,
   TableCell,
@@ -15,22 +16,34 @@ import Dialog, {
   DialogContentText,
 } from 'material-ui/Dialog';
 
+import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';
+
 import $ from 'jquery';
 import Paper from 'material-ui/Paper';
+import TextField from 'material-ui/TextField';
+
 import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
+import IconButton from 'material-ui/IconButton';
+import Input from 'material-ui/Input';
+import Menu from 'material-ui/Menu';
+import { MenuItem } from 'material-ui/Menu';
+import Grid from 'material-ui/Grid';
+import { Divider } from 'material-ui';
 
-// import DeleteIcon from 'material-ui-icons/Delete';
-// import Tooltip from 'material-ui/Tooltip';
-// import IconButton from 'material-ui/IconButton';
+import moment from 'moment';
+import autoBind from 'react-autobind';
 
+import sumBy from 'lodash/sumBy';
+import Autosuggest from 'react-autosuggest';
+import CloseIcon from 'material-ui-icons/Close';
+import LaunchIcon from 'material-ui-icons/Launch';
+import EditIcon from 'material-ui-icons/Edit';
 
-import { withTracker } from 'meteor/react-meteor-data';
-// import IngredientsCollection from '../../../api/Ingredients/Ingredients';
 import Loading from '../../components/Loading/Loading';
-
-class CategoriesTable extends React.Component {
+import './MealPresetsTable.scss';
+class MealPresetsTable extends Component {
   constructor(props) {
     super(props);
 
@@ -39,8 +52,9 @@ class CategoriesTable extends React.Component {
       selectedCheckboxesNumber: 0,
       deleteDialogOpen: false,
     };
-  }
 
+    autoBind(this);
+  }
 
   rowSelected(e, event, checked) {
     const selectedRowId = event.target.parentNode.parentNode.getAttribute('id');
@@ -94,36 +108,10 @@ class CategoriesTable extends React.Component {
       selectedCheckboxes: allCheckboxIds,
     });
   }
-
-  deleteSelectedRows() {
-    localStorage.setItem('categoriesTableDeleted', this.state.selectedCheckboxesNumber);
-
-    const categoryIds = this.state.selectedCheckboxes;
-
-    Meteor.call('categories.batchRemove', categoryIds, (error) => {
-      if (error) {
-        this.props.popTheSnackbar({
-          message: error.reason,
-        });
-      } else {
-        this.props.popTheSnackbar({
-          message: `${localStorage.getItem('categoriesTableDeleted')} categories deleted.`,
-        });
-      }
-    });
-
-    this.setState({
-      selectedCheckboxes: [],
-      selectedCheckboxesNumber: 0,
-      deleteDialogOpen: false,
-    });
-  }
-
-
   renderNoResults(count) {
     if (count == 0) {
       return (
-        <p style={{ padding: '25px' }} className="subheading">No category found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;</p>
+        <p style={{ padding: '25px' }} className="subheading">No result found for &lsquo;<span className="font-medium">{this.props.searchTerm}</span>&rsquo;}</p>
       );
     }
   }
@@ -138,6 +126,30 @@ class CategoriesTable extends React.Component {
     return false;
   }
 
+  deleteSelectedRows() {
+    localStorage.setItem('presetsTableDeleted', this.state.selectedCheckboxesNumber);
+
+    const presetIds = this.state.selectedCheckboxes;
+
+    Meteor.call('presets.batchRemove', presetIds, (error) => {
+      if (error) {
+        this.props.popTheSnackbar({
+          message: error.reason,
+        });
+      } else {
+        this.props.popTheSnackbar({
+          message: `${localStorage.getItem('presetsTableDeleted')} presets deleted.`,
+        });
+      }
+    });
+
+    this.setState({
+      selectedCheckboxes: [],
+      selectedCheckboxesNumber: 0,
+      deleteDialogOpen: false,
+    });
+  }
+
   deleteDialogHandleClickOpen() {
     this.setState({ deleteDialogOpen: true });
   }
@@ -147,86 +159,64 @@ class CategoriesTable extends React.Component {
   }
 
   render() {
+    if (this.props.loading) {
+      return <Loading />;
+    }
+
     return (
-      <div>
+      <div style={{ width: '100%' }}>
         <Paper elevation={2} className="table-container">
           {this.state.selectedCheckboxes.length > 0 ? (
             <div className="table-container--delete-rows-container">
               <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
-                {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'} selected
-              </Typography>
+                {this.state.selectedCheckboxesNumber} preset{this.state.selectedCheckboxes.length > 1 ? ('s') : ''} selected
+                </Typography>
               <Button style={{ color: '#FFF' }} onClick={this.deleteDialogHandleClickOpen.bind(this)}>Delete</Button>
             </div>
-          )
-            : ''
-
-          }
+          ) : ''}
           <Table className="table-container" style={{ tableLayout: 'fixed' }}>
             {this.props.count > 0 ?
               (<TableHead>
                 <TableRow>
                   <TableCell padding="checkbox" style={{ width: '12%' }}>
                     <Checkbox onChange={this.selectAllRows.bind(this)} /></TableCell>
-                  <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                    <Typography className="body2" type="body2">SKU</Typography></TableCell>
-                  <TableCell padding="none" style={{ width: '76%' }} onClick={() => this.props.sortByOptions('title')}>
-                    <Typography className="body2" type="body2">Category</Typography></TableCell>
-
+                  <TableCell padding="none" style={{ width: '88%' }} onClick={() => this.props.sortByOptions('title')}>
+                    <Typography className="body2" type="body2">Name</Typography>
+                  </TableCell>
                 </TableRow>
               </TableHead>)
               : ''
             }
             <TableBody>
+              {this.props.results.map((e, i) => {
+                const isSelected = this.isCheckboxSelected(e._id);
 
-              {/* <CSSTransitionGroup
-              transitionName="example"
-              transitionEnterTimeout={500}
-              transitionLeaveTimeout={300}
-            > */}
-              {
-                this.props.results.map((e, i) => {
-                  const isSelected = this.isCheckboxSelected(e._id);
+                return (
+                  <TableRow hover className={e._id} key={e._id}>
+                    <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
+                      <Checkbox
+                        className="row-checkbox"
+                        id={e._id}
+                        checked={isSelected}
+                        onChange={this.rowSelected.bind(this, e)}
+                      />
+                    </TableCell>
 
-                  return (
-                    <TableRow hover className={e._id} key={e._id}>
-                      <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }} padding="checkbox">
-                        <Checkbox
-                          className="row-checkbox"
-                          id={e._id}
-                          checked={isSelected}
-                          onChange={this.rowSelected.bind(this, e)}
-                        />
-                      </TableCell>
+                    <TableCell
+                      style={{ paddingTop: '10px', paddingBottom: '10px', width: '88%' }}
+                      padding="none"
+                      onClick={() => this.props.history.push(`/meal-planner-presets/${e._id}/edit`)}
+                    >
 
-                      <TableCell padding="none" style={{ width: '12%' }} onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}>
-                        <Typography className="subheading" type="subheading">{e.SKU ? e.SKU : ''}</Typography>
-                      </TableCell>
+                      <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                        {e.title}
+                      </Typography>
 
-                      <TableCell
-                        style={{ paddingTop: '10px', paddingBottom: '10px', width: '76%' }}
-                        padding="none"
-                        onClick={() => this.props.history.push(`/categories/${e._id}/edit`)}
-                      >
-
-                        <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                          {e.title}
-                        </Typography>
-                        <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {e.joinedTypes ?
-                            (
-                              e.joinedTypes.length > 1 ? (
-                                `${e.joinedTypes.length} types`
-                              ) : (`${e.joinedTypes.length} type`)
-                            )
-
-                            : '-'}
-                        </Typography>
-
-                      </TableCell>
-                    </TableRow>
-                  );
-                },
-                )
+                    </TableCell>
+                  </TableRow>
+                );
+              },
+              )
               }
 
               {this.renderNoResults(this.props.count)}
@@ -236,7 +226,7 @@ class CategoriesTable extends React.Component {
               <TableRow>
                 <TableCell>
                   <Typography className="body2 font-medium" type="body2" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                    {this.props.count} of {this.props.categoryCount} categories
+                    {this.props.count} of {this.props.presetCount} presets
                   </Typography>
                 </TableCell>
                 <TableCell />
@@ -250,12 +240,13 @@ class CategoriesTable extends React.Component {
             </TableFooter>
           </Table>
         </Paper>
+
         <Dialog open={this.state.deleteDialogOpen} onClose={this.deleteDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
-            Delete {this.state.selectedCheckboxesNumber} categor{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?
+            Delete {this.state.selectedCheckboxesNumber} preset{this.state.selectedCheckboxes.length > 1 ? ('s') : ''}?
           </Typography>
           <DialogContent>
-            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} categories?</DialogContentText>
+            <DialogContentText className="subheading"> Are you sure you want to delete {this.state.selectedCheckboxesNumber} preset{this.state.selectedCheckboxes.length > 1 ? ('s') : ''}?</DialogContentText>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.deleteDialogHandleRequestClose.bind(this)} color="default">
@@ -271,22 +262,19 @@ class CategoriesTable extends React.Component {
   }
 }
 
-CategoriesTable.propTypes = {
-  // results: PropType.isRequired,
-  history: PropTypes.func.isRequired,
+MealPresetsTable.propTypes = {
+  results: PropTypes.isRequired,
   hasMore: PropTypes.bool.isRequired,
   count: PropTypes.number.isRequired,
   loadMore: PropTypes.func.isRequired,
-  categoryCount: PropTypes.number.isRequired,
+  presetCount: PropTypes.number.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
-
 export default withTracker(() => {
-  const categoryCountSub = Meteor.subscribe('categories-all-count');
+  const presetCountSub = Meteor.subscribe('mealpresets-all-count');
 
   return {
-    // ingredientTypes: IngredientsWithTypes.find().fetch(),
-    categoryCount: Counts.get('categories'),
+    presetCount: Counts.get('mealpresets-count'),
   };
-})(CategoriesTable);
+})(MealPresetsTable);

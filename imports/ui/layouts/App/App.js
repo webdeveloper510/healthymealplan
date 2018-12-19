@@ -114,6 +114,9 @@ import EditType from '../../pages/EditType/EditType';
 
 import MealPlanner from '../../pages/MealPlanner/MealPlanner';
 
+import MealPresets from '../../pages/MealPresets/MealPresets';
+import NewMealPreset from '../../pages/NewMealPreset/NewMealPreset';
+import EditMealPreset from '../../pages/EditMealPreset/EditMealPreset';
 
 import Meals from '../../pages/Meals/Meals';
 import NewMeal from '../../pages/NewMeal/NewMeal';
@@ -740,6 +743,29 @@ class App extends React.Component {
                       {...this.props}
                     />
 
+                    <Authenticated
+                      exact
+                      path="/meal-planner-presets"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={MealPresets}
+                      {...this.props}
+                    />
+
+                    <Authenticated
+                      exact
+                      path="/meal-planner-presets/new"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={NewMealPreset}
+                      {...this.props}
+                    />
+
+                    <Authenticated
+                      exact
+                      path="/meal-planner-presets/:_id/edit"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={EditMealPreset}
+                      {...this.props}
+                    />
 
                     <Authenticated
                       exact
