@@ -367,6 +367,16 @@ class MealPlannerTable extends Component {
     });
   }
 
+  compareLifestyles(a, b) {
+    if (a.title > b.title) {
+      return -1
+    } else {
+      return 1
+    }
+
+    return 0
+  }
+
   render() {
     if (this.props.loading) {
       return <Loading />;
@@ -375,7 +385,7 @@ class MealPlannerTable extends Component {
     return (
       <div style={{ width: '100%' }}>
 
-        {this.props.lifestyles && this.props.lifestyles.map((lifestyle) => {
+        {this.props.lifestyles && this.props.lifestyles.sort(this.compareLifestyles).map((lifestyle) => {
           const mealTypeOrder = ['Breakfast', 'Lunch', 'Dinner'];
           const mapBy = [];
           const mainLifestyles = lifestyle.title == 'Traditional' || lifestyle.title == 'No meat' || lifestyle.title == 'Flex';
