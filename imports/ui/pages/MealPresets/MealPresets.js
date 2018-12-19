@@ -14,12 +14,7 @@ import SearchIcon from 'material-ui-icons/Search';
 import ClearIcon from 'material-ui-icons/Clear';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
-import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
-
-import LeftArrow from 'material-ui-icons/ArrowBack';
-import RightArrow from 'material-ui-icons/ArrowForward';
-
-import moment from 'moment';
+import autoBind from 'react-autobind';
 
 import MealPresetsColl from '../../../api/MealPresets/MealPresets';
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
@@ -35,23 +30,20 @@ class MealPresets extends React.Component {
   constructor(props) {
     super(props);
 
-    this.changeDate = this.changeDate.bind(this);
-
     this.state = {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
       options: {
         sort: {
-          onDate: -1,
+          title: 1,
         },
       },
       searchSelector: '',
-      // currentTabValue: /./,
-      selectedRoute: '',
-      currentSelectorDate: moment(new Date()).format('YYYY-MM-DD'),
+      currentTabValue: 0,
     };
 
-    this.sortByOption = this.sortByOption.bind(this);
+    autoBind(this);
+
   }
 
   searchByName() {
@@ -98,18 +90,6 @@ class MealPresets extends React.Component {
     this.setState({ currentTabValue: value });
   }
 
-  changeDate(operation) {
-    if (operation === 'add') {
-      this.setState({
-        currentSelectorDate: moment(this.state.currentSelectorDate).add(1, 'd').format('YYYY-MM-DD'),
-      });
-    } else {
-      this.setState({
-        currentSelectorDate: moment(this.state.currentSelectorDate).subtract(1, 'd').format('YYYY-MM-DD'),
-      });
-    }
-  }
-
   render() {
     const { loading, history } = this.props;
 
@@ -119,7 +99,7 @@ class MealPresets extends React.Component {
         <Grid container className="SideContent SideContent--spacer-2x--horizontal SideContent--spacer-2x--top">
 
           <Grid container className="clearfix">
-            <Grid item xs={12} style={{ alignItems: 'space-between' }}>
+            <Grid item xs={12} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <Typography type="headline" gutterBottom style={{ fontWeight: 500 }}>Meal presets</Typography>
               <Button
                 className="btn btn-primary"
@@ -130,31 +110,58 @@ class MealPresets extends React.Component {
             </Grid>
           </Grid>
 
+          <div style={{ marginTop: '25px' }}>
+            <AppBar position="static" className="appbar--no-background appbar--no-shadow">
+              <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
+                <Tab label="All" />
+              </Tabs>
+            </AppBar>
+          </div>
+
+          <div style={{
+            width: '100%',
+            background: '#FFF',
+            borderTopRightRadius: '2px',
+            borderTopLeftRadius: '2px',
+            marginTop: '3em',
+            padding: '16px 25px 1em',
+            boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
+            position: 'relative'
+          }}
+          >
+
+            <SearchIcon
+              className="autoinput-icon autoinput-icon--search"
+              style={{ display: (this.state.searchSelector.length > 0) ? 'none' : 'block', top: '33%', right: '1.8em !important' }}
+            />
+
+            <ClearIcon
+              className="autoinput-icon--clear"
+              onClick={this.clearSearchBox.bind(this)}
+              style={{
+                cursor: 'pointer',
+                display: (this.state.searchSelector.length > 0) ? 'block' : 'none',
+              }}
+            />
+
+            <Input
+              className="input-box"
+              style={{ width: '100%', position: 'relative' }}
+              placeholder="Search presets"
+              onKeyUp={this.searchByName.bind(this)}
+              inputProps={{
+                id: 'search-type-text',
+                'aria-label': 'Description',
+              }}
+            />
+          </div>
+
           <ListContainer
             limit={50}
             collection={MealPresetsColl}
             publication="mealpresets"
-            joins={[
-              {
-                localProperty: 'lifestyleId',
-                collection: Lifestyles,
-                joinAs: 'lifestyle',
-              },
-              {
-                localProperty: 'mealId',
-                collection: Meals,
-                joinAs: 'meal',
-              },
-              {
-                localProperty: 'plateId',
-                collection: PlatesCollection,
-                joinAs: 'plate',
-              },
-            ]}
             options={this.state.options}
-            selector={{
-              onDate: this.state.currentSelectorDate,
-            }}
+            selector={{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }}
             component={MealPresetsTable}
             componentProps={{
               popTheSnackbar: this.props.popTheSnackbar,
@@ -168,20 +175,8 @@ class MealPresets extends React.Component {
               plates: this.props.plates,
               loading: this.props.loading,
             }}
-          >
-            {/* <MealPlannerTable
-              popTheSnackbar={this.props.popTheSnackbar}
-              searchTerm={this.state.searchSelector}
-              rowsLimit={this.state.rowsVisible}
-              history={this.props.history}
-              sortByOptions={this.sortByOption}
-              currentSelectorDate={this.state.currentSelectorDate}
-              lifestyles={this.props.lifestyles}
-              meals={this.props.meals}
-              plates={this.props.plates}
-              loading={this.props.loading}
-            /> */}
-          </ListContainer>
+          />
+
         </Grid>
       </div >
     ) : <Loading />);

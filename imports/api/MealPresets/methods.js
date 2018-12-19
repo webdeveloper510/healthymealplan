@@ -4,43 +4,56 @@ import MealPresets from './MealPresets';
 import rateLimit from '../../modules/rate-limit';
 
 Meteor.methods({
-  'presets.insert': function mealPrestsInsert(date, lifestyle, meal, plate) {
-    check(date, String);
-    check(lifestyle, String);
-    check(meal, String);
-    check(plate, String);
+  'presets.insert': function mealPrestsInsert(data) {
+    check(data, {
+      title: String,
+      weekPresetMonday: Array,
+      weekPresetTuesday: Array,
+      weekPresetWednesday: Array,
+      weekPresetThursday: Array,
+      weekPresetFriday: Array,
+    });
 
     try {
-      return MealPresets.insert({
-        onDate: date,
-        lifestyleId: lifestyle,
-        mealId: meal,
-        plateId: plate,
-      });
+      return MealPresets.insert(data);
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
 
-  'presets.update': function presetsUpdate(forDate, reassignPlannerId, plateIdNew) {
-    check(forDate, String);
-    check(plateIdNew, String);
-    check(reassignPlannerId, String);
-
+  'presets.update': function presetsUpdate(data) {
+    check(data, {
+      _id: String,
+      title: String,
+      weekPresetMonday: Array,
+      weekPresetTuesday: Array,
+      weekPresetWednesday: Array,
+      weekPresetThursday: Array,
+      weekPresetFriday: Array,
+    });
 
     try {
-      MealPlanner.update({ _id: reassignPlannerId, onDate: forDate }, { $set: { plateId: plateIdNew } });
+      MealPresets.update({ _id: data._id }, { $set: data });
 
-      return reassignPlannerId;
+      return data._id;
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
-  'presets.remove': function presetsUpdate(presetId) {
+  'presets.remove': function presetRemove(presetId) {
     check(presetId, String);
 
     try {
-      MealPlanner.remove({ _id: presetId });
+      MealPresets.remove({ _id: presetId });
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
+  'presets.batchRemove': function presetsBatchRemove(presetIds) {
+    check(presetIds, Array);
+
+    try {
+      MealPresets.remove({ _id: { $in: presetIds } });
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
@@ -50,10 +63,10 @@ Meteor.methods({
 
 rateLimit({
   methods: [
-    'mealPrests.insert',
-    'mealPrests.update',
-    'mealPrests.remove',
-    'mealPrests.batchUpdate',
+    'presets.insert',
+    'presets.update',
+    'presets.remove',
+    'presets.batchRemove',
   ],
   limit: 5,
   timeRange: 1000,

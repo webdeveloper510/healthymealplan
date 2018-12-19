@@ -22,25 +22,50 @@ MealPresets.schema = new SimpleSchema({
     type: String,
     label: 'Customer ID of the delivery.',
   },
-  weekPreset: {
+  weekPresetMonday: {
     type: Array,
-    label: 'Preset lifestyle meals for the week',
+    label: 'Preset array containing per lifestyle meals for the day',
   },
-  'weekPreset.$': {
+  'weekPresetMonday.$': {
     type: Object,
-    label: 'Meal planner object',
+    label: 'Preset single plate object',
+    blackbox: true,
   },
-  'weekPreset.$.lifestyleId': {
-    type: String,
-    label: 'Customer ID of the delivery.',
+  weekPresetTuesday: {
+    type: Array,
+    label: 'Preset array containing per lifestyle meals for the day',
   },
-  'weekPreset.$.mealId': {
-    type: String,
-    label: 'The subscription id of the delivery.',
+  'weekPresetTuesday.$': {
+    type: Object,
+    label: 'Preset single plate object',
+    blackbox: true,
   },
-  'weekPreset.$.plateId': {
-    type: String,
-    label: 'The id of the meal',
+  weekPresetWednesday: {
+    type: Array,
+    label: 'Preset array containing per lifestyle meals for the day',
+  },
+  'weekPresetWednesday.$': {
+    type: Object,
+    label: 'Preset single plate object',
+    blackbox: true,
+  },
+  weekPresetThursday: {
+    type: Array,
+    label: 'Preset array containing per lifestyle meals for the day',
+  },
+  'weekPresetThursday.$': {
+    type: Object,
+    label: 'Preset single plate object',
+    blackbox: true,
+  },
+  weekPresetFriday: {
+    type: Array,
+    label: 'Preset array containing per lifestyle meals for the day',
+  },
+  'weekPresetFriday.$': {
+    type: Object,
+    label: 'Preset single plate object',
+    blackbox: true,
   },
   createdAt: {
     type: String,

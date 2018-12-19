@@ -26,7 +26,7 @@ import Button from 'material-ui/Button';
 // import IconButton from 'material-ui/IconButton';
 
 
-import { createContainer } from 'meteor/react-meteor-data';
+import { withTracker } from 'meteor/react-meteor-data';
 // import IngredientsCollection from '../../../api/Ingredients/Ingredients';
 import Loading from '../../components/Loading/Loading';
 
@@ -282,11 +282,11 @@ CategoriesTable.propTypes = {
 };
 
 
-export default createContainer(() => {
+export default withTracker(() => {
   const categoryCountSub = Meteor.subscribe('categories-all-count');
 
   return {
     // ingredientTypes: IngredientsWithTypes.find().fetch(),
     categoryCount: Counts.get('categories'),
   };
-}, CategoriesTable);
+})(CategoriesTable);

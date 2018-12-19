@@ -18,6 +18,6 @@ Meteor.publish('mealpresets.view', (prestId) => {
 });
 
 Meteor.publish('mealpresets-all-count', function mealPresetsCount() {
-  Counts.publish(this, 'mealpresets', MealPresets.find());
+  Counts.publish(this, 'mealpresets-count', MealPresets.find());
 });
 
