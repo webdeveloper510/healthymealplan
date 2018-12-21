@@ -22,10 +22,12 @@ import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
 
 import Typography from 'material-ui/Typography';
-import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
+import Tooltip from 'material-ui/Tooltip';
+import Checkbox from 'material-ui/Checkbox';
 import IconButton from 'material-ui/IconButton';
 import Input from 'material-ui/Input';
+import Select from 'material-ui/Select';
 import Menu from 'material-ui/Menu';
 import { MenuItem } from 'material-ui/Menu';
 import Grid from 'material-ui/Grid';
@@ -70,12 +72,18 @@ class MealPlannerTable extends Component {
 
       reassignResult: null,
       reassignPlannerId: '',
+
+      selectedPreset: 'none',
+      presetDialogOpen: false,
+
     };
 
     autoBind(this);
+
+    this.weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   }
 
-  openAssignDialog(lifestyleId, mealId) {
+  openAssignDialog(lifestyleId, mealId, plannerViewWeekDate = null) {
     const lifestyle = this.props.lifestyles.find(el => el._id === lifestyleId);
     const meal = this.props.meals.find(el => el._id === mealId);
 
@@ -89,6 +97,7 @@ class MealPlannerTable extends Component {
       assignDialogOpen: true,
       lifestyleSelected: lifestyleId,
       mealSelected: mealId,
+      dateSelected: plannerViewWeekDate,
     });
   }
 
@@ -98,6 +107,7 @@ class MealPlannerTable extends Component {
       selectedMeal: '',
       selectedPlate: '',
       assignDialogOpen: false,
+      dateSelected: '',
     });
   }
 
@@ -170,11 +180,52 @@ class MealPlannerTable extends Component {
     });
   }
 
+  handlePresetAssignment() {
+
+    localStorage.setItem('presetAssigned', this.props.presets.find(e => e._id == this.state.selectedPreset).title);
+
+    Meteor.call('mealPlanner.applyPreset', this.state.selectedPreset, this.props.currentSelectorWeekStart, (error) => {
+      if (error) {
+        this.props.popTheSnackbar({
+          message: error.reason,
+        });
+      } else {
+        this.props.popTheSnackbar({
+          message: `${localStorage.getItem('presetAssigned')} has been assigned.`,
+        });
+      }
+    });
+
+    this.setState({
+      presetDialogOpen: false,
+    });
+  }
+
+  handleClearWeek() {
+    localStorage.setItem('weekCleared', `Plates for the week of ${moment(this.props.currentSelectorWeekStart).format('dddd, MMMM D')}`);
+
+    Meteor.call('mealPlanner.clearWeek', this.props.currentSelectorWeekStart, (error) => {
+      if (error) {
+        this.props.popTheSnackbar({
+          message: error.reason,
+        });
+      } else {
+        this.props.popTheSnackbar({
+          message: `${localStorage.getItem('weekCleared')} have been cleared.`,
+        });
+      }
+    });
+
+    this.setState({
+      clearDialogOpen: false,
+    });
+  }
+
   handleMealAssignment() {
     localStorage.setItem('mealAssigned', this.state.selectedSugestion.title);
 
     Meteor.call('mealPlanner.insert',
-      this.props.currentSelectorDate,
+      this.props.plannerView == 'week' ? this.state.dateSelected : this.props.currentSelectorDate,
       this.state.lifestyleSelected,
       this.state.mealSelected,
       this.state.selectedSugestion._id, (error) => {
@@ -369,12 +420,16 @@ class MealPlannerTable extends Component {
 
   compareLifestyles(a, b) {
     if (a.title > b.title) {
-      return -1
-    } else {
-      return 1
+      return -1;
     }
+    return 1;
 
-    return 0
+
+    return 0;
+  }
+
+  handleChange(event) {
+    this.setState({ selectedPreset: event.target.value });
   }
 
   render() {
@@ -384,6 +439,16 @@ class MealPlannerTable extends Component {
 
     return (
       <div style={{ width: '100%' }}>
+        {this.props.plannerView == 'week' && (
+          <React.Fragment>
+            <Tooltip title="This will clear all the plates for the whole week">
+              <Button style={{ float: 'right' }} onClick={() => this.setState({ clearDialogOpen: true })}>Clear</Button>
+            </Tooltip>
+            <Tooltip title="Selected preset will be applied for the whole week">
+              <Button style={{ float: 'right' }} onClick={() => this.setState({ presetDialogOpen: true })}>Apply preset</Button>
+            </Tooltip>
+          </React.Fragment>
+        )}
 
         {this.props.lifestyles && this.props.lifestyles.sort(this.compareLifestyles).map((lifestyle) => {
           const mealTypeOrder = ['Breakfast', 'Lunch', 'Dinner'];
@@ -393,16 +458,19 @@ class MealPlannerTable extends Component {
             mapBy.push(this.props.meals.find(el => el.title == e));
           });
 
-          return (
-            <div style={{ width: '100%', marginBottom: '50px', marginTop: '25px' }} key={lifestyle._id}>
-              <Grid container>
-                <Grid item xs={12} lg={12}>
-                  <Typography type="headline" style={{ marginBottom: '25px' }}>{`${lifestyle.title} for ${moment(this.props.currentSelectorDate).format('dddd, MMMM D')}`}</Typography>
+          if (this.props.plannerView === 'day') {
+
+            return (
+              <div style={{ width: '100%', marginBottom: '50px', marginTop: '25px' }} key={lifestyle._id}>
+                <Grid container>
+                  <Grid item xs={12} lg={12}>
+                    <Typography type="headline" style={{ marginBottom: '25px' }}>
+                      {`${lifestyle.title} for ${moment(this.props.currentSelectorDate).format('dddd, MMMM D')}`}
+                    </Typography>
+                  </Grid>
                 </Grid>
-              </Grid>
-              <Grid container>
-                {
-                  mapBy.map((meal, index) => {
+                <Grid container>
+                  {mapBy.map((meal, index) => {
                     const presentDish = this.props.results.find(e => e.onDate == this.props.currentSelectorDate && e.lifestyleId == lifestyle._id && e.mealId == meal._id);
                     // console.log(presentDish);
                     // console.log(presentDish);
@@ -482,13 +550,174 @@ class MealPlannerTable extends Component {
                           </div>
                         </Grid>
                       );
-                  })// map
-                }
-              </Grid>
-            </div>
-          );
+                  })}
+                </Grid>
+              </div>
+            );
+          }
+
+          if (this.props.plannerView === 'week') {
+
+            return (
+              <div style={{ width: '100%', marginBottom: '50px', marginTop: '25px' }} key={lifestyle._id}>
+                <Grid container>
+                  <Grid item xs={12} lg={12}>
+                    <Typography type="headline" style={{ marginBottom: '25px' }}>
+                      {`${lifestyle.title} for the week of ${moment(this.props.currentSelectorWeekStart).format('dddd, MMMM D')}`}
+                    </Typography>
+                  </Grid>
+                </Grid>
+                <Grid container style={{ margin: 0 }}>
+                  {this.weekDays.map((weekDay, weekDayIndex) => (
+                    <React.Fragment>
+                      <Typography type="subheading" style={{ margin: '1.75em 0 1em' }}>
+                        {`${weekDay} ${moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('MMMM D')}`}
+                      </Typography>
+
+                      <Grid container>
+                        {mapBy.map((meal, index) => {
+                          const presentDish = this.props.results.find(e =>
+                            e.onDate == moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD') && e.lifestyleId == lifestyle._id && e.mealId == meal._id);
+                          // console.log(presentDish);
+                          // console.log(presentDish);
+                          let dish = null;
+                          let assignedPlateId = null;
+                          let assignedPlannerId = null;
+                          if (presentDish) {
+                            dish = this.props.plates.find(e => presentDish.plateId == e._id);
+                            assignedPlateId = this.getAssignedPlateId(this.props.results, lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'));
+                            assignedPlannerId = this.getAssignedPlannerId(this.props.results, lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'));
+                          }
+
+                          // console.log(dish);
+
+                          return dish != null && this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ? (
+                            <Grid item xs={12} sm={6} md={4} lg={4} key={assignedPlannerId}>
+                              <Card style={{ width: '100%' }}>
+                                {mainLifestyles && (
+                                  <CardMedia
+                                    style={{ height: '400px' }}
+                                    image={dish.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${dish.imageUrl}` : 'https://via.placeholder.com/460x540?text=+'}
+                                  />
+                                )}
+                                <CardContent>
+                                  <Typography style={{ marginBottom: '16px', fontSize: '14px', color: 'rgba(0, 0, 0, .54)' }}>
+                                    {meal.title}
+                                  </Typography>
+
+                                  <Typography type="headline" component="h2">
+                                    {dish.title}
+                                  </Typography>
+                                  <Typography type="body1" style={{ marginBottom: '12px', color: 'rgba(0, 0, 0, .54)' }}>
+                                    {dish.subtitle != undefined && dish.subtitle}
+                                  </Typography>
+
+                                </CardContent>
+                                <Divider />
+                                <CardActions style={{ justifyContent: 'flex-end' }}>
+
+                                  {dish.mealCategory && dish.slug && (
+                                    <Button
+                                      size="small"
+                                      dense
+                                      color="primary"
+                                      onClick={() => window.open(`https://www.vittle.ca/on-the-menu/${dish.mealCategory}/${dish.slug}`, '_blank')}
+                                    >
+                                      View
+                                    </Button>
+                                  )}
+
+                                  <Button
+                                    dense
+                                    size="small"
+                                    color="primary"
+                                    onClick={e => this.setState({ [`menu${assignedPlateId}`]: e.currentTarget })}
+                                  >
+                                    Edit
+                                  </Button>
+                                </CardActions>
+                              </Card>
+                              <Menu
+                                id={`menu${assignedPlateId}`}
+                                anchorEl={this.state[`menu${assignedPlateId}`]}
+                                open={Boolean(this.state[`menu${assignedPlateId}`])}
+                                onClose={e => this.setState({ [`menu${assignedPlateId}`]: null })}
+                              >
+                                <MenuItem onClick={() => this.removeMealPlanner(assignedPlannerId)}>Remove</MenuItem>
+                                <MenuItem onClick={() => this.openReassignDialog(lifestyle._id, meal._id, assignedPlannerId)}>Reassign</MenuItem>
+                                <MenuItem onClick={() => this.props.history.push(`/plates/${assignedPlateId}/edit`)}>View</MenuItem>
+                              </Menu>
+                            </Grid>
+                          ) : (
+                            <Grid item xs={12} sm={6} md={4} lg={4}>
+                              <div className="card-bordered-emtpy" onClick={() => this.openAssignDialog(lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'))}>
+                                <Typography className="card-bordered-empty__para" type="body1" component="p">Assign {meal && meal.title != undefined ? meal.title.toLowerCase() : ''}</Typography>
+                              </div>
+                            </Grid>
+                          );
+                        })}
+                      </Grid>
+                    </React.Fragment>
+                  ))}
+
+                </Grid>
+              </div>
+            );
+          }
 
         })}
+
+        <Dialog maxWidth="md" fullWidth fullScreen open={this.state.presetDialogOpen} onClose={() => this.setState({ presetDialogOpen: false })}>
+          <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
+            Apply a preset for the week of {moment(this.props.currentSelectorWeekStart).format('dddd, MMMM D')}
+          </Typography>
+          <Typography style={{ padding: '0 24px 20px' }} className="subheading" type="subheading">
+            Once a preset is applied it cannot be removed. Even if a preset is updated, it has to be applied again to reflect changes on the planner. A week's plates can be cleared off by using the reset functioanlity.
+          </Typography>
+          <DialogContent>
+
+            {this.props.plannerView == 'week' && (
+              <div>
+                <Select
+                  value={this.state.selectedPreset}
+                  onChange={this.handleChange}
+                >
+                  <MenuItem value="none" key="0">Select a preset</MenuItem>
+                  {this.props.presets.map(preset => (
+                    <MenuItem key={preset._id} value={preset._id}>{preset.title}</MenuItem>
+                  ))}
+                </Select>
+              </div>
+            )}
+
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => this.setState({ presetDialogOpen: false })} color="default">
+              Cancel
+            </Button>
+            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handlePresetAssignment} color="primary">
+              Apply
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Dialog open={this.state.clearDialogOpen} onClose={() => this.setState({ clearDialogOpen: false })}>
+          <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
+            Clear all plates for the week of {moment(this.props.currentSelectorWeekStart).format('dddd, MMMM D')}?
+          </Typography>
+          <Typography style={{ padding: '0 24px 20px' }} className="subheading" type="subheading">
+            This will remove all the plates assigned for all the lifestyles.
+          </Typography>
+
+          <DialogActions>
+            <Button onClick={() => this.setState({ clearDialogOpen: false })} color="default">
+              Cancel
+            </Button>
+            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleClearWeek} color="primary">
+              Clear
+            </Button>
+          </DialogActions>
+        </Dialog>
 
         <Dialog maxWidth="md" fullWidth fullScreen open={this.state.assignDialogOpen} onClose={this.closeAssignDialog}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
