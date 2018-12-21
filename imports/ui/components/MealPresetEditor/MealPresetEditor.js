@@ -555,6 +555,16 @@ class MealPresetEditor extends React.Component {
     });
   }
 
+  compareLifestyles(a, b) {
+    if (a.title > b.title) {
+      return -1
+    } else {
+      return 1
+    }
+
+    return 0
+  }
+
   renderPlateChip(lifestyleId, mealId, weekdayIndex) {
 
     const blankChip = <Chip className="chip--bordered" label="Plate" />;
@@ -568,6 +578,11 @@ class MealPresetEditor extends React.Component {
     if (selectedPreset) {
       const selectedPlateForWeekday = this.props.plates.find(e => e._id == selectedPreset.plateId);
       // console.log(selectedPlateForWeekday);
+
+      if(!selectedPlateForWeekday){
+        return blankChip;
+      }
+
       return (
         <Chip
           avatar={<Avatar>{selectedPlateForWeekday.title.charAt(0)}</Avatar>}
@@ -710,7 +725,7 @@ class MealPresetEditor extends React.Component {
                 </Typography>
               </Grid>
               <Grid item xs={12} sm={8}>
-                {this.props.lifestyles.map(lifestyle => (
+                {this.props.lifestyles.sort(this.compareLifestyles).map(lifestyle => (
 
                   <Paper style={{ padding: '2em', marginBottom: '2em' }}>
                     <Typography type="headline" style={{ marginBottom: '2em' }}>
@@ -818,18 +833,18 @@ class MealPresetEditor extends React.Component {
                 {this.props.newPreset ? (
                   ''
                 ) : (
-                  <Button
-                    style={{ backgroundColor: danger, color: '#FFFFFF' }}
-                    raised
-                    onClick={
-                      preset && preset._id
-                        ? this.handleRemove.bind(this)
-                        : () => this.props.history.push('/meal-planner-presets')
-                    }
-                  >
+                    <Button
+                      style={{ backgroundColor: danger, color: '#FFFFFF' }}
+                      raised
+                      onClick={
+                        preset && preset._id
+                          ? this.handleRemove.bind(this)
+                          : () => this.props.history.push('/meal-planner-presets')
+                      }
+                    >
                       Delete
                   </Button>
-                )}
+                  )}
               </Grid>
 
               <Grid item xs={8}>

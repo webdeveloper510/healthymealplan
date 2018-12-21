@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
 import MealPlanner from './MealPlanner';
+import MealPresets from '../MealPresets/MealPresets';
 import rateLimit from '../../modules/rate-limit';
 
 import sumBy from 'lodash/sumBy';
@@ -48,7 +49,50 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
+  'mealPlanner.applyPreset': function mealPlannerUpdate(presetId, weekStart) {
+    check(presetId, String);
+    check(weekStart, String);
 
+    const preset = MealPresets.findOne({ _id: presetId });
+
+    if (!preset) {
+      throw new Meteor.Error(404, 'Preset not found');
+    }
+
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thurdsay', 'Friday'];
+    const weekStartDate = moment(weekStart);
+
+    for (let i = 1; i <= 5; i++) {
+      const day = days[i - 1];
+      const presetForTheDay = preset[`weekPreset${day}`];
+
+      if (presetForTheDay == [] || !presetForTheDay) {
+        continue;
+      }
+
+      presetForTheDay.map((presetCurrentDay) => {
+        const plannerData = {
+          onDate: moment(weekStart).isoWeekday(i).format('YYYY-MM-DD'),
+          lifestyleId: presetCurrentDay.lifestyleId,
+          mealId: presetCurrentDay.mealId,
+          plateId: presetCurrentDay.plateId,
+        };
+
+        MealPlanner.update(plannerData, { $set: plannerData }, { upsert: true });
+      });
+    }
+  },
+  'mealPlanner.clearWeek': function mealPlannerUpdate(weekStart) {
+    check(weekStart, String);
+
+    try {
+      const dataToRemove = [1, 2, 3, 4, 5].map(e => moment(weekStart).isoWeekday(e).format('YYYY-MM-DD'));
+
+      MealPlanner.remove({ onDate: { $in: dataToRemove } });
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
 });
 
 rateLimit({
@@ -56,6 +100,8 @@ rateLimit({
     'mealPlanner.insert',
     'mealPlanner.update',
     'mealPlanner.remove',
+    'mealPlanner.applyPreset',
+    'mealPlanner.clearWeek',
     'mealPlanner.batchUpdate',
   ],
   limit: 5,

@@ -35,13 +35,13 @@ MealPlanner.schema = new SimpleSchema({
     type: String,
     label: 'Date to be cooked on',
   },
-
   createdAt: {
     type: String,
     label: 'The date this delivery was created.',
     autoValue() {
       if (this.isInsert) return (new Date()).toISOString();
     },
+    optional: true,
   },
   updatedAt: {
     type: String,
@@ -49,6 +49,7 @@ MealPlanner.schema = new SimpleSchema({
     autoValue() {
       if (this.isInsert || this.isUpdate) return (new Date()).toISOString();
     },
+    optional: true,
   },
 
 });
