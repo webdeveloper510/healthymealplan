@@ -72,6 +72,7 @@ class MealPlannerTable extends Component {
 
       reassignResult: null,
       reassignPlannerId: '',
+      reassignOnDate: null,
 
       selectedPreset: 'none',
       presetDialogOpen: false,
@@ -117,13 +118,20 @@ class MealPlannerTable extends Component {
     });
   }
 
-  openReassignDialog(lifestyleId, mealId) {
-    const assignedPlate = this.props.results.find(el => el.lifestyle._id === lifestyleId && el.meal._id === mealId && el.onDate === this.props.currentSelectorDate);
+  openReassignDialog(lifestyleId, mealId, weekViewFormattedDate = null) {
+    const onDate = this.props.plannerView == "week" ? weekViewFormattedDate : this.props.currentSelectorDate;
+    console.log("ON DATE");
+    console.log(onDate);
+    const assignedPlate = this.props.results.find(el =>
+      el.lifestyle._id === lifestyleId
+      && el.meal._id === mealId
+      && el.onDate === onDate);
 
     this.setState({
       reassignResult: assignedPlate,
       reassignDialogOpen: true,
       reassignPlannerId: assignedPlate._id,
+      reassignOnDate: weekViewFormattedDate,
     });
   }
 
@@ -251,7 +259,7 @@ class MealPlannerTable extends Component {
   handleMealReassignment() {
     localStorage.setItem('mealReassigned', this.state.selectedSugestion.title);
 
-    Meteor.call('mealPlanner.update', this.props.currentSelectorDate, this.state.reassignPlannerId, this.state.selectedSugestion._id, (error) => {
+    Meteor.call('mealPlanner.update', this.state.reassignOnDate, this.state.reassignPlannerId, this.state.selectedSugestion._id, (error) => {
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
@@ -267,6 +275,7 @@ class MealPlannerTable extends Component {
       reassignDialogOpen: false,
       selectedSuggestion: null,
       reassignPlannerId: null,
+      reassignOnDate: null,
     });
   }
 
@@ -539,7 +548,7 @@ class MealPlannerTable extends Component {
                             onClose={e => this.setState({ [`menu${assignedPlateId}`]: null })}
                           >
                             <MenuItem onClick={() => this.removeMealPlanner(assignedPlannerId)}>Remove</MenuItem>
-                            <MenuItem onClick={() => this.openReassignDialog(lifestyle._id, meal._id, assignedPlannerId)}>Reassign</MenuItem>
+                            <MenuItem onClick={() => this.openReassignDialog(lifestyle._id, meal._id)}>Reassign</MenuItem>
                             <MenuItem onClick={() => this.props.history.push(`/plates/${assignedPlateId}/edit`)}>View</MenuItem>
                           </Menu>
                         </Grid>
@@ -586,10 +595,13 @@ class MealPlannerTable extends Component {
                           if (presentDish) {
                             dish = this.props.plates.find(e => presentDish.plateId == e._id);
                             assignedPlateId = this.getAssignedPlateId(this.props.results, lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'));
-                            assignedPlannerId = this.getAssignedPlannerId(this.props.results, lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'));
+                            assignedPlannerId = this.getAssignedPlannerId(this.props.results,
+                              lifestyle._id,
+                              meal._id,
+                              moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'));
                           }
 
-                          // console.log(dish);
+                          console.log(assignedPlannerId);
 
                           return dish != null && this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ? (
                             <Grid item xs={12} sm={6} md={4} lg={4} key={assignedPlannerId}>
@@ -644,17 +656,17 @@ class MealPlannerTable extends Component {
                                 onClose={e => this.setState({ [`menu${assignedPlateId}`]: null })}
                               >
                                 <MenuItem onClick={() => this.removeMealPlanner(assignedPlannerId)}>Remove</MenuItem>
-                                <MenuItem onClick={() => this.openReassignDialog(lifestyle._id, meal._id, assignedPlannerId)}>Reassign</MenuItem>
+                                <MenuItem onClick={() => this.openReassignDialog(lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'))}>Reassign</MenuItem>
                                 <MenuItem onClick={() => this.props.history.push(`/plates/${assignedPlateId}/edit`)}>View</MenuItem>
                               </Menu>
                             </Grid>
                           ) : (
-                            <Grid item xs={12} sm={6} md={4} lg={4}>
-                              <div className="card-bordered-emtpy" onClick={() => this.openAssignDialog(lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'))}>
-                                <Typography className="card-bordered-empty__para" type="body1" component="p">Assign {meal && meal.title != undefined ? meal.title.toLowerCase() : ''}</Typography>
-                              </div>
-                            </Grid>
-                          );
+                              <Grid item xs={12} sm={6} md={4} lg={4}>
+                                <div className="card-bordered-emtpy" onClick={() => this.openAssignDialog(lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'))}>
+                                  <Typography className="card-bordered-empty__para" type="body1" component="p">Assign {meal && meal.title != undefined ? meal.title.toLowerCase() : ''}</Typography>
+                                </div>
+                              </Grid>
+                            );
                         })}
                       </Grid>
                     </React.Fragment>

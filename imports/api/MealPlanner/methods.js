@@ -40,7 +40,7 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
-  'mealPlanner.remove': function mealPlannerUpdate(mealPlannerId) {
+  'mealPlanner.remove': function mealPlannerRemove(mealPlannerId) {
     check(mealPlannerId, String);
 
     try {
@@ -49,7 +49,7 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
-  'mealPlanner.applyPreset': function mealPlannerUpdate(presetId, weekStart) {
+  'mealPlanner.applyPreset': function mealPlannerApplyPreset(presetId, weekStart) {
     check(presetId, String);
     check(weekStart, String);
 
@@ -82,7 +82,7 @@ Meteor.methods({
       });
     }
   },
-  'mealPlanner.clearWeek': function mealPlannerUpdate(weekStart) {
+  'mealPlanner.clearWeek': function mealPlannerClearWeek(weekStart) {
     check(weekStart, String);
 
     try {
