@@ -62,6 +62,13 @@ Meteor.methods({
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thurdsay', 'Friday'];
     const weekStartDate = moment(weekStart);
 
+    // clear the week
+
+    const dataToRemove = [1, 2, 3, 4, 5].map(e => weekStartDate.isoWeekday(e).format('YYYY-MM-DD'));
+    MealPlanner.remove({ onDate: { $in: dataToRemove } });
+
+
+    // loop through preset data mon-friday
     for (let i = 1; i <= 5; i++) {
       const day = days[i - 1];
       const presetForTheDay = preset[`weekPreset${day}`];
@@ -71,6 +78,21 @@ Meteor.methods({
       }
 
       presetForTheDay.map((presetCurrentDay) => {
+        // const plannerData = {
+        //   onDate: moment(weekStart).isoWeekday(i).format('YYYY-MM-DD'),
+        //   lifestyleId: presetCurrentDay.lifestyleId,
+        //   mealId: presetCurrentDay.mealId,
+        //   plateId: presetCurrentDay.plateId,
+        // };
+
+        // MealPlanner.update(plannerData, { $set: plannerData }, { upsert: true });
+
+        // const plannerDataCheck = {
+        //   onDate: moment(weekStart).isoWeekday(i).format('YYYY-MM-DD'),
+        //   lifestyleId: presetCurrentDay.lifestyleId,
+        //   mealId: presetCurrentDay.mealId,
+        // };
+
         const plannerData = {
           onDate: moment(weekStart).isoWeekday(i).format('YYYY-MM-DD'),
           lifestyleId: presetCurrentDay.lifestyleId,
@@ -78,7 +100,18 @@ Meteor.methods({
           plateId: presetCurrentDay.plateId,
         };
 
-        MealPlanner.update(plannerData, { $set: plannerData }, { upsert: true });
+        // const samePlateExists = MealPlanner.findOne(plannerDataCheck);
+
+        // if (samePlateExists) {
+        //   MealPlanner.update({
+        //     _id: samePlateExists._id,
+        //   }, {
+        //     $set: plannerData,
+        //   });
+        // } else {
+        MealPlanner.insert(plannerData);
+        // }
+
       });
     }
   },
