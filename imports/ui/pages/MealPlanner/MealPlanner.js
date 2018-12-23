@@ -123,11 +123,11 @@ class MealPlanner extends React.Component {
     } else if (this.state.plannerView == 'week') {
       if (operation === 'add') {
         this.setState({
-          currentSelectorWeekStart: moment(this.state.currentSelectorWeekStart).add(1, 'w').startOf('isoWeek').toISOString(),
+          currentSelectorWeekStart: moment(this.state.currentSelectorWeekStart).add(1, 'w').startOf('isoWeek').format('YYYY-MM-DD'),
         });
       } else {
         this.setState({
-          currentSelectorWeekStart: moment(this.state.currentSelectorWeekStart).subtract(1, 'w').startOf('isoWeek').toISOString(),
+          currentSelectorWeekStart: moment(this.state.currentSelectorWeekStart).subtract(1, 'w').startOf('isoWeek').format('YYYY-MM-DD'),
         });
       }
     }
@@ -137,10 +137,6 @@ class MealPlanner extends React.Component {
     this.setState({
       plannerView: viewBy,
     });
-  }
-
-  usePreset() {
-
   }
 
   render() {

@@ -119,8 +119,8 @@ class MealPlannerTable extends Component {
   }
 
   openReassignDialog(lifestyleId, mealId, weekViewFormattedDate = null) {
-    const onDate = this.props.plannerView == "week" ? weekViewFormattedDate : this.props.currentSelectorDate;
-    console.log("ON DATE");
+    const onDate = this.props.plannerView == 'week' ? weekViewFormattedDate : this.props.currentSelectorDate;
+    console.log('ON DATE');
     console.log(onDate);
     const assignedPlate = this.props.results.find(el =>
       el.lifestyle._id === lifestyleId
@@ -192,7 +192,10 @@ class MealPlannerTable extends Component {
 
     localStorage.setItem('presetAssigned', this.props.presets.find(e => e._id == this.state.selectedPreset).title);
 
-    Meteor.call('mealPlanner.applyPreset', this.state.selectedPreset, this.props.currentSelectorWeekStart, (error) => {
+    console.log('PRESET APPLY CALLED');
+    // console.log(this.props.currentSelectorWeekStart);
+
+    Meteor.call('mealPlanner.applyPreset', this.state.selectedPreset, moment(this.props.currentSelectorWeekStart).format('YYYY-MM-DD'), (error) => {
       if (error) {
         this.props.popTheSnackbar({
           message: error.reason,
@@ -211,6 +214,9 @@ class MealPlannerTable extends Component {
 
   handleClearWeek() {
     localStorage.setItem('weekCleared', `Plates for the week of ${moment(this.props.currentSelectorWeekStart).format('dddd, MMMM D')}`);
+
+    console.log('CLEAR WEEK CALLED');
+    console.log(this.props.currentSelectorWeekStart);
 
     Meteor.call('mealPlanner.clearWeek', this.props.currentSelectorWeekStart, (error) => {
       if (error) {
@@ -661,12 +667,12 @@ class MealPlannerTable extends Component {
                               </Menu>
                             </Grid>
                           ) : (
-                              <Grid item xs={12} sm={6} md={4} lg={4}>
-                                <div className="card-bordered-emtpy" onClick={() => this.openAssignDialog(lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'))}>
-                                  <Typography className="card-bordered-empty__para" type="body1" component="p">Assign {meal && meal.title != undefined ? meal.title.toLowerCase() : ''}</Typography>
-                                </div>
-                              </Grid>
-                            );
+                            <Grid item xs={12} sm={6} md={4} lg={4}>
+                              <div className="card-bordered-emtpy" onClick={() => this.openAssignDialog(lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'))}>
+                                <Typography className="card-bordered-empty__para" type="body1" component="p">Assign {meal && meal.title != undefined ? meal.title.toLowerCase() : ''}</Typography>
+                              </div>
+                            </Grid>
+                          );
                         })}
                       </Grid>
                     </React.Fragment>

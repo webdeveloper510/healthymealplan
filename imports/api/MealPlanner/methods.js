@@ -53,6 +53,8 @@ Meteor.methods({
     check(presetId, String);
     check(weekStart, String);
 
+    console.log(weekStart);
+
     const preset = MealPresets.findOne({ _id: presetId });
 
     if (!preset) {
@@ -60,11 +62,10 @@ Meteor.methods({
     }
 
     const days = ['Monday', 'Tuesday', 'Wednesday', 'Thurdsay', 'Friday'];
-    const weekStartDate = moment(weekStart);
 
     // clear the week
 
-    const dataToRemove = [1, 2, 3, 4, 5].map(e => weekStartDate.isoWeekday(e).format('YYYY-MM-DD'));
+    const dataToRemove = [1, 2, 3, 4, 5].map(e => moment(weekStart).isoWeekday(e).format('YYYY-MM-DD'));
     MealPlanner.remove({ onDate: { $in: dataToRemove } });
 
 
@@ -117,6 +118,7 @@ Meteor.methods({
   },
   'mealPlanner.clearWeek': function mealPlannerClearWeek(weekStart) {
     check(weekStart, String);
+    console.log(weekStart);
 
     try {
       const dataToRemove = [1, 2, 3, 4, 5].map(e => moment(weekStart).isoWeekday(e).format('YYYY-MM-DD'));
