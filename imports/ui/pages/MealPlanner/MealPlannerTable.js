@@ -607,8 +607,6 @@ class MealPlannerTable extends Component {
                               moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'));
                           }
 
-                          console.log(assignedPlannerId);
-
                           return dish != null && this.props.results.length > 0 && this.isPlateAssigned(this.props.results, lifestyle._id, meal._id) ? (
                             <Grid item xs={12} sm={6} md={4} lg={4} key={assignedPlannerId}>
                               <Card style={{ width: '100%' }}>

@@ -124,10 +124,12 @@ class MealPlanner extends React.Component {
       if (operation === 'add') {
         this.setState({
           currentSelectorWeekStart: moment(this.state.currentSelectorWeekStart).add(1, 'w').startOf('isoWeek').format('YYYY-MM-DD'),
-        });
+          currentSelectorWeekEnd: moment(this.state.currentSelectorWeekStart).add(1, 'w').endOf('isoWeek').format('YYYY-MM-DD'),
+       });
       } else {
         this.setState({
           currentSelectorWeekStart: moment(this.state.currentSelectorWeekStart).subtract(1, 'w').startOf('isoWeek').format('YYYY-MM-DD'),
+          currentSelectorWeekEnd: moment(this.state.currentSelectorWeekStart).subtract(1, 'w').endOf('isoWeek').format('YYYY-MM-DD'),
         });
       }
     }
