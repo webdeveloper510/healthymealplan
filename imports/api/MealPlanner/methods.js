@@ -61,7 +61,7 @@ Meteor.methods({
       throw new Meteor.Error(404, 'Preset not found');
     }
 
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thurdsay', 'Friday'];
+    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
 
     // clear the week
 

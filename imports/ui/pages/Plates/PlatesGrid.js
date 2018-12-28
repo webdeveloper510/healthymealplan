@@ -14,8 +14,10 @@ import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
+import IconButton from 'material-ui/IconButton';
 import Grid from 'material-ui/Grid';
 
+import RemoveRedEyeIcon from 'material-ui-icons/RemoveRedEye';
 
 import { createContainer } from 'meteor/react-meteor-data';
 import Loading from '../../components/Loading/Loading';
@@ -205,8 +207,12 @@ class PlatesGrid extends React.Component {
                         {e.subtitle}
                       </Typography>
                     </CardContent>
-                    <CardActions>
+                    <CardActions style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Button dense color="primary" onClick={() => this.props.history.push(`/plates/${e._id}/edit`)}>Edit</Button>
+                      <IconButton onClick={() => window.open(`https://www.vittle.ca/on-the-menu/${e.mealCategory}/${e.slug}`, '_blank')}>
+                        <RemoveRedEyeIcon style={{ color: '#AAA' }} />
+                      </IconButton>
+
                     </CardActions>
                   </Card>
 

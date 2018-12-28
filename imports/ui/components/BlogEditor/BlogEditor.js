@@ -1364,6 +1364,9 @@ class BlogEditor extends React.Component {
                   <MenuItem key={1} value="diets">
                     Diets
                   </MenuItem>
+                  <MenuItem key={1} value="lifestyle">
+                    Lifestyle
+                  </MenuItem>
                 </Select>
               </div>
             </Paper>
