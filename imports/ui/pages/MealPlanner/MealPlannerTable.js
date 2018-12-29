@@ -95,10 +95,16 @@ class MealPlannerTable extends Component {
 
     this.setState({
       assignResult,
-      assignDialogOpen: true,
       lifestyleSelected: lifestyleId,
       mealSelected: mealId,
+      mealSelectedText: meal.title,
+      lifestyleSelectedText: lifestyle.title,
       dateSelected: plannerViewWeekDate,
+    }, () => {
+      this.setState({
+        assignDialogOpen: true,
+
+      })
     });
   }
 
@@ -127,11 +133,17 @@ class MealPlannerTable extends Component {
       && el.meal._id === mealId
       && el.onDate === onDate);
 
+    const meal = this.props.meals.find(meal => meal._id == mealId);
+
     this.setState({
       reassignResult: assignedPlate,
-      reassignDialogOpen: true,
       reassignPlannerId: assignedPlate._id,
       reassignOnDate: weekViewFormattedDate,
+      mealSelectedText: meal.title,
+    }, () => {
+      this.setState({
+        reassignDialogOpen: true,
+      })
     });
   }
 
@@ -665,12 +677,12 @@ class MealPlannerTable extends Component {
                               </Menu>
                             </Grid>
                           ) : (
-                            <Grid item xs={12} sm={6} md={4} lg={4}>
-                              <div className="card-bordered-emtpy" onClick={() => this.openAssignDialog(lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'))}>
-                                <Typography className="card-bordered-empty__para" type="body1" component="p">Assign {meal && meal.title != undefined ? meal.title.toLowerCase() : ''}</Typography>
-                              </div>
-                            </Grid>
-                          );
+                              <Grid item xs={12} sm={6} md={4} lg={4}>
+                                <div className="card-bordered-emtpy" onClick={() => this.openAssignDialog(lifestyle._id, meal._id, moment(this.props.currentSelectorWeekStart).isoWeekday(weekDayIndex + 1).format('YYYY-MM-DD'))}>
+                                  <Typography className="card-bordered-empty__para" type="body1" component="p">Assign {meal && meal.title != undefined ? meal.title.toLowerCase() : ''}</Typography>
+                                </div>
+                              </Grid>
+                            );
                         })}
                       </Grid>
                     </React.Fragment>
@@ -787,6 +799,37 @@ class MealPlannerTable extends Component {
                 className: 'autoinput',
               }}
             />
+
+            <Grid container>
+              {this.props.plates && this.props.plates.filter(p => p.mealType == this.state.mealSelectedText).map((e, i) => {
+                return (
+                  <Grid item xs={12} sm={6} md={4} lg={4} style={{ minWidth: '320px' }} key={i}>
+                    <Card style={{ width: '100%' }}>
+                      <CardMedia
+                        style={{ height: '300px' }}
+                        image={e.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${e.imageUrl}` : e.image ? e.image : 'https://via.placeholder.com/600x600?text=+'}
+                        title="Contemplative Reptile"
+                      />
+                      <CardContent>
+                        <Typography type="body1" className="font-uppercase font-medium" style={{ marginBottom: '16px', fontSize: '14px', color: 'rgba(0, 0, 0, .54)' }}>
+                          {e.mealType}
+                        </Typography>
+                        <Typography type="headline" component="h2">
+                          {e.title}
+                        </Typography>
+                        <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                          {e.subtitle}
+                        </Typography>
+                      </CardContent>
+                      <CardActions>
+                        <Button dense color="primary" onClick={() => this.props.history.push(`/plates/${e._id}/edit`)}>Edit</Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                )
+              })}
+            </Grid>
+
           </DialogContent>
           <DialogActions>
             <Button onClick={this.closeAssignDialog} color="default">
@@ -808,7 +851,7 @@ class MealPlannerTable extends Component {
             className="title font-medium"
             type="title"
           >
-            Reassign main for {this.state.reassignResult ? this.state.reassignResult.lifestyle.title : ''}
+            Reassign main for {this.state.reassignResult ? this.state.reassignResult.lifestyle.title + " " : ''}
             {this.state.reassignResult ? this.state.reassignResult.meal.title : ''}
           </Typography>
 
@@ -861,6 +904,36 @@ class MealPlannerTable extends Component {
                 className: 'autoinput',
               }}
             />
+
+            <Grid container>
+              {this.props.plates && this.props.plates.filter(p => p.mealType == this.state.mealSelectedText).map((e, i) => {
+                return (
+                  <Grid item xs={12} sm={6} md={4} lg={4} style={{ minWidth: '320px' }} key={i}>
+                    <Card style={{ width: '100%' }}>
+                      <CardMedia
+                        style={{ height: '300px' }}
+                        image={e.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${e.imageUrl}` : e.image ? e.image : 'https://via.placeholder.com/600x600?text=+'}
+                        title="Contemplative Reptile"
+                      />
+                      <CardContent>
+                        <Typography type="body1" className="font-uppercase font-medium" style={{ marginBottom: '16px', fontSize: '14px', color: 'rgba(0, 0, 0, .54)' }}>
+                          {e.mealType}
+                        </Typography>
+                        <Typography type="headline" component="h2">
+                          {e.title}
+                        </Typography>
+                        <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                          {e.subtitle}
+                        </Typography>
+                      </CardContent>
+                      <CardActions>
+                        <Button dense color="primary" onClick={() => this.props.history.push(`/plates/${e._id}/edit`)}>Edit</Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                )
+              })}
+            </Grid>
           </DialogContent>
           <DialogActions>
             <Button onClick={this.closeReassignDialog} color="default">

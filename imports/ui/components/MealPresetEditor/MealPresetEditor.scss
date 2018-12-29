@@ -1,0 +1,8 @@
+.plate-card-assign {
+  &:hover {
+    // border: 2px lightgreen solid;
+    transition: all .35s ease;
+    transform: translateY(-4px);
+    cursor: pointer;
+  }
+}

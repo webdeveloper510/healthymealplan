@@ -19,7 +19,8 @@ import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
 // import Select from 'material-ui/Select';
 // import Input, { InputLabel } from 'material-ui/Input';
-// import { FormControl, FormHelperText } from 'material-ui/Form';
+import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';
+
 import Dialog, {
   DialogActions,
   DialogContent,
@@ -35,6 +36,7 @@ import Grid from 'material-ui/Grid';
 import Typography from 'material-ui/Typography';
 import Divider from 'material-ui/Divider';
 import Avatar from 'material-ui/Avatar';
+import { withStyles } from 'material-ui/styles';
 
 import { red } from 'material-ui/colors';
 import ChevronLeft from 'material-ui-icons/ChevronLeft';
@@ -46,7 +48,14 @@ import validate from '../../../modules/validate';
 // const primary = teal[500];
 const danger = red[700];
 
-const styles = theme => ({});
+const styles = theme => ({
+  cardSelected: {
+    borderRadius: '5px',
+    border: '2px lightgreen solid',
+  }
+});
+
+import './MealPresetEditor.scss';
 
 class MealPresetEditor extends React.Component {
   constructor(props) {
@@ -97,6 +106,8 @@ class MealPresetEditor extends React.Component {
 
       deleteDialogOpen: false,
       hasFormChanged: false,
+
+      openBrowseAndAssignDialog: false,
     };
 
     this.weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -148,17 +159,7 @@ class MealPresetEditor extends React.Component {
     });
   }
 
-  onSuggestionSelectedPlates(
-    mealId, lifestyleId, weekdayIndex,
-    event,
-    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
-
-    console.log(event);
-    console.log(suggestion);
-    console.log(mealId);
-    console.log(lifestyleId);
-    console.log(weekdayIndex);
-
+  assignPlateToADay(mealId, lifestyleId, weekdayIndex, plateId, onDialog = false) {
     const selectedWeekdayPreset = this.state[`weekPreset${this.weekDays[weekdayIndex]}`];
 
     if (selectedWeekdayPreset.length) {
@@ -169,7 +170,7 @@ class MealPresetEditor extends React.Component {
         clonedWeekdayPreset[plateAssignedIndex] = {
           mealId,
           lifestyleId,
-          plateId: suggestion._id,
+          plateId: plateId,
         };
 
         this.setState({
@@ -182,7 +183,7 @@ class MealPresetEditor extends React.Component {
         clonedWeekdayPreset.push({
           mealId,
           lifestyleId,
-          plateId: suggestion._id,
+          plateId: plateId,
         });
 
         this.setState({
@@ -191,13 +192,19 @@ class MealPresetEditor extends React.Component {
         });
       }
 
+      if (onDialog) {
+        this.setState({
+          openBrowseAndAssignDialog: false,
+        })
+      }
+
     } else {
       const clonedWeekdayPreset = selectedWeekdayPreset.slice();
 
       clonedWeekdayPreset.push({
         mealId,
         lifestyleId,
-        plateId: suggestion._id,
+        plateId: plateId,
       });
 
       this.setState({
@@ -205,6 +212,66 @@ class MealPresetEditor extends React.Component {
         [`weekPreset${this.weekDays[weekdayIndex]}`]: clonedWeekdayPreset,
       });
     }
+  }
+
+  onSuggestionSelectedPlates(
+    mealId, lifestyleId, weekdayIndex,
+    event,
+    { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
+
+    console.log(event);
+    console.log(suggestion);
+    console.log(mealId);
+    console.log(lifestyleId);
+    console.log(weekdayIndex);
+
+    // const selectedWeekdayPreset = this.state[`weekPreset${this.weekDays[weekdayIndex]}`];
+
+    // if (selectedWeekdayPreset.length) {
+    //   const plateAssignedIndex = selectedWeekdayPreset.findIndex(e => e.lifestyleId == lifestyleId && e.mealId == mealId);
+    //   const clonedWeekdayPreset = selectedWeekdayPreset.slice();
+
+    //   if (plateAssignedIndex >= 0) {
+    //     clonedWeekdayPreset[plateAssignedIndex] = {
+    //       mealId,
+    //       lifestyleId,
+    //       plateId: suggestion._id,
+    //     };
+
+    //     this.setState({
+    //       hasFormChanged: true,
+    //       [`weekPreset${this.weekDays[weekdayIndex]}`]: clonedWeekdayPreset,
+    //     });
+
+    //   } else {
+
+    //     clonedWeekdayPreset.push({
+    //       mealId,
+    //       lifestyleId,
+    //       plateId: suggestion._id,
+    //     });
+
+    //     this.setState({
+    //       hasFormChanged: true,
+    //       [`weekPreset${this.weekDays[weekdayIndex]}`]: clonedWeekdayPreset,
+    //     });
+    //   }
+
+    // } else {
+    //   const clonedWeekdayPreset = selectedWeekdayPreset.slice();
+
+    //   clonedWeekdayPreset.push({
+    //     mealId,
+    //     lifestyleId,
+    //     plateId: suggestion._id,
+    //   });
+
+    //   this.setState({
+    //     hasFormChanged: true,
+    //     [`weekPreset${this.weekDays[weekdayIndex]}`]: clonedWeekdayPreset,
+    //   });
+    // }
+    this.assignPlateToADay(mealId, lifestyleId, weekdayIndex, suggestion._id);
   }
 
   // Autosuggest will call this function every time you need to update suggestions.
@@ -464,60 +531,17 @@ class MealPresetEditor extends React.Component {
     );
   }
 
-  handleTypeChange(event, name) {
-    console.log(`Type changed ${event.target.value}`);
-    this.setState({ selectedType: event.target.value, hasFormChanged: true });
-  }
+  handlePresetMealDelete(lifestyleId, mealId, weekdayIndex) {
+    console.log("On chip delete")
+    const clonedPreset = this.state[`weekPreset${this.weekDays[weekdayIndex]}`].slice();
+    const presetIndexToDelete = this.state[`weekPreset${this.weekDays[weekdayIndex]}`].find(e => e.lifestyleId == lifestyleId && e.mealId == mealId);
 
-  handleSubIngredientChipDelete(subIngredient) {
-    console.log(subIngredient);
-
-    const stateCopy = this.state.subIngredients.slice();
-
-    stateCopy.splice(stateCopy.indexOf(subIngredient), 1);
+    clonedPreset.splice(presetIndexToDelete, 1);
 
     this.setState({
-      subIngredients: stateCopy,
       hasFormChanged: true,
+      [`weekPreset${this.weekDays[weekdayIndex]}`]: clonedPreset,
     });
-  }
-
-  handleTypeChipDelete(type) {
-    console.log(type);
-
-    const stateCopy = this.state.types.slice();
-
-    stateCopy.splice(stateCopy.indexOf(type), 1);
-
-    this.setState({
-      types: stateCopy,
-      hasFormChanged: true,
-    });
-  }
-
-  getSubIngredientTitle(subIngredient) {
-    // console.log(subIngredient);
-
-    if (subIngredient.title) {
-      return subIngredient.title;
-    }
-
-    if (this.props.allIngredients) {
-      return this.props.allIngredients.find(el => el._id === subIngredient);
-    }
-  }
-
-  getSubIngredientAvatar(subIngredient) {
-    if (subIngredient.title) {
-      return subIngredient.title.charAt(0);
-    }
-
-    if (this.props.allIngredients) {
-      const avatarToReturn = this.props.allIngredients.find(
-        el => el._id === subIngredient,
-      );
-      return avatarToReturn.title.charAt(0);
-    }
   }
 
   getPlateTitle(plate) {
@@ -579,7 +603,7 @@ class MealPresetEditor extends React.Component {
       const selectedPlateForWeekday = this.props.plates.find(e => e._id == selectedPreset.plateId);
       // console.log(selectedPlateForWeekday);
 
-      if(!selectedPlateForWeekday){
+      if (!selectedPlateForWeekday) {
         return blankChip;
       }
 
@@ -589,28 +613,29 @@ class MealPresetEditor extends React.Component {
           style={{ marginRight: '8px', marginBottom: '8px' }}
           label={selectedPlateForWeekday.title}
           key={selectedPlateForWeekday._id}
-          onDelete={this.handlePlateChipDelete.bind(
+          onDelete={this.handlePresetMealDelete.bind(
             this,
             lifestyleId,
-            weekdayIndex,
             mealId,
+            weekdayIndex
           )}
         />
       );
     }
+
     return blankChip;
   }
 
-  handlePlateChipDelete(lifestyleId, weekdayIndex, mealId) {
-    const clonedPreset = this.state[`weekPreset${this.weekDays[weekdayIndex]}`].slice();
-    const presetIndexToDelete = this.state[`weekPreset${this.weekDays[weekdayIndex]}`].find(e => e.lifestyleId == lifestyleId && e.mealId == mealId);
-
-    clonedPreset.splice(1, presetIndexToDelete);
-
+  openBrowseMealDialog(lifestyleId, lifestyleTitle, mealId, currentMealTitle, weekdayIndex) {
     this.setState({
-      hasFormChanged: true,
-      [`weekPreset${this.weekDays[weekdayIndex]}`]: clonedPreset,
-    });
+      lifestyleSelectedId: lifestyleId,
+      lifestyleSelectedText: lifestyleTitle,
+      mealSelectedText: currentMealTitle,
+      mealSelectedId: mealId,
+      selectedWeekdayIndex: weekdayIndex,
+    }, () => {
+      this.setState({ openBrowseAndAssignDialog: true });
+    })
   }
 
   render() {
@@ -804,10 +829,17 @@ class MealPresetEditor extends React.Component {
                                     display: 'flex',
                                     alignItems: 'center',
                                     flexWrap: 'wrap',
+                                    justifyContent: 'space-between',
                                     marginTop: '25px',
                                   }}
                                 >
                                   {this.renderPlateChip(lifestyle._id, currentMeal._id, weekdayIndex)}
+
+                                  <Button
+                                    size="small"
+                                    onClick={() => this.openBrowseMealDialog(lifestyle._id, lifestyle.title, currentMeal._id, currentMeal.title, weekdayIndex)}>
+                                    Browse
+                                  </Button>
                                 </div>
                               </div>
                             </div>
@@ -877,6 +909,57 @@ class MealPresetEditor extends React.Component {
         </Grid>
 
         {!this.props.newPreset && this.renderDeleteDialog()}
+
+        <Dialog maxWidth="md" fullWidth fullScreen open={this.state.openBrowseAndAssignDialog} onClose={() => this.setState({ openBrowseAndAssignDialog: false })}>
+          <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
+            Assign main for {this.state.lifestyleSelectedText} {this.state.mealSelectedText} {this.weekDays[this.state.selectedWeekdayIndex]}
+          </Typography>
+          <DialogContent>
+
+            <Grid container>
+              {this.props.plates && this.props.plates.filter(p => p.mealType == this.state.mealSelectedText).map((e, i) => {
+                return (
+                  <Grid item xs={12} sm={6} md={4} lg={4} style={{ minWidth: '320px' }} key={i}>
+                    <Card
+                      className="plate-card-assign"
+                      style={{ width: '100%' }}
+                      onClick={() => this.assignPlateToADay(this.state.mealSelectedId, this.state.lifestyleSelectedId, this.state.selectedWeekdayIndex, e._id, true)}
+                    >
+                      <CardMedia
+                        style={{ height: '300px' }}
+                        image={e.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${e.imageUrl}` : e.image ? e.image : 'https://via.placeholder.com/600x600?text=+'}
+                        title={e.title}
+                      />
+                      <CardContent>
+                        <Typography type="body1" className="font-uppercase font-medium" style={{ marginBottom: '16px', fontSize: '14px', color: 'rgba(0, 0, 0, .54)' }}>
+                          {e.mealType}
+                        </Typography>
+                        <Typography type="headline" component="h2">
+                          {e.title}
+                        </Typography>
+                        <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                          {e.subtitle}
+                        </Typography>
+                      </CardContent>
+                      <CardActions>
+                        <Button dense color="primary" onClick={() => this.props.history.push(`/plates/${e._id}/edit`)}>Edit</Button>
+                      </CardActions>
+                    </Card>
+                  </Grid>
+                )
+              })}
+            </Grid>
+
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={() => this.setState({ openBrowseAndAssignDialog: false })} color="default">
+              Cancel
+            </Button>
+            <Button stroked className="button--bordered button--bordered--accent" onClick={this.handleMealAssignment} color="primary">
+              Assign
+            </Button>
+          </DialogActions>
+        </Dialog>
       </form>
     );
   }
@@ -891,4 +974,4 @@ MealPresetEditor.propTypes = {
   popTheSnackbar: PropTypes.func.isRequired,
 };
 
-export default MealPresetEditor;
+export default withStyles(styles)(MealPresetEditor);
