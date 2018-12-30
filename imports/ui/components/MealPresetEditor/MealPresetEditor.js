@@ -531,10 +531,10 @@ class MealPresetEditor extends React.Component {
     );
   }
 
-  handlePresetMealDelete(lifestyleId, mealId, weekdayIndex) {
+  handlePresetMealDelete(lifestyleId, mealId, plateId, weekdayIndex) {
     console.log("On chip delete")
     const clonedPreset = this.state[`weekPreset${this.weekDays[weekdayIndex]}`].slice();
-    const presetIndexToDelete = this.state[`weekPreset${this.weekDays[weekdayIndex]}`].find(e => e.lifestyleId == lifestyleId && e.mealId == mealId);
+    const presetIndexToDelete = this.state[`weekPreset${this.weekDays[weekdayIndex]}`].find(e => e.lifestyleId == lifestyleId && e.mealId == mealId && e.plateId == plateId);
 
     clonedPreset.splice(presetIndexToDelete, 1);
 
@@ -617,6 +617,7 @@ class MealPresetEditor extends React.Component {
             this,
             lifestyleId,
             mealId,
+            selectedPreset.plateId,
             weekdayIndex
           )}
         />
