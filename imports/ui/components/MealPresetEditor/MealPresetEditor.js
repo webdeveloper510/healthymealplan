@@ -45,6 +45,8 @@ import moment from 'moment';
 
 import validate from '../../../modules/validate';
 
+import './MealPresetEditor.scss';
+
 // const primary = teal[500];
 const danger = red[700];
 
@@ -52,10 +54,8 @@ const styles = theme => ({
   cardSelected: {
     borderRadius: '5px',
     border: '2px lightgreen solid',
-  }
+  },
 });
-
-import './MealPresetEditor.scss';
 
 class MealPresetEditor extends React.Component {
   constructor(props) {
@@ -108,6 +108,7 @@ class MealPresetEditor extends React.Component {
       hasFormChanged: false,
 
       openBrowseAndAssignDialog: false,
+      searchTextPlateDialog: '',
     };
 
     this.weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
@@ -170,7 +171,7 @@ class MealPresetEditor extends React.Component {
         clonedWeekdayPreset[plateAssignedIndex] = {
           mealId,
           lifestyleId,
-          plateId: plateId,
+          plateId,
         };
 
         this.setState({
@@ -183,7 +184,7 @@ class MealPresetEditor extends React.Component {
         clonedWeekdayPreset.push({
           mealId,
           lifestyleId,
-          plateId: plateId,
+          plateId,
         });
 
         this.setState({
@@ -195,7 +196,7 @@ class MealPresetEditor extends React.Component {
       if (onDialog) {
         this.setState({
           openBrowseAndAssignDialog: false,
-        })
+        });
       }
 
     } else {
@@ -204,7 +205,7 @@ class MealPresetEditor extends React.Component {
       clonedWeekdayPreset.push({
         mealId,
         lifestyleId,
-        plateId: plateId,
+        plateId,
       });
 
       this.setState({
@@ -219,68 +220,17 @@ class MealPresetEditor extends React.Component {
     event,
     { suggestion, suggestionValue, suggestionIndex, sectionIndex, method }) {
 
-    console.log(event);
-    console.log(suggestion);
-    console.log(mealId);
-    console.log(lifestyleId);
-    console.log(weekdayIndex);
+    // console.log(event);
+    // console.log(suggestion);
+    // console.log(mealId);
+    // console.log(lifestyleId);
+    // console.log(weekdayIndex);
 
-    // const selectedWeekdayPreset = this.state[`weekPreset${this.weekDays[weekdayIndex]}`];
-
-    // if (selectedWeekdayPreset.length) {
-    //   const plateAssignedIndex = selectedWeekdayPreset.findIndex(e => e.lifestyleId == lifestyleId && e.mealId == mealId);
-    //   const clonedWeekdayPreset = selectedWeekdayPreset.slice();
-
-    //   if (plateAssignedIndex >= 0) {
-    //     clonedWeekdayPreset[plateAssignedIndex] = {
-    //       mealId,
-    //       lifestyleId,
-    //       plateId: suggestion._id,
-    //     };
-
-    //     this.setState({
-    //       hasFormChanged: true,
-    //       [`weekPreset${this.weekDays[weekdayIndex]}`]: clonedWeekdayPreset,
-    //     });
-
-    //   } else {
-
-    //     clonedWeekdayPreset.push({
-    //       mealId,
-    //       lifestyleId,
-    //       plateId: suggestion._id,
-    //     });
-
-    //     this.setState({
-    //       hasFormChanged: true,
-    //       [`weekPreset${this.weekDays[weekdayIndex]}`]: clonedWeekdayPreset,
-    //     });
-    //   }
-
-    // } else {
-    //   const clonedWeekdayPreset = selectedWeekdayPreset.slice();
-
-    //   clonedWeekdayPreset.push({
-    //     mealId,
-    //     lifestyleId,
-    //     plateId: suggestion._id,
-    //   });
-
-    //   this.setState({
-    //     hasFormChanged: true,
-    //     [`weekPreset${this.weekDays[weekdayIndex]}`]: clonedWeekdayPreset,
-    //   });
-    // }
     this.assignPlateToADay(mealId, lifestyleId, weekdayIndex, suggestion._id);
   }
 
   // Autosuggest will call this function every time you need to update suggestions.
   // You already implemented this logic above, so just use it.
-  onSuggestionsFetchRequested({ value }) {
-    this.setState({
-      suggestions: this.getSuggestions(value),
-    });
-  }
 
   onSuggestionsFetchRequestedPlates({ value }) {
     this.setState({
@@ -289,12 +239,6 @@ class MealPresetEditor extends React.Component {
   }
 
   // Autosuggest will call this function every time you need to clear suggestions.
-  onSuggestionsClearRequested() {
-    this.setState({
-      suggestions: [],
-    });
-  }
-
   onSuggestionsClearRequestedPlates() {
     this.setState({
       suggestionsPlates: [],
@@ -302,17 +246,6 @@ class MealPresetEditor extends React.Component {
   }
 
   // Teach Autosuggest how to calculate suggestions for any given input value.
-  getSuggestions(value) {
-    const inputValue = value.trim().toLowerCase();
-    const inputLength = inputValue.length;
-
-    return inputLength === 0
-      ? []
-      : this.props.plates.filter(
-        plate =>
-          plate.title.toLowerCase().slice(0, inputLength) === inputValue,
-      );
-  }
 
   getSuggestionsPlates(value) {
     const inputValue = value.trim().toLowerCase();
@@ -328,10 +261,6 @@ class MealPresetEditor extends React.Component {
   // When suggestion is clicked, Autosuggest needs to populate the input
   // based on the clicked suggestion. Teach Autosuggest how to calculate the
   // input value for every given suggestion.
-  getSuggestionValue(suggestion) {
-    return suggestion.title;
-  }
-
   getSuggestionValuePlates(suggestion) {
     return suggestion.title;
   }
@@ -531,10 +460,13 @@ class MealPresetEditor extends React.Component {
     );
   }
 
-  handlePresetMealDelete(lifestyleId, mealId, plateId, weekdayIndex) {
-    console.log("On chip delete")
+  handlePresetMealDelete(lifestyleId, mealId, weekdayIndex) {
+    console.log(lifestyleId);
+    console.log(mealId);
+    console.log(weekdayIndex);
     const clonedPreset = this.state[`weekPreset${this.weekDays[weekdayIndex]}`].slice();
-    const presetIndexToDelete = this.state[`weekPreset${this.weekDays[weekdayIndex]}`].find(e => e.lifestyleId == lifestyleId && e.mealId == mealId && e.plateId == plateId);
+    const presetIndexToDelete = clonedPreset.findIndex(e => e.lifestyleId == lifestyleId && e.mealId == mealId);
+    console.log(presetIndexToDelete);
 
     clonedPreset.splice(presetIndexToDelete, 1);
 
@@ -581,12 +513,10 @@ class MealPresetEditor extends React.Component {
 
   compareLifestyles(a, b) {
     if (a.title > b.title) {
-      return -1
-    } else {
-      return 1
+      return -1;
     }
+    return 1;
 
-    return 0
   }
 
   renderPlateChip(lifestyleId, mealId, weekdayIndex) {
@@ -613,12 +543,10 @@ class MealPresetEditor extends React.Component {
           style={{ marginRight: '8px', marginBottom: '8px' }}
           label={selectedPlateForWeekday.title}
           key={selectedPlateForWeekday._id}
-          onDelete={this.handlePresetMealDelete.bind(
-            this,
+          onDelete={() => this.handlePresetMealDelete(
             lifestyleId,
             mealId,
-            selectedPreset.plateId,
-            weekdayIndex
+            weekdayIndex,
           )}
         />
       );
@@ -636,7 +564,7 @@ class MealPresetEditor extends React.Component {
       selectedWeekdayIndex: weekdayIndex,
     }, () => {
       this.setState({ openBrowseAndAssignDialog: true });
-    })
+    });
   }
 
   render() {
@@ -838,7 +766,8 @@ class MealPresetEditor extends React.Component {
 
                                   <Button
                                     size="small"
-                                    onClick={() => this.openBrowseMealDialog(lifestyle._id, lifestyle.title, currentMeal._id, currentMeal.title, weekdayIndex)}>
+                                    onClick={() => this.openBrowseMealDialog(lifestyle._id, lifestyle.title, currentMeal._id, currentMeal.title, weekdayIndex)}
+                                  >
                                     Browse
                                   </Button>
                                 </div>
@@ -918,37 +847,55 @@ class MealPresetEditor extends React.Component {
           <DialogContent>
 
             <Grid container>
-              {this.props.plates && this.props.plates.filter(p => p.mealType == this.state.mealSelectedText).map((e, i) => {
-                return (
-                  <Grid item xs={12} sm={6} md={4} lg={4} style={{ minWidth: '320px' }} key={i}>
-                    <Card
-                      className="plate-card-assign"
-                      style={{ width: '100%' }}
-                      onClick={() => this.assignPlateToADay(this.state.mealSelectedId, this.state.lifestyleSelectedId, this.state.selectedWeekdayIndex, e._id, true)}
-                    >
-                      <CardMedia
-                        style={{ height: '300px' }}
-                        image={e.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${e.imageUrl}` : e.image ? e.image : 'https://via.placeholder.com/600x600?text=+'}
-                        title={e.title}
-                      />
-                      <CardContent>
-                        <Typography type="body1" className="font-uppercase font-medium" style={{ marginBottom: '16px', fontSize: '14px', color: 'rgba(0, 0, 0, .54)' }}>
-                          {e.mealType}
-                        </Typography>
-                        <Typography type="headline" component="h2">
-                          {e.title}
-                        </Typography>
-                        <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                          {e.subtitle}
-                        </Typography>
-                      </CardContent>
-                      <CardActions>
-                        <Button dense color="primary" onClick={() => this.props.history.push(`/plates/${e._id}/edit`)}>Edit</Button>
-                      </CardActions>
-                    </Card>
-                  </Grid>
-                )
-              })}
+              <Grid item xs={12}>
+                <TextField
+                  fullWidth
+                  placeholder="Search"
+                  style={{ marginBottom: '1em' }}
+                  value={this.state.searchTextPlateDialog}
+                  onChange={e => this.setState({ searchTextPlateDialog: e.target.value })}
+                />
+              </Grid>
+            </Grid>
+
+            <Grid container>
+
+              {this.props.plates && this.props.plates.filter((p) => {
+                if (this.state.searchTextPlateDialog) {
+                  const searchString = new RegExp(this.state.searchTextPlateDialog);
+                  return p.mealType == this.state.mealSelectedText && searchString.test(p.title.toLowerCase())
+                } else {
+                  return p.mealType == this.state.mealSelectedText
+                }
+              }).map((e, i) => (
+                <Grid item xs={12} sm={6} md={4} lg={4} style={{ minWidth: '320px' }} key={i}>
+                  <Card
+                    className="plate-card-assign"
+                    style={{ width: '100%' }}
+                    onClick={() => this.assignPlateToADay(this.state.mealSelectedId, this.state.lifestyleSelectedId, this.state.selectedWeekdayIndex, e._id, true)}
+                  >
+                    <CardMedia
+                      style={{ height: '300px' }}
+                      image={e.imageUrl ? `${Meteor.settings.public.S3BucketDomain}${e.imageUrl}` : e.image ? e.image : 'https://via.placeholder.com/600x600?text=+'}
+                      title={e.title}
+                    />
+                    <CardContent>
+                      <Typography type="body1" className="font-uppercase font-medium" style={{ marginBottom: '16px', fontSize: '14px', color: 'rgba(0, 0, 0, .54)' }}>
+                        {e.mealType}
+                      </Typography>
+                      <Typography type="headline" component="h2">
+                        {e.title}
+                      </Typography>
+                      <Typography type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                        {e.subtitle}
+                      </Typography>
+                    </CardContent>
+                    <CardActions>
+                      <Button dense color="primary" onClick={() => this.props.history.push(`/plates/${e._id}/edit`)}>Edit</Button>
+                    </CardActions>
+                  </Card>
+                </Grid>
+              ))}
             </Grid>
 
           </DialogContent>
