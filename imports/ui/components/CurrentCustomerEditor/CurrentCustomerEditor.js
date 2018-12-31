@@ -83,7 +83,7 @@ import Search from 'material-ui-icons/Search';
 import autoBind from 'react-autobind';
 
 import validate from '../../../modules/validate';
-import { DELIVERYCOST } from '../../../modules/validate';
+import { DELIVERYCOST } from '../../../modules/constants';
 
 import Step4CheckoutCurrent from './Step4CheckoutCurrent'
 
