@@ -415,7 +415,7 @@ class Step3Delivery extends React.Component {
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -425,7 +425,7 @@ class Step3Delivery extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -459,7 +459,7 @@ class Step3Delivery extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -485,7 +485,7 @@ class Step3Delivery extends React.Component {
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -495,7 +495,7 @@ class Step3Delivery extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -527,7 +527,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -537,7 +537,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -571,7 +571,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -581,7 +581,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -603,7 +603,7 @@ class Step3Delivery extends React.Component {
                   .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(2, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -613,7 +613,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -625,7 +625,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -635,7 +635,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -670,7 +670,7 @@ class Step3Delivery extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -712,7 +712,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -756,7 +756,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -800,7 +800,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -811,7 +811,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -838,7 +838,7 @@ class Step3Delivery extends React.Component {
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -848,7 +848,7 @@ class Step3Delivery extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -880,7 +880,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -890,7 +890,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -921,7 +921,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -931,7 +931,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -953,7 +953,7 @@ class Step3Delivery extends React.Component {
                   .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(3, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -961,7 +961,7 @@ class Step3Delivery extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -970,7 +970,7 @@ class Step3Delivery extends React.Component {
                 label={`Monday evening ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -982,7 +982,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -992,7 +992,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -1003,7 +1003,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1034,7 +1034,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1044,7 +1044,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1075,7 +1075,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1085,7 +1085,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1116,7 +1116,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1126,7 +1126,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1157,7 +1157,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1167,7 +1167,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1198,7 +1198,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1208,7 +1208,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1239,7 +1239,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1249,7 +1249,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1280,7 +1280,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1290,7 +1290,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1321,7 +1321,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1331,7 +1331,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1362,7 +1362,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1372,7 +1372,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1407,7 +1407,7 @@ class Step3Delivery extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -1439,7 +1439,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1449,7 +1449,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1490,7 +1490,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1520,7 +1520,7 @@ class Step3Delivery extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1554,7 +1554,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -1565,7 +1565,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1596,7 +1596,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1606,7 +1606,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1647,7 +1647,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1678,7 +1678,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -1688,7 +1688,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1770,7 +1770,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1811,7 +1811,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1852,7 +1852,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1893,7 +1893,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1934,7 +1934,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -1977,7 +1977,7 @@ class Step3Delivery extends React.Component {
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -1987,7 +1987,7 @@ class Step3Delivery extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -2022,7 +2022,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2032,7 +2032,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2066,7 +2066,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2076,7 +2076,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2110,7 +2110,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2120,7 +2120,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2154,7 +2154,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2164,7 +2164,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2198,7 +2198,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2208,7 +2208,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2242,7 +2242,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2252,7 +2252,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2275,7 +2275,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2285,7 +2285,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2308,7 +2308,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2318,7 +2318,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2352,7 +2352,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2362,7 +2362,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2396,7 +2396,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2406,7 +2406,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2428,7 +2428,7 @@ class Step3Delivery extends React.Component {
                   .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(3, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2436,7 +2436,7 @@ class Step3Delivery extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2448,7 +2448,7 @@ class Step3Delivery extends React.Component {
                   .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(2, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2460,7 +2460,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2470,7 +2470,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -2481,7 +2481,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2503,7 +2503,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -2513,7 +2513,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2550,7 +2550,7 @@ class Step3Delivery extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -2594,7 +2594,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2638,7 +2638,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2682,7 +2682,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2726,7 +2726,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2770,7 +2770,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2814,7 +2814,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2847,7 +2847,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2880,7 +2880,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2924,7 +2924,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -2968,7 +2968,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3001,7 +3001,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3031,7 +3031,7 @@ class Step3Delivery extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3065,7 +3065,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -3076,7 +3076,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3120,7 +3120,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3163,7 +3163,7 @@ class Step3Delivery extends React.Component {
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -3173,7 +3173,7 @@ class Step3Delivery extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3207,7 +3207,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3217,7 +3217,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3250,7 +3250,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3260,7 +3260,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3293,7 +3293,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3303,7 +3303,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3336,7 +3336,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3346,7 +3346,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3379,7 +3379,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3389,7 +3389,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3422,7 +3422,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3432,7 +3432,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3454,7 +3454,7 @@ class Step3Delivery extends React.Component {
                   .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(3, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3462,7 +3462,7 @@ class Step3Delivery extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3474,7 +3474,7 @@ class Step3Delivery extends React.Component {
                   .format('MMM')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(2, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3486,7 +3486,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3496,7 +3496,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -3507,7 +3507,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3540,7 +3540,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3550,7 +3550,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3583,7 +3583,7 @@ class Step3Delivery extends React.Component {
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3593,7 +3593,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3630,7 +3630,7 @@ class Step3Delivery extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3674,7 +3674,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3717,7 +3717,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3760,7 +3760,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3803,7 +3803,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3846,7 +3846,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3889,7 +3889,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3919,7 +3919,7 @@ class Step3Delivery extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3953,7 +3953,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -3964,7 +3964,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4007,7 +4007,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4050,7 +4050,7 @@ class Step3Delivery extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4091,7 +4091,7 @@ class Step3Delivery extends React.Component {
               
               ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
 
 
@@ -4125,7 +4125,7 @@ class Step3Delivery extends React.Component {
                 
                 ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -4148,7 +4148,7 @@ class Step3Delivery extends React.Component {
                 
                   ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $2.50`}
+                    .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4158,7 +4158,7 @@ class Step3Delivery extends React.Component {
                 
                 ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -4180,7 +4180,7 @@ class Step3Delivery extends React.Component {
                 
                   ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -4203,7 +4203,7 @@ class Step3Delivery extends React.Component {
                 
                   ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} day of - $2.50`}
+                    .format('DD')} day of - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4213,7 +4213,7 @@ class Step3Delivery extends React.Component {
                 
                   ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $2.50`}
+                    .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -4238,7 +4238,7 @@ class Step3Delivery extends React.Component {
                   
                 ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('DD')} evening - $2.50`}
+                  .format('DD')} evening - $${DELIVERYCOST}`}
             />
 
 
@@ -4249,7 +4249,7 @@ class Step3Delivery extends React.Component {
                 
                   ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
 
 
@@ -4283,7 +4283,7 @@ class Step3Delivery extends React.Component {
                 
                 ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -4305,7 +4305,7 @@ class Step3Delivery extends React.Component {
                 
                   ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $2.50`}
+                    .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4315,7 +4315,7 @@ class Step3Delivery extends React.Component {
                 
                 ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -4338,7 +4338,7 @@ class Step3Delivery extends React.Component {
                 
                   ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -4361,7 +4361,7 @@ class Step3Delivery extends React.Component {
                 
                 ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} day of - $2.50`}
+                    .format('DD')} day of - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4371,7 +4371,7 @@ class Step3Delivery extends React.Component {
                 
                   ${moment(new Date(this.props.customerInfo.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $2.50`}
+                    .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>

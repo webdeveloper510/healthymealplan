@@ -7,6 +7,8 @@ import Discounts from '../../../api/Discounts/Discounts';
 
 import createSubscriptionLineItems from './createSubscriptionLineItems';
 
+import { DELIVERYCOST } from '../../constants';
+
 import sum from 'lodash/sum';
 import sumBy from 'lodash/sumBy';
 
@@ -1513,7 +1515,7 @@ export default function calculateSubscriptionCost(customerInfo) {
       deliveryTypeSelected == 'dayOfTuesday' ||
       deliveryTypeSelected == 'dayOfMonday'
     ) {
-      actualDeliveryCost += 2.5;
+      actualDeliveryCost += DELIVERYCOST;
     } else if (
       daysMealSum == 1 &&
       (deliveryTypeSelected == 'nightBefore' ||
@@ -1524,7 +1526,7 @@ export default function calculateSubscriptionCost(customerInfo) {
         deliveryTypeSelected == 'nightBeforeTuesday' ||
         deliveryTypeSelected == 'nightBeforeWednesday')
     ) {
-      actualDeliveryCost += 2.5;
+      actualDeliveryCost += DELIVERYCOST;
     } else if (delivIndex == 5) {
       // these explicit conditions because they depend on friday's/thursday's selections
       if (
@@ -1532,7 +1534,7 @@ export default function calculateSubscriptionCost(customerInfo) {
         'dayOfThursday'
       ) {
         if (deliveryTypeSelected == 'nightBeforeThursday') {
-          actualDeliveryCost += 2.5;
+          actualDeliveryCost += DELIVERYCOST;
 
           // mixing surcharges here
           primaryCustomer.deliverySurcharges += surchargePerDelivery;
@@ -1543,7 +1545,7 @@ export default function calculateSubscriptionCost(customerInfo) {
         customerInfo.delivery[delivIndex - 2] == 'dayOf'
       ) {
         if (deliveryTypeSelected == 'nightBeforeThursday') {
-          actualDeliveryCost += 2.5;
+          actualDeliveryCost += DELIVERYCOST;
 
           // mixing surcharges here
           primaryCustomer.deliverySurcharges += surchargePerDelivery;

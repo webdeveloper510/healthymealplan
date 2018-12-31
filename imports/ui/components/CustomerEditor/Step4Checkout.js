@@ -32,6 +32,8 @@ import _ from 'lodash';
 import $ from 'jquery';
 import validate from '../../../modules/validate';
 
+import { DELIVERYCOST } from '../../../modules/constants';
+
 const styles = theme => ({
   root: {
     display: 'flex',
@@ -1536,7 +1538,7 @@ class Step4Checkout extends React.Component {
           deliveryTypeSelected == 'dayOfTuesday' ||
           deliveryTypeSelected == 'dayOfMonday'
         ) {
-          actualDeliveryCost += 2.5;
+          actualDeliveryCost += DELIVERYCOST;
         } else if (
           daysMealSum == 1 &&
           (deliveryTypeSelected == 'nightBefore' ||
@@ -1547,7 +1549,7 @@ class Step4Checkout extends React.Component {
             deliveryTypeSelected == 'nightBeforeTuesday' ||
             deliveryTypeSelected == 'nightBeforeWednesday')
         ) {
-          actualDeliveryCost += 2.5;
+          actualDeliveryCost += DELIVERYCOST;
         } else if (delivIndex == 5) {
           // these explicit conditions because they depend on friday's/thursday's selections
           if (
@@ -1555,7 +1557,7 @@ class Step4Checkout extends React.Component {
             'dayOfThursday'
           ) {
             if (deliveryTypeSelected == 'nightBeforeThursday') {
-              actualDeliveryCost += 2.5;
+              actualDeliveryCost += DELIVERYCOST;
 
               // mixing surcharges here
               primaryCustomer.deliverySurcharges += surchargePerDelivery;
@@ -1566,7 +1568,7 @@ class Step4Checkout extends React.Component {
             this.props.customerInfo.deliveryType[delivIndex - 2] == 'dayOf'
           ) {
             if (deliveryTypeSelected == 'nightBeforeThursday') {
-              actualDeliveryCost += 2.5;
+              actualDeliveryCost += DELIVERYCOST;
 
               // mixing surcharges here
               primaryCustomer.deliverySurcharges += surchargePerDelivery;

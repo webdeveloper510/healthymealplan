@@ -83,6 +83,7 @@ import Search from 'material-ui-icons/Search';
 import autoBind from 'react-autobind';
 
 import validate from '../../../modules/validate';
+import { DELIVERYCOST } from '../../../modules/validate';
 
 import Step4CheckoutCurrent from './Step4CheckoutCurrent'
 
@@ -3295,7 +3296,7 @@ class CurrentCustomerEditor extends React.Component {
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -3305,7 +3306,7 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3339,7 +3340,7 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3365,7 +3366,7 @@ class CurrentCustomerEditor extends React.Component {
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -3375,7 +3376,7 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3407,7 +3408,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3417,7 +3418,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3451,7 +3452,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3461,7 +3462,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3483,7 +3484,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(2, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3493,7 +3494,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3505,7 +3506,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3515,7 +3516,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3550,7 +3551,7 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3592,7 +3593,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3636,7 +3637,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3680,7 +3681,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -3691,7 +3692,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3718,7 +3719,7 @@ class CurrentCustomerEditor extends React.Component {
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -3728,7 +3729,7 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3760,7 +3761,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3770,7 +3771,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3801,7 +3802,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3811,7 +3812,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3833,7 +3834,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(3, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3841,7 +3842,7 @@ class CurrentCustomerEditor extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3850,7 +3851,7 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Monday evening ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3862,7 +3863,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3872,7 +3873,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -3883,7 +3884,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3914,7 +3915,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3924,7 +3925,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3955,7 +3956,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3965,7 +3966,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3996,7 +3997,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4006,7 +4007,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4037,7 +4038,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4047,7 +4048,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4078,7 +4079,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4088,7 +4089,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4119,7 +4120,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4129,7 +4130,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4160,7 +4161,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4170,7 +4171,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4201,7 +4202,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4211,7 +4212,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4242,7 +4243,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4252,7 +4253,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4287,7 +4288,7 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -4319,7 +4320,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4329,7 +4330,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4370,7 +4371,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4400,7 +4401,7 @@ class CurrentCustomerEditor extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4434,7 +4435,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -4445,7 +4446,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4476,7 +4477,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4486,7 +4487,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4527,7 +4528,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4558,7 +4559,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4568,7 +4569,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4650,7 +4651,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4691,7 +4692,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4732,7 +4733,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4773,7 +4774,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4814,7 +4815,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4857,7 +4858,7 @@ class CurrentCustomerEditor extends React.Component {
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -4867,7 +4868,7 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -4902,7 +4903,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4912,7 +4913,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4946,7 +4947,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4956,7 +4957,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4990,7 +4991,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5000,7 +5001,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5034,7 +5035,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5044,7 +5045,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5078,7 +5079,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5088,7 +5089,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5122,7 +5123,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5132,7 +5133,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5155,7 +5156,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5165,7 +5166,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5188,7 +5189,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5198,7 +5199,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5232,7 +5233,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5242,7 +5243,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5276,7 +5277,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5286,7 +5287,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5308,7 +5309,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(3, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5316,7 +5317,7 @@ class CurrentCustomerEditor extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5328,7 +5329,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(2, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5340,7 +5341,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5350,7 +5351,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -5361,7 +5362,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5383,7 +5384,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5393,7 +5394,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5430,7 +5431,7 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -5474,7 +5475,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5518,7 +5519,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5562,7 +5563,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5606,7 +5607,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5650,7 +5651,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5694,7 +5695,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5727,7 +5728,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5760,7 +5761,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5804,7 +5805,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5848,7 +5849,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5881,7 +5882,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5911,7 +5912,7 @@ class CurrentCustomerEditor extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5945,7 +5946,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -5956,7 +5957,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6000,7 +6001,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6043,7 +6044,7 @@ class CurrentCustomerEditor extends React.Component {
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .subtract(1, 'd')
-                  .format('D')} - $2.50`}
+                  .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -6053,7 +6054,7 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -6087,7 +6088,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6097,7 +6098,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6130,7 +6131,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6140,7 +6141,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6173,7 +6174,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6183,7 +6184,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6216,7 +6217,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6226,7 +6227,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6259,7 +6260,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6269,7 +6270,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6302,7 +6303,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6312,7 +6313,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6334,7 +6335,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(3, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6342,7 +6343,7 @@ class CurrentCustomerEditor extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6354,7 +6355,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(2, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6366,7 +6367,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6376,7 +6377,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -6387,7 +6388,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6420,7 +6421,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6430,7 +6431,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6463,7 +6464,7 @@ class CurrentCustomerEditor extends React.Component {
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
                     .subtract(1, 'd')
-                    .format('D')} - $2.50`}
+                    .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6473,7 +6474,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6510,7 +6511,7 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -6554,7 +6555,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6597,7 +6598,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6640,7 +6641,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6683,7 +6684,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6726,7 +6727,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6769,7 +6770,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6799,7 +6800,7 @@ class CurrentCustomerEditor extends React.Component {
                 control={<Radio />}
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('dddd')} - $2.50`}
+                  .format('dddd')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6833,7 +6834,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -6844,7 +6845,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6887,7 +6888,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6930,7 +6931,7 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6971,7 +6972,7 @@ class CurrentCustomerEditor extends React.Component {
               
               ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
 
 
@@ -7005,7 +7006,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -7028,7 +7029,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $2.50`}
+                    .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -7038,7 +7039,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7060,7 +7061,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7083,7 +7084,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} day of - $2.50`}
+                    .format('DD')} day of - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -7093,7 +7094,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $2.50`}
+                    .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7118,7 +7119,7 @@ class CurrentCustomerEditor extends React.Component {
                   
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(2, 'd')
-                  .format('DD')} evening - $2.50`}
+                  .format('DD')} evening - $${DELIVERYCOST}`}
             />
 
 
@@ -7129,7 +7130,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
-                  .format('DD')} - $2.50`}
+                  .format('DD')} - $${DELIVERYCOST}`}
             />
 
 
@@ -7163,7 +7164,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7185,7 +7186,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $2.50`}
+                    .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -7195,7 +7196,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -7218,7 +7219,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $2.50`}
+                    .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7241,7 +7242,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} day of - $2.50`}
+                    .format('DD')} day of - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -7251,7 +7252,7 @@ class CurrentCustomerEditor extends React.Component {
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
                     .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $2.50`}
+                    .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
