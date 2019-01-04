@@ -39,6 +39,7 @@ Meteor.methods({
       status: String,
       meals: Array,
       onDate: String,
+      deliveryAssignedTo: String,
     });
 
     check(statusChange, String);
@@ -47,8 +48,6 @@ Meteor.methods({
 
     const twilioClient = new twilio(Meteor.settings.public.twilioAccountSid, Meteor.settings.private.twilioAuthToken);
 
-
-    // try {
     const updated = Deliveries.update(
       {
         routeId: delivery.routeId,
@@ -90,7 +89,7 @@ Meteor.methods({
         deliveryDriver = Meteor.users.findOne({ _id: this.userId, }, { fields: { _id: 1, roles: 1, profile: 1, } });
 
         if (deliveryDriver.roles.findIndex(e => e == "delivery") == -1) {
-          deliveryDriver = "Delivery driver";
+          deliveryDriver = "Your delivery driver";
         } else {
           deliveryDriver = deliveryDriver.profile.name.first;
         }
@@ -99,7 +98,7 @@ Meteor.methods({
       if (notifyUserByEmail) {
         try {
           sendDeliveredEmail({
-            deliveryDriver: deliveryDriver || 'Delivery driver',
+            deliveryDriver: deliveryDriver || 'Your delivery driver',
             firstName: deliveryUser.profile.name.first,
             email: deliveryUser.emails[0].address,
             totalMeals: sumBy(delivery.meals, 'total'),
@@ -140,7 +139,7 @@ Meteor.methods({
       if (notifyUserBySms) {
         try {
           twilioClient.messages.create({
-            body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us so we can try again.`,
+            body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us by calling (613) 701-6250 to discuss pick up.`,
             to: `+1${deliveryUser.phone}`,
             from: fromPhoneNumber,
           });
@@ -153,7 +152,7 @@ Meteor.methods({
       if (notifyUserByEmail || notifyUserBySms) {
         deliveryDriver = Meteor.users.findOne({ _id: this.userId, }, { fields: { _id: 1, roles: 1, profile: 1, } })
         if (deliveryDriver.roles.findIndex(e => e == "delivery") == -1) {
-          deliveryDriver = "Delivery driver";
+          deliveryDriver = "Your delivery driver";
         } else {
           deliveryDriver = deliveryDriver.profile.name.first;
         }
@@ -162,7 +161,7 @@ Meteor.methods({
       if (notifyUserByEmail) {
         try {
           sendInTransitEmail({
-            deliveryDriver: deliveryDriver || 'Delivery driver',
+            deliveryDriver: deliveryDriver || 'Your delivery driver',
             firstName: deliveryUser.profile.name.first,
             email: deliveryUser.emails[0].address,
             totalMeals: sumBy(delivery.meals, 'total'),
@@ -213,11 +212,6 @@ Meteor.methods({
       }
     }
 
-    // } catch (exception) {
-    //   console.log(exception);
-    //   throw new Meteor.Error('500', exception);
-    // }
-
     return delivery._id;
 
   },
@@ -227,7 +221,7 @@ Meteor.methods({
     check(statusChange, String);
 
     console.log('Server: deliveries.batchUpdate');
-    console.log(deliveries);
+    // console.log(deliveries);
 
     const twilioClient = new twilio(Meteor.settings.public.twilioAccountSid, Meteor.settings.private.twilioAuthToken);
     // const fromPhoneNumber = process.env.NODE_ENV == "development" ? twilioMagicPhones['valid'] : '+16138006196';
@@ -262,18 +256,18 @@ Meteor.methods({
     });
 
     let deliveryDriver = Meteor.users.findOne({ _id: this.userId, }, { fields: { _id: 1, roles: 1, profile: 1, } });
-    console.log(deliveryDriver);
+    // console.log(deliveryDriver);
 
     if (deliveryDriver.roles.findIndex(e => e == "delivery") == -1) {
-      deliveryDriver = "Delivery driver";
+      deliveryDriver = "Your delivery driver";
     } else {
       deliveryDriver = deliveryDriver.profile.name.first;
     }
 
     deliveries.forEach((e) => {
       const delivery = Deliveries.findOne({ _id: e._id });
-      console.log("Looping through each delivery: ")
-      console.log(delivery);
+      // console.log("Looping through each delivery: ")
+      // console.log(delivery);
 
       const deliveryUser = Meteor.users.findOne({ _id: e.customerId });
 
@@ -314,7 +308,7 @@ Meteor.methods({
 
         if (notifyUserBySms) {
           twilioClient.messages.create({
-            body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us to discuss pick up.`,
+            body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us by calling (613) 701-6250 to discuss pick up.`,
             to: `+1${deliveryUser.phone}`,
             from: fromPhoneNumber,
           });

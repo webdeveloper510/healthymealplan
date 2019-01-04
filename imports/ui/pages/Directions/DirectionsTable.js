@@ -28,6 +28,7 @@ import { Random } from 'meteor/random';
 import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
+import Chip from 'material-ui/Chip';
 
 import moment from 'moment';
 
@@ -262,16 +263,18 @@ class DirectionsTable extends React.Component {
       selectedCheckboxes: [],
       selectedCheckboxesNumber: 0,
       updateDialogOpen: false,
+      openMassNotifyDialog: false,
     });
 
     this.forceUpdate();
   }
 
   handleDeliveryAssign(event) {
-    console.log(event.currentTarget.value);
+    // console.log(event.currentTarget.value);
+    const tabValue = event.currentTarget.value;
 
     const deliveries = this.state.aggregateData.deliveries.filter(el => this.state.selectedCheckboxes.indexOf(el._id) >= 0).map(e => e.subscriptionId)
-    console.log(deliveries);
+    // console.log(deliveries);
 
     if (!deliveries) {
       this.props.popTheSnackbar({
@@ -294,10 +297,13 @@ class DirectionsTable extends React.Component {
       } else {
         this.props.popTheSnackbar({
           message: 'Delivery personnel changed successfully',
+        });
+
+        this.setState({
           openAssignDialog: false,
           selectedCheckboxes: [],
           selectedCheckboxesNumber: 0,
-        });
+        })
       }
     })
   }
@@ -465,7 +471,12 @@ class DirectionsTable extends React.Component {
   }
 
   handleTabChange(event, value) {
-    this.setState({ currentTabValue: value, aggregateDataLoadingTabChange: true });
+    this.setState({
+      currentTabValue: value,
+      selectedCheckboxes: [],
+      selectedCheckboxesNumber: 0,
+      aggregateDataLoadingTabChange: true
+    });
 
     Meteor.call('getDeliveryAggregatedData', this.props.currentSelectorDate, value, (err, res) => {
       this.setState({
@@ -541,7 +552,7 @@ class DirectionsTable extends React.Component {
             onClick={this.clearSearchBox.bind(this)}
             style={{
               cursor: 'pointer',
-              display: (this.state.searchBy.length > 0) ? 'block' : 'none',
+              display: (this.state.searchBy.length > 0 && !this.state.selectedCheckboxes.length > 0) ? 'block' : 'none',
             }}
           />
 
@@ -585,7 +596,7 @@ class DirectionsTable extends React.Component {
                       <Typography className="body2" type="body2">Address</Typography>
                     </TableCell>
                     <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.sortByOptions('title')}>
-                      <Typography className="body2" type="body2">Route</Typography>
+                      <Typography className="body2" type="body2">Driver</Typography>
                     </TableCell>
                     <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.sortByOptions('title')}>
                       <Typography className="body2" type="body2">Delivery</Typography>
@@ -639,10 +650,9 @@ class DirectionsTable extends React.Component {
                           />
                         </TableCell>
 
-                        <TableCell padding="none" style={{ width: '22%' }} >
+                        <TableCell padding="none" style={{ width: '20%' }} >
                           <Typography className="subheading" type="subheading" style={{ display: 'flex', alignItems: 'center' }}>
-                            <span className="status-circle" />{' '}
-
+                            {/* <span className="status-circle" />{' '} */}
                             {e.customer ? (
                               `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''}
                                    ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''} `
@@ -660,7 +670,7 @@ class DirectionsTable extends React.Component {
                         </TableCell>
 
                         <TableCell
-                          style={{ paddingTop: '10px', paddingBottom: '10px', width: '25%' }}
+                          style={{ paddingTop: '10px', paddingBottom: '10px', width: '23%' }}
                           padding="none"
                           onClick={() => this.handleAddressDialogOpen(e.customer.profile, e.customer.address.streetAddress)}
                         >
@@ -670,15 +680,7 @@ class DirectionsTable extends React.Component {
                           <Typography type="body1">
                             {e.customer ? this.renderAddressSubText(e.customer.address) : ''}
                           </Typography>
-
-
-                        </TableCell>
-
-                        <TableCell
-                          style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }}
-                          padding="none"
-                        >
-
+                          <div style={{ marginTop: '5px' }} />
                           <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
                             {e.route ? (
                               `${e.route.title} `
@@ -689,6 +691,19 @@ class DirectionsTable extends React.Component {
                               `${e.customer.postalCode} `
                             ) : ''}
                           </Typography>
+
+                        </TableCell>
+
+                        <TableCell
+                          style={{ paddingTop: '10px', paddingBottom: '10px', width: '12%' }}
+                          padding="none"
+                        >
+
+                          {e.deliveryAssignedTo == "unassigned" ? (
+                            <Typography type="subheading" className="subheading">Unassigned</Typography>
+                          ) : (
+                              <Typography type="subheading" className="subheading">{this.props.deliveryGuys.find(guy => guy._id == e.deliveryAssignedTo).profile.name.first || ''}</Typography>
+                            )}
 
 
                         </TableCell>
@@ -733,32 +748,13 @@ class DirectionsTable extends React.Component {
                           style={{ paddingTop: '10px', paddingBottom: '10px', width: '13%' }}
                           padding="none"
                         >
-                          <TextField
-                            fullWidth
-                            id="select-delivery-status"
-                            select
-                            SelectProps={{ native: true }}
-                            name="status"
-                            style={{ width: '90%', margin: '0 auto' }}
-                            onChange={event => this.handleStatusChange(event, e._id, false)}
-                            value={status}
-                          >
-                            <option value="Scheduled">
-                              Scheduled
-                            </option>
-                            <option value="In-Transit">
-                              In-Transit
-                            </option>
-                            <option value="Delayed">
-                              Delayed
-                            </option>
-                            <option value="Not delivered">
-                              Not delivered
-                            </option>
-                            <option value="Delivered">
-                              Delivered
-                            </option>
-                          </TextField>
+                          <Typography type="body2" className="body2" style={{ textTransform: 'capitalize' }}>
+                            <Chip
+                              style={{ color: '#FFF', textTransform: 'capitalize' }}
+                              label={status}
+                              className={`${statusClass} directions-chip`}
+                            />
+                          </Typography>
 
                         </TableCell>
 

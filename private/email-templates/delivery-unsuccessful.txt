@@ -1,6 +1,7 @@
 Hi {{firstName}},
 
-We attempted to deliver your {{totalMeals}} meals to {{address}} at {{deliveredAt}}.  Please get in touch with us to discuss pick up.
+We attempted to deliver your {{totalMeals}} meals to {{address}} at {{deliveredAt}}. 
+Please get in touch with us by calling (613) 701-6250 to discuss pick up. 
 
 Regards,
 The {{applicationName}} Team

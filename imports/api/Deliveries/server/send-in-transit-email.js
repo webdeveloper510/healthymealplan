@@ -9,6 +9,7 @@ export default (options) => {
   const emailAddress = options.email;
   const totalMeals = options.totalMeals;
   const deliveryDriver = options.deliveryDriver;
+  const address = options.address;
 
   return sendEmail({
     to: process.env.NODE_ENV == "development" ? 'jivanyesh@gmail.com' : emailAddress,
@@ -20,6 +21,7 @@ export default (options) => {
       firstName,
       totalMeals,
       deliveryDriver,
+      address,
     },
   }).catch((error) => {
     throw new Meteor.Error('500', `${error}`);
