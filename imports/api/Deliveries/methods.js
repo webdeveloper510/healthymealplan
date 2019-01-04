@@ -1,5 +1,6 @@
 import { Meteor } from 'meteor/meteor';
 import { check } from 'meteor/check';
+import { Match } from 'meteor/check';
 import Deliveries from './Deliveries';
 import Subscriptions from '../Subscriptions/Subscriptions';
 
@@ -11,30 +12,18 @@ import moment from 'moment';
 import sendDeliveredEmail from './server/send-delivered-email';
 import sendDeliveryDelayedEmail from './server/send-delivery-delayed-email';
 import sendNotDeliveredEmail from './server/send-not-delivered-email';
+import sendInTransitEmail from './server/send-in-transit-email';
 
 import twilio from 'twilio';
 import deliveriesDataMapper from '../../modules/server/deliveriesDataMapper';
 
+const twilioMagicPhones = {
+  unavailable: '+15005550000',
+  invalid: '+15005550001',
+  valid: '+15005550006'
+};
 
 Meteor.methods({
-  'deliveries.insert': function deliveriesInsert(cat) {
-    check(cat, {
-      title: String,
-      types: Array,
-    });
-
-    const existsCategory = Deliveries.findOne({ title: cat.title });
-
-    if (existsCategory) {
-      throw new Meteor.Error('500', `${cat.title} is already present`);
-    }
-
-    try {
-      return Deliveries.insert({ title: cat.title, types: cat.types, owner: this.userId });
-    } catch (exception) {
-      throw new Meteor.Error('500', exception);
-    }
-  },
 
   'deliveries.update': function deliveriesUpdate(delivery, statusChange) {
     check(delivery, Object);
@@ -59,58 +48,260 @@ Meteor.methods({
     const twilioClient = new twilio(Meteor.settings.public.twilioAccountSid, Meteor.settings.private.twilioAuthToken);
 
 
-    try {
-      const updated = Deliveries.update(
-        {
-          routeId: delivery.routeId,
+    // try {
+    const updated = Deliveries.update(
+      {
+        routeId: delivery.routeId,
+        customerId: delivery.customerId,
+        subscriptionId: delivery.subscriptionId,
+        onDate: delivery.onDate,
+      },
+      {
+        $set: { status: statusChange, updatedAt: new Date().toISOString() },
+        $setOnInsert: {
+          _id: delivery._id,
+          customer: delivery.customer,
+          route: delivery.route,
           customerId: delivery.customerId,
           subscriptionId: delivery.subscriptionId,
+          postalCode: delivery.postalCode,
+          routeId: delivery.routeId,
+          title: delivery.title,
+          meals: delivery.meals,
           onDate: delivery.onDate,
+          createdAt: new Date().toISOString(),
         },
-        {
-          $set: { status: statusChange, updatedAt: new Date().toISOString() },
-          $setOnInsert: {
-            _id: delivery._id,
-            customer: delivery.customer,
-            route: delivery.route,
-            customerId: delivery.customerId,
-            subscriptionId: delivery.subscriptionId,
-            postalCode: delivery.postalCode,
-            routeId: delivery.routeId,
-            title: delivery.title,
-            meals: delivery.meals,
-            onDate: delivery.onDate,
-            createdAt: new Date().toISOString(),
-          },
-        },
-        { upsert: true },
-      );
+      },
+      { upsert: true },
+    );
 
-      // const delivery = Deliveries.findOne({ _id: delivery._id });
-      const deliveryUser = Meteor.users.findOne({ _id: delivery.customerId });
+    // const delivery = Deliveries.findOne({ _id: delivery._id });
+    const deliveryUser = Meteor.users.findOne({ _id: delivery.customerId }, { fields: { _id: 1, address: 1, phone: 1, emails: 1, profile: 1, notifications: 1, } });
 
-      const notifyUserByEmail = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.email : false;
-      const notifyUserBySms = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.sms : false;
+    const notifyUserByEmail = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.email : false;
+    const notifyUserBySms = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.sms : false;
+    // const fromPhoneNumber = process.env.NODE_ENV == "development" ? twilioMagicPhones['invalid'] : '+16138006196';
+    const fromPhoneNumber = '+16138006196';
 
-      if (updated && statusChange == 'Delivered') {
-        if (notifyUserByEmail) {
+    if (updated && statusChange == 'Delivered') {
+      let deliveryDriver = null;
+
+      if (notifyUserByEmail || notifyUserBySms) {
+        deliveryDriver = Meteor.users.findOne({ _id: this.userId, }, { fields: { _id: 1, roles: 1, profile: 1, } });
+
+        if (deliveryDriver.roles.findIndex(e => e == "delivery") == -1) {
+          deliveryDriver = "Delivery driver";
+        } else {
+          deliveryDriver = deliveryDriver.profile.name.first;
+        }
+      }
+
+      if (notifyUserByEmail) {
+        try {
           sendDeliveredEmail({
+            deliveryDriver: deliveryDriver || 'Delivery driver',
             firstName: deliveryUser.profile.name.first,
             email: deliveryUser.emails[0].address,
             totalMeals: sumBy(delivery.meals, 'total'),
             address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
             deliveredAt: moment(new Date()).format('h:mm a'),
           });
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      if (notifyUserBySms) {
+        try {
+          twilioClient.messages.create({
+            body: `Your ${sumBy(delivery.meals, 'total')} meals have been delivered to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}.`,
+            to: `+1${deliveryUser.phone}`,
+            from: fromPhoneNumber,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    } else if (updated && statusChange == 'Not delivered') {
+      if (notifyUserByEmail) {
+        try {
+          sendNotDeliveredEmail({
+            firstName: deliveryUser.profile.name.first,
+            email: deliveryUser.emails[0].address,
+            totalMeals: sumBy(delivery.meals, 'total'),
+            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+            deliveredAt: moment(new Date()).format('h:mm a'),
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      if (notifyUserBySms) {
+        try {
+          twilioClient.messages.create({
+            body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us so we can try again.`,
+            to: `+1${deliveryUser.phone}`,
+            from: fromPhoneNumber,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    } else if (updated && statusChange == 'In-Transit') {
+
+      if (notifyUserByEmail || notifyUserBySms) {
+        deliveryDriver = Meteor.users.findOne({ _id: this.userId, }, { fields: { _id: 1, roles: 1, profile: 1, } })
+        if (deliveryDriver.roles.findIndex(e => e == "delivery") == -1) {
+          deliveryDriver = "Delivery driver";
+        } else {
+          deliveryDriver = deliveryDriver.profile.name.first;
+        }
+      }
+
+      if (notifyUserByEmail) {
+        try {
+          sendInTransitEmail({
+            deliveryDriver: deliveryDriver || 'Delivery driver',
+            firstName: deliveryUser.profile.name.first,
+            email: deliveryUser.emails[0].address,
+            totalMeals: sumBy(delivery.meals, 'total'),
+            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+            deliveredAt: moment(new Date()).format('h:mm a'),
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      if (notifyUserBySms) {
+        try {
+          twilioClient.messages.create({
+            body: `${deliveryDriver} just left the kitchen with your ${sumBy(delivery.meals, 'total')} meals and is on route to ${deliveryUser.address.streetAddress}.`,
+            to: `+1${deliveryUser.phone}`,
+            from: fromPhoneNumber,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    } else if (updated && statusChange == 'Delayed') {
+      if (notifyUserByEmail) {
+        try {
+          sendDeliveryDelayedEmail({
+            firstName: deliveryUser.profile.name.first,
+            email: deliveryUser.emails[0].address,
+            totalMeals: sumBy(delivery.meals, 'total'),
+            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+            deliveredAt: moment(new Date()).format('h:mm a'),
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
+
+      if (notifyUserBySms) {
+        try {
+          twilioClient.messages.create({
+            body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today. Please get in touch with us if you cannot accept a late delivery.`,
+            to: `+1${deliveryUser.phone}`,
+            from: fromPhoneNumber,
+          });
+        } catch (error) {
+          console.log(error);
+        }
+      }
+    }
+
+    // } catch (exception) {
+    //   console.log(exception);
+    //   throw new Meteor.Error('500', exception);
+    // }
+
+    return delivery._id;
+
+  },
+
+  'deliveries.batchUpdate': function deliveriesBatchUpdate(deliveries, statusChange) {
+    check(deliveries, Array);
+    check(statusChange, String);
+
+    console.log('Server: deliveries.batchUpdate');
+    console.log(deliveries);
+
+    const twilioClient = new twilio(Meteor.settings.public.twilioAccountSid, Meteor.settings.private.twilioAuthToken);
+    // const fromPhoneNumber = process.env.NODE_ENV == "development" ? twilioMagicPhones['valid'] : '+16138006196';
+    const fromPhoneNumber = '+16138006196';
+
+    deliveries.forEach((e) => {
+      Deliveries.update(
+        {
+          routeId: e.routeId,
+          customerId: e.customerId,
+          subscriptionId: e.subscriptionId,
+          onDate: e.onDate,
+        },
+        {
+          $set: { status: statusChange, updatedAt: new Date().toISOString() },
+          $setOnInsert: {
+            _id: e._id,
+            customer: e.customer,
+            route: e.route,
+            customerId: e.customerId,
+            subscriptionId: e.subscriptionId,
+            postalCode: e.postalCode,
+            routeId: e.routeId,
+            title: e.title,
+            meals: e.meals,
+            onDate: e.onDate,
+            createdAt: new Date().toISOString(),
+          },
+        },
+        { upsert: true },
+      );
+    });
+
+    let deliveryDriver = Meteor.users.findOne({ _id: this.userId, }, { fields: { _id: 1, roles: 1, profile: 1, } });
+    console.log(deliveryDriver);
+
+    if (deliveryDriver.roles.findIndex(e => e == "delivery") == -1) {
+      deliveryDriver = "Delivery driver";
+    } else {
+      deliveryDriver = deliveryDriver.profile.name.first;
+    }
+
+    deliveries.forEach((e) => {
+      const delivery = Deliveries.findOne({ _id: e._id });
+      console.log("Looping through each delivery: ")
+      console.log(delivery);
+
+      const deliveryUser = Meteor.users.findOne({ _id: e.customerId });
+
+      const notifyUserByEmail = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.email : false;
+      const notifyUserBySms = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.sms : false;
+
+
+      if (statusChange == 'Delivered') {
+
+        if (notifyUserByEmail) {
+          sendDeliveredEmail({
+            firstName: deliveryUser.profile.name.first,
+            email: deliveryUser.emails[0].address,
+            totalMeals: sumBy(delivery.meals, 'total'),
+            address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
+            deliveryDriver: deliveryDriver,
+            deliveredAt: moment(new Date()).format('h:mm a'),
+          });
         }
 
         if (notifyUserBySms) {
           twilioClient.messages.create({
-            body: `Your ${sumBy(delivery.meals, 'total')} meals have been delivered to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}.`,
+            body: `Your ${sumBy(delivery.meals, 'total')} meals have been delivered by ${deliveryDriver} to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}.`,
             to: `+1${deliveryUser.phone}`,
-            from: '+16138006196',
+            from: fromPhoneNumber,
           });
         }
-      } else if (updated && statusChange == 'Not delivered') {
+      } else if (statusChange == 'Not delivered') {
         if (notifyUserByEmail) {
           sendNotDeliveredEmail({
             firstName: deliveryUser.profile.name.first,
@@ -123,12 +314,12 @@ Meteor.methods({
 
         if (notifyUserBySms) {
           twilioClient.messages.create({
-            body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us so we can try again.`,
+            body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us to discuss pick up.`,
             to: `+1${deliveryUser.phone}`,
-            from: '+16138006196',
+            from: fromPhoneNumber,
           });
         }
-      } else if (updated && statusChange == 'Delayed') {
+      } else if (statusChange == 'Delayed') {
         if (notifyUserByEmail) {
           sendDeliveryDelayedEmail({
             firstName: deliveryUser.profile.name.first,
@@ -141,136 +332,59 @@ Meteor.methods({
 
         if (notifyUserBySms) {
           twilioClient.messages.create({
-            body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today. Please get in touch with us if you cannot accept a late delivery.`,
+            body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today.`,
             to: `+1${deliveryUser.phone}`,
-            from: '+16138006196',
+            from: fromPhoneNumber,
           });
         }
-      }
+      } else if (statusChange == 'In-Transit') {
 
-      return delivery._id;
-    } catch (exception) {
-      console.log(exception);
-      throw new Meteor.Error('500', exception);
-    }
-  },
-
-  'deliveries.batchUpdate': function deliveriesBatchUpdate(deliveries, statusChange) {
-    check(deliveries, Array);
-    check(statusChange, String);
-
-    console.log('Server: deliveries.batchUpdate');
-
-    const twilioClient = new twilio(Meteor.settings.public.twilioAccountSid, Meteor.settings.private.twilioAuthToken);
-
-    try {
-      deliveries.forEach((e) => {
-        Deliveries.update(
-          {
-            routeId: e.routeId,
-            customerId: e.customerId,
-            subscriptionId: e.subscriptionId,
-            onDate: e.onDate,
-          },
-          {
-            $set: { status: statusChange, updatedAt: new Date().toISOString() },
-            $setOnInsert: {
-              _id: e._id,
-              customer: e.customer,
-              route: e.route,
-              customerId: e.customerId,
-              subscriptionId: e.subscriptionId,
-              postalCode: e.postalCode,
-              routeId: e.routeId,
-              title: e.title,
-              meals: e.meals,
-              onDate: e.onDate,
-              createdAt: new Date().toISOString(),
-            },
-          },
-          { upsert: true },
-        );
-      });
-
-
-      deliveries.forEach((e) => {
-        const delivery = Deliveries.findOne({ _id: e._id });
-        const deliveryUser = Meteor.users.findOne({ _id: e.customerId });
-
-        const notifyUserByEmail = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.email : false;
-        const notifyUserBySms = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.sms : false;
-
-
-        if (statusChange == 'Delivered') {
-          if (notifyUserByEmail) {
-            sendDeliveredEmail({
+        if (notifyUserByEmail) {
+          try {
+            sendInTransitEmail({
+              deliveryDriver: deliveryDriver,
               firstName: deliveryUser.profile.name.first,
               email: deliveryUser.emails[0].address,
               totalMeals: sumBy(delivery.meals, 'total'),
               address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
               deliveredAt: moment(new Date()).format('h:mm a'),
             });
-          }
-
-          if (notifyUserBySms) {
-            twilioClient.messages.create({
-              body: `Your ${sumBy(delivery.meals, 'total')} meals have been delivered to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}.`,
-              to: `+1${deliveryUser.phone}`,
-              from: '+16138006196',
-            });
-          }
-        } else if (statusChange == 'Not delivered') {
-          if (notifyUserByEmail) {
-            sendNotDeliveredEmail({
-              firstName: deliveryUser.profile.name.first,
-              email: deliveryUser.emails[0].address,
-              totalMeals: sumBy(delivery.meals, 'total'),
-              address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
-              deliveredAt: moment(new Date()).format('h:mm a'),
-            });
-          }
-
-          if (notifyUserBySms) {
-            twilioClient.messages.create({
-              body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us to discuss pick up.`,
-              to: `+1${deliveryUser.phone}`,
-              from: '+16138006196',
-            });
-          }
-        } else if (statusChange == 'Delayed') {
-          if (notifyUserByEmail) {
-            sendDeliveryDelayedEmail({
-              firstName: deliveryUser.profile.name.first,
-              email: deliveryUser.emails[0].address,
-              totalMeals: sumBy(delivery.meals, 'total'),
-              address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
-              deliveredAt: moment(new Date()).format('h:mm a'),
-            });
-          }
-
-          if (notifyUserBySms) {
-            twilioClient.messages.create({
-              body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today.`,
-              to: `+1${deliveryUser.phone}`,
-              from: '+16138006196',
-            });
+          } catch (error) {
+            console.log(error);
           }
         }
-      });
-    } catch (exception) {
-      console.log(exception);
-      throw new Meteor.Error('500', exception);
-    }
+
+        if (notifyUserBySms) {
+          try {
+            twilioClient.messages.create({
+              body: `${deliveryDriver} just left the kitchen with your ${sumBy(delivery.meals, 'total')} meals and is on route to ${deliveryUser.address.streetAddress}.`,
+              to: `+1${deliveryUser.phone}`,
+              from: fromPhoneNumber,
+            });
+          } catch (error) {
+            console.log(error);
+          }
+        }
+      }
+    });
+
   },
 
-  getDeliveryAggregatedData(currentDate) {
+  getDeliveryAggregatedData(currentDate, deliveryAssignedToPassed = null) {
     check(currentDate, String);
+    check(deliveryAssignedToPassed, Match.OneOf(String, Object));
+
+    let matchObject = {
+      status: 'active',
+    }
+
+    if (deliveryAssignedToPassed) {
+      matchObject.deliveryAssignedTo = deliveryAssignedToPassed;
+    }
 
     const aggregation = Subscriptions.aggregate([
       {
-        $match: {
-          status: 'active',
-        },
+        $match: matchObject,
       },
       {
         $lookup: {

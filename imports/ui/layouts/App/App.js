@@ -40,6 +40,7 @@ import { blueGrey, green, red } from 'material-ui/colors';
 import { Link } from 'react-router-dom';
 import Navigation from '../../components/Navigation/Navigation';
 import Authenticated from '../../components/Authenticated/Authenticated';
+import Authorized from '../../components/Authorized/Authorized';
 import AuthenticatedSideNav from '../../components/AuthenticatedSideNav/AuthenticatedSideNav';
 import AuthenticatedNavigation from '../../components/AuthenticatedNavigation/AuthenticatedNavigation';
 
@@ -514,7 +515,8 @@ class App extends React.Component {
               >
                 {!this.props.loading ? (
                   <Switch key={this.props.key} location={this.props.location}>
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/billing"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -522,7 +524,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/blog"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -531,7 +534,9 @@ class App extends React.Component {
                     />
 
 
-                    <Authenticated
+
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/blog/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -539,7 +544,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/blog/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -547,21 +553,24 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/categories"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Categories}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/categories/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewCategory}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/categories/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -569,14 +578,16 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/customers"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Customers}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/customers/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -585,7 +596,8 @@ class App extends React.Component {
                     />
 
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/customers/new/:_id"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -593,7 +605,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/customers/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -601,7 +614,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['admin', 'deliveries']}
                       exact
                       path="/directions"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -610,7 +624,8 @@ class App extends React.Component {
                     />
 
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/discounts"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -619,7 +634,8 @@ class App extends React.Component {
                     />
 
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/discounts/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -627,7 +643,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/discounts/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -635,7 +652,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/gift-cards"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -644,7 +662,8 @@ class App extends React.Component {
                     />
 
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/gift-cards/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -652,7 +671,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/gift-cards/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -660,21 +680,24 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/ingredients"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Ingredients}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/ingredients/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewIngredient}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/ingredients/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -682,7 +705,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/instructions"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -690,7 +714,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/invoices"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -698,14 +723,17 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/instructions/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewInstruction}
                       {...this.props}
                     />
-                    <Authenticated
+
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/instructions/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -713,21 +741,26 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/lifestyles"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Lifestyles}
                       {...this.props}
                     />
-                    <Authenticated
+
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/lifestyles/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewLifestyle}
                       {...this.props}
                     />
-                    <Authenticated
+
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/lifestyles/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -735,7 +768,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/meal-planner"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -743,7 +777,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/meal-planner-presets"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -751,7 +786,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/meal-planner-presets/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -759,7 +795,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/meal-planner-presets/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -767,21 +804,24 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/meals"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Meals}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/meals/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewMeal}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/meals/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -790,14 +830,16 @@ class App extends React.Component {
                     />
 
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/plates"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Plates}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/plates/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -805,7 +847,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/plates/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -813,21 +856,26 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/postal-codes"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={PostalCodes}
                       {...this.props}
                     />
-                    <Authenticated
+
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/postal-codes/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewPostalCode}
                       {...this.props}
                     />
-                    <Authenticated
+
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/postal-codes/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -835,7 +883,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/plating"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -851,21 +900,26 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/restrictions"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Restrictions}
                       {...this.props}
                     />
-                    <Authenticated
+
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/restrictions/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewRestriction}
                       {...this.props}
                     />
-                    <Authenticated
+
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/restrictions/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -873,21 +927,24 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/routes"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Routes}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/routes/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewRoute}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/routes/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -895,21 +952,24 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/sides"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Sides}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/sides/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewSide}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/sides/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -925,21 +985,24 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/types"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={Types}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/types/new"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
                       component={NewType}
                       {...this.props}
                     />
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin', 'chef']}
                       exact
                       path="/types/:_id/edit"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}

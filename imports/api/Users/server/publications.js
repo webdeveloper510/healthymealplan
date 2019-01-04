@@ -26,6 +26,9 @@ Meteor.publish('users.customers', (query, selector) => {
   return Meteor.users.find({ roles: ['customer'] });
 });
 
+Meteor.publish('users.deliveryGuys', () => Meteor.users.find({ roles: ['admin', 'delivery'] }));
+
+
 Meteor.publish('users.customers.new', function newMethod(selector, options, skip, limit) {
   check(selector, Object);
   check(options, Object);

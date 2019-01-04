@@ -79,7 +79,7 @@ Subscriptions.schema = new SimpleSchema({
   paymentMethod: {
     type: String,
     label: 'The payment method for the subscription',
-  },  
+  },
 
   amount: {
     type: Number,
@@ -187,6 +187,12 @@ Subscriptions.schema = new SimpleSchema({
   //   label: "lifestyle",
   //   optional: true
   // },
+  deliveryAssignedTo: {
+    type: String,
+    label: "Delivery personnel",
+    optional: true,
+    defaultValue: 'unassigned',
+  },
 
   createdAt: {
     type: String,

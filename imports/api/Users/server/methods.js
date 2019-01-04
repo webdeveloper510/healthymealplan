@@ -702,40 +702,40 @@ Meteor.methods({
 
     if (sub.paymentMethod == 'card') {
 
-      console.log('Payment method is card and the subscription is paused');
+      console.log('Payment method is card');
 
 
-      const syncGetSubscription = Meteor.wrapAsync(getSubscription);
+      // const syncGetSubscription = Meteor.wrapAsync(getSubscription);
 
-      const getSubscriptionRes = syncGetSubscription(sub.authorizeSubscriptionId);
+      // const getSubscriptionRes = syncGetSubscription(sub.authorizeSubscriptionId);
 
-      console.log(getSubscriptionRes);
+      // console.log(getSubscriptionRes);
 
-      if (getSubscriptionRes.messages.resultCode != 'Ok') {
-        throw new Meteor.Error(500, 'There was a problem fetching the subscription [Authorize.Net]');
-      }
+      // if (getSubscriptionRes.messages.resultCode != 'Ok') {
+      //   throw new Meteor.Error(500, 'There was a problem fetching the subscription [Authorize.Net]');
+      // }
 
-      const subscriptionStartDate = getSubscriptionRes.subscription.paymentSchedule.startDate;
-      const subscriptionTotalOccurrences = getSubscriptionRes.subscription.paymentSchedule.totalOccurrences;
+      // const subscriptionStartDate = getSubscriptionRes.subscription.paymentSchedule.startDate;
+      // const subscriptionTotalOccurrences = getSubscriptionRes.subscription.paymentSchedule.totalOccurrences;
 
-      console.log(moment(subscriptionStartDate).hour(23).minute(30));
-      console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
+      // console.log(moment(subscriptionStartDate).hour(23).minute(30));
+      // console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
 
-      // this changes subscription amount immediately if first charge hasn't happened
-      if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))
-        && sub.status == "paused") {
+      // // this changes subscription amount immediately if first charge hasn't happened
+      // if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))
+      //   && sub.status == "paused") {
 
-        console.log("Subscription hasn't been charged");
+      //   console.log("Subscription hasn't been charged");
 
-        const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
+      //   const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
 
-        const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
+      //   const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
 
-        if (updateSubscriptionRes.messages.resultCode != 'Ok') {
-          throw new Meteor.Error(500, 'There was a problem updating the subscription [Authorize.Net]');
-        }
+      //   if (updateSubscriptionRes.messages.resultCode != 'Ok') {
+      //     throw new Meteor.Error(500, 'There was a problem updating the subscription [Authorize.Net]');
+      //   }
 
-      } else {
+      // } else {
 
         const jobExists = Jobs.findOne({ type: 'editSubscriptionJob', 'data.id': data.id, status: 'waiting' });
 
@@ -757,7 +757,7 @@ Meteor.methods({
         return {
           subUpdateScheduled: true,
         };
-      }
+      // }
     }
 
     const keysToUnset = {};
@@ -775,9 +775,9 @@ Meteor.methods({
     Subscriptions.update({
       customerId: data.id,
     }, {
-        $set: keysToSet,
-        $unset: keysToUnset,
-      });
+      $set: keysToSet,
+      $unset: keysToUnset,
+    });
 
   },
 

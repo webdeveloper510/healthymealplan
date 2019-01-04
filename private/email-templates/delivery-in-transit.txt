@@ -1,0 +1,6 @@
+Hi {{firstName}},
+
+{{deliveryDriver}} just left the kitchen with your {{totalMeals}} meals and is on route to {{address}}.
+
+Regards,
+The {{applicationName}} Team

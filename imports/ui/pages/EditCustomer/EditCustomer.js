@@ -31,6 +31,7 @@ const EditCustomer = ({
   discounts,
   jobs,
   giftCards,
+  deliveryGuys,
 }) => (loading ? <Loading /> : customer ? (
   <div className="EditCurrentCustomer">
     <Grid container className="EditCategory SideContent SideContent--spacer-2x--horizontal">
@@ -48,6 +49,7 @@ const EditCustomer = ({
         discounts={discounts}
         jobs={jobs}
         giftCards={giftCards}
+        deliveryGuys={deliveryGuys}
       />
     </Grid>
   </div>
@@ -59,6 +61,7 @@ EditCustomer.propTypes = {
   secondaryAccounts: PropTypes.arrayOf(Object).isRequired,
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
+  deliveryGuys: PropTypes.array,
 };
 
 export default withTracker(({ match }) => {
@@ -73,11 +76,12 @@ export default withTracker(({ match }) => {
   const subscription8 = Meteor.subscribe('discounts');
   const subscription9 = Meteor.subscribe('jobs.subscription', customerId);
   const subscription10 = Meteor.subscribe('giftcards');
+  const subscription11 = Meteor.subscribe('users.deliveryGuys');
 
 
   return {
     loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready()
-      && !subscription6.ready() && !subscription7.ready() && !subscription8.ready() && !subscription9.ready() && !subscription10.ready(),
+      && !subscription6.ready() && !subscription7.ready() && !subscription8.ready() && !subscription9.ready() && !subscription10.ready() && !subscription11.ready(),
     customer: Meteor.users.findOne(customerId),
     subscription: Subscriptions.findOne({ customerId }),
     secondaryAccounts: Meteor.users.find({ secondary: true, primaryAccount: customerId }).fetch(),
@@ -88,5 +92,6 @@ export default withTracker(({ match }) => {
     discounts: Discounts.find().fetch(),
     jobs: Jobs.find().fetch(),
     giftCards: GiftCards.find().fetch(),
+    deliveryGuys: Meteor.users.find({ roles: ['admin', 'delivery'] }).fetch(),
   };
 })(EditCustomer);

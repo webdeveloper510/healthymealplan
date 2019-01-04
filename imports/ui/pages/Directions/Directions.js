@@ -160,74 +160,36 @@ class Directions extends React.Component {
 
           </Grid>
 
-          {/* <div style={{ marginTop: '25px' }}>
-            <AppBar position="static" className="appbar--no-background appbar--no-shadow">
-              <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
-                <Tab label="All" value={/./} />
-                {this.props.routes && this.props.routes.map((e, i) => (
-                  <Tab key={i} label={e.title} value={e._id} />
-                ))}
-              </Tabs>
-            </AppBar>
-          </div> */}
-
-          {/* <div style={{
-            width: '100%',
-            background: '#FFF',
-            borderTopRightRadius: '2px',
-            borderTopLeftRadius: '2px',
-            marginTop: '3em',
-            padding: '16px 25px 1em',
-            boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
-            position: 'relative',
-          }}
-          >
-
-            <SearchIcon
-              className="autoinput-icon autoinput-icon--search"
-              style={{ display: (this.state.searchSelector.length > 0) ? 'none' : 'block', top: '33%', right: '1.8em !important' }}
-            />
-
-            <ClearIcon
-              className="autoinput-icon--clear"
-              onClick={this.clearSearchBox.bind(this)}
-              style={{
-                cursor: 'pointer',
-                display: (this.state.searchSelector.length > 0) ? 'block' : 'none',
-              }}
-            />
-
-          </div> */}
           <ListContainer
-            limit={50}
+            limit={1000}
             collection={Deliveries}
             publication="deliveries"
-            joins={[
-              {
-                localProperty: 'routeId',
-                collection: Routes,
-                joinAs: 'route',
-              },
-              {
-                localProperty: 'postalCode',
-                collection: PostalCodes,
-                joinAs: 'postalCode',
-              },
-              {
-                localProperty: 'customerId',
-                collection: Meteor.users,
-                joinAs: 'customer',
-              },
-              {
-                localProperty: 'subscriptionId',
-                collection: Subscriptions,
-                joinAs: 'subscription',
-              },
-            ]}
+            // joins={[
+            //   {
+            //     localProperty: 'routeId',
+            //     collection: Routes,
+            //     joinAs: 'route',
+            //   },
+            //   {
+            //     localProperty: 'postalCode',
+            //     collection: PostalCodes,
+            //     joinAs: 'postalCode',
+            //   },
+            //   {
+            //     localProperty: 'customerId',
+            //     collection: Meteor.users,
+            //     joinAs: 'customer',
+            //   },
+            //   {
+            //     localProperty: 'subscriptionId',
+            //     collection: Subscriptions,
+            //     joinAs: 'subscription',
+            //   },
+            // ]}
             options={this.state.options}
             selector={{
               onDate: this.state.currentSelectorDate,
-              routeId: { $regex: new RegExp(this.state.currentTabValue), $options: 'i' },
+              // routeId: { $regex: new RegExp(this.state.currentTabValue), $options: 'i' },
               $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }],
             }}
             component={DirectionsTable}
@@ -241,21 +203,12 @@ class Directions extends React.Component {
               searchSelector: this.state.searchSelector,
               routeSelector: this.state.currentTabValue,
               routes: this.props.routes,
+              deliveryGuys: this.props.deliveryGuys,
+              userRoles: this.props.userRoles || this.props.roles,
+              userId: this.props.userId,
             }}
-          >
-            {/* <DirectionsTable
-              popTheSnackbar={this.props.popTheSnackbar}
-              searchTerm={this.state.searchSelector}
-              rowsLimit={this.state.rowsVisible}
-              history={this.props.history}
-              sortByOptions={this.sortByOption.bind(this)}
-              currentSelectorDate={this.state.currentSelectorDate}
-              searchSelector={this.state.searchSelector}
-              routeSelector={this.state.currentTabValue}
-              routes={this.props.routes}
-            /> */}
 
-          </ListContainer>
+          />
 
 
         </Grid>
@@ -267,6 +220,7 @@ class Directions extends React.Component {
 Directions.propTypes = {
   loading: PropTypes.bool.isRequired,
   delvieries: PropTypes.arrayOf(PropTypes.object).isRequired,
+  deliveryGuys: PropTypes.array,
   match: PropTypes.object.isRequired,
   history: PropTypes.object.isRequired,
 };
@@ -279,12 +233,13 @@ export default withTracker(() => {
   const subscription3 = Meteor.subscribe('routes');
   const subscription4 = Meteor.subscribe('subscriptions');
   const subscription5 = Meteor.subscribe('users.customers', {}, {});
-
+  const subscription6 = Meteor.subscribe('users.deliveryGuys');
 
   return {
-    loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready(),
+    loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready() && !subscription6.ready() && Meteor.user(),
     deliveries: Deliveries.find().fetch(),
     routes: Routes.find().fetch(),
     postalCodes: PostalCodes.find().fetch(),
+    deliveryGuys: Meteor.users.find({ roles: ['admin', 'delivery'] }).fetch(),
   };
 })(Directions);

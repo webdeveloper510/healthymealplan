@@ -10,10 +10,11 @@ export default (options) => {
   const totalMeals = options.totalMeals;
   const address = options.address;
   const deliveredAt = options.deliveredAt;
+  const deliveryDriver = options.deliveryDriver;
 
 
   return sendEmail({
-    to: emailAddress,
+    to: process.env.NODE_ENV == "development" ? 'jivanyesh@gmail.com' : emailAddress,
     from: `${applicationName} <support@vittle.ca>`,
     subject: 'Your Vittle has been delivered',
     template: 'delivery-successful',
@@ -22,6 +23,7 @@ export default (options) => {
       firstName,
       totalMeals,
       address,
+      deliveryDriver,
       deliveredAt,
     },
   })

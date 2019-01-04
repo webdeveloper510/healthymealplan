@@ -1,6 +1,6 @@
-Hi, {{firstName}}
+Hi {{firstName}},
 
-Your {{totalMeals}} meals have been delivered to {{address}} at {{deliveredAt}}.
+Your {{totalMeals}} meals have been delivered by {{deliveryDriver}} to {{address}} at {{deliveredAt}}.
 
 Bon appétit!
 The {{applicationName}} Team

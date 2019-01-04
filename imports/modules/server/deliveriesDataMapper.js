@@ -96,7 +96,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
       const deliveryExists = Deliveries.findOne({
         customerId: el.customerId,
         subscriptionId: el.subscriptionId,
-        routeId: el.route[0]._id,
+        routeId: route._id,
         onDate: currentDay,
       });
 
@@ -117,7 +117,8 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
         postalCode: el.postalCode[0]._id,
         routeId: el.route[0]._id,
         title: '',
-        status: 'Scheduled',
+        status: deliveryExists ? deliveryExists.status : 'Scheduled',
+        deliveryAssignedTo: el.deliveryAssignedTo || 'unassigned',
         meals: [],
       };
 
@@ -1433,10 +1434,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
       if (index === 6) {
         continue;
-        daysPaired = [];
       }
 
-      // if a day is not paired and not empty only then push the document into deliveries array
+      // if a day is not paired and not empty then push the document into deliveries array
 
       if ((e != '' || e != 'false') && daysPaired.indexOf(index) == -1) {
         // console.log('Pushing this delivery');

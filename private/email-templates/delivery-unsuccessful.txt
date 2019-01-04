@@ -1,4 +1,4 @@
-Hi, {{firstName}}
+Hi {{firstName}},
 
 We attempted to deliver your {{totalMeals}} meals to {{address}} at {{deliveredAt}}.  Please get in touch with us to discuss pick up.
 

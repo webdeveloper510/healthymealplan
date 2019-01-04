@@ -53,6 +53,49 @@ Meteor.methods({
       throw new Meteor.Error('500', exception);
     }
   },
+
+  'subscriptions.assignDeliveryPersonnel': function assignDeliveryPersonnel(data) {
+    check(data, Object);
+    check(data, {
+      subscriptionId: String,
+      deliveryPersonId: String,
+    });
+
+    try {
+      return Subscriptions.update({
+        _id: data.subscriptionId,
+      }, {
+          $set: {
+            deliveryAssignedTo: data.deliveryPersonId,
+          }
+        });
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
+
+  'subscriptions.batchAssignDeliveryPersonnel': function assignDeliveryPersonnel(data) {
+    check(data, Object);
+    check(data, {
+      subscriptionIds: Array,
+      deliveryPersonId: String,
+    });
+
+    try {
+      return Subscriptions.update({
+        _id: { $in: data.subscriptionIds },
+      }, {
+          $set: {
+            deliveryAssignedTo: data.deliveryPersonId,
+          }
+        }, {
+          multi: true
+        });
+    } catch (exception) {
+      throw new Meteor.Error('500', exception);
+    }
+  },
+
 });
 
 rateLimit({

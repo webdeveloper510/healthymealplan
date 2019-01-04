@@ -132,6 +132,8 @@ class Step4CheckoutCurrent extends React.Component {
       primaryProfileBillingNew: null,
       secondaryProfilesBillingNew: null,
 
+      deliveryAssignedTo: this.props.subscription.deliveryAssignedTo ? this.props.subscription.deliveryAssignedTo : 'unassigned',
+
     };
 
     autoBind(this);
@@ -978,10 +980,28 @@ class Step4CheckoutCurrent extends React.Component {
           });
         }
       });
-
-
     }
+  }
 
+  handleDeliveryPersonnelAssignment(){
+    this.setState({ 
+      deliveryButtonLoading: true, 
+    })
+
+    Meteor.call('subscriptions.assignDeliveryPersonnel', {
+      deliveryPersonId: this.state.deliveryAssignedTo, 
+      subscriptionId: this.props.subscription._id
+    }, (err, res) => {
+      if(err){
+        this.props.popTheSnackbar({
+          message: err.reason || err,
+        })
+      } else {
+        this.props.popTheSnackbar({
+          message: 'Delivery personnel changed successfully',
+        });
+      }
+    })
   }
 
   render() {
@@ -1013,31 +1033,31 @@ class Step4CheckoutCurrent extends React.Component {
                   {this.state.paymentProfileLoading ? (
                     <CircularProgress size={30} />
                   ) : (
-                    this.state.paymentMethod === 'card' && this.state.paymentProfileDetails != null && (
-                      <div>
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                          <div>
-                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Visa' && (<img width="80" src="/visa.svg" />)}
+                      this.state.paymentMethod === 'card' && this.state.paymentProfileDetails != null && (
+                        <div>
+                          <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <div>
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Visa' && (<img width="80" src="/visa.svg" />)}
 
-                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Mastercard' && (<img width="80" src="/mastercard.svg" />)}
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Mastercard' && (<img width="80" src="/mastercard.svg" />)}
 
-                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'AmericanExpress' && (<img width="80" src="/amex.svg" />)}
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'AmericanExpress' && (<img width="80" src="/amex.svg" />)}
 
-                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Discover' && (<img width="80" src="/discover.svg" />)}
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Discover' && (<img width="80" src="/discover.svg" />)}
 
-                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'JCB' && (<img width="80" src="/jcb.svg" />)}
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'JCB' && (<img width="80" src="/jcb.svg" />)}
 
-                            {this.state.paymentProfileDetails.payment.creditCard.cardType == 'DinersClub' && (<img width="80" src="/diners.svg" />)}
+                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'DinersClub' && (<img width="80" src="/diners.svg" />)}
+                            </div>
+                            <div style={{ marginLeft: '10px' }}>
+                              <Typography type="body2">Card {this.state.paymentProfileDetails.payment.creditCard.cardNumber}</Typography>
+                              <Typography type="body2">Expiry {this.state.paymentProfileDetails.payment.creditCard.expirationDate}</Typography>
+                            </div>
+                            <Button onClick={this.openEditPaymentMethodDialog} style={{ marginLeft: '1em' }}>Edit</Button>
                           </div>
-                          <div style={{ marginLeft: '10px' }}>
-                            <Typography type="body2">Card {this.state.paymentProfileDetails.payment.creditCard.cardNumber}</Typography>
-                            <Typography type="body2">Expiry {this.state.paymentProfileDetails.payment.creditCard.expirationDate}</Typography>
-                          </div>
-                          <Button onClick={this.openEditPaymentMethodDialog} style={{ marginLeft: '1em' }}>Edit</Button>
                         </div>
-                      </div>
-                    )
-                  )}
+                      )
+                    )}
 
                   {this.state.paymentMethod === 'cash' ? (
                     <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -1191,8 +1211,8 @@ class Step4CheckoutCurrent extends React.Component {
                         />
                       ))
                     ) : (
-                      <Chip className="chip--bordered" label="Discount code" />
-                    )}
+                        <Chip className="chip--bordered" label="Discount code" />
+                      )}
                   </div>
                 </Grid>
 
@@ -1290,9 +1310,38 @@ class Step4CheckoutCurrent extends React.Component {
                         />
                       ))
                     ) : (
-                      <Chip className="chip--bordered" label="Gift card" />
-                    )}
+                        <Chip className="chip--bordered" label="Gift card" />
+                      )}
                   </div>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Typography type="headline" style={{ margin: '25px 0', display: 'flex', alignItems: 'center' }}>
+                    Delivered by
+                  </Typography>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <RadioGroup
+                    onChange={e => this.setState({ deliveryAssignedTo: e.currentTarget.value, hasDeliveryChanged: true, })}
+                    value={this.state.deliveryAssignedTo}
+                  >
+                    <FormControlLabel
+                      key={0}
+                      value={'unassigned'}
+                      control={<Radio />}
+                      label={'Unassigned'}
+                    />
+                    {!this.props.loading && this.props.deliveryGuys.map((e, index) => (
+                      <FormControlLabel
+                        key={e._id}
+                        value={e._id}
+                        control={<Radio />}
+                        label={e.profile.name.first}
+                      />
+                    ))}
+                  </RadioGroup>
+                  <Button disabled={!this.state.hasDeliveryChanged} onClick={this.handleDeliveryPersonnelAssignment}> Save</Button>
                 </Grid>
 
                 <Dialog
@@ -1602,7 +1651,7 @@ class Step4CheckoutCurrent extends React.Component {
                         0 ||
                         this.state.primaryProfileBilling
                           .totalBodybuilderSurcharge > 0) ? (
-                            <Grid item xs={12}>
+                        <Grid item xs={12}>
                           <Typography
                             type="body2"
                             className="font-medium font-uppercase"
@@ -1653,7 +1702,7 @@ class Step4CheckoutCurrent extends React.Component {
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling
                         .totalBodybuilderSurcharge > 0 ? (
-                          <Grid container>
+                        <Grid container>
                           <Grid item xs={12} sm={6}>
                             <Typography type="subheading">
                               Bodybuilder
@@ -1691,17 +1740,17 @@ class Step4CheckoutCurrent extends React.Component {
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.restrictionsActual
                         .length > 0 && (
-                      <Typography
-                        type="body2"
-                        className="font-medium font-uppercase"
-                        style={{
-                          marginTop: '.75em',
-                          marginBottom: '.75em',
-                        }}
-                      >
+                        <Typography
+                          type="body2"
+                          className="font-medium font-uppercase"
+                          style={{
+                            marginTop: '.75em',
+                            marginBottom: '.75em',
+                          }}
+                        >
                           Restrictions
-                      </Typography>
-                    )}
+                        </Typography>
+                      )}
 
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.restrictionsActual
@@ -1808,36 +1857,36 @@ class Step4CheckoutCurrent extends React.Component {
                           {/* discount secondary = */}
                           {e.discountActual &&
                             e.discountActual > 0 && (
-                            <Grid container>
-                              <Grid item xs={12}>
-                                <Typography
-                                  type="body2"
-                                  className="font-medium font-uppercase"
-                                  style={{ marginTop: '.75em' }}
-                                >
+                              <Grid container>
+                                <Grid item xs={12}>
+                                  <Typography
+                                    type="body2"
+                                    className="font-medium font-uppercase"
+                                    style={{ marginTop: '.75em' }}
+                                  >
                                     Discount
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <Typography type="subheading">
-                                  {e.discount.charAt(0).toUpperCase() +
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                  <Typography type="subheading">
+                                    {e.discount.charAt(0).toUpperCase() +
                                       e.discount.substr(
                                         1,
                                         e.discount.length,
                                       )}
-                                </Typography>
-                              </Grid>
-                              <Grid item xs={12} sm={6}>
-                                <Typography
-                                  type="subheading"
-                                  style={{ textAlign: 'right' }}
-                                >
+                                  </Typography>
+                                </Grid>
+                                <Grid item xs={12} sm={6}>
+                                  <Typography
+                                    type="subheading"
+                                    style={{ textAlign: 'right' }}
+                                  >
                                     -${e.discountActual}{' '}
-                                </Typography>
-                              </Grid>
+                                  </Typography>
+                                </Grid>
 
-                            </Grid>
-                          )}
+                              </Grid>
+                            )}
 
                           {e.totalAthleticSurcharge > 0 ||
                             e.totalBodybuilderSurcharge > 0 ? (
@@ -1881,8 +1930,8 @@ class Step4CheckoutCurrent extends React.Component {
                               </Grid>
                             </Grid>
                           ) : (
-                            ''
-                          )}
+                              ''
+                            )}
 
                           {e.totalBodybuilderSurcharge > 0 ? (
                             <Grid container>
@@ -1912,8 +1961,8 @@ class Step4CheckoutCurrent extends React.Component {
                               </Grid>
                             </Grid>
                           ) : (
-                            ''
-                          )}
+                              ''
+                            )}
 
                           {e.restrictionsActual.length > 0 && (
                             <Typography
@@ -1996,7 +2045,7 @@ class Step4CheckoutCurrent extends React.Component {
                           {this.state.primaryProfileBilling &&
                             this.state.primaryProfileBilling.deliveryCost > 0
                             ? `$${
-                              this.state.primaryProfileBilling.deliveryCost
+                            this.state.primaryProfileBilling.deliveryCost
                             }`
                             : 'Free'}
                         </Typography>
@@ -2006,38 +2055,38 @@ class Step4CheckoutCurrent extends React.Component {
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.deliverySurcharges >
                       0 && (
-                      <Grid container>
-                        <Grid item xs={6}>
-                          <Typography type="subheading">
+                        <Grid container>
+                          <Grid item xs={6}>
+                            <Typography type="subheading">
                               Delivery Surcharge (${
-                              this.props.postalCodes.find(
-                                el =>
-                                  el.title ===
+                                this.props.postalCodes.find(
+                                  el =>
+                                    el.title ===
                                     this.props.customer.postalCode.substring(
                                       0,
                                       3,
                                     ),
-                              ).extraSurcharge
-                            })
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            type="subheading"
-                            style={{ textAlign: 'right' }}
-                          >
-                            {this.state.primaryProfileBilling &&
+                                ).extraSurcharge
+                              })
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              type="subheading"
+                              style={{ textAlign: 'right' }}
+                            >
+                              {this.state.primaryProfileBilling &&
                                 this.state.primaryProfileBilling
                                   .deliverySurcharges > 0
-                              ? `$${
+                                ? `$${
                                 this.state.primaryProfileBilling
                                   .deliverySurcharges
-                              }`
-                              : ''}
-                          </Typography>
+                                }`
+                                : ''}
+                            </Typography>
+                          </Grid>
                         </Grid>
-                      </Grid>
-                    )}
+                      )}
                     {this.state.primaryProfileBilling.discountTotal > 0 && !this.state.discountBeingRemoved
                       && this.props.subscription.hasOwnProperty('discountApplied') ? (
                         <div style={{ marginTop: '25px' }}>
@@ -2068,23 +2117,23 @@ class Step4CheckoutCurrent extends React.Component {
 
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.coolerBag > 0 && (
-                      <Grid container>
-                        <Grid item xs={6}>
-                          <Typography type="subheading">
+                        <Grid container>
+                          <Grid item xs={6}>
+                            <Typography type="subheading">
                               Cooler bag
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={6}>
-                          <Typography
-                            type="subheading"
-                            style={{ textAlign: 'right' }}
-                          >
-                            {/* $20.00 */}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={6}>
+                            <Typography
+                              type="subheading"
+                              style={{ textAlign: 'right' }}
+                            >
+                              {/* $20.00 */}
                               $0
-                          </Typography>
+                            </Typography>
+                          </Grid>
                         </Grid>
-                      </Grid>
-                    )}
+                      )}
 
                     <Typography
                       type="title"
@@ -2110,8 +2159,8 @@ class Step4CheckoutCurrent extends React.Component {
                         </Grid>
                       </Grid>
                     ) : (
-                      ''
-                    )}
+                        ''
+                      )}
                     <Grid container>
                       <Grid item xs={12} sm={6}>
                         <Typography type="title">Total</Typography>
@@ -2131,7 +2180,7 @@ class Step4CheckoutCurrent extends React.Component {
                             this.state.primaryProfileBilling.taxes}/week`
                             : this.state.primaryProfileBilling &&
                             `$${
-                              this.state.primaryProfileBilling.groupTotal
+                            this.state.primaryProfileBilling.groupTotal
                             }/week`}
                         </Typography>
                       </Grid>
@@ -2157,10 +2206,11 @@ class Step4CheckoutCurrent extends React.Component {
                         Subscription update
                       </Typography>
                       <Button
-color="inherit"
+                        color="inherit"
                         onClick={this.state.discountBeingRemoved ? this.handleRemoveDiscount : this.handleSaveDiscount}
                       >
-                        Save</Button>
+                        Save
+                      </Button>
                     </Toolbar>
                   </AppBar>
                   <OrderSummary

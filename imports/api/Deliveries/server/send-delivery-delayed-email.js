@@ -11,7 +11,7 @@ export default (options) => {
 
 
   return sendEmail({
-    to: emailAddress,
+    to: process.env.NODE_ENV == "development" ? 'jivanyesh@gmail.com' : emailAddress,
     from: `${applicationName} <support@vittle.ca>`,
     subject: `We are experiencing delays delivering your ${applicationName} order`,
     template: 'delivery-delayed',

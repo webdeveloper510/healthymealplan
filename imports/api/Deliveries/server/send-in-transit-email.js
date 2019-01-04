@@ -8,24 +8,20 @@ export default (options) => {
   const firstName = options.firstName;
   const emailAddress = options.email;
   const totalMeals = options.totalMeals;
-  const address = options.address;
-  const deliveredAt = options.deliveredAt;
-
+  const deliveryDriver = options.deliveryDriver;
 
   return sendEmail({
     to: process.env.NODE_ENV == "development" ? 'jivanyesh@gmail.com' : emailAddress,
     from: `${applicationName} <support@vittle.ca>`,
-    subject: `There was an issue delivering your ${applicationName} order`,
-    template: 'delivery-unsuccessful',
+    subject: `Your Vittle order has left the kitchen`,
+    template: 'delivery-in-transit',
     templateVars: {
       applicationName,
       firstName,
       totalMeals,
-      address,
-      deliveredAt,
+      deliveryDriver,
     },
-  })
-    .catch((error) => {
-      throw new Meteor.Error('500', `${error}`);
-    });
+  }).catch((error) => {
+    throw new Meteor.Error('500', `${error}`);
+  });
 };

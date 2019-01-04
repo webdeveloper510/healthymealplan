@@ -41,6 +41,7 @@ import green from 'material-ui/colors/green';
 
 import $ from 'jquery';
 import validate from '../../../modules/validate';
+import { DELIVERYCOST } from '../../../modules/constants';
 import FormGroup from 'material-ui/Form/FormGroup';
 
 const styles = theme => ({

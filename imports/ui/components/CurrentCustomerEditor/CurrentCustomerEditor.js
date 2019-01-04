@@ -9667,6 +9667,7 @@ class CurrentCustomerEditor extends React.Component {
               history={this.props.history}
               discounts={this.props.discounts}
               giftCards={this.props.giftCards}
+              deliveryGuys={this.props.deliveryGuys}
             />
           ) : this.state.currentTab === 3 ? (
             <Typography type="subheading">
