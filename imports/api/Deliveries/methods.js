@@ -20,7 +20,7 @@ import deliveriesDataMapper from '../../modules/server/deliveriesDataMapper';
 const twilioMagicPhones = {
   unavailable: '+15005550000',
   invalid: '+15005550001',
-  valid: '+15005550006'
+  valid: '+15005550006',
 };
 
 Meteor.methods({
@@ -75,7 +75,7 @@ Meteor.methods({
     );
 
     // const delivery = Deliveries.findOne({ _id: delivery._id });
-    const deliveryUser = Meteor.users.findOne({ _id: delivery.customerId }, { fields: { _id: 1, address: 1, phone: 1, emails: 1, profile: 1, notifications: 1, } });
+    const deliveryUser = Meteor.users.findOne({ _id: delivery.customerId }, { fields: { _id: 1, address: 1, phone: 1, emails: 1, profile: 1, notifications: 1 } });
 
     const notifyUserByEmail = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.email : false;
     const notifyUserBySms = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.sms : false;
@@ -86,10 +86,10 @@ Meteor.methods({
       let deliveryDriver = null;
 
       if (notifyUserByEmail || notifyUserBySms) {
-        deliveryDriver = Meteor.users.findOne({ _id: this.userId, }, { fields: { _id: 1, roles: 1, profile: 1, } });
+        deliveryDriver = Meteor.users.findOne({ _id: this.userId }, { fields: { _id: 1, roles: 1, profile: 1 } });
 
-        if (deliveryDriver.roles.findIndex(e => e == "delivery") == -1) {
-          deliveryDriver = "Your delivery driver";
+        if (deliveryDriver.roles.findIndex(e => e == 'delivery') == -1) {
+          deliveryDriver = 'Your delivery driver';
         } else {
           deliveryDriver = deliveryDriver.profile.name.first;
         }
@@ -150,9 +150,9 @@ Meteor.methods({
     } else if (updated && statusChange == 'In-Transit') {
 
       if (notifyUserByEmail || notifyUserBySms) {
-        deliveryDriver = Meteor.users.findOne({ _id: this.userId, }, { fields: { _id: 1, roles: 1, profile: 1, } })
-        if (deliveryDriver.roles.findIndex(e => e == "delivery") == -1) {
-          deliveryDriver = "Your delivery driver";
+        deliveryDriver = Meteor.users.findOne({ _id: this.userId }, { fields: { _id: 1, roles: 1, profile: 1 } });
+        if (deliveryDriver.roles.findIndex(e => e == 'delivery') == -1) {
+          deliveryDriver = 'Your delivery driver';
         } else {
           deliveryDriver = deliveryDriver.profile.name.first;
         }
@@ -255,11 +255,11 @@ Meteor.methods({
       );
     });
 
-    let deliveryDriver = Meteor.users.findOne({ _id: this.userId, }, { fields: { _id: 1, roles: 1, profile: 1, } });
+    let deliveryDriver = Meteor.users.findOne({ _id: this.userId }, { fields: { _id: 1, roles: 1, profile: 1 } });
     // console.log(deliveryDriver);
 
-    if (deliveryDriver.roles.findIndex(e => e == "delivery") == -1) {
-      deliveryDriver = "Your delivery driver";
+    if (deliveryDriver.roles.findIndex(e => e == 'delivery') == -1) {
+      deliveryDriver = 'Your delivery driver';
     } else {
       deliveryDriver = deliveryDriver.profile.name.first;
     }
@@ -281,16 +281,17 @@ Meteor.methods({
           sendDeliveredEmail({
             firstName: deliveryUser.profile.name.first,
             email: deliveryUser.emails[0].address,
-            totalMeals: sumBy(delivery.meals, 'total'),
+            totalMeals: sumBy(e.meals, 'total'),
             address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
-            deliveryDriver: deliveryDriver,
+            deliveryDriver,
             deliveredAt: moment(new Date()).format('h:mm a'),
+            note: e.deliveredNote || '',
           });
         }
 
         if (notifyUserBySms) {
           twilioClient.messages.create({
-            body: `Your ${sumBy(delivery.meals, 'total')} meals have been delivered by ${deliveryDriver} to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}.`,
+            body: `Your ${sumBy(e.meals, 'total')} meals have been delivered by ${deliveryDriver} to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')} ${delivery.deliveredNote || ''}`,
             to: `+1${deliveryUser.phone}`,
             from: fromPhoneNumber,
           });
@@ -300,7 +301,7 @@ Meteor.methods({
           sendNotDeliveredEmail({
             firstName: deliveryUser.profile.name.first,
             email: deliveryUser.emails[0].address,
-            totalMeals: sumBy(delivery.meals, 'total'),
+            totalMeals: sumBy(e.meals, 'total'),
             address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
             deliveredAt: moment(new Date()).format('h:mm a'),
           });
@@ -308,7 +309,7 @@ Meteor.methods({
 
         if (notifyUserBySms) {
           twilioClient.messages.create({
-            body: `We attempted to deliver your ${sumBy(delivery.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us by calling (613) 701-6250 to discuss pick up.`,
+            body: `We attempted to deliver your ${sumBy(e.meals, 'total')} meals to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. Please get in touch with us by calling (613) 701-6250 to discuss pick up.`,
             to: `+1${deliveryUser.phone}`,
             from: fromPhoneNumber,
           });
@@ -318,7 +319,7 @@ Meteor.methods({
           sendDeliveryDelayedEmail({
             firstName: deliveryUser.profile.name.first,
             email: deliveryUser.emails[0].address,
-            totalMeals: sumBy(delivery.meals, 'total'),
+            totalMeals: sumBy(e.meals, 'total'),
             address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
             deliveredAt: moment(new Date()).format('h:mm a'),
           });
@@ -326,7 +327,7 @@ Meteor.methods({
 
         if (notifyUserBySms) {
           twilioClient.messages.create({
-            body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(delivery.meals, 'total')} meals later than expected today.`,
+            body: `We are currently experiencing delays with our deliveries and expect to deliver your ${sumBy(e.meals, 'total')} meals later than expected today.`,
             to: `+1${deliveryUser.phone}`,
             from: fromPhoneNumber,
           });
@@ -336,10 +337,10 @@ Meteor.methods({
         if (notifyUserByEmail) {
           try {
             sendInTransitEmail({
-              deliveryDriver: deliveryDriver,
+              deliveryDriver,
               firstName: deliveryUser.profile.name.first,
               email: deliveryUser.emails[0].address,
-              totalMeals: sumBy(delivery.meals, 'total'),
+              totalMeals: sumBy(e.meals, 'total'),
               address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
               deliveredAt: moment(new Date()).format('h:mm a'),
             });
@@ -351,7 +352,7 @@ Meteor.methods({
         if (notifyUserBySms) {
           try {
             twilioClient.messages.create({
-              body: `${deliveryDriver} just left the kitchen with your ${sumBy(delivery.meals, 'total')} meals and is on route to ${deliveryUser.address.streetAddress}.`,
+              body: `${deliveryDriver} just left the kitchen with your ${sumBy(e.meals, 'total')} meals and is on route to ${deliveryUser.address.streetAddress}.`,
               to: `+1${deliveryUser.phone}`,
               from: fromPhoneNumber,
             });
@@ -364,13 +365,13 @@ Meteor.methods({
 
   },
 
-  getDeliveryAggregatedData(currentDate, deliveryAssignedToPassed = null) {
+  getDeliveriesForTheDay(currentDate, deliveryAssignedToPassed = null) {
     check(currentDate, String);
     check(deliveryAssignedToPassed, Match.OneOf(String, Object));
 
-    let matchObject = {
+    const matchObject = {
       status: 'active',
-    }
+    };
 
     if (deliveryAssignedToPassed) {
       matchObject.deliveryAssignedTo = deliveryAssignedToPassed;

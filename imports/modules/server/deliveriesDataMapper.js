@@ -1455,7 +1455,5 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
   }); // aggregate loop
 
 
-  return {
-    deliveries: this.deliveriesForCurrentDay,
-  };
+  return this.deliveriesForCurrentDay;
 }
