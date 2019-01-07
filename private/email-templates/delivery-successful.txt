@@ -2,5 +2,9 @@ Hi {{firstName}},
 
 Your {{totalMeals}} meals have been delivered by {{deliveryDriver}} to {{address}} at {{deliveredAt}}.
 
+{{#if deliveredNote}}
+  {{deliveredNote}}
+{{/if}}
+
 Bon appétit!
 The {{applicationName}} Team

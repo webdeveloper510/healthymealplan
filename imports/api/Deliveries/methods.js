@@ -273,7 +273,7 @@ Meteor.methods({
 
       const notifyUserByEmail = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.email : false;
       const notifyUserBySms = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.sms : false;
-
+      console.log(e.deliveredNote);
 
       if (statusChange == 'Delivered') {
 
@@ -285,13 +285,13 @@ Meteor.methods({
             address: `${deliveryUser.address.streetAddress} ${deliveryUser.address.postalCode}`,
             deliveryDriver,
             deliveredAt: moment(new Date()).format('h:mm a'),
-            note: e.deliveredNote || '',
+            deliveredNote: e.deliveredNote || false,
           });
         }
 
         if (notifyUserBySms) {
           twilioClient.messages.create({
-            body: `Your ${sumBy(e.meals, 'total')} meals have been delivered by ${deliveryDriver} to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')} ${delivery.deliveredNote || ''}`,
+            body: `Your ${sumBy(e.meals, 'total')} meals have been delivered by ${deliveryDriver} to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. ${delivery.deliveredNote || ''}`,
             to: `+1${deliveryUser.phone}`,
             from: fromPhoneNumber,
           });

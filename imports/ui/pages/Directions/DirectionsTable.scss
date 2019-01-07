@@ -6,6 +6,11 @@ tr.status {
   background-color: rgba(255,255,255,1) !important;
 }
 
+.table-container--directions {
+  display: flex;
+  flex-direction: column;
+}
+
 .status-circle{
   width: .8em;
   height: .8em;

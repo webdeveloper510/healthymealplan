@@ -11,6 +11,7 @@ export default (options) => {
   const address = options.address;
   const deliveredAt = options.deliveredAt;
   const deliveryDriver = options.deliveryDriver;
+  const deliveredNote = options.deliveredNote;
 
 
   return sendEmail({
@@ -25,6 +26,7 @@ export default (options) => {
       address,
       deliveryDriver,
       deliveredAt,
+      deliveredNote,
     },
   })
     .catch((error) => {
