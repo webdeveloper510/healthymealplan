@@ -266,14 +266,12 @@ Meteor.methods({
 
     deliveries.forEach((e) => {
       const delivery = Deliveries.findOne({ _id: e._id });
-      // console.log("Looping through each delivery: ")
-      // console.log(delivery);
+
 
       const deliveryUser = Meteor.users.findOne({ _id: e.customerId });
 
       const notifyUserByEmail = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.email : false;
       const notifyUserBySms = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.sms : false;
-      console.log(e.deliveredNote);
 
       if (statusChange == 'Delivered') {
 
@@ -291,7 +289,7 @@ Meteor.methods({
 
         if (notifyUserBySms) {
           twilioClient.messages.create({
-            body: `Your ${sumBy(e.meals, 'total')} meals have been delivered by ${deliveryDriver} to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. ${delivery.deliveredNote || ''}`,
+            body: `Your ${sumBy(e.meals, 'total')} meals have been delivered by ${deliveryDriver} to ${deliveryUser.address.streetAddress} at ${moment(new Date()).format('h:mm a')}. ${e.deliveredNote || ''}`,
             to: `+1${deliveryUser.phone}`,
             from: fromPhoneNumber,
           });
