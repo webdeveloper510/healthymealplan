@@ -106,18 +106,22 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
   doc.addPage();
 
   // VITTLE LOGO
-  doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+  doc.addImage(vittlebase64, 'PNG', 1.552, 0.05, 0.8, 0.2);
 
   if (renderBirthdayCake(userData.birthday, true)) {
     doc.addImage(cakeImage, 'PNG', 0.48, 0.18, 0.2, 0.2);
   }
 
   // plating day + 1
-  doc.setFontStyle('normal');
-  doc.setFontSize(9);
-  const day = moment(currentSelectorDate).add(1, 'd').format('M/D/YYYY');
-  doc.text(day, 3.2, 0.38);
+  // doc.setFontStyle('normal');
+  // doc.setFontSize(9);
+  // const day = moment(currentSelectorDate).add(1, 'd').format('M/D/YYYY');
+  // doc.text(day, 3.2, 0.38);
 
+    doc.setFontStyle('normal');
+    doc.setFontSize(7.5);
+    const day = moment(currentSelectorDate).format('MMMM D');
+    doc.text(`Made for you on ${day}`, 0.15, 2.72);
 
   // total meals for this customer
   doc.setFontStyle('normal');
@@ -147,35 +151,35 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
 
   // name
   doc.setFontStyle('bold');
-  doc.setFontSize(10);
-  doc.text(`Made for ${userData.name}`, 0.25, 0.8);
+  doc.setFontSize(18);
+  doc.text(`Made for ${userData.name}`, 0.15, 0.79);
 
-  // plan name
-  doc.setFontStyle('normal');
-  doc.setFontSize(10);
-  doc.text(`${userData.lifestyleName} ${mealType}`, 0.25, 1);
+  // // plan name
+  // doc.setFontStyle('normal');
+  // doc.setFontSize(10);
+  // doc.text(`${userData.lifestyleName} ${mealType}`, 0.25, 1);
 
   // dish title
   doc.setFontStyle('bold');
-  doc.setFontSize(12);
-  doc.text(doc.splitTextToSize(currentPlate.plate.title, 3.25), 0.25, 1.2);
+  doc.setFontSize(10);
+  doc.text(doc.splitTextToSize(`${mealType}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.85), 0.15, 1.17);
 
   // dish subtitle
-  doc.setFontStyle('normal');
-  doc.setFontSize(12);
-  doc.text(doc.splitTextToSize(currentPlate.plate.subtitle || '', 3.25), 0.25, 1.4);
+  // doc.setFontStyle('normal');
+  // doc.setFontSize(12);
+  // doc.text(doc.splitTextToSize(currentPlate.plate.subtitle || '', 3.25), 0.25, 1.4);
 
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
-    doc.setFontSize(7);
-    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.3), 0.25, 1.65);
+    doc.setFontSize(9);
+    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.85), 0.15, 1.48);
   }
 
   // instructions
   if (currentPlate.hasOwnProperty('instruction')) {
-    doc.setFontStyle('normal');
-    doc.setFontSize(8);
-    doc.text(doc.splitTextToSize(currentPlate.instruction.description, 3.25), 0.25, 2);
+    doc.setFontStyle('bold');
+    doc.setFontSize(7.5);
+    doc.text(doc.splitTextToSize(currentPlate.instruction.description, 3.25), 0.15, 2.61);
   }
 
   let restrictionsLine = '';
@@ -207,7 +211,7 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
 
   if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
     doc.setFontStyle('normal');
-    doc.setFontSize(8);
+    doc.setFontSize(7.5);
 
     // calories
     let currentMealPortionCalories = '0';
@@ -219,37 +223,50 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
       currentMealPortionCalories = currentPlate.plate.nutritional[mealPortion].calories;
     }
 
-    const calories = [currentMealPortionCalories, 'calories'];
-    // console.log(calories);
-    doc.text(calories, 2, 2.7);
+      doc.setFontStyle("bold")
+      doc.text(currentMealPortionCalories, 2.3,2.61);
+
+      doc.setFontStyle("normal")
+      doc.text("Calories", 2.3, 2.72);
 
     // protein
     if (currentPlate.plate.nutritional[mealPortion].proteins > 0) {
       currentMealPortionProteins = currentPlate.plate.nutritional[mealPortion].proteins;
     }
-    const protein = [currentMealPortionProteins, 'protein'];
-    doc.text(protein, 2.6, 2.7);
+
+    doc.setFontStyle("bold")
+    doc.text(currentMealPortionProteins + "g", 2.83,2.61);
+
+     doc.setFontStyle("normal")
+    doc.text("Protein", 2.83, 2.72);
 
     // carbs
     if (currentPlate.plate.nutritional[mealPortion].carbs > 0) {
       currentMealPortionCarbs = currentPlate.plate.nutritional[mealPortion].carbs;
     }
-    const carbs = [currentMealPortionCarbs, 'carbs'];
-    doc.text(carbs, 3.1, 2.7);
+      doc.setFontStyle("bold")
+      doc.text(currentMealPortionCarbs + "g", 3.27,2.61);
+
+      doc.setFontStyle("normal")
+      doc.text("Carbs", 3.27, 2.72);
+
 
     // fats
     if (currentPlate.plate.nutritional[mealPortion].fat > 0) {
       currentMealPortionFat = currentPlate.plate.nutritional[mealPortion].fat;
     }
 
-    const fats = [currentMealPortionFat, 'fats'];
-    doc.text(fats, 3.55, 2.7);
+      doc.setFontStyle("bold")
+      doc.text(currentMealPortionFat + "g", 3.65,2.61);
+
+      doc.setFontStyle("normal")
+      doc.text("Fats", 3.65, 2.72);
   }
 
   if (userData.platingNotes) {
-    doc.setFontStyle('normal');
-    doc.setFontSize(8);
-    doc.text('See plating notes', 0.25, 2.7);
+    // doc.setFontStyle('normal');
+    // doc.setFontSize(8);
+    // doc.text('See plating notes', 0.25, 2.7);
   }
 }
 
@@ -305,18 +322,19 @@ function renderSummaryLabel(doc, currentPlate, dataCurrentLifestyle, lifestyleTi
   // dish title
   doc.setFontStyle('bold');
   doc.setFontSize(10);
-  doc.text(doc.splitTextToSize(currentPlate.plate.title, 3.25), 0.25, 1.3);
+  doc.text(doc.splitTextToSize(`${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.85), 0.15, 1.17);
 
   // dish subtitle
-  doc.setFontStyle('normal');
-  doc.setFontSize(10);
-  doc.text(doc.splitTextToSize(currentPlate.plate.subtitle || '', 3.25), 0.25, 1.5);
+  // doc.setFontStyle('normal');
+  // doc.setFontSize(10);
+  // doc.text(doc.splitTextToSize(currentPlate.plate.subtitle || '', 3.25), 0.25, 1.5);
 
 
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
-    doc.setFontSize(7);
-    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.3), 0.25, 1.75);
+    doc.setFontStyle('normal');
+    doc.setFontSize(9);
+    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.85), 0.15, 1.48);
   }
 
   doc.setFontSize(8);
@@ -539,13 +557,13 @@ currentPlate;
         if (this.state.mealTitle === 'Breakfast') {
           if (userData.bodybuilderBreakfast > 0 && upperIndex == 0) {
             for (let i = 1; i <= userData.bodybuilderBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Breakfast (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Breakfast', 'bodybuilder', this.props.currentSelectorDate);
             }
           }
 
           if (userData.athleticBreakfast > 0 && upperIndex == 1) {
             for (let i = 1; i <= userData.athleticBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Breakfast (Athletic)', 'athletic', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Breakfast', 'athletic', this.props.currentSelectorDate);
             }
           }
 
@@ -559,13 +577,13 @@ currentPlate;
         if (this.state.mealTitle === 'Dinner') {
           if (userData.bodybuilderDinner > 0 && upperIndex == 0) {
             for (let i = 1; i <= userData.bodybuilderDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Dinner (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Dinner', 'bodybuilder', this.props.currentSelectorDate);
             }
           }
 
           if (userData.athleticDinner > 0 && upperIndex == 1) {
             for (let i = 1; i <= userData.athleticDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Dinner (Athletic)', 'athletic', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Dinner', 'athletic', this.props.currentSelectorDate);
             }
           }
 
@@ -579,13 +597,13 @@ currentPlate;
         if (this.state.mealTitle === 'Lunch') {
           if (userData.bodybuilderLunch > 0 && upperIndex == 0) {
             for (let i = 1; i <= userData.bodybuilderLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch', 'bodybuilder', this.props.currentSelectorDate);
             }
           }
 
           if (userData.athleticLunch > 0 && upperIndex == 1) {
             for (let i = 1; i <= userData.athleticLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch (Athletic)', 'athletic', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch',' athletic', this.props.currentSelectorDate);
             }
           }
 
@@ -599,13 +617,13 @@ currentPlate;
         if (this.state.mealTitle === 'Chefs Choice Breakfast') {
           if (userData.bodybuilderChefsChoiceBreakfast > 0 && upperIndex == 0) {
             for (let i = 1; i <= userData.bodybuilderChefsChoiceBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'bodybuilder', this.props.currentSelectorDate);
             }
           }
 
           if (userData.athleticChefsChoiceBreakfast > 0 && upperIndex == 1) {
             for (let i = 1; i <= userData.athleticChefsChoiceBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast (Athletic)', 'athletic', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'athletic', this.props.currentSelectorDate);
             }
           }
 
@@ -619,13 +637,13 @@ currentPlate;
         if (this.state.mealTitle === 'Chefs Choice Lunch') {
           if (userData.bodybuilderChefsChoiceLunch > 0 && upperIndex == 0) {
             for (let i = 1; i <= userData.bodybuilderChefsChoiceLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'bodybuilder', this.props.currentSelectorDate);
             }
           }
 
           if (userData.athleticChefsChoiceLunch > 0 && upperIndex == 1) {
             for (let i = 1; i <= userData.athleticChefsChoiceLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch (Athletic)', 'athletic', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'athletic', this.props.currentSelectorDate);
             }
           }
 
@@ -639,13 +657,13 @@ currentPlate;
         if (this.state.mealTitle === 'Chefs Choice Dinner') {
           if (userData.bodybuilderChefsChoiceDinner > 0 && upperIndex == 0) {
             for (let i = 1; i <= userData.bodybuilderChefsChoiceDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner (Bodybuilder)', 'bodybuilder', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'bodybuilder', this.props.currentSelectorDate);
             }
           }
 
           if (userData.athleticChefsChoiceDinner > 0 && upperIndex == 1) {
             for (let i = 1; i <= userData.athleticChefsChoiceDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner (Athletic)', 'athletic', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'athletic', this.props.currentSelectorDate);
             }
           }
 
