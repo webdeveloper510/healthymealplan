@@ -12,10 +12,6 @@ import rateLimit from '../../../modules/rate-limit';
 
 import calculateSubscriptionCost from '../../../modules/server/billing/calculateSubscriptionCost';
 
-import createSubscriptionFromCustomerProfile from '../../../modules/server/authorize/createSubscriptionFromCustomerProfile';
-import cancelSubscription from '../../../modules/server/authorize/cancelSubscription';
-import getSubscription from '../../../modules/server/authorize/getSubscription';
-
 import getCustomerPaymentProfile from '../../../modules/server/authorize/getCustomerPaymentProfile';
 import createCustomerProfile from '../../../modules/server/authorize/createCustomerProfile';
 
@@ -356,7 +352,9 @@ Meteor.methods({
 
       secondaries.forEach((e, i) => {
         dataToSend.secondaryProfiles.push({
-          lifestyle: e.lifestyle,
+            first_name: e.profile.name.first || "",
+            last_name: e.profile.name.last || "",
+            lifestyle: e.lifestyle,
           scheduleReal: e.schedule,
           subIngredients: e.preferences,
           restrictions: e.restrictions,
@@ -671,7 +669,9 @@ Meteor.methods({
 
       secondaries.forEach((e, i) => {
         billingData.secondaryProfiles.push({
-          lifestyle: e.lifestyle,
+            first_name: e.profile.name.first || "",
+            last_name: e.profile.name.last || "",
+            lifestyle: e.lifestyle,
           scheduleReal: e.schedule,
           subIngredients: e.preferences,
           restrictions: e.restrictions,
