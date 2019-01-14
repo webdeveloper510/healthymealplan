@@ -236,7 +236,7 @@ class CurrentCustomerEditor extends React.Component {
           specificRestrictions: e.specificRestrictions,
           // lifestyle: this.props.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
           lifestyle: e.lifestyle,
-          isLifestyleCustom: this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom,
+          isLifestyleCustom: (this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle) && this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom) || false,
           discount: e.discount,
           restrictions: e.restrictions, //fix here
           activeMealScheduleStep: 0,
