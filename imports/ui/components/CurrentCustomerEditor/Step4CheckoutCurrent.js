@@ -2098,7 +2098,8 @@ class Step4CheckoutCurrent extends React.Component {
                           <Grid container>
                             <Grid item xs={12} sm={6}>
                               <Typography type="body2">
-                                {this.props.discounts && this.state.discountApplied && this.props.discounts.find(e => this.props.subscription.discountApplied == e._id).title}
+                                {this.props.discounts && this.state.discountApplied && this.props.discounts.find(e => this.props.subscription.discountApplied == e._id) &&
+                                this.props.discounts.find(e => this.props.subscription.discountApplied == e._id).title}
                               </Typography>
                             </Grid>
                             <Grid item xs={12} sm={6}>

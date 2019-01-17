@@ -40,3 +40,13 @@
     border-color: rgba(0,0,0,.45);
   }
 }
+
+.plate-card-assign {
+  cursor: pointer;
+
+  &:hover {
+    // border: 2px lightgreen solid;
+    transition: all .35s ease;
+    transform: translateY(-4px);
+  }
+}

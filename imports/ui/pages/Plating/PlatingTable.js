@@ -871,13 +871,7 @@ currentPlate;
   }
 
   compareLifestyles(a, b) {
-    if (a.title > b.title) {
-      return -1
-    } else {
-      return 1
-    }
-
-    return 0
+      return a.title > b.title ? -1 : 1
   }
 
   render() {

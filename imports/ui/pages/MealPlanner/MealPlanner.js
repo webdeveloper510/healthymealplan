@@ -122,14 +122,18 @@ class MealPlanner extends React.Component {
       }
     } else if (this.state.plannerView == 'week') {
       if (operation === 'add') {
+        const week = moment(this.state.currentSelectorWeekStart).add(1, 'w');
+
         this.setState({
-          currentSelectorWeekStart: moment(this.state.currentSelectorWeekStart).add(1, 'w').startOf('isoWeek').format('YYYY-MM-DD'),
-          currentSelectorWeekEnd: moment(this.state.currentSelectorWeekStart).add(1, 'w').endOf('isoWeek').format('YYYY-MM-DD'),
+          currentSelectorWeekStart: week.startOf('isoWeek').format('YYYY-MM-DD'),
+          currentSelectorWeekEnd: week.endOf('isoWeek').format('YYYY-MM-DD'),
        });
       } else {
-        this.setState({
-          currentSelectorWeekStart: moment(this.state.currentSelectorWeekStart).subtract(1, 'w').startOf('isoWeek').format('YYYY-MM-DD'),
-          currentSelectorWeekEnd: moment(this.state.currentSelectorWeekStart).subtract(1, 'w').endOf('isoWeek').format('YYYY-MM-DD'),
+          const week = moment(this.state.currentSelectorWeekStart).subtract(1, 'w');
+
+          this.setState({
+          currentSelectorWeekStart: week.startOf('isoWeek').format('YYYY-MM-DD'),
+          currentSelectorWeekEnd: week.endOf('isoWeek').format('YYYY-MM-DD'),
         });
       }
     }
@@ -189,7 +193,7 @@ class MealPlanner extends React.Component {
           </Grid>
 
           <ListContainer
-            limit={50}
+            limit={1000}
             collection={MealPlannerColl}
             publication="mealplanner"
             joins={[

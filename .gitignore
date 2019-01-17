@@ -4,3 +4,4 @@ settings-staging.json
 settings-production.json
 data
 run-prod.bat
+.idea
