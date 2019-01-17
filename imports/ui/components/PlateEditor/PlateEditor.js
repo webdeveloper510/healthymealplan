@@ -402,6 +402,26 @@ class PlateEditor extends React.Component {
       submitSuccess: false,
       submitLoading: true,
     });
+    
+    if(this.state.mealCategory == ""){
+      this.props.popTheSnackbar({
+          message: 'Meal category is required',
+      });
+        this.setState({
+            submitSuccess: false,
+            submitLoading: false,
+        });
+
+    } else if(this.state.madeBy == ""){
+      this.props.popTheSnackbar({
+          message: 'Created by chef is required',
+      });
+        this.setState({
+            submitSuccess: false,
+            submitLoading: false,
+        });
+
+    }
 
     const { history, popTheSnackbar } = this.props;
     const existingPlate = this.props.plate && this.props.plate._id;
