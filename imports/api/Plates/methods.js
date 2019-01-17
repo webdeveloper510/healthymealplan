@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import { Match } from 'meteor/check';
 import { check } from 'meteor/check';
+
 import Plates from './Plates';
 import rateLimit from '../../modules/rate-limit';
 import slugify from 'slugify';
@@ -12,7 +13,7 @@ Meteor.methods({
   platesInsert(plate) {
     check(plate, {
       title: String,
-      subtitle: Match.Optional(String),
+      subtitle: String,
       description: Match.Optional(String),
       madeBy: String,
       mealCategory: String,
@@ -23,7 +24,7 @@ Meteor.methods({
       instructionId: Match.Optional(String),
       generatedTags: Match.Optional(Array),
       ingredients: Array,
-      nutritional: Match.Optional(Object),
+      nutritional: Object,
     });
 
     check(plate.nutritional, {
@@ -53,7 +54,7 @@ Meteor.methods({
       fat: String,
     });
 
-    const existingPlate = Plates.findOne({ title: plate.title });
+      const existingPlate = Plates.findOne({ title: plate.title });
 
     if (existingPlate) {
       throw new Meteor.Error('500', `${plate.title} is already present`);
@@ -62,40 +63,47 @@ Meteor.methods({
     let nextSeqItem = getNextSequence('plates');
     nextSeqItem = nextSeqItem.toString();
 
-    if (plate.hasOwnProperty('instructionId')) {
-      plate.instructionId = plate.instructionId;
-    }
 
-    if (plate.hasOwnProperty('substitutePlate')) {
-      plate.substitutePlate = plate.substitutePlate;
-    }
 
-    if (plate.hasOwnProperty('generatedTags')) {
-      plate.generatedTags = plate.generatedTags;
-    }
+    const plateToInsert = {
+        ...plate,
+        SKU: nextSeqItem,
+        createdBy: this.userId,
+    };
 
+      if (plate.hasOwnProperty('instructionId')) {
+        plateToInsert.instructionId = plate.instructionId;
+      }
+
+      if (plate.hasOwnProperty('substitutePlate')) {
+        plateToInsert.substitutePlate = plate.substitutePlate;
+      }
+
+      if (plate.hasOwnProperty('generatedTags')) {
+        plateToInsert.generatedTags = plate.generatedTags;
+      }
 
     if (plate.subtitle.length > 0) {
       const slug = `${plate.title} ${plate.subtitle}`;
-      plate.slug = slugify(slug, { remove: /[*+~.(),'"!:@]/g, lower: true });
+        plateToInsert.slug = slugify(slug, { remove: /[*+~.(),'"!:@]/g, lower: true });
     } else {
       const slug = `${plate.title}`;
-      plate.slug = slugify(slug, { remove: /[*+~.(),'"!:@]/g, lower: true });
+        plateToInsert.slug = slugify(slug, { remove: /[*+~.(),'"!:@]/g, lower: true });
     }
 
-    plate.title = plate.title.toLowerCase();
-    plate.subtitle = plate.subtitle.toLowerCase();
+    plateToInsert.title = plateToInsert.title.toLowerCase();
+    plateToInsert.subtitle = plateToInsert.subtitle.toLowerCase();
 
-    plate.title = plate.title.replace(/&/gm, 'and');
-    plate.subtitle = plate.subtitle.replace(/&/gm, 'and');
+      plateToInsert.title = plateToInsert.title.replace(/&/gm, 'and');
+    plateToInsert.subtitle = plateToInsert.subtitle.replace(/&/gm, 'and');
 
-    plate.title = plate.title.split(" ")
-      .map((e) => (e.toLowerCase() == "b.b.q." || e == "B.b.q.") ? e.toUpperCase() : (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
-    plate.subtitle = plate.subtitle.split(" ")
-      .map((e) => (e.toLowerCase() == "b.b.q." || e == "B.b.q.") ? e.toUpperCase() : (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+    plateToInsert.title = plateToInsert.title.split(" ")
+      .map((e) => (e.toLowerCase() === "b.b.q." || e === "B.b.q.") ? e.toUpperCase() : (e === "with" || e === "and" || e === 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+    plateToInsert.subtitle = plateToInsert.subtitle.split(" ")
+      .map((e) => (e.toLowerCase() === "b.b.q." || e === "B.b.q.") ? e.toUpperCase() : (e === "with" || e === "and" || e === 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
 
     try {
-      return Plates.insert({ ...plate, SKU: nextSeqItem });
+      return Plates.insert(plateToInsert);
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
