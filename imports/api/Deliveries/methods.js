@@ -6,6 +6,7 @@ import Subscriptions from '../Subscriptions/Subscriptions';
 
 import rateLimit from '../../modules/rate-limit';
 
+import sortBy from "lodash/sortBy";
 import sumBy from 'lodash/sumBy';
 import moment from 'moment';
 
@@ -148,7 +149,6 @@ Meteor.methods({
         }
       }
     } else if (updated && statusChange == 'In-Transit') {
-
       if (notifyUserByEmail || notifyUserBySms) {
         deliveryDriver = Meteor.users.findOne({ _id: this.userId }, { fields: { _id: 1, roles: 1, profile: 1 } });
         if (deliveryDriver.roles.findIndex(e => e == 'delivery') == -1) {
@@ -213,7 +213,6 @@ Meteor.methods({
     }
 
     return delivery._id;
-
   },
 
   'deliveries.batchUpdate': function deliveriesBatchUpdate(deliveries, statusChange) {
@@ -274,7 +273,6 @@ Meteor.methods({
       const notifyUserBySms = deliveryUser.notifications && deliveryUser.notifications.delivery ? deliveryUser.notifications.delivery.sms : false;
 
       if (statusChange == 'Delivered') {
-
         if (notifyUserByEmail) {
           sendDeliveredEmail({
             firstName: deliveryUser.profile.name.first,
@@ -331,7 +329,6 @@ Meteor.methods({
           });
         }
       } else if (statusChange == 'In-Transit') {
-
         if (notifyUserByEmail) {
           try {
             sendInTransitEmail({
@@ -360,7 +357,6 @@ Meteor.methods({
         }
       }
     });
-
   },
 
   getDeliveriesForTheDay(currentDate, deliveryAssignedToPassed = null) {
@@ -419,6 +415,56 @@ Meteor.methods({
 
     return result;
   }, // deliveryAggregation
+
+  getAssignedUsersAndTheirOrder() {
+    const userId = this.userId;
+
+    let assignedUsers = Subscriptions.aggregate([
+      {
+        $match: {
+          deliveryAssignedTo: userId,
+            status: 'active',
+        },
+      },
+      {
+        $lookup: {
+          from: 'users',
+          localField: 'customerId',
+          foreignField: '_id',
+          as: 'subCustomer',
+        },
+      },
+      { $unwind: '$subCustomer' },
+      {
+        $project: { _id: 1, status: 1, deliveryAssignedTo: 1, subCustomer: { _id: 1, subscriptionId: 1, profile: 1, address: 1, postalCode: 1 } },
+      },
+    ]);
+
+    const deliveryGuy = Meteor.users.findOne({ _id: this.userId });
+
+    if(assignedUsers.length > 0 && deliveryGuy.hasOwnProperty('assignedUsersOrder')) {
+       assignedUsers = sortBy(assignedUsers, user => deliveryGuy.assignedUsersOrder.indexOf(user._id));
+    }
+
+    return {
+      assignedUsers,
+      assignedUsersOrder: deliveryGuy.assignedUsersOrder || [],
+    };
+  },
+  saveCustomerDeliveriesOrder(orderedSubscriptionIds) {
+
+    check(orderedSubscriptionIds, Array);
+
+    try {
+      Meteor.users.update({ _id: this.userId }, {
+        $set: {
+          assignedUsersOrder: orderedSubscriptionIds,
+        },
+      });
+    } catch (exception) {
+      throw new Meteor.Error(500, exception.reason || exception);
+    }
+  },
 });
 
 rateLimit({

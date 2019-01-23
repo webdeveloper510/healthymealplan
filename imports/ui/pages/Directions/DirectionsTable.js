@@ -1,6 +1,7 @@
 import { Meteor } from 'meteor/meteor';
 import React from 'react';
 import PropTypes from 'prop-types';
+
 import Table, {
   TableBody,
   TableCell,
@@ -23,23 +24,21 @@ import NoteIcon from 'material-ui-icons/Note';
 import $ from 'jquery';
 import Paper from 'material-ui/Paper';
 import TextField from 'material-ui/TextField';
-import { Random } from 'meteor/random';
 
 import Grid from 'material-ui/Grid';
 import Typography from 'material-ui/Typography';
 import Checkbox from 'material-ui/Checkbox';
 import Button from 'material-ui/Button';
 import Chip from 'material-ui/Chip';
-import List, { ListItem, ListItemText, ListItemIcon } from 'material-ui/List';
+import List, { ListItem, ListItemIcon, ListItemText } from 'material-ui/List';
 import Divider from 'material-ui/Divider';
 
 import moment from 'moment';
-
+import sortBy from 'lodash/sortBy';
 import sumBy from 'lodash/sumBy';
 import groupBy from 'lodash/groupBy';
 import jsPDF from 'jspdf';
 import autoBind from 'react-autobind';
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 
 import vittlebase64 from '../../../modules/vittlelogobase64';
 
@@ -117,7 +116,7 @@ class DirectionsTable extends React.Component {
 
       deliveriesLoadingTabChange: true,
 
-      currentTabValue: this.props.userRoles.findIndex(e => e == 'delivery') == -1 ? { $exists: true } : this.props.userId,
+      currentTabValue: this.props.userRoles.findIndex(e => e === 'delivery') === -1 ? { $exists: true } : this.props.userId,
 
       searchBy: '',
 
@@ -127,14 +126,22 @@ class DirectionsTable extends React.Component {
     autoBind(this);
   }
 
-  componentDidMount() {
+  getDeliveriesForTheDay() {
+    this.setState({
+      deliveriesLoading: true,
+    });
+
     Meteor.call('getDeliveriesForTheDay', this.props.currentSelectorDate, this.state.currentTabValue, (err, res) => {
       this.setState({
-        deliveries: res,
+        deliveries: sortBy(res, delivery => this.props.assignedUsersOrder.indexOf(delivery.subscriptionId)),
       }, () => {
         this.setState({ deliveriesLoading: false, deliveriesLoadingTabChange: false });
       });
     });
+  }
+
+  componentDidMount() {
+    this.getDeliveriesForTheDay();
   }
 
   handleAddressDialogOpen(customerProfile, customerAddress) {
@@ -176,7 +183,7 @@ class DirectionsTable extends React.Component {
   }
 
   componentWillUpdate(nextProps, nextState) {
-    if (nextProps.currentSelectorDate != this.props.currentSelectorDate) {
+    if (nextProps.currentSelectorDate !== this.props.currentSelectorDate) {
       this.setState({
         deliveriesLoading: true,
         deliveriesLoadingTabChange: true,
@@ -245,50 +252,6 @@ class DirectionsTable extends React.Component {
     });
   }
 
-  getListStyle(isDraggingOver) {
-    return {
-      background: isDraggingOver ? 'lightblue' : '',
-      padding: 0,
-      width: '100%',
-    };
-  }
-
-  getItemStyle(isDragging, draggableStyle) {
-    return ({
-      userSelect: 'none',
-      padding: 4,
-      margin: '0 0 4px 0',
-
-      background: isDragging ? 'lightgreen' : '',
-
-      ...draggableStyle,
-    });
-  }
-
-  reorder(list, startIndex, endIndex) {
-    const result = Array.from(list);
-    const [removed] = result.splice(startIndex, 1);
-    result.splice(endIndex, 0, removed);
-
-    return result;
-  }
-
-  onDragEnd(result) {
-    // dropped outside the list
-    if (!result.destination) {
-      return;
-    }
-
-    const reOrderedDeliveries = this.reorder(
-      this.state.deliveries,
-      result.source.index,
-      result.destination.index,
-    );
-
-    this.setState({
-      deliveries: reOrderedDeliveries,
-    });
-  }
 
   handleBatchStatusChange() {
     localStorage.setItem('deliveryUpdated', this.state.selectedCheckboxesNumber);
@@ -297,7 +260,7 @@ class DirectionsTable extends React.Component {
     // console.log(deliveries);
     // return;
 
-    if (this.state.selectedCheckboxes.length == 1 && this.state.batchDeliveryStatus == "Delivered") {
+    if (this.state.selectedCheckboxes.length === 1 && this.state.batchDeliveryStatus === 'Delivered') {
       deliveries[0].deliveredNote = this.state.deliveredNote;
     }
 
@@ -314,7 +277,7 @@ class DirectionsTable extends React.Component {
 
       this.setState({
         deliveredNote: '',
-      })
+      });
     });
 
     this.setState({
@@ -323,15 +286,10 @@ class DirectionsTable extends React.Component {
       updateDialogOpen: false,
       openMassNotifyDialog: false,
     });
-
   }
 
   handleDeliveryAssign(valueToAssign) {
-    // console.log(event.currentTarget.value);
-    const tabValue = valueToAssign;
-
     const deliveries = this.state.deliveries.filter(el => this.state.selectedCheckboxes.indexOf(el._id) >= 0).map(e => e.subscriptionId);
-    // console.log(deliveries);
 
     if (!deliveries) {
       this.props.popTheSnackbar({
@@ -370,10 +328,10 @@ class DirectionsTable extends React.Component {
       this.setState({
         batchDeliveryStatus: statusToChangeTo,
       }, () => {
-        this.setState({ updateDialogOpen: true, });
+        this.setState({ updateDialogOpen: true });
       });
     } else {
-      const delivery = this.state.deliveries.find(el => el._id == deliveryId);
+      const delivery = this.state.deliveries.find(el => el._id === deliveryId);
 
       Meteor.call('deliveries.update', delivery, statusToChangeTo, (error) => {
         if (error) {
@@ -392,15 +350,15 @@ class DirectionsTable extends React.Component {
   renderAddressSubText(address) {
     let toRender = '';
 
-    if (address.type == 'apartment') {
+    if (address.type === 'apartment') {
       toRender = `${address.apartmentName ? `Apartment name  ${address.apartmentName}` : ''}, ${address.unit ? `Unit ${address.unit}` : ''}, ${address.buzzer ? `Business ${address.buzzer}` : ''}`;
-    } else if (address.type == 'hotel') {
+    } else if (address.type === 'hotel') {
       toRender = `${address.hotelName ? `Unit ${address.hotelName}` : ''}, ${address.roomNumber ? `Room number ${address.roomNumber}` : ''}`;
-    } else if (address.type == 'house') {
+    } else if (address.type === 'house') {
       toRender = `${address.unit ? `Unit ${address.unit}` : ''} `;
-    } else if (address.type == 'business') {
+    } else if (address.type === 'business') {
       toRender = `${address.businessName ? `Business name ${address.businessName}` : ''}, ${address.unit ? `Unit ${address.unit}` : ''}, ${address.buzzer ? `Business ${address.buzzer}` : ''}`;
-    } else if (address.type == 'dormitory') {
+    } else if (address.type === 'dormitory') {
       toRender = `${address.dormName ? `Dorm name ${address.dormName}` : ''},  ${address.dormResidence ? `Dorm residence ${address.dormResidence}` : ''} ${address.roomNumber ? `Room number ${address.roomNumber}` : ''}, ${address.buzzer ? `Business ${address.buzzer}` : ''}`;
     }
 
@@ -426,17 +384,17 @@ class DirectionsTable extends React.Component {
   }
 
   printLabels(type) {
-    const sweetType = type == 'dayOf' ? 'morning' : type == 'nightBefore' ? 'evening' : '';
-    const formalType = type == 'dayOf' ? 'Day of' : type == 'nightBefore' ? 'Evening of' : '';
+    const sweetType = type === 'dayOf' ? 'morning' : type === 'nightBefore' ? 'evening' : '';
+    const formalType = type === 'dayOf' ? 'Day of' : type === 'nightBefore' ? 'Evening of' : '';
 
 
     const currentDate = this.props.currentSelectorDate;
 
-    const deliveries = this.state.deliveries.filter(e => e.onDate == currentDate && e.title == type);
+    const deliveries = this.state.deliveries.filter(e => e.onDate === currentDate && e.title === type);
 
     const deliveriesByRoute = groupBy(deliveries, e => e.route.title);
 
-    if (deliveries.length == 0) {
+    if (deliveries.length === 0) {
       this.props.popTheSnackbar({
         message: `There are no ${sweetType} labels to print`,
       });
@@ -464,15 +422,15 @@ class DirectionsTable extends React.Component {
             }
           });
 
-          let deliveryAssignedToInitials = e.route.title == 'Downtown' ? 'DT' : e.route.title.charAt(0);
+          let deliveryAssignedToInitials = e.route.title === 'Downtown' ? 'DT' : e.route.title.charAt(0);
 
           if (typeof this.state.currentTabValue === 'string' && this.state.currentTabValue !== 'unassigned') {
-            const deliveryAssignedTo = this.props.deliveryGuys.find(deliveryGuy => deliveryGuy._id == this.state.currentTabValue);
+            const deliveryAssignedTo = this.props.deliveryGuys.find(deliveryGuy => deliveryGuy._id === this.state.currentTabValue);
             // console.log(deliveryAssignedTo);
             deliveryAssignedToInitials = deliveryAssignedTo.profile.name.first.charAt(0) + deliveryAssignedTo.profile.name.last.charAt(0);
           } else if (typeof this.state.currentTabValue === 'object') {
             if (e.deliveryAssignedTo !== 'unassigned') {
-              const deliveryAssignedTo = this.props.deliveryGuys.find(deliveryGuy => deliveryGuy._id == e.deliveryAssignedTo);
+              const deliveryAssignedTo = this.props.deliveryGuys.find(deliveryGuy => deliveryGuy._id === e.deliveryAssignedTo);
               // console.log(deliveryAssignedTo);
               deliveryAssignedToInitials = deliveryAssignedTo.profile.name.first.charAt(0) + deliveryAssignedTo.profile.name.last.charAt(0);
             }
@@ -549,7 +507,7 @@ class DirectionsTable extends React.Component {
   }
 
   checkInDeliveries(data) {
-    return this.props.results.find(e => e.customerId == data.customerId && e.subscriptionId == data.subscriptionId && e.onDate == this.props.currentSelectorDate);
+    return this.props.deliveries.find(e => e.customerId === data.customerId && e.subscriptionId === data.subscriptionId && e.onDate === this.props.currentSelectorDate);
   }
 
   clearSearchBox() {
@@ -584,7 +542,7 @@ class DirectionsTable extends React.Component {
             boxShadow: '0px 0px 5px 0px rgba(0, 0, 0, 0.2), 0px 0px 0px 0px rgba(0, 0, 0, 0.14), 0px 0px 1px -2px rgba(0, 0, 0, 0.12)',
             position: 'relative',
             width: '100%',
-            marginBottom: '1em'
+            marginBottom: '1em',
           }}
           >
             <Input
@@ -619,234 +577,210 @@ class DirectionsTable extends React.Component {
         {this.state.deliveriesLoading || this.state.deliveriesLoadingTabChange ? (
           <Loading />
         ) : (
-            <Grid container>
-              <Paper elevation={2} className="table-container">
-                <div style={{ padding: '20px' }}>
-                  <Button className="btn btn-primary" onClick={() => this.printLabels('nightBefore')} raised color="primary" style={{ float: 'right', marginLeft: '1em' }}>Print evening labels</Button>
-                  <Button className="btn btn-primary" onClick={() => this.printLabels('dayOf')} raised color="primary" style={{ float: 'right' }}>Print day of labels</Button>
+          <Grid container>
+            <Paper elevation={2} className="table-container">
+              <div style={{ padding: '20px' }}>
+                <Button className="btn btn-primary" onClick={() => this.printLabels('nightBefore')} raised color="primary" style={{ float: 'right', marginLeft: '1em' }}>Print evening labels</Button>
+                <Button className="btn btn-primary" onClick={() => this.printLabels('dayOf')} raised color="primary" style={{ float: 'right' }}>Print day of labels</Button>
+              </div>
+
+
+              {this.state.selectedCheckboxes.length > 0 ? (
+                <div className="table-container--delete-rows-container" style={{ backgroundColor: '#607d8b' }}>
+                  <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
+                    {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'} selected
+                  </Typography>
+                  <div>
+                    <Button onClick={() => this.setState({ openAssignDialog: true })} style={{ color: '#FFF' }}>Assign</Button>
+                    <Button onClick={() => this.setState({ openMassNotifyDialog: true })} style={{ color: '#FFF' }}>Notify</Button>
+                  </div>
                 </div>
 
+              ) : ''}
 
-                {this.state.selectedCheckboxes.length > 0 ? (
-                  <div className="table-container--delete-rows-container" style={{ backgroundColor: '#607d8b' }}>
-                    <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
-                      {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'} selected
-                </Typography>
-                    <div>
-                      <Button onClick={() => this.setState({ openAssignDialog: true })} style={{ color: '#FFF' }}>Assign</Button>
-                      <Button onClick={() => this.setState({ openMassNotifyDialog: true })} style={{ color: '#FFF' }}>Notify</Button>
-                    </div>
-                  </div>
+              <Table className="table-container" style={{ marginTop: '10px', tableLayout: 'fixed' }}>
+                <TableHead>
+                  <TableRow>
+                    <TableCell padding="checkbox" style={{ width: '8%' }}>
+                      <Checkbox onChange={this.selectAllRows.bind(this)} />
+                    </TableCell>
+                    <TableCell padding="none" style={{ width: '20%' }} onClick={() => this.props.sortByOptions('SKU')}>
+                      <Typography className="body2" type="body2">Name</Typography>
+                    </TableCell>
 
-                ) : ''}
+                    <TableCell padding="none" style={{ width: '25%' }} onClick={() => this.props.sortByOptions('title')}>
+                      <Typography className="body2" type="body2">Address</Typography>
+                    </TableCell>
+                    <TableCell padding="none" style={{ width: '10%' }} onClick={() => this.props.sortByOptions('title')}>
+                      <Typography className="body2" type="body2">Phone</Typography>
+                    </TableCell>
+                    <TableCell padding="none" style={{ width: '10%' }} onClick={() => this.props.sortByOptions('title')}>
+                      <Typography className="body2" type="body2">Meals</Typography>
+                    </TableCell>
+                    <TableCell padding="none" style={{ width: '13%' }} onClick={() => this.props.sortByOptions('title')}>
+                      <Typography className="body2" type="body2">Delivery</Typography>
+                    </TableCell>
+                    <TableCell padding="none" style={{ width: '14%' }} onClick={() => this.props.sortByOptions('title')}>
+                      <Typography className="body2" type="body2">Status</Typography>
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
 
-                <Table className="table-container table-container--directions" style={{ marginTop: '10px', tableLayout: 'fixed' }}>
+                <TableBody>
 
-                  <TableHead style={{ display: 'flex' }}>
-                    <TableRow style={{ display: 'flex' }}>
-                      <TableCell padding="checkbox" style={{ width: '8%' }}>
-                        <Checkbox onChange={this.selectAllRows.bind(this)} />
-                      </TableCell>
-                      <TableCell padding="none" style={{ width: '20%' }} onClick={() => this.props.sortByOptions('SKU')}>
-                        <Typography className="body2" type="body2">Customer</Typography>
-                      </TableCell>
+                  {!this.state.deliveriesLoading && !this.state.deliveriesLoadingTabChange && sortBy(this.state.deliveries,
+                    delivery => (this.props.assignedUsersOrder.indexOf(delivery.subscriptionId) === -1 ? false :
+                      this.props.assignedUsersOrder.indexOf(delivery.subscriptionId)),
+                  ).filter(e =>
+                    this.props.filterBy === 'all' || e.title === this.props.filterBy).filter((el) => {
+                    const fullName = `${el.customer.profile.name.first} ${el.customer.profile.name.last}`;
+                    const like = new RegExp(this.state.searchBy, 'gi');
 
-                      <TableCell padding="none" style={{ width: '15%' }} onClick={() => this.props.sortByOptions('title')}>
-                        <Typography className="body2" type="body2">Address</Typography>
-                      </TableCell>
-                      <TableCell padding="none" style={{ width: '15%' }} onClick={() => this.props.sortByOptions('title')}>
-                        <Typography className="body2" type="body2">Driver</Typography>
-                      </TableCell>
-                      <TableCell padding="none" style={{ width: '10%' }} onClick={() => this.props.sortByOptions('title')}>
-                        <Typography className="body2" type="body2">Delivery</Typography>
-                      </TableCell>
-                      <TableCell padding="none" style={{ width: '10%' }} onClick={() => this.props.sortByOptions('title')}>
-                        <Typography className="body2" type="body2">Meals</Typography>
-                      </TableCell>
-                      <TableCell padding="none" style={{ width: '8%' }} onClick={() => this.props.sortByOptions('title')}>
-                        <Typography className="body2" type="body2">Cooler bag</Typography>
-                      </TableCell>
-                      <TableCell padding="none" style={{ width: '14%' }} onClick={() => this.props.sortByOptions('title')}>
-                        <Typography className="body2" type="body2">Status</Typography>
-                      </TableCell>
-                    </TableRow>
-                  </TableHead>
+                    if (this.state.searchBy !== '' && !like.test(fullName)) {
+                      return false;
+                    }
 
-                  <TableBody>
-                    <DragDropContext onDragEnd={this.onDragEnd}>
-                      <Droppable droppableId="droppable">
-                        {
-                          (provided, snapshot) => (
-                            <div ref={provided.innerRef} style={this.getListStyle(snapshot.isDraggingOver)}>
-                              {!this.state.deliveriesLoading && !this.state.deliveriesLoadingTabChange && this.state.deliveries.filter(el =>
-                                // if (this.state.currentTabValue != 'all' && el.routeId != this.state.currentTabValue) {
-                                //   return false;
-                                // }
-                                true,
+                    return true;
+                  }).map((e, i) => {
+                    const inDeliveries = this.checkInDeliveries(e);
+                    const rowId = inDeliveries !== undefined ? inDeliveries._id : e._id;
+                    const status = inDeliveries !== undefined ? inDeliveries.status : 'Scheduled';
+                    const isSelected = this.isCheckboxSelected(rowId);
+                    const statusClass = this.getStatusClass(status);
 
-                              ).filter((el) => {
-                                const fullName = `${el.customer.profile.name.first} ${el.customer.profile.name.last}`;
+                    return (
+                      <TableRow hover className={`${rowId} ${statusClass} delivery-status`} key={rowId}>
+                        <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }} padding="checkbox">
+                          <Checkbox
+                            className="row-checkbox"
+                            id={rowId}
+                            checked={isSelected}
+                            onChange={this.rowSelected.bind(this, rowId)}
+                          />
+                        </TableCell>
 
-                                const like = new RegExp(this.state.searchBy, 'gi');
-
-                                if (this.state.searchBy != '' && !like.test(fullName)) {
-                                  return false;
-                                }
-
-                                return true;
-
-                              }).map((e, i) => {
-                                const inDeliveries = this.checkInDeliveries(e);
-                                const rowId = inDeliveries != undefined ? inDeliveries._id : e._id;
-                                const status = inDeliveries != undefined ? inDeliveries.status : 'Scheduled';
-                                const isSelected = this.isCheckboxSelected(rowId);
-                                const statusClass = this.getStatusClass(status);
-
-                                return (
-                                  <Draggable key={i} draggableId={i} index={i}>
-                                    {(provided, snapshot) => (
-                                      <div
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                        {...provided.dragHandleProps}
-                                        style={this.getItemStyle(
-                                          snapshot.isDragging,
-                                          provided.draggableProps.style,
-                                        )}
-                                      >
-                                        <TableRow hover className={`${rowId} ${statusClass} delivery-status`} key={rowId}>
-                                          <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }} padding="checkbox">
-                                            <Checkbox
-                                              className="row-checkbox"
-                                              id={rowId}
-                                              checked={isSelected}
-                                              onChange={this.rowSelected.bind(this, rowId)}
-                                            />
-                                          </TableCell>
-
-                                          <TableCell padding="none" style={{ width: '20%' }} >
-                                            <Typography className="subheading" type="subheading" style={{ display: 'flex', alignItems: 'center' }}>
-                                              {/* <span className="status-circle" />{' '} */}
-                                              {e.customer ? (
-                                                `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''}
+                        <TableCell padding="none" style={{ width: '20%' }} >
+                          <Typography className="subheading" type="subheading" style={{ display: 'flex', alignItems: 'center' }}>
+                            {e.customer ? (
+                              `${e.customer.profile && e.customer.profile.name && e.customer.profile.name.first ? e.customer.profile.name.first : ''}
                                           ${e.customer.profile && e.customer.profile.name && e.customer.profile.name.last ? e.customer.profile.name.last : ''} `
-                                              ) : ''}
-                                              {' '}
-                                              {e.customer.address.notes && e.customer.address.notes.length > 0 ? (<NoteIcon style={{ marginLeft: '10px' }} onClick={() => this.handleNoteDialogOpen(e.customer.profile, e.customer.address.notes)} />) : ''}
-                                            </Typography>
+                            ) : ''}
+                            {' '}
+                            {e.customer.address.notes && e.customer.address.notes.length > 0 ? (<NoteIcon style={{ marginLeft: '10px' }} onClick={() => this.handleNoteDialogOpen(e.customer.profile, e.customer.address.notes)} />) : ''}
+                          </Typography>
 
-                                            <Typography className="body1" type="body1" style={{ marginLeft: '1.5em', color: 'rgba(0, 0, 0, .54)' }}>
-                                              {e.customer ? (
-                                                `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''} ${e.customer.associatedProfiles > 1 ? ' profiles' : e.customer.associatedProfiles == 1 ? ' profile' : ''} `
-                                              ) : ''}
+                          <Typography className="body1" type="body1" style={{ marginLeft: '1.5em', color: 'rgba(0, 0, 0, .54)' }}>
+                            {e.customer ? (
+                              `${e.customer.associatedProfiles > 0 ? e.customer.associatedProfiles : ''} ${e.customer.associatedProfiles > 1 ? ' profiles' :
+                                e.customer.associatedProfiles === 1 ? ' profile' : ''} `
+                            ) : ''}
 
-                                            </Typography>
-                                          </TableCell>
+                          </Typography>
+                        </TableCell>
 
-                                          <TableCell
-                                            style={{ paddingTop: '10px', paddingBottom: '10px', width: '15%' }}
-                                            padding="none"
-                                            onClick={() => this.handleAddressDialogOpen(e.customer.profile, e.customer.address.streetAddress)}
-                                          >
-                                            <Typography type="subheading" style={{ textTransform: 'capitalize' }}>
-                                              {e.customer.address.streetAddress}
-                                            </Typography>
-                                            <Typography type="body1">
-                                              {e.customer ? this.renderAddressSubText(e.customer.address) : ''}
-                                            </Typography>
-                                            <div style={{ marginTop: '5px' }} />
-                                            <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                                              {e.route ? (
-                                                `${e.route.title} `
-                                              ) : ''}
-                                            </Typography>
-                                            <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                                              {e.customer ? (
-                                                `${e.customer.postalCode} `
-                                              ) : ''}
-                                            </Typography>
+                        <TableCell
+                          style={{ paddingTop: '10px', paddingBottom: '10px', width: '25%', paddingRight: '15px' }}
+                          padding="none"
+                          onClick={() =>
+                            this.handleAddressDialogOpen(e.customer.profile, e.customer.address.streetAddress)
+                          }
+                        >
+                          <Typography type="subheading" style={{ textTransform: 'capitalize' }}>
+                            {e.customer.address.streetAddress}
+                          </Typography>
+                          <Typography type="body1">
+                            {e.customer ? this.renderAddressSubText(e.customer.address) : ''}
+                          </Typography>
+                          <div style={{ marginTop: '5px' }} />
+                          <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                            {e.route ? (
+                              `${e.route.title} `
+                            ) : ''}
+                          </Typography>
+                          <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                            {e.customer ? (
+                              `${e.customer.postalCode} `
+                            ) : ''}
+                          </Typography>
 
-                                          </TableCell>
+                        </TableCell>
 
-                                          <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '10%' }} padding="none">
-                                            {e.deliveryAssignedTo == 'unassigned' ? (
-                                              <Typography type="subheading" className="subheading">Unassigned</Typography>
-                                            ) : (
-                                                <Typography type="subheading" className="subheading">{this.props.deliveryGuys.find(guy => guy._id == e.deliveryAssignedTo).profile.name.first || ''}</Typography>
-                                              )}
-                                          </TableCell>
+                        <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '10%' }} padding="none">
+                          {/* {e.deliveryAssignedTo === 'unassigned' ? ( */}
+                          {/* <Typography type="subheading" className="subheading">Unassigned</Typography> */}
+                          {/* ) : ( */}
+                          {/* <Typography type="subheading" className="subheading">{this.props.deliveryGuys.find(guy => guy._id === e.deliveryAssignedTo).profile.name.first || ''}</Typography> */}
+                          {/* )} */}
 
-                                          <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '10%' }} padding="none">
-                                            <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                                              {e.title === 'nightBefore' ? 'Evening' : e.title === 'dayOf' ? 'Day' : ''}
-                                            </Typography>
-                                            <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
-                                              {moment(e.onDate).format('MMMM D')}
-                                            </Typography>
-                                          </TableCell>
+                          {e.customer.phone ? (
+                            <React.Fragment>
+                              <a style={{ textDecoration: 'none', color: 'inherit' }} href={`tel:${e.customer.phone}`}>{e.customer.phone}</a>
+                            </React.Fragment>
+                          ) : '-'}
+                        </TableCell>
 
-                                          <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '10%' }} padding="none">
-                                            <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                                              {sumBy(e.meals, 'total')}
-                                            </Typography>
+                        <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '10%' }} padding="none">
+                          <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                            {sumBy(e.meals, 'total')}
+                          </Typography>
 
-                                            <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>0 sides</Typography>
-                                          </TableCell>
+                          <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>0 sides</Typography>
+                        </TableCell>
 
-                                          <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }} padding="none">
-                                            <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                                              {e.customer.coolerBag ? 'Yes' : 'No'}
-                                            </Typography>
-                                          </TableCell>
-
-                                          <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '14%' }} padding="none">
-                                            <Typography type="body2" className="body2" style={{ textTransform: 'capitalize' }}>
-                                              <Chip
-                                                style={{ color: '#FFF', textTransform: 'capitalize' }}
-                                                label={status}
-                                                className={`${statusClass} directions-chip`}
-                                              />
-                                            </Typography>
-                                          </TableCell>
-                                        </TableRow>
-
-                                      </div>)}
-                                  </Draggable>
-
-                                );
-                              },
-                              )
-                              }
-                            </div>
-                          )
-                        }
-                      </Droppable>
-                    </DragDropContext>
+                        <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '13%' }} padding="none">
+                          <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
+                            {e.title === 'nightBefore' ? 'Evening' : e.title === 'dayOf' ? 'Day' : ''}
+                          </Typography>
+                          <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>
+                            {moment(e.onDate).format('MMMM D')}
+                          </Typography>
+                        </TableCell>
 
 
-                  </TableBody>
-                </Table>
+                        {/* <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '8%' }} padding="none"> */}
+                        {/* <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}> */}
+                        {/* {e.customer.coolerBag ? 'Yes' : 'No'} */}
+                        {/* </Typography> */}
+                        {/* </TableCell> */}
 
-              </Paper>
-            </Grid>
-          )}
+                        <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '14%' }} padding="none">
+                          <Typography type="body2" className="body2" style={{ textTransform: 'capitalize' }}>
+                            <Chip
+                              style={{ color: '#FFF', textTransform: 'capitalize' }}
+                              label={status}
+                              className={`${statusClass} directions-chip`}
+                            />
+                          </Typography>
+                        </TableCell>
+                      </TableRow>
+
+                    );
+                  })
+                  }
+                </TableBody>
+              </Table>
+
+            </Paper>
+          </Grid>
+        )}
+
         <Dialog open={this.state.updateDialogOpen} onClose={this.updateDialogHandleRequestClose.bind(this)}>
           <Typography style={{ flex: '0 0 auto', margin: '0', padding: '24px 24px 20px 24px' }} className="title font-medium" type="title">
             Update {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?
           </Typography>
           <DialogContent>
             <DialogContentText className="subheading"> Are you sure you want to update {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'}?</DialogContentText>
-            {this.state.selectedCheckboxes.length == 1 && this.state.batchDeliveryStatus == 'Delivered' && (
+            {this.state.selectedCheckboxes.length === 1 && this.state.batchDeliveryStatus === 'Delivered' && (
               <React.Fragment>
                 <Typography style={{ marginTop: '1em' }} type="body2">Select optional note</Typography>
                 <List>
-                  <ListItem button style={{ background: this.state.deliveredNote == 'Left in the lobby.' ? 'lightgrey' : '' }} onClick={e => this.setState({ deliveredNote: 'Left in the lobby.' })}>
+                  <ListItem button style={{ background: this.state.deliveredNote === 'Left in the lobby.' ? 'lightgrey' : '' }} onClick={e => this.setState({ deliveredNote: 'Left in the lobby.' })}>
                     <ListItemText primary="Left in the lobby." />
                   </ListItem>
-                  <ListItem button style={{ background: this.state.deliveredNote == 'Left at your door.' ? 'lightgrey' : '' }} onClick={e => this.setState({ deliveredNote: 'Left at your door.' })}>
+                  <ListItem button style={{ background: this.state.deliveredNote === 'Left at your door.' ? 'lightgrey' : '' }} onClick={e => this.setState({ deliveredNote: 'Left at your door.' })}>
                     <ListItemText primary="Left at your door." />
                   </ListItem>
-                  <ListItem button style={{ background: this.state.deliveredNote == 'Left with the concierge.' ? 'lightgrey' : '' }} onClick={e => this.setState({ deliveredNote: 'Left with the concierge.' })}>
+                  <ListItem button style={{ background: this.state.deliveredNote === 'Left with the concierge.' ? 'lightgrey' : '' }} onClick={e => this.setState({ deliveredNote: 'Left with the concierge.' })}>
                     <ListItemText primary="Left with the concierge." />
                   </ListItem>
                   <ListItem button onClick={e => this.setState({ deliveredNote: '' })}>
@@ -989,23 +923,18 @@ class DirectionsTable extends React.Component {
   }
 }
 
+
+DirectionsTable.defaultProps = {
+  deliveries: [],
+  loading: false,
+};
+
 DirectionsTable.propTypes = {
-  // results: PropType.isRequired,
   history: PropTypes.func.isRequired,
   hasMore: PropTypes.bool.isRequired,
   loadMore: PropTypes.func.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
   currentSelectorDate: PropTypes.string.isRequired,
 };
-
-
-// export default createContainer(() => {
-//   const deliveryCountSub = Meteor.subscribe('deliveries-all-count');
-
-//   return {
-//     // ingredientTypes: IngredientsWithTypes.find().fetch(),
-//     categoryCount: Counts.get('deliveries'),
-//   };
-// }, DirectionsTable);
 
 export default DirectionsTable;

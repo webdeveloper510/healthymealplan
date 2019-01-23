@@ -103,6 +103,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
       const delivery = {
         _id: deliveryExists ? deliveryExists._id : Random.id(),
         customer: {
+          phone: customer.phone || '-',
           profile: customer.profile,
           postalCode: customer.postalCode,
           address: customer.address,
