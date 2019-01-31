@@ -85,7 +85,7 @@ import autoBind from 'react-autobind';
 import validate from '../../../modules/validate';
 import { DELIVERYCOST } from '../../../modules/constants';
 
-import Step4CheckoutCurrent from './Step4CheckoutCurrent'
+import Step4CheckoutCurrent from './Step4CheckoutCurrent';
 
 import OrderSummary from '../../pages/OrderSummary/OrderSummary';
 
@@ -179,7 +179,7 @@ class CurrentCustomerEditor extends React.Component {
           dinner: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
-          chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },        
+          chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -187,7 +187,7 @@ class CurrentCustomerEditor extends React.Component {
           dinner: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
-          chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },        
+          chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -195,7 +195,7 @@ class CurrentCustomerEditor extends React.Component {
           dinner: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
-          chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },        
+          chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -203,7 +203,7 @@ class CurrentCustomerEditor extends React.Component {
           dinner: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
-          chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },        
+          chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -211,7 +211,7 @@ class CurrentCustomerEditor extends React.Component {
           dinner: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
-          chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },        
+          chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -227,25 +227,23 @@ class CurrentCustomerEditor extends React.Component {
 
       secondaryCollapses: [false, false, false, false, false, false],
       secondaryProfileCount: !this.props.loading && this.props.customer && this.props.customer.associatedProfiles > 0 ? this.props.customer.associatedProfiles : 0,
-      secondaryProfilesData: !this.props.loading && this.props.customer && this.props.lifestyles && this.props.secondaryAccounts ? this.props.secondaryAccounts.map((e) => {
-        return {
-          _id: e._id,
-          first_name: e.profile.name.first,
-          last_name: e.profile.name.last ? e.profile.name.last : '',
-          subIngredients: e.preferences,
-          specificRestrictions: e.specificRestrictions,
-          // lifestyle: this.props.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
-          lifestyle: e.lifestyle,
-          isLifestyleCustom: (this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle) && this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom) || false,
-          discount: e.discount,
-          restrictions: e.restrictions, //fix here
-          activeMealScheduleStep: 0,
-          deleteDialogOpen: false,
-          scheduleReal: e.schedule,
-          platingNotes: e.platingNotes ? e.platingNotes : '',
-          adultOrChild: e.adultOrChild,
-        }
-      }) : [],
+      secondaryProfilesData: !this.props.loading && this.props.customer && this.props.lifestyles && this.props.secondaryAccounts ? this.props.secondaryAccounts.map(e => ({
+        _id: e._id,
+        first_name: e.profile.name.first,
+        last_name: e.profile.name.last ? e.profile.name.last : '',
+        subIngredients: e.preferences,
+        specificRestrictions: e.specificRestrictions,
+        // lifestyle: this.props.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
+        lifestyle: e.lifestyle,
+        isLifestyleCustom: (this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle) && this.props.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom) || false,
+        discount: e.discount,
+        restrictions: e.restrictions, // fix here
+        activeMealScheduleStep: 0,
+        deleteDialogOpen: false,
+        scheduleReal: e.schedule,
+        platingNotes: e.platingNotes ? e.platingNotes : '',
+        adultOrChild: e.adultOrChild,
+      })) : [],
       secondaryProfilesRemoved: [],
 
       orderSummaryDialogOpen: false,
@@ -285,7 +283,7 @@ class CurrentCustomerEditor extends React.Component {
         }
         : {
           email: false,
-          sms: false
+          sms: false,
         },
 
       activeDeliveryScheduleStep: 0,
@@ -305,7 +303,7 @@ class CurrentCustomerEditor extends React.Component {
       submitSuccessReset: false,
 
 
-      secondTime: false, //Step2 modal save
+      secondTime: false, // Step2 modal save
 
       discountApplied: !this.props.loading && this.props.subscription && this.props.subscription.hasOwnProperty('discountApplied') ? this.props.subscription.discountApplied : '',
 
@@ -314,7 +312,7 @@ class CurrentCustomerEditor extends React.Component {
 
     };
 
-    autoBind(this)
+    autoBind(this);
   }
 
   handleSelectChange(event) {
@@ -327,7 +325,7 @@ class CurrentCustomerEditor extends React.Component {
   renderMonths() {
     const options = [];
 
-    options.push(<MenuItem key={0} value=""></MenuItem>);
+    options.push(<MenuItem key={0} value="" />);
 
     for (let i = 1; i <= 12; i++) {
       options.push(<MenuItem key={i} value={i}>{moment().month(i - 1).format('MMMM')}</MenuItem>);
@@ -339,7 +337,7 @@ class CurrentCustomerEditor extends React.Component {
   renderDays() {
     const options = [];
 
-    options.push(<MenuItem key={0} value=""></MenuItem>);
+    options.push(<MenuItem key={0} value="" />);
 
     for (let i = 1; i <= 31; i++) {
       options.push(<MenuItem key={i} value={i}>{i}</MenuItem>);
@@ -395,7 +393,7 @@ class CurrentCustomerEditor extends React.Component {
           maxlength: 2,
           max: 31,
           min: 1,
-        }
+        },
       },
       submitHandler() {
         component.saveFirstStep();
@@ -404,60 +402,54 @@ class CurrentCustomerEditor extends React.Component {
   }
 
   handleResetPassword() {
-
     this.setState({
       submitLoadingReset: true,
       submitSuccessReset: false,
-    })
+    });
 
     Meteor.call('users.resetPassword', this.props.customer._id, (err, res) => {
       if (err) {
         this.setState({
           submitLoadingReset: false,
           submitSuccessReset: false,
-        })
+        });
 
         this.props.popTheSnackbar({
-          message: 'There was a problem sending the reset password email.'
-        })
-
+          message: 'There was a problem sending the reset password email.',
+        });
       } else {
         this.setState({
           submitLoadingReset: false,
           submitSuccessReset: false,
-        })
+        });
 
         this.props.popTheSnackbar({
-          message: 'Successfully sent a reset password email.'
-        })
+          message: 'Successfully sent a reset password email.',
+        });
       }
-    })
+    });
   }
 
   componentWillReceiveProps(nextProps, prevState) {
-
     if (!nextProps.loading) {
       if (nextProps.lifestyles && nextProps.customer && nextProps.customer.lifestyle && nextProps.subscription && nextProps.secondaryAccounts) {
-
-        const secondaryAccounts = nextProps.secondaryAccounts.map((e) => {
-          return {
-            _id: e._id,
-            first_name: e.profile.name.first,
-            last_name: e.profile.name.last ? e.profile.name.last : '',
-            subIngredients: e.preferences,
-            specificRestrictions: e.specificRestrictions,
-            // lifestyle: nextProps.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
-            lifestyle: e.lifestyle,
-            isLifestyleCustom: nextProps.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom,
-            discount: e.discount,
-            restrictions: e.restrictions, //fix here
-            activeMealScheduleStep: 0,
-            deleteDialogOpen: false,
-            scheduleReal: e.schedule,
-            platingNotes: e.platingNotes ? e.platingNotes : '',
-            adultOrChild: e.adultOrChild,
-          }
-        });
+        const secondaryAccounts = nextProps.secondaryAccounts.map(e => ({
+          _id: e._id,
+          first_name: e.profile.name.first,
+          last_name: e.profile.name.last ? e.profile.name.last : '',
+          subIngredients: e.preferences,
+          specificRestrictions: e.specificRestrictions,
+          // lifestyle: nextProps.lifestyles.find(lifestyle => lifestyle._id === e.lifestyle).title,
+          lifestyle: e.lifestyle,
+          isLifestyleCustom: nextProps.lifestyles.find(lifestyle => lifestyle._id == e.lifestyle).custom,
+          discount: e.discount,
+          restrictions: e.restrictions, // fix here
+          activeMealScheduleStep: 0,
+          deleteDialogOpen: false,
+          scheduleReal: e.schedule,
+          platingNotes: e.platingNotes ? e.platingNotes : '',
+          adultOrChild: e.adultOrChild,
+        }));
 
         const discountApplied = nextProps.subscription.hasOwnProperty('discountApplied') ? nextProps.subscription.discountApplied : '';
 
@@ -474,14 +466,13 @@ class CurrentCustomerEditor extends React.Component {
             lifestyleCustom: isLifestyleCustom,
             completeSchedule: nextProps.subscription.completeSchedule,
             deliveryType: nextProps.subscription.delivery,
-            discountApplied: discountApplied,
+            discountApplied,
             secondaryProfileCount: associatedProfiles,
             secondaryProfilesData: secondaryAccounts,
-          })
+          });
         }
       }
     }
-
   }
 
   componentWillUpdate(nextProps, nextState) {
@@ -536,7 +527,7 @@ class CurrentCustomerEditor extends React.Component {
           adultOrChild6: { required: true },
           adultOrChild7: { required: true },
 
-          //delivery
+          // delivery
           addressType: {
             required: true,
           },
@@ -641,7 +632,7 @@ class CurrentCustomerEditor extends React.Component {
         const element = this.state.secondaryProfilesData[index];
         if (
           element.scheduleReal.find(
-            el => el.breakfast.active || el.lunch.active || el.dinner.active || el.chefsChoiceBreakfast.active || el.chefsChoiceLunch.active || el.chefsChoiceDinner.active
+            el => el.breakfast.active || el.lunch.active || el.dinner.active || el.chefsChoiceBreakfast.active || el.chefsChoiceLunch.active || el.chefsChoiceDinner.active,
           ) === undefined
         ) {
           this.props.popTheSnackbar({
@@ -655,13 +646,13 @@ class CurrentCustomerEditor extends React.Component {
     }
 
     const scheduleSummation = [
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
     ];
 
     this.state.scheduleReal.forEach((e, i) => {
@@ -714,7 +705,7 @@ class CurrentCustomerEditor extends React.Component {
         if (el.chefsChoiceLunch.active) {
           scheduleSummation[index].chefsChoiceLunch += parseInt(el.chefsChoiceLunch.quantity, 10);
         }
-        
+
         if (el.chefsChoiceDinner.active) {
           scheduleSummation[index].chefsChoiceDinner += parseInt(el.chefsChoiceDinner.quantity, 10);
         }
@@ -728,9 +719,9 @@ class CurrentCustomerEditor extends React.Component {
     for (let index = 0; index < this.state.deliveryType.length; index++) {
       const element = this.state.deliveryType[index];
 
-      if (((element == "" || element == "false") && check[index] > 0 && index != 6)) {
+      if (((element == '' || element == 'false') && check[index] > 0 && index != 6)) {
         this.props.popTheSnackbar({
-          message: "Please select all the delivery options in the schedule."
+          message: 'Please select all the delivery options in the schedule.',
         });
 
         return;
@@ -792,17 +783,15 @@ class CurrentCustomerEditor extends React.Component {
       notifications: {
         delivery: {
           sms: this.state.deliveryNotifcations.sms,
-          email: this.state.deliveryNotifcations.email
-        }
-      }
+          email: this.state.deliveryNotifcations.email,
+        },
+      },
     };
 
     console.log(step2Data);
 
     if (!this.state.secondTime) {
-
       Meteor.call('edit.customer.generateBillData', step2Data, (err, res) => {
-
         if (err) {
           this.setState({
             submitSuccess: false,
@@ -811,7 +800,7 @@ class CurrentCustomerEditor extends React.Component {
             this.props.popTheSnackbar({
               message: err.reason,
             });
-          })
+          });
         } else {
           this.setState({
             submitSuccess: true,
@@ -822,10 +811,9 @@ class CurrentCustomerEditor extends React.Component {
             this.setState({
               orderSummaryDialogOpen: true,
               secondTime: true,
-            })
+            });
           });
         }
-
       });
 
       return;
@@ -850,8 +838,7 @@ class CurrentCustomerEditor extends React.Component {
           submitLoading: false,
           secondTime: false,
         }, () => {
-
-          if (typeof res == "object" && res.hasOwnProperty('subUpdateScheduled')) {
+          if (typeof res === 'object' && res.hasOwnProperty('subUpdateScheduled')) {
             this.props.popTheSnackbar({
               message: 'Customer details update scheduled for friday night.',
             });
@@ -862,9 +849,8 @@ class CurrentCustomerEditor extends React.Component {
           }
 
           this.setState({
-            orderSummaryDialogOpen: false
-          })
-
+            orderSummaryDialogOpen: false,
+          });
         });
       }
     });
@@ -972,13 +958,13 @@ class CurrentCustomerEditor extends React.Component {
     scheduleRealCopy[index][mealType].quantity = event.target.value;
 
     const scheduleSummation = [
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
     ];
 
     this.state.scheduleReal.forEach((e, i) => {
@@ -1023,7 +1009,7 @@ class CurrentCustomerEditor extends React.Component {
         if (el.dinner.active) {
           scheduleSummation[index].dinner += parseInt(el.dinner.quantity, 10);
         }
-        
+
         if (el.chefsChoiceBreakfast.active) {
           scheduleSummation[index].chefsChoiceBreakfast += parseInt(el.chefsChoiceBreakfast.quantity, 10);
         }
@@ -1040,7 +1026,7 @@ class CurrentCustomerEditor extends React.Component {
 
     this.setState({
       scheduleReal: scheduleRealCopy,
-      completeSchedule: scheduleSummation
+      completeSchedule: scheduleSummation,
     });
   }
 
@@ -1066,13 +1052,13 @@ class CurrentCustomerEditor extends React.Component {
       scheduleReal: scheduleRealCopy,
     }, () => {
       const scheduleSummation = [
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
       ];
 
       this.state.scheduleReal.forEach((e, i) => {
@@ -1294,15 +1280,42 @@ class CurrentCustomerEditor extends React.Component {
     });
   }
 
+  handleSubIngredientChipDeleteSecondary(subIngredient, profileIndex) {
+    console.log(subIngredient);
+
+    const secondaries = this.state.secondaryProfilesData.slice();
+
+    secondaries[profileIndex].subIngredients.splice(secondaries[profileIndex].subIngredients.indexOf(subIngredient), 1);
+
+    this.setState({
+      secondaryProfilesData: secondaries,
+    });
+  }
+
+
   handleSubIngredientChipDeleteSpecificRestriction(subIngredient) {
     console.log(subIngredient);
 
     const stateCopy = this.state.specificRestrictions.slice();
 
-    stateCopy.splice(stateCopy.indexOf(subIngredient), 1);
+    const asd = stateCopy.splice(stateCopy.indexOf(subIngredient), 1);
 
     this.setState({
       specificRestrictions: stateCopy,
+    });
+  }
+
+
+  handleSubIngredientChipDeleteSpecificRestrictionSecondary(subIngredient, profileIndex) {
+    console.log(subIngredient);
+
+    const secondaries = this.state.secondaryProfilesData.slice();
+
+    secondaries[profileIndex].specificRestrictions.splice(secondaries[profileIndex].specificRestrictions.indexOf(subIngredient), 1);
+
+
+    this.setState({
+      secondaryProfilesData: secondaries,
     });
   }
 
@@ -1968,13 +1981,13 @@ class CurrentCustomerEditor extends React.Component {
     console.log(toBeRemoved);
 
     const scheduleSummation = [
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
     ];
 
     this.state.scheduleReal.forEach((e, i) => {
@@ -2041,8 +2054,6 @@ class CurrentCustomerEditor extends React.Component {
       secondaryProfilesRemoved: secondaryProfilesRemovedCopy,
       deliveryType: ['', '', '', '', '', '', ''],
     });
-
-
   }
 
   handleProfileOpen(primary, index) {
@@ -2075,15 +2086,14 @@ class CurrentCustomerEditor extends React.Component {
     this.setState({
       secondaryProfilesData: secondaryProfilesDataCopy,
     }, () => {
-
       const scheduleSummation = [
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
       ];
 
       this.state.scheduleReal.forEach((e, i) => {
@@ -2144,9 +2154,8 @@ class CurrentCustomerEditor extends React.Component {
       });
 
       this.setState({
-        completeSchedule: scheduleSummation
-      })
-
+        completeSchedule: scheduleSummation,
+      });
     });
   }
   handleChangeRadioSchedulePortionSecondary(
@@ -2166,7 +2175,6 @@ class CurrentCustomerEditor extends React.Component {
     this.setState({
       secondaryProfilesData: secondaryProfilesDataCopy,
     });
-
   }
   handleScheduleMealTypeCheckSecondary(profileIndex, index, mealType, event) {
     const secondaryProfilesDataCopy = this.state.secondaryProfilesData.slice();
@@ -2181,13 +2189,13 @@ class CurrentCustomerEditor extends React.Component {
       secondaryProfilesData: secondaryProfilesDataCopy,
     }, () => {
       const scheduleSummation = [
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
       ];
 
       this.state.scheduleReal.forEach((e, i) => {
@@ -3122,13 +3130,12 @@ class CurrentCustomerEditor extends React.Component {
 
   // STEP 3: Delivery
   handleDeliveryNotification(type, event) {
-
     const notificationClone = this.state.deliveryNotifcations;
 
     notificationClone[type] = event.target.checked;
 
     this.setState({
-      deliveryNotifcations: notificationClone
+      deliveryNotifcations: notificationClone,
     });
   }
 
@@ -3142,7 +3149,7 @@ class CurrentCustomerEditor extends React.Component {
     this.setState({
       orderSummaryDialogOpen: false,
       secondTime: false,
-    })
+    });
   }
 
   changeDormName(event, value) {
@@ -3294,9 +3301,9 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -3305,8 +3312,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3328,9 +3335,9 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
             />
 
             <FormControlLabel
@@ -3339,8 +3346,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3364,9 +3371,9 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -3375,8 +3382,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3406,9 +3413,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3417,8 +3424,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3438,9 +3445,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -3450,9 +3457,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3461,8 +3468,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3482,9 +3489,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3493,8 +3500,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3504,9 +3511,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3515,8 +3522,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3539,9 +3546,9 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
             />
 
             <FormControlLabel
@@ -3550,8 +3557,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3581,9 +3588,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -3592,8 +3599,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3613,9 +3620,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -3625,9 +3632,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -3636,8 +3643,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3657,9 +3664,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -3669,9 +3676,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -3680,8 +3687,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -3691,8 +3698,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3717,9 +3724,9 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -3728,8 +3735,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -3759,9 +3766,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3770,8 +3777,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3800,9 +3807,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3811,8 +3818,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3832,9 +3839,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3861,9 +3868,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3872,8 +3879,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -3883,8 +3890,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3913,9 +3920,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3924,8 +3931,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3954,9 +3961,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -3965,8 +3972,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -3995,9 +4002,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4006,8 +4013,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4036,9 +4043,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4047,8 +4054,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4077,9 +4084,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4088,8 +4095,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4118,9 +4125,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4129,8 +4136,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4159,9 +4166,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4170,8 +4177,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4200,9 +4207,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4211,8 +4218,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4241,9 +4248,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4252,8 +4259,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4276,9 +4283,9 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
             />
 
             <FormControlLabel
@@ -4287,8 +4294,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -4318,9 +4325,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4329,8 +4336,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4359,9 +4366,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4370,8 +4377,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4391,9 +4398,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4411,9 +4418,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4423,9 +4430,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4434,8 +4441,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -4445,8 +4452,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4475,9 +4482,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4486,8 +4493,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4516,9 +4523,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4527,8 +4534,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4557,9 +4564,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4568,8 +4575,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4598,9 +4605,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4609,8 +4616,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - Free`}
+                  .add(step, 'd')
+                  .format('DD')} - Free`}
               />
             </RadioGroup>
           );
@@ -4639,9 +4646,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4650,8 +4657,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4680,9 +4687,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4691,8 +4698,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4721,9 +4728,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4732,8 +4739,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4762,9 +4769,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4773,8 +4780,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4803,9 +4810,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4814,8 +4821,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4856,9 +4863,9 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -4867,8 +4874,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -4889,9 +4896,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4901,9 +4908,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4912,8 +4919,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4933,9 +4940,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4945,9 +4952,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -4956,8 +4963,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -4977,9 +4984,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -4989,9 +4996,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5000,8 +5007,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5021,9 +5028,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} evening - Free`}
               />
 
               <FormControlLabel
@@ -5033,9 +5040,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5044,8 +5051,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5065,9 +5072,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
               />
 
               <FormControlLabel
@@ -5077,9 +5084,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5088,8 +5095,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5109,9 +5116,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5121,9 +5128,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5132,8 +5139,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5154,9 +5161,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5165,8 +5172,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5187,9 +5194,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5198,8 +5205,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5219,9 +5226,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5231,9 +5238,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5242,8 +5249,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5263,9 +5270,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
               />
 
               <FormControlLabel
@@ -5275,9 +5282,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5286,8 +5293,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5307,9 +5314,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5327,9 +5334,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5339,9 +5346,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5350,8 +5357,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -5361,8 +5368,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5382,9 +5389,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -5393,8 +5400,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5419,9 +5426,9 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
             />
 
             <FormControlLabel
@@ -5430,8 +5437,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -5451,9 +5458,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5463,9 +5470,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5474,8 +5481,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5495,9 +5502,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5507,9 +5514,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5518,8 +5525,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5539,9 +5546,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5551,9 +5558,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5562,8 +5569,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5583,9 +5590,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} evening - Free`}
               />
 
               <FormControlLabel
@@ -5595,9 +5602,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5606,8 +5613,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5627,9 +5634,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
               />
 
               <FormControlLabel
@@ -5639,9 +5646,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5650,8 +5657,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5671,9 +5678,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5683,9 +5690,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5694,8 +5701,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5716,9 +5723,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5727,8 +5734,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5749,9 +5756,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5760,8 +5767,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5781,9 +5788,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5793,9 +5800,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5804,8 +5811,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5825,9 +5832,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
               />
 
               <FormControlLabel
@@ -5837,9 +5844,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5848,8 +5855,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5870,9 +5877,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5881,8 +5888,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5902,9 +5909,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5922,9 +5929,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5934,9 +5941,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5945,8 +5952,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -5956,8 +5963,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -5977,9 +5984,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -5989,9 +5996,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6000,8 +6007,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6042,9 +6049,9 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - $${DELIVERYCOST}`}
             />
 
             <FormControlLabel
@@ -6053,8 +6060,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -6075,9 +6082,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} evening - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6086,9 +6093,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6097,8 +6104,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6118,9 +6125,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6129,9 +6136,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6140,8 +6147,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6161,9 +6168,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6172,9 +6179,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6183,8 +6190,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6204,9 +6211,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6215,9 +6222,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6226,8 +6233,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6247,9 +6254,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6258,9 +6265,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6269,8 +6276,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6290,9 +6297,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6301,9 +6308,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6312,8 +6319,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6333,9 +6340,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6353,9 +6360,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6365,9 +6372,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6376,8 +6383,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -6387,8 +6394,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6408,9 +6415,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6419,9 +6426,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6430,8 +6437,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6451,9 +6458,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6462,9 +6469,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -6473,8 +6480,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6499,9 +6506,9 @@ class CurrentCustomerEditor extends React.Component {
                 .add(step, 'd')
                 .subtract(1, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .subtract(1, 'd')
-                  .format('D')} - Free`}
+                .add(step, 'd')
+                .subtract(1, 'd')
+                .format('D')} - Free`}
             />
 
             <FormControlLabel
@@ -6510,8 +6517,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                 .add(step, 'd')
                 .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+                .add(step, 'd')
+                .format('DD')} - $${DELIVERYCOST}`}
             />
           </RadioGroup>
         );
@@ -6532,9 +6539,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} evening - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6543,9 +6550,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6554,8 +6561,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6575,9 +6582,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6586,9 +6593,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6597,8 +6604,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6618,9 +6625,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6629,9 +6636,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6640,8 +6647,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6661,9 +6668,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6672,9 +6679,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6683,8 +6690,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6704,9 +6711,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6715,9 +6722,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6726,8 +6733,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6747,9 +6754,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6758,9 +6765,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6769,8 +6776,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6790,9 +6797,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6810,9 +6817,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('MMM')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6822,9 +6829,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6833,8 +6840,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd').subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd').subtract(1, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -6844,8 +6851,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6865,9 +6872,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(2, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(2, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(2, 'd')
+                  .format('D')} - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6876,9 +6883,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6887,8 +6894,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6908,9 +6915,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(3, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(3, 'd')
-                    .format('D')} evening - Free`}
+                  .add(step, 'd')
+                  .subtract(3, 'd')
+                  .format('D')} evening - Free`}
               />
               <FormControlLabel
                 value="nightBefore"
@@ -6919,9 +6926,9 @@ class CurrentCustomerEditor extends React.Component {
                   .add(step, 'd')
                   .subtract(1, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .subtract(1, 'd')
-                    .format('D')} - Free`}
+                  .add(step, 'd')
+                  .subtract(1, 'd')
+                  .format('D')} - Free`}
               />
 
               <FormControlLabel
@@ -6930,8 +6937,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw))
                   .add(step, 'd')
                   .format('dddd')} ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+                  .add(step, 'd')
+                  .format('DD')} - $${DELIVERYCOST}`}
               />
             </RadioGroup>
           );
@@ -6960,8 +6967,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
               
               ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd').subtract(2, 'd')
-                  .format('DD')} evening - Free`}
+            .add(step, 'd').subtract(2, 'd')
+            .format('DD')} evening - Free`}
             />
 
 
@@ -6971,8 +6978,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
               
               ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd').subtract(1, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+            .add(step, 'd').subtract(1, 'd')
+            .format('DD')} - $${DELIVERYCOST}`}
             />
 
 
@@ -6995,8 +7002,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
               
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - Free`}
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - Free`}
               />
 
               <FormControlLabel
@@ -7005,8 +7012,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -7028,8 +7035,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -7038,8 +7045,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7060,8 +7067,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`3-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7083,8 +7090,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} day of - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} day of - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -7093,8 +7100,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7118,8 +7125,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                   
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd').subtract(2, 'd')
-                  .format('DD')} evening - $${DELIVERYCOST}`}
+            .add(step, 'd').subtract(2, 'd')
+            .format('DD')} evening - $${DELIVERYCOST}`}
             />
 
 
@@ -7129,8 +7136,8 @@ class CurrentCustomerEditor extends React.Component {
               label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
-                  .add(step, 'd').subtract(1, 'd')
-                  .format('DD')} - $${DELIVERYCOST}`}
+            .add(step, 'd').subtract(1, 'd')
+            .format('DD')} - $${DELIVERYCOST}`}
             />
 
 
@@ -7153,8 +7160,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - Free`}
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - Free`}
               />
 
               <FormControlLabel
@@ -7163,8 +7170,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7185,8 +7192,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -7195,8 +7202,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`Day of  ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $${DELIVERYCOST}`}
               />
 
 
@@ -7218,8 +7225,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`3-day pairing day of ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7241,8 +7248,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`2-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(1, 'd').format('dddd')} 
                 
                 ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(1, 'd')
-                    .format('DD')} day of - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(1, 'd')
+              .format('DD')} day of - $${DELIVERYCOST}`}
               />
 
               <FormControlLabel
@@ -7251,8 +7258,8 @@ class CurrentCustomerEditor extends React.Component {
                 label={`3-day pairing ${moment(new Date(this.state.subscriptionStartDateRaw)).add(step, 'd').subtract(2, 'd').format('dddd')} 
                 
                   ${moment(new Date(this.state.subscriptionStartDateRaw))
-                    .add(step, 'd').subtract(2, 'd')
-                    .format('DD')} evening - $${DELIVERYCOST}`}
+              .add(step, 'd').subtract(2, 'd')
+              .format('DD')} evening - $${DELIVERYCOST}`}
               />
 
             </RadioGroup>
@@ -7290,7 +7297,7 @@ class CurrentCustomerEditor extends React.Component {
     const steps = this.getSteps();
 
     if (loading) {
-      return <Loading />
+      return <Loading />;
     }
 
     return (
@@ -7360,10 +7367,10 @@ class CurrentCustomerEditor extends React.Component {
                   <Tab label="Subscription" />
                 </Tabs>
               ) : (
-                  <Tabs indicatorColor="#000" value={this.state.currentTab} onChange={this.handleTabChange}>
-                    <Tab label="Basic" />
-                  </Tabs>
-                )}
+                <Tabs indicatorColor="#000" value={this.state.currentTab} onChange={this.handleTabChange}>
+                  <Tab label="Basic" />
+                </Tabs>
+              )}
             </AppBar>
           </Grid>
 
@@ -7414,15 +7421,15 @@ class CurrentCustomerEditor extends React.Component {
                     />
 
                   ) : (
-                      <TextField
-                        margin="normal"
-                        id="email"
-                        label="Email"
-                        name="email"
-                        fullWidth
-                        defaultValue={customer.emails[0].address}
-                      />
-                    )}
+                    <TextField
+                      margin="normal"
+                      id="email"
+                      label="Email"
+                      name="email"
+                      fullWidth
+                      defaultValue={customer.emails[0].address}
+                    />
+                  )}
                   <Grid container>
                     <Grid item xs={12} sm={6}>
                       <TextField
@@ -7462,7 +7469,7 @@ class CurrentCustomerEditor extends React.Component {
                           native
                           onChange={this.handleChange}
                         >
-                        
+
                           {this.renderMonths()}
                         </Select> */}
 
@@ -7477,7 +7484,7 @@ class CurrentCustomerEditor extends React.Component {
                       >
                         {this.renderMonths()}
                       </TextField>
-                      {/* <TextField 
+                      {/* <TextField
                           id="birthMonth"
                           label="Month"
                           name="birthMonth"
@@ -7501,7 +7508,7 @@ class CurrentCustomerEditor extends React.Component {
                         {this.renderDays()}
                       </TextField>
 
-                      {/* <TextField 
+                      {/* <TextField
                            id="birthDay"
                            label="Day"
                            name="birthDay"
@@ -7524,7 +7531,7 @@ class CurrentCustomerEditor extends React.Component {
                           onClick={this.handleResetPassword}
                         >
                           Reset password
-                            {this.state.submitLoadingReset && (
+                          {this.state.submitLoadingReset && (
                             <CircularProgress
                               size={24}
                               className={this.props.classes.buttonProgress}
@@ -7555,10 +7562,15 @@ class CurrentCustomerEditor extends React.Component {
                 {/* <Button onClick={() => this.props.history.push(`/customers/add/type=abandoned&firstName=${customer.profile.name.first}&lastName=${customer.profile.name.last ? customer.profile.name.last : ' '}&email=${customer.emails[0].address}&postalCode=${customer.postalCode}`)} */}
 
                 {this.props.subscription == undefined && this.props.customer.secondary == undefined && (
-                  <Button onClick={() => this.props.history.push(`/customers/new/${customer._id}`)}
-                    raised color="primary" type="submit" style={{ marginLeft: "25px", marginTop: "25px" }}>
+                  <Button
+                    onClick={() => this.props.history.push(`/customers/new/${customer._id}`)}
+                    raised
+                    color="primary"
+                    type="submit"
+                    style={{ marginLeft: '25px', marginTop: '25px' }}
+                  >
                     Continue adding
-                    </Button>
+                  </Button>
                 )}
               </form>
             </div>
@@ -7700,8 +7712,8 @@ class CurrentCustomerEditor extends React.Component {
                         Back
                       </Button>
                     ) : (
-                        ''
-                      )}
+                      ''
+                    )}
 
                     {activeMealScheduleStep < 6 ? (
                       <Button
@@ -7711,10 +7723,10 @@ class CurrentCustomerEditor extends React.Component {
                         Next
                       </Button>
                     ) : (
-                        ''
-                      )}
+                      ''
+                    )}
                   </div>
-                  <Grid container>
+                  <Grid container style={{ marginBottom: '3em' }}>
                     <Grid item xs={12} style={{ marginTop: '25px' }}>
                       <Typography
                         type="body1"
@@ -7723,7 +7735,7 @@ class CurrentCustomerEditor extends React.Component {
                         Restrictions
                       </Typography>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={3}>
                       <FormControl component="fieldset">
                         <FormLabel component="legend">Allergies</FormLabel>
                         <FormGroup>
@@ -7757,7 +7769,7 @@ class CurrentCustomerEditor extends React.Component {
                         </FormGroup>
                       </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={3}>
                       <FormControl component="fieldset">
                         <FormLabel component="legend">Dietary</FormLabel>
                         <FormGroup>
@@ -7791,7 +7803,7 @@ class CurrentCustomerEditor extends React.Component {
                         </FormGroup>
                       </FormControl>
                     </Grid>
-                    <Grid item xs={4}>
+                    <Grid item xs={3}>
                       <FormControl component="fieldset">
                         <FormLabel component="legend">Religious</FormLabel>
                         <FormGroup>
@@ -7806,6 +7818,41 @@ class CurrentCustomerEditor extends React.Component {
                                 .lifestyleRestrictions
                                 ? this.state.lifestyleRestrictions.indexOf(e._id) !=
                                 -1
+                                : false;
+                              return (
+                                <FormControlLabel
+                                  key={i}
+                                  disabled={isAlreadyChecked}
+                                  control={
+                                    <Checkbox
+                                      checked={isSelected || isAlreadyChecked}
+                                      onChange={this.handleChange.bind(this, e._id)}
+                                      value={e.title.toLowerCase()}
+                                    />
+                                  }
+                                  label={e.title}
+                                />
+                              );
+                            })}
+                        </FormGroup>
+                      </FormControl>
+                    </Grid>
+
+                    <Grid item xs={3}>
+                      <FormControl component="fieldset">
+                        <FormLabel component="legend">Preference</FormLabel>
+                        <FormGroup>
+                          {this.props.restrictions
+                            .filter(e => e.restrictionType === 'preference')
+                            .map((e, i) => {
+                              const isSelected = this.state.restrictions.length
+                                ? this.state.restrictions.indexOf(e._id) != -1
+                                : false;
+
+                              const isAlreadyChecked = this.state
+                                .lifestyleRestrictions
+                                ? this.state.lifestyleRestrictions.indexOf(e._id) !=
+                                              -1
                                 : false;
                               return (
                                 <FormControlLabel
@@ -7928,7 +7975,7 @@ class CurrentCustomerEditor extends React.Component {
                         type="subheading"
                         className="text-uppercase font-medium"
                       >
-                        Preferences
+                        Dislikes
                       </Typography>
 
                       <div
@@ -7961,8 +8008,8 @@ class CurrentCustomerEditor extends React.Component {
                             />
                           ))
                         ) : (
-                            <Chip className="chip--bordered" label="Ingredient" />
-                          )}
+                          <Chip className="chip--bordered" label="Ingredient" />
+                        )}
                       </div>
                     </Grid>
 
@@ -8008,8 +8055,8 @@ class CurrentCustomerEditor extends React.Component {
                             ),
                           )
                         ) : (
-                            <Chip className="chip--bordered" label="Ingredient" />
-                          )}
+                          <Chip className="chip--bordered" label="Ingredient" />
+                        )}
                       </div>
                     </Grid>
                   </Grid>
@@ -8055,8 +8102,8 @@ class CurrentCustomerEditor extends React.Component {
                             this.state.secondaryProfilesData[profileIndex]
                               .first_name
                               ? `${
-                              this.state.secondaryProfilesData[profileIndex]
-                                .first_name
+                                this.state.secondaryProfilesData[profileIndex]
+                                  .first_name
                               }'s Profile`
                               : `Profile ${profileIndex + 2}`
                           }
@@ -8064,8 +8111,8 @@ class CurrentCustomerEditor extends React.Component {
                         {this.state.secondaryCollapses[profileIndex] ? (
                           <ExpandLess />
                         ) : (
-                            <ExpandMore />
-                          )}
+                          <ExpandMore />
+                        )}
                       </ListItem>
                       <Collapse
                         in={this.state.secondaryCollapses[profileIndex]}
@@ -8119,7 +8166,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="text-uppercase font-medium"
                                   >
                                     Plan
-                                    </Typography>
+                                  </Typography>
                                 </FormLabel>
                                 <RadioGroup
                                   aria-label="lifestyle"
@@ -8152,7 +8199,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="text-uppercase font-medium"
                                   >
                                     Discount
-                                    </Typography>
+                                  </Typography>
                                 </FormLabel>
                                 <RadioGroup
                                   aria-label="discount"
@@ -8232,7 +8279,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="text-uppercase font-medium"
                                   >
                                     Type
-                                    </Typography>
+                                  </Typography>
                                 </FormLabel>
                                 <RadioGroup
                                   aria-label="adultOrChild"
@@ -8307,7 +8354,7 @@ class CurrentCustomerEditor extends React.Component {
                                   style={{ marginTop: '20px' }}
                                 >
                                   Back
-                                  </Button>
+                                </Button>
                               ) : (
                                 ''
                               )}
@@ -8322,22 +8369,22 @@ class CurrentCustomerEditor extends React.Component {
                                   style={{ marginTop: '20px' }}
                                 >
                                   Next
-                                  </Button>
+                                </Button>
                               ) : (
                                 ''
                               )}
                           </div>
 
-                          <Grid container>
+                          <Grid container style={{ marginBottom: '3em' }}>
                             <Grid item xs={12} style={{ marginTop: '25px' }}>
                               <Typography
                                 type="body1"
                                 className="text-uppercase font-medium"
                               >
                                 Restrictions
-                                </Typography>
+                              </Typography>
                             </Grid>
-                            <Grid item xs={4}>
+                            <Grid item xs={3}>
                               <FormControl component="fieldset">
                                 <FormLabel component="legend">Allergies</FormLabel>
                                 <FormGroup>
@@ -8384,7 +8431,7 @@ class CurrentCustomerEditor extends React.Component {
                                 </FormGroup>
                               </FormControl>
                             </Grid>
-                            <Grid item xs={4}>
+                            <Grid item xs={3}>
                               <FormControl component="fieldset">
                                 <FormLabel component="legend">Dietary</FormLabel>
                                 <FormGroup>
@@ -8431,7 +8478,7 @@ class CurrentCustomerEditor extends React.Component {
                                 </FormGroup>
                               </FormControl>
                             </Grid>
-                            <Grid item xs={4}>
+                            <Grid item xs={3}>
                               <FormControl component="fieldset">
                                 <FormLabel component="legend">Religious</FormLabel>
                                 <FormGroup>
@@ -8477,6 +8524,53 @@ class CurrentCustomerEditor extends React.Component {
                                 </FormGroup>
                               </FormControl>
                             </Grid>
+
+                            <Grid item xs={3}>
+                              <FormControl component="fieldset">
+                                <FormLabel component="legend">Preference</FormLabel>
+                                <FormGroup>
+                                  {this.props.restrictions
+                                    .filter(e => e.restrictionType === 'preference')
+                                    .map((e, i) => {
+                                      const isSelected = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .restrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].restrictions.indexOf(e._id) != -1
+                                        : false;
+                                      const isAlreadyChecked = this.state
+                                        .secondaryProfilesData[profileIndex]
+                                        .lifestyleRestrictions
+                                        ? this.state.secondaryProfilesData[
+                                          profileIndex
+                                        ].lifestyleRestrictions.indexOf(e._id) !=
+                                                      -1
+                                        : false;
+                                      return (
+                                        <FormControlLabel
+                                          key={i}
+                                          disabled={isAlreadyChecked}
+                                          control={
+                                            <Checkbox
+                                              checked={
+                                                isSelected || isAlreadyChecked
+                                              }
+                                              onChange={this.handleChangeSecondary.bind(
+                                                this,
+                                                profileIndex,
+                                                e._id,
+                                              )}
+                                              value={e.title.toLowerCase()}
+                                            />
+                                          }
+                                          label={e.title}
+                                        />
+                                      );
+                                    })}
+                                </FormGroup>
+                              </FormControl>
+                            </Grid>
                           </Grid>
 
                           <Dialog
@@ -8496,12 +8590,12 @@ class CurrentCustomerEditor extends React.Component {
                               type="title"
                             >
                               Add a restriction
-                              </Typography>
+                            </Typography>
 
                             <DialogContent>
                               <DialogContentText>
                                 Select if it's a preference or if it's a restriction
-                                </DialogContentText>
+                              </DialogContentText>
                               <FormControl component="fieldset">
                                 <RadioGroup
                                   aria-label="restritionOrPref"
@@ -8588,10 +8682,9 @@ class CurrentCustomerEditor extends React.Component {
                               <Typography
                                 type="body1"
                                 className="text-uppercase font-medium"
-                                style={{ marginTop: '25px' }}
                               >
-                                Preferences
-                                </Typography>
+                                Dislikes
+                              </Typography>
 
                               <div
                                 style={{
@@ -8620,18 +8713,19 @@ class CurrentCustomerEditor extends React.Component {
                                         subIngredient,
                                       )}
                                       key={i}
-                                      onDelete={this.handleSubIngredientChipDelete.bind(
+                                      onDelete={this.handleSubIngredientChipDeleteSecondary.bind(
                                         this,
                                         subIngredient,
+                                        profileIndex,
                                       )}
                                     />
                                   ))
                                 ) : (
-                                    <Chip
-                                      className="chip--bordered"
-                                      label="Ingredient"
-                                    />
-                                  )}
+                                  <Chip
+                                    className="chip--bordered"
+                                    label="Ingredient"
+                                  />
+                                )}
                               </div>
                             </Grid>
 
@@ -8641,7 +8735,7 @@ class CurrentCustomerEditor extends React.Component {
                                 className="text-uppercase font-medium"
                               >
                                 Restrictions
-                                </Typography>
+                              </Typography>
 
                               <div
                                 style={{
@@ -8673,9 +8767,10 @@ class CurrentCustomerEditor extends React.Component {
                                           subIngredient,
                                         )}
                                         key={i}
-                                        onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                                        onDelete={this.handleSubIngredientChipDeleteSpecificRestrictionSecondary.bind(
                                           this,
                                           subIngredient,
+                                          profileIndex,
                                         )}
                                       />
                                     ))
@@ -8696,7 +8791,7 @@ class CurrentCustomerEditor extends React.Component {
                                 onClick={this.deleteDialogHandleOpenSecondary.bind(this, profileIndex)}
                               >
                                 Add a restriction
-                                </Button>
+                              </Button>
                             </Grid>
                           </Grid>
 
@@ -8720,7 +8815,7 @@ class CurrentCustomerEditor extends React.Component {
                             style={{ float: 'right', marginTop: '25px' }}
                           >
                             Remove profile
-                            </Button>
+                          </Button>
                         </div>
                       </Collapse>
                     </div>
@@ -8786,7 +8881,7 @@ class CurrentCustomerEditor extends React.Component {
                         <Grid item xs={12}>
                           <Typography type="subheading" className="font-uppercase">
                             Apartment
-                            </Typography>
+                          </Typography>
 
                         </Grid>
                         <Grid item xs={12}>
@@ -8831,8 +8926,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                   {this.state.addressType == 'business' ? (
                     <div>
@@ -8840,7 +8935,7 @@ class CurrentCustomerEditor extends React.Component {
                         <Grid item xs={12}>
                           <Typography type="subheading" className="font-uppercase">
                             Business
-                            </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
@@ -8885,8 +8980,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                   {this.state.addressType == 'dormitory' ? (
                     <div>
@@ -8894,7 +8989,7 @@ class CurrentCustomerEditor extends React.Component {
                         <Grid item xs={12}>
                           <Typography type="subheading" className="font-uppercase">
                             Dormitory
-                            </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
@@ -8914,14 +9009,14 @@ class CurrentCustomerEditor extends React.Component {
                           >
                             <MenuItem key={1} value="Algonquin College">
                               Algonquin College
-                              </MenuItem>
+                            </MenuItem>
 
                             <MenuItem key={3} value="Carleton University">
                               Carleton University
-                              </MenuItem>
+                            </MenuItem>
                             <MenuItem key={4} value="University of Ottawa">
                               University of Ottawa
-                              </MenuItem>
+                            </MenuItem>
                           </TextField>
                         </Grid>
 
@@ -8945,7 +9040,7 @@ class CurrentCustomerEditor extends React.Component {
 
                                 <MenuItem key={1} value="Student Residence">
                                   Student Residence
-                                  </MenuItem>
+                                </MenuItem>
 
                               </TextField>
                             ) : (
@@ -8969,28 +9064,28 @@ class CurrentCustomerEditor extends React.Component {
                               >
                                 <MenuItem key={1} value="Dundas House">
                                   Dundas House
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={2} value="Glengarry House">
                                   Glengarry House
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={3} value="Grenville House">
                                   Grenville House
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={4} value="Lanark House">
                                   Lanark House
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={5} value="Lennox & Addington House">
                                   Lennox & Addington House
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={6} value="Renfrew House">
                                   Renfrew House
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={7} value="Russell House">
                                   Russell House
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={8} value="Stormont House">
                                   Stormont House
-                                  </MenuItem>
+                                </MenuItem>
                               </TextField>
                             ) : (
                               ''
@@ -9014,19 +9109,19 @@ class CurrentCustomerEditor extends React.Component {
                               >
                                 <MenuItem key={1} value="90 U Residence">
                                   90 U Residence
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={2} value="Hyman Soloway Residence">
                                   Hyman Soloway Residence
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={3} value="Marchand Residence">
                                   Marchand Residence
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={4} value="Stanton Residence">
                                   Stanton Residence
-                                  </MenuItem>
+                                </MenuItem>
                                 <MenuItem key={5} value="Thompson Residence">
                                   Thompson Residence
-                                  </MenuItem>
+                                </MenuItem>
                               </TextField>
                             ) : (
                               ''
@@ -9064,15 +9159,15 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                   {this.state.addressType && this.state.addressType === 'hotel' ? (
                     <Grid container>
                       <Grid item xs={12}>
                         <Typography type="subheading" className="font-uppercase">
                           Hotel
-                          </Typography>
+                        </Typography>
                       </Grid>
                       <Grid item xs={12} sm={6}>
                         <TextField
@@ -9114,8 +9209,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </Grid>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                   {this.state.addressType && this.state.addressType === 'house' ? (
                     <div>
@@ -9123,7 +9218,7 @@ class CurrentCustomerEditor extends React.Component {
                         <Grid item xs={12}>
                           <Typography type="subheading" className="font-uppercase">
                             House
-                            </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={12}>
                           <TextField
@@ -9141,8 +9236,8 @@ class CurrentCustomerEditor extends React.Component {
                       </Grid>
                     </div>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                   {this.state.addressType ? (
                     <div>
@@ -9205,7 +9300,7 @@ class CurrentCustomerEditor extends React.Component {
                           className="text-uppercase font-medium"
                         >
                           Delivery Notifications
-                          </Typography>
+                        </Typography>
                       </Grid>
 
                       <Grid container>
@@ -9236,7 +9331,7 @@ class CurrentCustomerEditor extends React.Component {
                             className="text-uppercase font-medium"
                           >
                             Complete Schedule
-                            </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={12}>
                           <Table className="table-lifestyles">
@@ -9250,7 +9345,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="font-medium font-uppercase"
                                   >
                                     Breakfast
-                                    </Typography>
+                                  </Typography>
                                 </TableCell>
                                 <TableCell style={{ textAlign: 'center' }}>
                                   <Typography
@@ -9258,7 +9353,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="font-medium font-uppercase"
                                   >
                                     Lunch
-                                    </Typography>
+                                  </Typography>
                                 </TableCell>
                                 <TableCell style={{ textAlign: 'center' }}>
                                   <Typography
@@ -9266,7 +9361,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="font-medium font-uppercase"
                                   >
                                     Dinner
-                                    </Typography>
+                                  </Typography>
                                 </TableCell>
                               </TableRow>
                             </TableHead>
@@ -9350,7 +9445,7 @@ class CurrentCustomerEditor extends React.Component {
                             </TableBody>
                           </Table>
 
-                          <Typography type="body1" style={{marginTop: "2em"}}>Complete Schedule Chef's choice</Typography>
+                          <Typography type="body1" style={{ marginTop: '2em' }}>Complete Schedule Chef's choice</Typography>
 
                           <Table className="table-lifestyles">
                             <TableHead>
@@ -9363,7 +9458,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="font-medium font-uppercase"
                                   >
                                     Breakfast
-                                    </Typography>
+                                  </Typography>
                                 </TableCell>
                                 <TableCell style={{ textAlign: 'center' }}>
                                   <Typography
@@ -9371,7 +9466,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="font-medium font-uppercase"
                                   >
                                     Lunch
-                                    </Typography>
+                                  </Typography>
                                 </TableCell>
                                 <TableCell style={{ textAlign: 'center' }}>
                                   <Typography
@@ -9379,7 +9474,7 @@ class CurrentCustomerEditor extends React.Component {
                                     className="font-medium font-uppercase"
                                   >
                                     Dinner
-                                    </Typography>
+                                  </Typography>
                                 </TableCell>
                               </TableRow>
                             </TableHead>
@@ -9472,7 +9567,7 @@ class CurrentCustomerEditor extends React.Component {
                             className="text-uppercase font-medium"
                           >
                             Delivery type
-                            </Typography>
+                          </Typography>
                         </Grid>
                         <Grid item xs={12}>
 
@@ -9506,26 +9601,26 @@ class CurrentCustomerEditor extends React.Component {
                               onClick={this.handleBackDeliverySchedule.bind(this)}
                             >
                               Back
-                              </Button>
+                            </Button>
                           ) : (
-                              ''
-                            )}
+                            ''
+                          )}
 
                           {activeDeliveryScheduleStep < 5 ? (
                             <Button
                               onClick={this.handleNextDeliverySchedule.bind(this)}
                             >
                               Next
-                              </Button>
+                            </Button>
                           ) : (
-                              ''
-                            )}
+                            ''
+                          )}
                         </Grid>
                       </Grid>
                     </div>
                   ) : (
-                      ''
-                    )}
+                    ''
+                  )}
 
                 </Paper>
                 <Button
@@ -9582,73 +9677,72 @@ class CurrentCustomerEditor extends React.Component {
           {this.state.currentTab == 2 && (
 
             <Paper elevation={2} style={{ width: '100%' }} className="paper-for-fields">
-              <Typography type="headline" style={{ marginBottom: "1em" }}>Activity</Typography>
+              <Typography type="headline" style={{ marginBottom: '1em' }}>Activity</Typography>
 
 
-              {this.props.jobs && this.props.jobs.sort((a, b) => b.created - a.created).map((e, i) => {
-
-                return (
-                  <Grid container justify="space-between">
-                    <Grid item xs={12}
-                    justify="space-between" 
-                    style={{display: 'flex',cursor: 'pointer'}} 
-                    onClick={() => this.setState({ [e._id]: !this.state[e._id], })} >
-                      <Typography type="body1">
-                        {e.type == "editSubscriptionJob" ? 'Edit subscription' : e.type
-                          === "editSubscriptionJobNonCard" ? 'Edit subscription (non card)' : e.type
-                          === "setSubscriptionCancelledJob" ? 'Cancel subscription (non card)' : e.type
-                          === "setSubscriptionCancelledCardJob" ? 'Cancel subscription' : e.type
-                          === "setSubscriptionActiveJob" ? 'Activate subscription (non card)' :  e.type
-                          === "setSubscriptionActiveCardJob" ? 'Activate subscription' : e.type
-                          === "setSubscriptionActive" ? 'Activate subscription' : ''}
-                        {" "}({e.status}) {`runs ${moment(e.after).format('dddd, MMMM D YYYY h:m A')}`}
-                        {e.data.hasOwnProperty('jobCreatedBy') && (
-                          <React.Fragment>
-                            {e.data.jobCreatedBy == "customer" ? (
-                            ` by customer`
-                            ) : ''}
-                          </React.Fragment>
-                        )}
-                      </Typography>
-
-                      <Typography>{`Added ${moment(e.created).format('dddd, MMMM D YYYY h:m A')}`}</Typography>
-                    </Grid>
-                    <Collapse
-                      in={Boolean(this.state[e._id])}
-                      transitionDuration="auto"
-                      component="div"
-                    >
-                      {e.type =="editSubscriptionJob" || e.type == "editSubscriptionJobNonCard" ? (
+              {this.props.jobs && this.props.jobs.sort((a, b) => b.created - a.created).map((e, i) => (
+                <Grid container justify="space-between">
+                  <Grid
+                    item
+                    xs={12}
+                    justify="space-between"
+                    style={{ display: 'flex', cursor: 'pointer' }}
+                    onClick={() => this.setState({ [e._id]: !this.state[e._id] })}
+                  >
+                    <Typography type="body1">
+                      {e.type == 'editSubscriptionJob' ? 'Edit subscription' : e.type
+                          === 'editSubscriptionJobNonCard' ? 'Edit subscription (non card)' : e.type
+                          === 'setSubscriptionCancelledJob' ? 'Cancel subscription (non card)' : e.type
+                          === 'setSubscriptionCancelledCardJob' ? 'Cancel subscription' : e.type
+                          === 'setSubscriptionActiveJob' ? 'Activate subscription (non card)' : e.type
+                          === 'setSubscriptionActiveCardJob' ? 'Activate subscription' : e.type
+                          === 'setSubscriptionActive' ? 'Activate subscription' : ''}
+                      {' '}({e.status}) {`runs ${moment(e.after).format('dddd, MMMM D YYYY h:m A')}`}
+                      {e.data.hasOwnProperty('jobCreatedBy') && (
                         <React.Fragment>
-                          {e.data.completeSchedule.map((compScheuleDay, compScheduleIndex) => (
-                            <div>
-                              <Typography type="body2">
-                                {`${moment().isoWeekday(compScheduleIndex + 1).format("dddd")} `}
-                                {`Breakfast: ${compScheuleDay.breakfast} `}
-                                {`Lunch: ${compScheuleDay.lunch} `}
-                                {`Dinner: ${compScheuleDay.dinner} `}
-                                {`Chef's choice: ${compScheuleDay.chefsChoice || 0} `}
-                              </Typography>
-                            </div>
-                          ))}
-
-                          {e.data.delivery.map((deliveryVal, deliveryIndex) => (
-                            <div>
-                              <Typography type="body2">
-                                {`${moment().isoWeekday(deliveryIndex + 1).format("dddd")}: ${deliveryVal == "false" || deliveryVal == "" ? "N/A" : deliveryVal}`}
-                              </Typography>
-                            </div>
-                          ))}
+                          {e.data.jobCreatedBy == 'customer' ? (
+                            ' by customer'
+                          ) : ''}
                         </React.Fragment>
-                      ) : (
-                        <div></div>
                       )}
-                     
-                    </Collapse>
-                  </Grid>
-                )
+                    </Typography>
 
-              })}
+                    <Typography>{`Added ${moment(e.created).format('dddd, MMMM D YYYY h:m A')}`}</Typography>
+                  </Grid>
+                  <Collapse
+                    in={Boolean(this.state[e._id])}
+                    transitionDuration="auto"
+                    component="div"
+                  >
+                    {e.type == 'editSubscriptionJob' || e.type == 'editSubscriptionJobNonCard' ? (
+                      <React.Fragment>
+                        {e.data.completeSchedule.map((compScheuleDay, compScheduleIndex) => (
+                          <div>
+                            <Typography type="body2">
+                              {`${moment().isoWeekday(compScheduleIndex + 1).format('dddd')} `}
+                              {`Breakfast: ${compScheuleDay.breakfast} `}
+                              {`Lunch: ${compScheuleDay.lunch} `}
+                              {`Dinner: ${compScheuleDay.dinner} `}
+                              {`Chef's choice: ${compScheuleDay.chefsChoice || 0} `}
+                            </Typography>
+                          </div>
+                        ))}
+
+                        {e.data.delivery.map((deliveryVal, deliveryIndex) => (
+                          <div>
+                            <Typography type="body2">
+                              {`${moment().isoWeekday(deliveryIndex + 1).format('dddd')}: ${deliveryVal == 'false' || deliveryVal == '' ? 'N/A' : deliveryVal}`}
+                            </Typography>
+                          </div>
+                        ))}
+                      </React.Fragment>
+                    ) : (
+                      <div />
+                    )}
+
+                  </Collapse>
+                </Grid>
+              ))}
 
             </Paper>
           )}
@@ -9678,7 +9772,6 @@ class CurrentCustomerEditor extends React.Component {
         </Grid>
       </div>
     );
-
   }
 }
 
