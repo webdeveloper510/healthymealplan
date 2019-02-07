@@ -22,6 +22,9 @@ import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
 import CloseIcon from 'material-ui-icons/Close';
 import CakeIcon from 'material-ui-icons/Cake';
+import Tooltip from 'material-ui/Tooltip';
+import { ThreeDayPairingIcon, TwoDayPairingIcon, BirthdayIcon } from '../../../modules/LabelIcons';
+
 
 import $ from 'jquery';
 
@@ -43,6 +46,8 @@ import jsPDF from 'jspdf';
 import autotable from 'jspdf-autotable';
 
 import vittlebase64 from '../../../modules/vittlelogobase64';
+import alerticon from '../../../modules/alerticonlabel';
+
 import hmpbase64 from '../../../modules/hmplogobase64';
 import cakeImage from '../../../modules/cakebase64';
 
@@ -85,7 +90,7 @@ function sortByLastName(a, b) {
 }
 
 function renderBirthdayCake(birthday, returnBool) {
-  if (returnBool == false && birthday == null) {
+  if (returnBool === false && birthday === null) {
     return '';
   } else if (returnBool == true && birthday == null) {
     return false;
@@ -94,23 +99,21 @@ function renderBirthdayCake(birthday, returnBool) {
   const day = parseInt(moment().format('D'), 10);
   const month = parseInt(moment().format('M'), 10);
 
-  if (day == parseInt(birthday.day, 10) && month == parseInt(birthday.month, 10)) {
-    if (returnBool == false) {
+  if (day === parseInt(birthday.day, 10) && month === parseInt(birthday.month, 10)) {
+    if (returnBool === false) {
       return <CakeIcon />;
     }
     return true;
   }
 }
 
-function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPortion, currentSelectorDate) {
+function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPortion, currentSelectorDate, isChefsChoice = false, labelGeneratedQty) {
   doc.addPage();
 
   // VITTLE LOGO
-  doc.addImage(vittlebase64, 'PNG', 1.552, 0.05, 0.8, 0.2);
 
-  if (renderBirthdayCake(userData.birthday, true)) {
-    doc.addImage(cakeImage, 'PNG', 0.48, 0.18, 0.2, 0.2);
-  }
+  doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
+
 
   // plating day + 1
   // doc.setFontStyle('normal');
@@ -118,68 +121,104 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
   // const day = moment(currentSelectorDate).add(1, 'd').format('M/D/YYYY');
   // doc.text(day, 3.2, 0.38);
 
-    doc.setFontStyle('normal');
-    doc.setFontSize(7.5);
-    const day = moment(currentSelectorDate).format('MMMM D');
-    doc.text(`Made for you on ${day}`, 0.15, 2.72);
+  doc.setFontStyle('normal');
+  doc.setFontSize(7.5);
+  const day = moment(currentSelectorDate).format('MMMM D');
+  doc.text(`Made for you on ${day}`, 0.15, 2.89);
 
   // total meals for this customer
   doc.setFontStyle('normal');
   doc.setFontSize(9);
-  const totalMeals = userData.breakfast +
-    userData.athleticBreakfast +
-    userData.bodybuilderBreakfast +
-    userData.lunch +
-    userData.athleticLunch +
-    userData.bodybuilderLunch +
-    userData.dinner +
-    userData.athleticDinner +
-    userData.bodybuilderDinner +
-    userData.chefsChoiceBreakfast +
-    userData.athleticChefsChoiceBreakfast +
-    userData.bodybuilderChefsChoiceBreakfast +
-    userData.chefsChoiceLunch +
-    userData.athleticChefsChoiceLunch +
-    userData.bodybuilderChefsChoiceLunch +
-    userData.chefsChoiceDinner +
-    userData.athleticChefsChoiceDinner +
-    userData.bodybuilderChefsChoiceDinner;
+  // const totalMeals = userData.breakfast +
+  //   userData.athleticBreakfast +
+  //   userData.bodybuilderBreakfast +
+  //   userData.lunch +
+  //   userData.athleticLunch +
+  //   userData.bodybuilderLunch +
+  //   userData.dinner +
+  //   userData.athleticDinner +
+  //   userData.bodybuilderDinner +
+  //   userData.chefsChoiceBreakfast +
+  //   userData.athleticChefsChoiceBreakfast +
+  //   userData.bodybuilderChefsChoiceBreakfast +
+  //   userData.chefsChoiceLunch +
+  //   userData.athleticChefsChoiceLunch +
+  //   userData.bodybuilderChefsChoiceLunch +
+  //   userData.chefsChoiceDinner +
+  //   userData.athleticChefsChoiceDinner +
+  //   userData.bodybuilderChefsChoiceDinner;
+  // console.log(currentPlate);
+    let totalQty = 0;
 
-  console.log(currentPlate);
+    switch (mealType) {
+        case 'Breakfast':
+            totalQty = userData.bodybuilderBreakfast + userData.athleticBreakfast + userData.breakfast;
+            break;
 
-  doc.text(`${totalMeals}`, 0.25, 0.38);
+        case 'Lunch':
+            totalQty = userData.bodybuilderLunch + userData.athleticLunch + userData.lunch;
+            break;
+
+        case 'Dinner':
+            totalQty = userData.bodybuilderDinner + userData.athleticDinner + userData.dinner;
+            break;
+
+        default:
+          totalQty = 1;
+          break;
+    }
+
+    doc.setFontSize(7.5);
+    doc.setFontStyle('bold');
+
+    const qtyText = `Qty: ${labelGeneratedQty} of ${totalQty}0`;
+
+    doc.setLineWidth(0.01);
+    doc.roundedRect(0.15625, 0.46875, doc.getTextWidth(qtyText) + 0.15, 0.21875, 0.025, 0.025);
+
+    doc.text(qtyText, 0.21, 0.615);
+
+  if (userData.pairing !== null) {
+    if (userData.pairing === 2) {
+      console.log('Has pairing 2');
+      doc.addImage(TwoDayPairingIcon, 'PNG', 0.875, 0.46875, 0.92708, 0.2187);
+    }
+
+    if (userData.pairing === 3) {
+      console.log('Has pairing 3');
+      doc.addImage(ThreeDayPairingIcon, 'PNG', 0.875, 0.46875, 0.92708, 0.21875);
+    }
+
+    if (renderBirthdayCake(userData.birthday, true)) {
+      doc.addImage(BirthdayIcon, 'PNG', 0.48, 0.18, 0.6979166667, 0.21875);
+    }
+  } else if (renderBirthdayCake(userData.birthday, true)) {
+    doc.addImage(BirthdayIcon, 'PNG', 0.48, 0.18, 0.6979166667, 0.21875);
+  }
+
 
   // name
   doc.setFontStyle('bold');
   doc.setFontSize(18);
-  doc.text(`Made for ${userData.name}`, 0.15, 0.79);
-
-  // // plan name
-  // doc.setFontStyle('normal');
-  // doc.setFontSize(10);
-  // doc.text(`${userData.lifestyleName} ${mealType}`, 0.25, 1);
+  doc.text(`Made for ${userData.name}`, 0.15, 0.975833333);
 
   // dish title
   doc.setFontStyle('bold');
   doc.setFontSize(10);
-  doc.text(doc.splitTextToSize(`${mealType}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.85), 0.15, 1.17);
-
-  // dish subtitle
-  // doc.setFontStyle('normal');
-  // doc.setFontSize(12);
-  // doc.text(doc.splitTextToSize(currentPlate.plate.subtitle || '', 3.25), 0.25, 1.4);
+  doc.text(doc.splitTextToSize(`${mealType}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.6875), 0.15, 1.257083333);
 
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
     doc.setFontSize(9);
-    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.85), 0.15, 1.48);
+    doc.setFontStyle('normal');
+    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.6875), 0.15, 1.569583333);
   }
 
   // instructions
   if (currentPlate.hasOwnProperty('instruction')) {
     doc.setFontStyle('bold');
     doc.setFontSize(7.5);
-    doc.text(doc.splitTextToSize(currentPlate.instruction.description, 3.25), 0.15, 2.61);
+    doc.text(doc.splitTextToSize(currentPlate.instruction.description, 3.25), 0.15, 2.77);
   }
 
   let restrictionsLine = '';
@@ -203,10 +242,13 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
   }
 
   if (restrictionsPresent) {
-    restrictionsLine = `Restrictions: ${allRestrictions.join(', ')}`;
-    doc.setFontStyle('bold');
+    doc.setLineWidth(0.01);
+    doc.roundedRect(0.15, 1.9504, 3.68, 0.625, 0.025, 0.025);
+    doc.addImage(alerticon, 'PNG', 0.31, 2.0595, 0.22, 0.19);
+    restrictionsLine = `${allRestrictions.join(', ')}`;
+    doc.setFontStyle('normal');
     doc.setFontSize(7);
-    doc.text(doc.splitTextToSize(restrictionsLine, 3.25), 0.25, 2.2);
+    doc.text(doc.splitTextToSize(restrictionsLine, 3.0416), 0.6979, 2.1295);
   }
 
   if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
@@ -223,32 +265,32 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
       currentMealPortionCalories = currentPlate.plate.nutritional[mealPortion].calories;
     }
 
-      doc.setFontStyle("bold")
-      doc.text(currentMealPortionCalories, 2.3,2.61);
+    doc.setFontStyle('bold');
+    doc.text(currentMealPortionCalories, 2.3, 2.77);
 
-      doc.setFontStyle("normal")
-      doc.text("Calories", 2.3, 2.72);
+    doc.setFontStyle('normal');
+    doc.text('Calories', 2.3, 2.89);
 
     // protein
     if (currentPlate.plate.nutritional[mealPortion].proteins > 0) {
       currentMealPortionProteins = currentPlate.plate.nutritional[mealPortion].proteins;
     }
 
-    doc.setFontStyle("bold")
-    doc.text(currentMealPortionProteins + "g", 2.83,2.61);
+    doc.setFontStyle('bold');
+    doc.text(`${currentMealPortionProteins}g`, 2.83, 2.77);
 
-     doc.setFontStyle("normal")
-    doc.text("Protein", 2.83, 2.72);
+    doc.setFontStyle('normal');
+    doc.text('Protein', 2.83, 2.89);
 
     // carbs
     if (currentPlate.plate.nutritional[mealPortion].carbs > 0) {
       currentMealPortionCarbs = currentPlate.plate.nutritional[mealPortion].carbs;
     }
-      doc.setFontStyle("bold")
-      doc.text(currentMealPortionCarbs + "g", 3.27,2.61);
+    doc.setFontStyle('bold');
+    doc.text(`${currentMealPortionCarbs}g`, 3.27, 2.77);
 
-      doc.setFontStyle("normal")
-      doc.text("Carbs", 3.27, 2.72);
+    doc.setFontStyle('normal');
+    doc.text('Carbs', 3.27, 2.89);
 
 
     // fats
@@ -256,12 +298,18 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
       currentMealPortionFat = currentPlate.plate.nutritional[mealPortion].fat;
     }
 
-      doc.setFontStyle("bold")
-      doc.text(currentMealPortionFat + "g", 3.65,2.61);
+    doc.setFontStyle('bold');
+    doc.text(`${currentMealPortionFat}g`, 3.65, 2.77);
 
-      doc.setFontStyle("normal")
-      doc.text("Fats", 3.65, 2.72);
+    doc.setFontStyle('normal');
+    doc.text('Fats', 3.65, 2.89);
   }
+
+  doc.setFontStyle('bold');
+  doc.text(mealPortion.charAt(0).toUpperCase() + mealPortion.substr(1), 1.62, 2.77);
+
+  doc.setFontStyle('normal');
+  doc.text('Portion', 1.62, 2.89);
 
   if (userData.platingNotes) {
     // doc.setFontStyle('normal');
@@ -272,7 +320,6 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
 
 
 function getMealTitle(mealTitle, firstInitialCapitalized = false) {
-
   let toReturn = '';
 
   if (mealTitle === 'Chefs Choice Breakfast') {
@@ -292,17 +339,64 @@ function getMealTitle(mealTitle, firstInitialCapitalized = false) {
   return toReturn;
 }
 
+function renderPlatingNoteOnLabel(doc, userData) {
+  doc.addPage();
+
+  // VITTLE LOGO
+  doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
+
+  // name
+  doc.setFontStyle('bold');
+  doc.setFontSize(18);
+  doc.text(doc.splitTextToSize(`Note for ${userData.name}`, 3.6875), 0.15, 0.76);
+
+  doc.setFontStyle('normal');
+  doc.setFontSize(9);
+  doc.text(doc.splitTextToSize(userData.platingNotes, 3.6875), 0.15, 1.25);
+
+
+  let restrictionsLine = '';
+  let restrictionsPresent = false;
+  const allRestrictions = [];
+
+  // restrictions
+  if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
+    restrictionsPresent = true;
+    allRestrictions.push(...userData.restrictions.map(rest => rest.title));
+  }
+
+  if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
+    restrictionsPresent = true;
+    allRestrictions.push(...userData.specificRestrictions.map(rest => rest.title));
+  }
+
+  if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
+    restrictionsPresent = true;
+    allRestrictions.push(...userData.preferences.map(rest => rest.title));
+  }
+
+  if (restrictionsPresent) {
+    doc.setLineWidth(0.01);
+    doc.roundedRect(0.15, 2.204, 3.68, 0.625, 0.025, 0.025);
+    doc.addImage(alerticon, 'PNG', 0.31, 2.3095, 0.22, 0.19);
+    restrictionsLine = `${allRestrictions.join(', ')}`;
+    doc.setFontStyle('normal');
+    doc.setFontSize(7);
+    doc.text(doc.splitTextToSize(restrictionsLine, 3.0416), 0.6979, 2.3795);
+  }
+}
+
 function renderSummaryLabel(doc, currentPlate, dataCurrentLifestyle, lifestyleTitle, mealTitle, currentSelectorDate, count) {
   doc.addPage();
 
   // VITTLE LOGO
-  doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+  doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
 
   // plating day + 1
-  doc.setFontStyle('normal');
-  doc.setFontSize(9);
-  const day = moment(currentSelectorDate).add(1, 'd').format('M/D/YYYY');
-  doc.text(day, 3.2, 0.55);
+  // doc.setFontStyle('normal');
+  // doc.setFontSize(9);
+  // const day = moment(currentSelectorDate).add(1, 'd').format('M/D/YYYY');
+  // doc.text(day, 3.2, 0.55);
 
 
   // total meals for this customer
@@ -313,55 +407,41 @@ function renderSummaryLabel(doc, currentPlate, dataCurrentLifestyle, lifestyleTi
     dataCurrentLifestyle[getMealTitle(mealTitle)].athletic +
     dataCurrentLifestyle[getMealTitle(mealTitle)].bodybuilder;
 
-  doc.text(`${totalMeals}`, 0.25, 0.55);
-
-  doc.setFontStyle('normal');
-  doc.setFontSize(14);
-  doc.text(`${lifestyleTitle} ${mealTitle}`, 0.25, 1);
+  // doc.text(`${totalMeals}`, 0.25, 0.55);
+  //
+  // doc.setFontStyle('normal');
+  // doc.setFontSize(14);
+  // doc.text(`${mealTitle}`, 0.25, 1);
 
   // dish title
   doc.setFontStyle('bold');
   doc.setFontSize(10);
-  doc.text(doc.splitTextToSize(`${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.85), 0.15, 1.17);
-
-  // dish subtitle
-  // doc.setFontStyle('normal');
-  // doc.setFontSize(10);
-  // doc.text(doc.splitTextToSize(currentPlate.plate.subtitle || '', 3.25), 0.25, 1.5);
-
+  doc.text(doc.splitTextToSize(`${mealTitle}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.85), 0.15, 0.975833);
 
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
     doc.setFontStyle('normal');
-    doc.setFontSize(9);
+    doc.setFontSize(14);
     doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.85), 0.15, 1.48);
   }
+  //
+  // doc.setFontSize(8);
+  // doc.text(`With restrictions: Regular ${count.regularRestrictionsCount} Athletic ${count.athleticRestrictionsCount} Bodybuilder ${count.bodybuilderRestrictionsCount}`, 0.25, 2.2);
+  //
+  // doc.setFontSize(8);
+  // doc.text(`Without restrictions: Regular ${count.regularWithoutRestrictionsCount} Athletic ${count.athleticWithoutRestrictionsCount} Bodybuilder ${count.bodybuilderWithoutRestrictionsCount}`, 0.25, 2.35);
 
-  doc.setFontSize(8);
-  doc.text(`With restrictions: Regular ${count.regularRestrictionsCount} Athletic ${count.athleticRestrictionsCount} Bodybuilder ${count.bodybuilderRestrictionsCount}`, 0.25, 2.2);
+  doc.setFontSize(9);
 
-  doc.setFontSize(8);
-  doc.text(`Without restrictions: Regular ${count.regularWithoutRestrictionsCount} Athletic ${count.athleticWithoutRestrictionsCount} Bodybuilder ${count.bodybuilderWithoutRestrictionsCount}`, 0.25, 2.35);
+  doc.text('Regular', 0.15, 2.78);
+  doc.text('Athletic', 0.70833, 2.78);
+  doc.text('Bodybuilder', 1.25, 2.78);
 
-
-  // Regular
-  const regularText = `${dataCurrentLifestyle[getMealTitle(mealTitle)].regular}`;
   doc.setFontStyle('bold');
-  doc.setFontSize(11);
-  const regular = [regularText, 'Regular'];
-  doc.text(regular, 0.75, 2.6);
 
-  // Athletic
-  const athleticText = `${dataCurrentLifestyle[getMealTitle(mealTitle)].athletic}`;
-  doc.setFontSize(11);
-  const athletic = [athleticText, 'Athletic'];
-  doc.text(athletic, 1.6, 2.6);
-
-  // Bodybuilder
-  const bodybuilderText = `${dataCurrentLifestyle[getMealTitle(mealTitle)].bodybuilder}`;
-  doc.setFontSize(11);
-  const bodybuilder = [bodybuilderText, 'Bodybuilder'];
-  doc.text(bodybuilder, 2.4, 2.6);
+  doc.text(`${dataCurrentLifestyle[getMealTitle(mealTitle)].regular}`, 0.15, 2.64208);
+  doc.text(`${dataCurrentLifestyle[getMealTitle(mealTitle)].athletic}`, 0.70833, 2.64208);
+  doc.text(`${dataCurrentLifestyle[getMealTitle(mealTitle)].bodybuilder}`, 1.25, 2.64208);
 }
 
 class PlatingTable extends React.Component {
@@ -417,18 +497,17 @@ class PlatingTable extends React.Component {
 
   getCurrentSelectionPlate(what) {
     if (!this.state.aggregateDataLoading && this.state.lifestyleSelected && this.state.mealSelected) {
+      let lifestylePlates,
+        currentPlate;
 
-      let lifestylePlates, 
-currentPlate;
-
-      if (this.state.mealTitle == 'Chefs Choice Breakfast' || this.state.mealTitle == 'Chefs Choice Lunch' || this.state.mealTitle == 'Chefs Choice Dinner') {
+      if (this.state.mealTitle === 'Chefs Choice Breakfast' || this.state.mealTitle === 'Chefs Choice Lunch' || this.state.mealTitle === 'Chefs Choice Dinner') {
         lifestylePlates = [1];
-        if (this.state.mealTitle == 'Chefs Choice Breakfast') {
-          currentPlate = this.props.plates.find(e => e.title == "Chef's Choice Breakfast");
-        } else if (this.state.mealTitle == 'Chefs Choice Lunch') {
+        if (this.state.mealTitle === 'Chefs Choice Breakfast') {
+          currentPlate = this.props.plates.find(e => e.title === "Chef's Choice Breakfast");
+        } else if (this.state.mealTitle === 'Chefs Choice Lunch') {
           currentPlate = this.props.plates.find(e => e.title == "Chef's Choice Lunch");
-        } else if (this.state.mealTitle == 'Chefs Choice Dinner') {
-          currentPlate = this.props.plates.find(e => e.title == "Chef's Choice Dinner");
+        } else if (this.state.mealTitle === 'Chefs Choice Dinner') {
+          currentPlate = this.props.plates.find(e => e.title === "Chef's Choice Dinner");
         }
       } else {
         lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
@@ -439,11 +518,11 @@ currentPlate;
         return;
       }
 
-      if (what == 'title') {
+      if (what === 'title') {
         return currentPlate.plate && currentPlate.plate.title ? currentPlate.plate.title : '';
-      } else if (what == 'subtitle') {
+      } else if (what === 'subtitle') {
         return currentPlate.plate && currentPlate.plate.subtitle ? currentPlate.plate.subtitle : '';
-      } else if (what == 'ingredients') {
+      } else if (what === 'ingredients') {
         return currentPlate.plate && currentPlate.plate.ingredients &&
           currentPlate.plate.ingredients.length > 0 ? currentPlate.plate.ingredients.map(e => e.title).join(', ') : '';
       }
@@ -463,12 +542,34 @@ currentPlate;
     });
   }
 
+  printNotesLabels() {
+    if (this.state.aggregateDataLoading) {
+      return;
+    }
+
+    const doc = new jsPDF({
+      orientation: 'landscape',
+      unit: 'in',
+      format: [4, 3],
+    });
+
+    const usersWithSelectedLifestyle = this.state.aggregateData.userData.filter(user =>
+      user.lifestyleId === this.state.lifestyleSelected && user.platingNotes,
+    ).filter(user => user.platingNotes.length > 0).forEach((user) => {
+      renderPlatingNoteOnLabel(doc, user);
+    });
+
+    doc.deletePage(1);
+
+    doc.save(`Notes_${this.state.lifestyleTitle}_${new Date().toDateString()} `);
+  }
+
   printLabels() {
     if (this.state.aggregateDataLoading) {
       return;
     }
 
-    const userDataNew = this.state.aggregateData.userData.filter(user => user.lifestyleId == this.state.lifestyleSelected
+    const userDataNew = this.state.aggregateData.userData.filter(user => user.lifestyleId === this.state.lifestyleSelected
       && (user[getMealTitle(this.state.mealTitle)] > 0 ||
         user[`athletic${getMealTitle(this.state.mealTitle, true)}`] > 0 ||
         user[`bodybuilder${getMealTitle(this.state.mealTitle, true)}`] > 0)).sort((a, b) => {
@@ -503,7 +604,7 @@ currentPlate;
       return totalRestrictionsB - totalRestrictionsA;
     });
 
-    const labelsByPortions = this.state.aggregateData.userData.filter(user => user.lifestyleId == this.state.lifestyleSelected
+    const labelsByPortions = this.state.aggregateData.userData.filter(user => user.lifestyleId === this.state.lifestyleSelected
       && (user[getMealTitle(this.state.mealTitle)] > 0 ||
         user[`athletic${getMealTitle(this.state.mealTitle, true)}`] > 0 ||
         user[`bodybuilder${getMealTitle(this.state.mealTitle, true)}`] > 0));
@@ -514,21 +615,20 @@ currentPlate;
 
     const orderedUserData = concat([bodybuilder], [athletic], [regular]);
 
-    let lifestylePlates, 
-currentPlate;
+    let lifestylePlates;
+    let currentPlate;
 
 
-    if (this.state.mealTitle == 'Chefs Choice Breakfast' || this.state.mealTitle == 'Chefs Choice Lunch' || this.state.mealTitle == 'Chefs Choice Dinner') {
+    if (this.state.mealTitle === 'Chefs Choice Breakfast' || this.state.mealTitle === 'Chefs Choice Lunch' || this.state.mealTitle === 'Chefs Choice Dinner') {
       lifestylePlates = [1];
 
-      if (this.state.mealTitle == 'Chefs Choice Breakfast') {
-        currentPlate = { plate: this.props.plates.find(e => e.title == "Chef's Choice Breakfast") };
-      } else if (this.state.mealTitle == 'Chefs Choice Lunch') {
-        currentPlate = { plate: this.props.plates.find(e => e.title == "Chef's Choice Lunch") };
-      } else if (this.state.mealTitle == 'Chefs Choice Dinner') {
-        currentPlate = { plate: this.props.plates.find(e => e.title == "Chef's Choice Dinner") };
+      if (this.state.mealTitle === 'Chefs Choice Breakfast') {
+        currentPlate = { plate: this.props.plates.find(e => e.title === "Chef's Choice Breakfast") };
+      } else if (this.state.mealTitle === 'Chefs Choice Lunch') {
+        currentPlate = { plate: this.props.plates.find(e => e.title === "Chef's Choice Lunch") };
+      } else if (this.state.mealTitle === 'Chefs Choice Dinner') {
+        currentPlate = { plate: this.props.plates.find(e => e.title === "Chef's Choice Dinner") };
       }
-
     } else {
       lifestylePlates = this.state.aggregateData.plates.find(e => e._id === this.state.lifestyleSelected).plates[0];
       currentPlate = lifestylePlates.find(e => e.mealId === this.state.mealSelected);
@@ -544,7 +644,6 @@ currentPlate;
 
     const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === this.state.lifestyleSelected);
 
-
     const doc = new jsPDF({
       orientation: 'landscape',
       unit: 'in',
@@ -553,123 +652,139 @@ currentPlate;
 
     orderedUserData.forEach((e, upperIndex) => {
       console.log(e);
+
       e.forEach((userData, index) => {
         if (this.state.mealTitle === 'Breakfast') {
-          if (userData.bodybuilderBreakfast > 0 && upperIndex == 0) {
+          let labelGeneratedQty = 0;
+
+          if (userData.bodybuilderBreakfast > 0 && upperIndex === 0) {
             for (let i = 1; i <= userData.bodybuilderBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Breakfast', 'bodybuilder', this.props.currentSelectorDate);
+              labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Breakfast', 'bodybuilder', this.props.currentSelectorDate, false, labelGeneratedQty);
             }
           }
 
-          if (userData.athleticBreakfast > 0 && upperIndex == 1) {
+          if (userData.athleticBreakfast > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Breakfast', 'athletic', this.props.currentSelectorDate);
+              labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Breakfast', 'athletic', this.props.currentSelectorDate, false, labelGeneratedQty);
             }
           }
 
-          if (userData.breakfast > 0 && upperIndex == 2) {
+          if (userData.breakfast > 0 && upperIndex === 2) {
             for (let i = 1; i <= userData.breakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Breakfast', 'regular', this.props.currentSelectorDate);
+              labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Breakfast', 'regular', this.props.currentSelectorDate, false, labelGeneratedQty);
             }
           }
         }// Breakfast
 
         if (this.state.mealTitle === 'Dinner') {
-          if (userData.bodybuilderDinner > 0 && upperIndex == 0) {
+          let labelGeneratedQty = 0;
+
+          if (userData.bodybuilderDinner > 0 && upperIndex === 0) {
             for (let i = 1; i <= userData.bodybuilderDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Dinner', 'bodybuilder', this.props.currentSelectorDate);
+              labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Dinner', 'bodybuilder', this.props.currentSelectorDate, false, labelGeneratedQty);
             }
           }
 
-          if (userData.athleticDinner > 0 && upperIndex == 1) {
+          if (userData.athleticDinner > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Dinner', 'athletic', this.props.currentSelectorDate);
+              labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Dinner', 'athletic', this.props.currentSelectorDate, false, labelGeneratedQty);
             }
           }
 
-          if (userData.dinner > 0 && upperIndex == 2) {
+          if (userData.dinner > 0 && upperIndex === 2) {
             for (let i = 1; i <= userData.dinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Dinner', 'regular', this.props.currentSelectorDate);
+              labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Dinner', 'regular', this.props.currentSelectorDate, false, labelGeneratedQty);
             }
           }
         } // Dinner
 
         if (this.state.mealTitle === 'Lunch') {
-          if (userData.bodybuilderLunch > 0 && upperIndex == 0) {
+          let labelGeneratedQty = 0;
+
+          if (userData.bodybuilderLunch > 0 && upperIndex === 0) {
+            labelGeneratedQty += 1;
             for (let i = 1; i <= userData.bodybuilderLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch', 'bodybuilder', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch', 'bodybuilder', this.props.currentSelectorDate, false, labelGeneratedQty);
             }
           }
 
-          if (userData.athleticLunch > 0 && upperIndex == 1) {
+          if (userData.athleticLunch > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch',' athletic', this.props.currentSelectorDate);
+              labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch', ' athletic', this.props.currentSelectorDate, false, labelGeneratedQty);
             }
           }
 
-          if (userData.lunch > 0 && upperIndex == 2) {
+          if (userData.lunch > 0 && upperIndex === 2) {
             for (let i = 1; i <= userData.lunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch', 'regular', this.props.currentSelectorDate);
+              labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch', 'regular', this.props.currentSelectorDate, false, labelGeneratedQty);
             }
           }
         } // Lunch
 
         if (this.state.mealTitle === 'Chefs Choice Breakfast') {
-          if (userData.bodybuilderChefsChoiceBreakfast > 0 && upperIndex == 0) {
+          if (userData.bodybuilderChefsChoiceBreakfast > 0 && upperIndex === 0) {
             for (let i = 1; i <= userData.bodybuilderChefsChoiceBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'bodybuilder', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'bodybuilder', this.props.currentSelectorDate, true);
             }
           }
 
-          if (userData.athleticChefsChoiceBreakfast > 0 && upperIndex == 1) {
+          if (userData.athleticChefsChoiceBreakfast > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticChefsChoiceBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'athletic', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'athletic', this.props.currentSelectorDate, true);
             }
           }
 
-          if (userData.chefsChoiceBreakfast > 0 && upperIndex == 2) {
+          if (userData.chefsChoiceBreakfast > 0 && upperIndex === 2) {
             for (let i = 1; i <= userData.chefsChoiceBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'regular', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'regular', this.props.currentSelectorDate, true);
             }
           }
         } // Chefs Choice
 
         if (this.state.mealTitle === 'Chefs Choice Lunch') {
-          if (userData.bodybuilderChefsChoiceLunch > 0 && upperIndex == 0) {
+          if (userData.bodybuilderChefsChoiceLunch > 0 && upperIndex === 0) {
             for (let i = 1; i <= userData.bodybuilderChefsChoiceLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'bodybuilder', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'bodybuilder', this.props.currentSelectorDate, true);
             }
           }
 
-          if (userData.athleticChefsChoiceLunch > 0 && upperIndex == 1) {
+          if (userData.athleticChefsChoiceLunch > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticChefsChoiceLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'athletic', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'athletic', this.props.currentSelectorDate, true);
             }
           }
 
-          if (userData.chefsChoiceLunch > 0 && upperIndex == 2) {
+          if (userData.chefsChoiceLunch > 0 && upperIndex === 2) {
             for (let i = 1; i <= userData.chefsChoiceLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'regular', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'regular', this.props.currentSelectorDate, true);
             }
           }
         } // Chefs Choice
 
         if (this.state.mealTitle === 'Chefs Choice Dinner') {
-          if (userData.bodybuilderChefsChoiceDinner > 0 && upperIndex == 0) {
+          if (userData.bodybuilderChefsChoiceDinner > 0 && upperIndex === 0) {
             for (let i = 1; i <= userData.bodybuilderChefsChoiceDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'bodybuilder', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'bodybuilder', this.props.currentSelectorDate, true);
             }
           }
 
-          if (userData.athleticChefsChoiceDinner > 0 && upperIndex == 1) {
+          if (userData.athleticChefsChoiceDinner > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticChefsChoiceDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'athletic', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'athletic', this.props.currentSelectorDate, true);
             }
           }
 
-          if (userData.chefsChoiceDinner > 0 && upperIndex == 2) {
+          if (userData.chefsChoiceDinner > 0 && upperIndex === 2) {
             for (let i = 1; i <= userData.chefsChoiceDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'regular', this.props.currentSelectorDate);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'regular', this.props.currentSelectorDate, true);
             }
           }
         } // Chefs Choice
@@ -695,7 +810,7 @@ currentPlate;
 
 
   usersWithoutRestrictions() {
-    if (this.state.aggregateDataLoading || this.state.lifestyleSelected == '' || this.state.mealSelected == '') {
+    if (this.state.aggregateDataLoading || this.state.lifestyleSelected === '' || this.state.mealSelected === '') {
       return '';
     }
 
@@ -710,7 +825,7 @@ currentPlate;
     };
 
     this.state.aggregateData.userData.filter((user) => {
-      if (user.lifestyleId == this.state.lifestyleSelected && (user[getMealTitle(this.state.mealTitle)] > 0 ||
+      if (user.lifestyleId === this.state.lifestyleSelected && (user[getMealTitle(this.state.mealTitle)] > 0 ||
         user[`athletic${getMealTitle(this.state.mealTitle, true)}`] > 0 ||
         user[`bodybuilder${getMealTitle(this.state.mealTitle, true)}`] > 0)) {
         if ((user.restrictions && user.restrictions.length > 0) ||
@@ -744,8 +859,8 @@ currentPlate;
     const plateSubtitle = this.getCurrentSelectionPlate('subtitle');
     const plateIngredients = this.getCurrentSelectionPlate('ingredients');
 
-    let lifestylePlates, 
-currentPlate;
+    let lifestylePlates,
+      currentPlate;
 
     if (this.state.mealTitle == 'Chefs Choice Breakfast' || this.state.mealTitle == 'Chefs Choice Lunch' || this.state.mealTitle == 'Chefs Choice Dinner') {
       lifestylePlates = [1];
@@ -890,12 +1005,12 @@ currentPlate;
 
   compareLifestyles(a, b) {
     if (a.title > b.title) {
-      return -1
-    } else {
-      return 1
+      return -1;
     }
+    return 1;
 
-    return 0
+
+    return 0;
   }
 
   render() {
@@ -952,13 +1067,12 @@ currentPlate;
                   const mapBy = [];
 
                   mealTypeOrder.forEach((e) => {
-                    mapBy.push(this.props.meals.find(el => el.title == e));
+                    mapBy.push(this.props.meals.find(el => el.title === e));
                   });
 
                   return (
 
                     this.props.meals && mapBy.map((meal) => {
-
                       const mealTitle = getMealTitle(meal.title);
 
                       return (
@@ -1044,17 +1158,22 @@ currentPlate;
               <Button color="inherit" onClick={this.printLabels}>
                 Print labels
               </Button>
+              <Tooltip title="Prints notes for all users with selected lifestyle">
+                <Button color="inherit" onClick={this.printNotesLabels}>
+                        Print notes
+                </Button>
+              </Tooltip>
               <IconButton color="inherit" onClick={this.closeAssignDialog} aria-label="Close">
                 <CloseIcon />
               </IconButton>
             </Toolbar>
 
             <div style={{ paddingLeft: '24px', paddingRight: '24px', paddingBottom: '20px' }}>
-              {!this.state.aggregateDataLoading && this.state.lifestyleSelected != '' ?
+              {!this.state.aggregateDataLoading && this.state.lifestyleSelected !== '' ?
                 (<Typography type="title" color="inherit">{this.getCurrentSelectionPlate('title')}</Typography>) : ''}
-              {!this.state.aggregateDataLoading && this.state.lifestyleSelected != '' ?
+              {!this.state.aggregateDataLoading && this.state.lifestyleSelected !== '' ?
                 (<Typography type="subheading" color="inherit">{this.getCurrentSelectionPlate('subtitle')}</Typography>) : ''}
-              {!this.state.aggregateDataLoading && this.state.lifestyleSelected != '' ?
+              {!this.state.aggregateDataLoading && this.state.lifestyleSelected !== '' ?
                 (<Typography type="body2" color="inherit">{this.getCurrentSelectionPlate('ingredients')}</Typography>) : ''}
 
 
@@ -1090,7 +1209,7 @@ currentPlate;
               </TableHead>
               <TableBody>
                 {!this.state.aggregateDataLoading &&
-                  this.state.aggregateData.userData.filter(user => user.lifestyleId == this.state.lifestyleSelected &&
+                  this.state.aggregateData.userData.filter(user => user.lifestyleId === this.state.lifestyleSelected &&
                     (user[getMealTitle(this.state.mealTitle)] > 0 ||
                       user[`athletic${getMealTitle(this.state.mealTitle, true)}`] > 0 ||
                       user[`bodybuilder${getMealTitle(this.state.mealTitle, true)}`] > 0)).sort((a, b) => {
