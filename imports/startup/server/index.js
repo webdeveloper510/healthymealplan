@@ -13,8 +13,11 @@ import './jobs/createInvoices';
 
 import './jobs/setSubscriptionCancelledJob';
 import './jobs/setSubscriptionActiveJob';
+import './jobs/setSubscriptionPausedJob';
+
 import './jobs/setSubscriptionCancelledCardJob';
 import './jobs/setSubscriptionActiveCardJob';
+
 import './jobs/editSubscriptionJob';
 import './jobs/editSubscriptionJobNonCard';
 
@@ -40,7 +43,7 @@ S3.config = {
 
 // const cost = calculateSubscriptionCost({});
 
-// Jobs.setLogStream(process.stdout);
+ Jobs.setLogStream(process.stdout);
 
 // THIS IS TO BE USED IN AN EMERGENCY
 // MANUAL SUBSCRIPTION EDIT CODE BELOW
