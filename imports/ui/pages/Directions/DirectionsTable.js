@@ -55,7 +55,7 @@ import './DirectionsTable.scss';
 function renderDeliveryLabelData(doc, delivery, formalType, currentTabValue, multiple = false, multipleCurrent = 0, multipleTotal = 0) {
   doc.addPage();
 
-  doc.addImage(vittlebase64, 'PNG', 1.78, 0.15, 0.4, 0.4);
+    doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
   // doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
 
   if (multiple) {
