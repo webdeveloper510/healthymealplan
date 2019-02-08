@@ -173,7 +173,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
     });
   };
 
-  this.appendDataToCustomers = function (scheduleDays, customer, delivery) {
+  this.appendDataToCustomers = function (scheduleDays, customer, delivery, pairing = null) {
     const lifestyleActual = Lifestyles.findOne({ _id: customer.lifestyle });
 
     const customerToAdd = {
@@ -223,6 +223,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       delivery,
       scheduleDays,
       platingNotes: customer.platingNotes,
+        pairing,
     };
 
     scheduleDays.forEach((e) => {
@@ -339,14 +340,14 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // set delivery for monday tuesday and wednesday as sunday night
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0], customerSchedule[1], customerSchedule[2]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[0], customerSchedule[1], customerSchedule[2]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[0], customerSchedule[1], customerSchedule[2]], customer, delivery, 3);
               }
               // set cooking as sunday
             } else if (nextDay === '' && dayAfterTomorrow === 'nightBeforePaired') {
               // set delivery for monday and wednesday as sunday night
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0], customerSchedule[2]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[0], customerSchedule[2]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[0], customerSchedule[2]], customer, delivery, 2);
               }
 
               // set cooking as sunday
@@ -354,7 +355,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // set delivery for monday and tuesday as sunday night
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0], customerSchedule[1]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[0], customerSchedule[1]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[0], customerSchedule[1]], customer, delivery, 2);
               }
               // set cooking as sunday
             } else {
@@ -369,7 +370,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
             if (nextDay === 'dayOfPaired' && dayAfterTomorrow === 'dayOfPaired') {
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0], customerSchedule[1], customerSchedule[2]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[0], customerSchedule[1], customerSchedule[2]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[0], customerSchedule[1], customerSchedule[2]], customer, delivery, 3);
               }
               // set cooking for sunday
             } else if (nextDay === '' && dayAfterTomorrow === 'dayOfPaired') {
@@ -377,14 +378,14 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
 
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0], customerSchedule[2]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[0], customerSchedule[2]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[0], customerSchedule[2]], customer, delivery, 2);
               }
               // summation of monday and wednesday meals
               // set cooking for sunday
             } else if (nextDay === 'dayOfPaired') {
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[0], customerSchedule[1]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[0], customerSchedule[1]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[0], customerSchedule[1]], customer, delivery, 2);
               }
               // set cooking as sunday
             } else {
@@ -404,14 +405,14 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
             if (nextDay === 'nightBeforePaired' && dayAfterTomorrow === 'nightBeforePaired') {
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[2], customerSchedule[3]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2], customerSchedule[3]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2], customerSchedule[3]], customer, delivery, 3);
               }
               // set cooking as monday
             } else if (nextDay === '' && dayAfterTomorrow === 'nightBeforePaired') {
               // set delivery for tuesday and thursday as monday night
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[3]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[1], customerSchedule[3]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[1], customerSchedule[3]], customer, delivery, 2);
               }
               // summation of tuesday and thursday mealss
               // set cooking as monday
@@ -419,7 +420,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // set delivery for tuesday and wednesday as monday night
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[2]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2]], customer, delivery, 2);
               }
               // summation of tuesday and wednesday meals
               // set cooking as monday
@@ -438,20 +439,20 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
             if (nextDay === 'dayOfPaired' && dayAfterTomorrow === 'dayOfPaired') {
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[2], customerSchedule[3]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2], customerSchedule[3]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2], customerSchedule[3]], customer, delivery, 3);
               }
               // set cooking as monday
             } else if (nextDay === '' && dayAfterTomorrow === 'dayOfPaired') {
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[3]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[1], customerSchedule[3]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[1], customerSchedule[3]], customer, 2);
               }
               // set cooking as monday
             } else if (nextDay === 'dayOfPaired') {
               // set delivery for tuesday and wednesday as tuesday day
               if (this.platingDay == 1) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[2]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2]], customer, delivery, 2);
               }
               // summation of tuesday and wednesday meals
               // set cooking as monday
@@ -477,7 +478,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
 
               if (this.platingDay == 0) {
                 this.appendDataToLifestyle([customerSchedule[1], customerSchedule[2]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[1], customerSchedule[2]], customer, delivery, 2);
               }
 
             } else {
@@ -497,7 +498,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // summation of wednesday thursday and friday meals
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2], customerSchedule[3], customerSchedule[4]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[2], customerSchedule[3], customerSchedule[4]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[2], customerSchedule[3], customerSchedule[4]], customer, delivery, 3);
               }
               // set cooking as tuesday
             } else if (nextDay === '' && dayAfterTomorrow === 'nightBeforePaired') {
@@ -505,7 +506,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // summation of wednesday and friday meals
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2], customerSchedule[4]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[2], customerSchedule[4]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[2], customerSchedule[4]], customer, delivery, 2);
               }
 
               // set cooking as tuesday
@@ -514,7 +515,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // summation of wednesday and thursay meals
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2], customerSchedule[3]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[2], customerSchedule[3]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[2], customerSchedule[3]], customer, delivery, 2);
               }
               // set cooking as tuesday
             } else {
@@ -533,14 +534,14 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // set cooking as tuesday
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2], customerSchedule[3], customerSchedule[4]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[2], customerSchedule[3], customerSchedule[4]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[2], customerSchedule[3], customerSchedule[4]], customer, delivery, 3);
               }
             } else if (nextDay === '' && dayAfterTomorrow === 'dayOfPaired') {
               // set delivery for wednesday and friday as wednesday day
               // summation of wednesday and friday meals
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2], customerSchedule[4]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[2], customerSchedule[4]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[2], customerSchedule[4]], customer, delivery, 2);
               }
               // set cooking as tuesday
             } else if (nextDay === 'dayOfPaired') {
@@ -548,7 +549,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // summation of wednesday and thursday meals
               if (this.platingDay == 2) {
                 this.appendDataToLifestyle([customerSchedule[2], customerSchedule[3]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[2], customerSchedule[3]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[2], customerSchedule[3]], customer, delivery, 2);
               }
               // set cooking as tuesday
             } else {
@@ -603,7 +604,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // set cooking as wednesday
               if (this.platingDay == 3) {
                 this.appendDataToLifestyle([customerSchedule[3], customerSchedule[4]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[3], customerSchedule[4]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[3], customerSchedule[4]], customer, delivery, 2);
               }
             } else {
               // set delivery for thursday as wednesday night
@@ -619,7 +620,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
               // set delivery for thursday and friday as thursday day
               if (this.platingDay == 3) {
                 this.appendDataToLifestyle([customerSchedule[3], customerSchedule[4]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[3], customerSchedule[4]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[3], customerSchedule[4]], customer, delivery, 2);
               }
               // set cooking as wednesday
             } else {
@@ -674,7 +675,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
 
               if (this.platingDay == 4) {
                 this.appendDataToLifestyle([customerSchedule[4], customerSchedule[5], customerSchedule[6]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[4], customerSchedule[5], customerSchedule[6]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[4], customerSchedule[5], customerSchedule[6]], customer, delivery, 3);
               }
             } else if (this.platingDay == 4) {
               this.appendDataToLifestyle([customerSchedule[4]], lifestyleIndex);
@@ -684,7 +685,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
             if (nextDay == 'dayOfFriday' || nextDay == 'dayOf') {
               if (this.platingDay == 4) {
                 this.appendDataToLifestyle([customerSchedule[4], customerSchedule[5], customerSchedule[6]], lifestyleIndex);
-                this.appendDataToCustomers([customerSchedule[4], customerSchedule[5], customerSchedule[6]], customer, delivery);
+                this.appendDataToCustomers([customerSchedule[4], customerSchedule[5], customerSchedule[6]], customer, delivery, 2);
               }
             } else if (this.platingDay == 4) {
               this.appendDataToLifestyle([customerSchedule[4]], lifestyleIndex);
