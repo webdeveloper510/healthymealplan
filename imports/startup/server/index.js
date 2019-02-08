@@ -43,7 +43,7 @@ S3.config = {
 
 // const cost = calculateSubscriptionCost({});
 
- Jobs.setLogStream(process.stdout);
+ // Jobs.setLogStream(process.stdout);
 
 // THIS IS TO BE USED IN AN EMERGENCY
 // MANUAL SUBSCRIPTION EDIT CODE BELOW
