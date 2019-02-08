@@ -164,17 +164,16 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
             break;
 
         default:
-          totalQty = 1;
           break;
     }
 
     doc.setFontSize(7.5);
     doc.setFontStyle('bold');
 
-    const qtyText = `Qty: ${labelGeneratedQty} of ${totalQty}0`;
+    const qtyText = `Qty: ${labelGeneratedQty} of ${totalQty}`;
 
     doc.setLineWidth(0.01);
-    doc.roundedRect(0.15625, 0.46875, doc.getTextWidth(qtyText) + 0.15, 0.21875, 0.025, 0.025);
+    doc.roundedRect(0.15625, 0.46875, doc.getTextWidth(qtyText) + 0.10, 0.21875, 0.025, 0.025);
 
     doc.text(qtyText, 0.21, 0.615);
 
@@ -730,61 +729,76 @@ class PlatingTable extends React.Component {
         } // Lunch
 
         if (this.state.mealTitle === 'Chefs Choice Breakfast') {
-          if (userData.bodybuilderChefsChoiceBreakfast > 0 && upperIndex === 0) {
+            let labelGeneratedQty = 0;
+
+            if (userData.bodybuilderChefsChoiceBreakfast > 0 && upperIndex === 0) {
             for (let i = 1; i <= userData.bodybuilderChefsChoiceBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'bodybuilder', this.props.currentSelectorDate, true);
+                labelGeneratedQty += 1;
+                renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'bodybuilder', this.props.currentSelectorDate, true, labelGeneratedQty);
             }
           }
 
           if (userData.athleticChefsChoiceBreakfast > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticChefsChoiceBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'athletic', this.props.currentSelectorDate, true);
+                labelGeneratedQty += 1;
+                renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'athletic', this.props.currentSelectorDate, true, labelGeneratedQty);
             }
           }
 
           if (userData.chefsChoiceBreakfast > 0 && upperIndex === 2) {
             for (let i = 1; i <= userData.chefsChoiceBreakfast; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'regular', this.props.currentSelectorDate, true);
+                labelGeneratedQty += 1;
+                renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Breakfast', 'regular', this.props.currentSelectorDate, true, labelGeneratedQty);
             }
           }
         } // Chefs Choice
 
         if (this.state.mealTitle === 'Chefs Choice Lunch') {
-          if (userData.bodybuilderChefsChoiceLunch > 0 && upperIndex === 0) {
+          let labelGeneratedQty = 0
+
+            if (userData.bodybuilderChefsChoiceLunch > 0 && upperIndex === 0) {
             for (let i = 1; i <= userData.bodybuilderChefsChoiceLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'bodybuilder', this.props.currentSelectorDate, true);
+                labelGeneratedQty += 1;
+                renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'bodybuilder', this.props.currentSelectorDate, true, labelGeneratedQty);
             }
           }
 
           if (userData.athleticChefsChoiceLunch > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticChefsChoiceLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'athletic', this.props.currentSelectorDate, true);
+                labelGeneratedQty += 1;
+                renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'athletic', this.props.currentSelectorDate, true, labelGeneratedQty);
             }
           }
 
           if (userData.chefsChoiceLunch > 0 && upperIndex === 2) {
             for (let i = 1; i <= userData.chefsChoiceLunch; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'regular', this.props.currentSelectorDate, true);
+                labelGeneratedQty += 1;
+                renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Lunch', 'regular', this.props.currentSelectorDate, true, labelGeneratedQty);
             }
           }
         } // Chefs Choice
 
         if (this.state.mealTitle === 'Chefs Choice Dinner') {
+          let labelGeneratedQty = 0;
+
           if (userData.bodybuilderChefsChoiceDinner > 0 && upperIndex === 0) {
             for (let i = 1; i <= userData.bodybuilderChefsChoiceDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'bodybuilder', this.props.currentSelectorDate, true);
+                labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'bodybuilder', this.props.currentSelectorDate, true, labelGeneratedQty);
             }
           }
 
           if (userData.athleticChefsChoiceDinner > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticChefsChoiceDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'athletic', this.props.currentSelectorDate, true);
+              labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'athletic', this.props.currentSelectorDate, true. labelGeneratedQty);
             }
           }
 
           if (userData.chefsChoiceDinner > 0 && upperIndex === 2) {
             for (let i = 1; i <= userData.chefsChoiceDinner; i++) {
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'regular', this.props.currentSelectorDate, true);
+              labelGeneratedQty += 1;
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'regular', this.props.currentSelectorDate, true, labelGeneratedQty);
             }
           }
         } // Chefs Choice
@@ -794,7 +808,6 @@ class PlatingTable extends React.Component {
     renderSummaryLabel(doc, currentPlate, dataCurrentLifestyle, this.state.lifestyleTitle, this.state.mealTitle, this.props.currentSelectorDate, this.usersWithoutRestrictions());
 
     doc.deletePage(1);
-
 
     doc.save(`Plating_${this.state.lifestyleTitle} _${this.state.mealTitle} _${new Date().toDateString()} `);
   }
