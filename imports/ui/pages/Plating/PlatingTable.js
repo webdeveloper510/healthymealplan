@@ -162,6 +162,17 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
         case 'Dinner':
             totalQty = userData.bodybuilderDinner + userData.athleticDinner + userData.dinner;
             break;
+        case "Chef\'s Choice Breakfast":
+            totalQty = userData.bodybuilderChefsChoiceBreakfast + userData.athleticChefsChoiceBreakfast + userData.chefsChoiceBreakfast;
+            break;
+
+        case "Chef\'s Choice Lunch":
+            totalQty = userData.bodybuilderChefsChoiceLunch + userData.athleticChefsChoiceLunch + userData.chefsChoiceLunch;
+            break;
+
+        case "Chef\'s Choice Dinner":
+            totalQty = userData.bodybuilderChefsChoiceDinner + userData.athleticChefsChoiceDinner + userData.chefsChoiceDinner;
+            break;
 
         default:
           break;
@@ -188,18 +199,34 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
       doc.addImage(ThreeDayPairingIcon, 'PNG', 0.875, 0.46875, 0.92708, 0.21875);
     }
 
-    if (renderBirthdayCake(userData.birthday, true)) {
-      doc.addImage(BirthdayIcon, 'PNG', 0.48, 0.18, 0.6979166667, 0.21875);
-    }
-  } else if (renderBirthdayCake(userData.birthday, true)) {
-    doc.addImage(BirthdayIcon, 'PNG', 0.48, 0.18, 0.6979166667, 0.21875);
+    // if (renderBirthdayCake(userData.birthday, true)) {
+    //   doc.addImage(BirthdayIcon, 'PNG', 0.48, 0.18, 0.6979166667, 0.21875);
+    // }
   }
+
+  // else if (renderBirthdayCake(userData.birthday, true)) {
+  //   doc.addImage(BirthdayIcon, 'PNG', 0.48, 0.18, 0.6979166667, 0.21875);
+  // }
 
 
   // name
+  let customerName = "";
+  // `Made for ${userData.name}`;
+
+    console.log(userData.name);
+    console.log(doc.getStringUnitWidth(`Made for ${userData.name}`) * 18 / 72)
+
+  if(doc.getStringUnitWidth(`Made for ${userData.name}`) * 18 / 72 <= 3.6875) {
+    customerName = `Made for ${userData.name}`;
+  } else if (doc.getStringUnitWidth(`${userData.name}`) * 18 / 72 <= 3.6875) {
+    customerName = userData.name;
+  } else {
+      customerName = `${userData.name.split(" ")[0]} ${userData.name.split(" ")[userData.name.split(" ").length - 1 || 1].charAt(0)}}.`;
+  }
+
   doc.setFontStyle('bold');
   doc.setFontSize(18);
-  doc.text(`Made for ${userData.name}`, 0.15, 0.975833333);
+  doc.text(customerName, 0.15, 0.975833333);
 
   // dish title
   doc.setFontStyle('bold');
@@ -414,14 +441,14 @@ function renderSummaryLabel(doc, currentPlate, dataCurrentLifestyle, lifestyleTi
 
   // dish title
   doc.setFontStyle('bold');
-  doc.setFontSize(10);
-  doc.text(doc.splitTextToSize(`${mealTitle}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.85), 0.15, 0.975833);
+  doc.setFontSize(16);
+  doc.text(doc.splitTextToSize(`${mealTitle}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.6875), 0.15, 0.76);
 
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
     doc.setFontStyle('normal');
     doc.setFontSize(14);
-    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.85), 0.15, 1.48);
+    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.6875), 0.15, 1.48);
   }
   //
   // doc.setFontSize(8);
@@ -431,6 +458,7 @@ function renderSummaryLabel(doc, currentPlate, dataCurrentLifestyle, lifestyleTi
   // doc.text(`Without restrictions: Regular ${count.regularWithoutRestrictionsCount} Athletic ${count.athleticWithoutRestrictionsCount} Bodybuilder ${count.bodybuilderWithoutRestrictionsCount}`, 0.25, 2.35);
 
   doc.setFontSize(9);
+  doc.setFontStyle('normal');
 
   doc.text('Regular', 0.15, 2.78);
   doc.text('Athletic', 0.70833, 2.78);
@@ -650,7 +678,7 @@ class PlatingTable extends React.Component {
     });
 
     orderedUserData.forEach((e, upperIndex) => {
-      console.log(e);
+      // console.log(e);
 
       e.forEach((userData, index) => {
         if (this.state.mealTitle === 'Breakfast') {
