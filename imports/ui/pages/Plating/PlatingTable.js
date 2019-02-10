@@ -248,30 +248,79 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
   }
 
   let restrictionsLine = '';
+  let actualRestrictionsPresent = false;
+  let specificRestrictionsRendered = false;
+
   let restrictionsPresent = false;
   const allRestrictions = [];
 
   // restrictions
   if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
+    actualRestrictionsPresent = true;
     restrictionsPresent = true;
-    allRestrictions.push(...userData.restrictions.map(rest => rest.title));
+
+    let restrictionsToRender = "";
+    // below is out of the loop because there are specific ingredient restrictions as well
+    // which are separate from actual "Restrictions"
+
+    let restrictionAllergy = [];
+
+    const restrictionsByType = groupBy(userData.restrictions, (restriction) => restriction.restrictionType);
+
+    console.log(restrictionsByType);
+
+    if(restrictionsByType['allergy']) {
+      restrictionsByType['allergy'].forEach(allergy => {
+          restrictionAllergy.push(allergy.title);
+      });
+
+      if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
+          specificRestrictionsRendered = true;
+          restrictionAllergy.push(...userData.specificRestrictions.map(rest => rest.title));
+      }
+
+      restrictionsToRender += `Allergies: ${restrictionAllergy.join(", ")}; `;
+    }
+
+    if(restrictionsByType['dietary']) {
+      restrictionsToRender += `Dietary: ${restrictionsByType.dietary.map(dietary => dietary.title).join(", ")}; `;
+    }
+
+    if(restrictionsByType['religious']) {
+        restrictionsToRender += `Religious: ${restrictionsByType.religious.map(religious => religious.title).join(", ")}; `;
+    }
+
+    if(restrictionsByType['preference']) {
+      restrictionsToRender += `Preferences: ${restrictionsByType.preference.map(preference => preference.title).join(", ")}; `;
+    }
+
+      // allRestrictions.push(...userData.restrictions.map(rest => rest.title));
+      allRestrictions.push(restrictionsToRender);
+
+    console.log(allRestrictions);
   }
 
+
   if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
-    restrictionsPresent = true;
-    allRestrictions.push(...userData.specificRestrictions.map(rest => rest.title));
+      restrictionsPresent = true;
+      // allRestrictions.push(...userData.specificRestrictions.map(rest => rest.title));
+      if(!specificRestrictionsRendered) {
+        allRestrictions.push(`Allergies: ${userData.specificRestrictions.map(rest => rest.title).join(", ")}; `);
+      }
   }
 
   if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
     restrictionsPresent = true;
-    allRestrictions.push(...userData.preferences.map(rest => rest.title));
+    // allRestrictions.push(...userData.preferences.map(rest => rest.title));
+
+    allRestrictions.push(`Dislikes: ${userData.preferences.map(rest => rest.title).join(", ")}; `);
   }
 
   if (restrictionsPresent) {
     doc.setLineWidth(0.01);
     doc.roundedRect(0.15, 1.9504, 3.68, 0.625, 0.025, 0.025);
     doc.addImage(alerticon, 'PNG', 0.31, 2.0595, 0.22, 0.19);
-    restrictionsLine = `${allRestrictions.join(', ')}`;
+    restrictionsLine = `${allRestrictions}`;
     doc.setFontStyle('normal');
     doc.setFontSize(7);
     doc.text(doc.splitTextToSize(restrictionsLine, 3.0416), 0.6979, 2.1295);
@@ -380,32 +429,80 @@ function renderPlatingNoteOnLabel(doc, userData) {
   doc.setFontSize(9);
   doc.text(doc.splitTextToSize(userData.platingNotes, 3.6875), 0.15, 1.25);
 
-
   let restrictionsLine = '';
+  let actualRestrictionsPresent = false;
+  let specificRestrictionsRendered = false;
+
   let restrictionsPresent = false;
   const allRestrictions = [];
 
   // restrictions
   if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
-    restrictionsPresent = true;
-    allRestrictions.push(...userData.restrictions.map(rest => rest.title));
+      actualRestrictionsPresent = true;
+      restrictionsPresent = true;
+
+      let restrictionsToRender = "";
+      // below is out of the loop because there are specific ingredient restrictions as well
+      // which are separate from actual "Restrictions"
+
+      let restrictionAllergy = [];
+
+      const restrictionsByType = groupBy(userData.restrictions, (restriction) => restriction.restrictionType);
+
+      console.log(restrictionsByType);
+
+      if(restrictionsByType['allergy']) {
+          restrictionsByType['allergy'].forEach(allergy => {
+              restrictionAllergy.push(allergy.title);
+          });
+
+          if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
+              specificRestrictionsRendered = true;
+              restrictionAllergy.push(...userData.specificRestrictions.map(rest => rest.title));
+          }
+
+          restrictionsToRender += `Allergies: ${restrictionAllergy.join(", ")}; `;
+      }
+
+      if(restrictionsByType['dietary']) {
+          restrictionsToRender += `Dietary: ${restrictionsByType.dietary.map(dietary => dietary.title).join(", ")}; `;
+      }
+
+      if(restrictionsByType['religious']) {
+          restrictionsToRender += `Religious: ${restrictionsByType.religious.map(religious => religious.title).join(", ")}; `;
+      }
+
+      if(restrictionsByType['preference']) {
+          restrictionsToRender += `Preferences: ${restrictionsByType.preference.map(preference => preference.title).join(", ")}; `;
+      }
+
+      // allRestrictions.push(...userData.restrictions.map(rest => rest.title));
+      allRestrictions.push(restrictionsToRender);
+
+      console.log(allRestrictions);
   }
 
+
   if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
-    restrictionsPresent = true;
-    allRestrictions.push(...userData.specificRestrictions.map(rest => rest.title));
+      restrictionsPresent = true;
+      // allRestrictions.push(...userData.specificRestrictions.map(rest => rest.title));
+      if(!specificRestrictionsRendered) {
+          allRestrictions.push(`Allergies: ${userData.specificRestrictions.map(rest => rest.title).join(", ")}; `);
+      }
   }
 
   if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
-    restrictionsPresent = true;
-    allRestrictions.push(...userData.preferences.map(rest => rest.title));
+      restrictionsPresent = true;
+      // allRestrictions.push(...userData.preferences.map(rest => rest.title));
+
+      allRestrictions.push(`Dislikes: ${userData.preferences.map(rest => rest.title).join(", ")}; `);
   }
 
   if (restrictionsPresent) {
     doc.setLineWidth(0.01);
     doc.roundedRect(0.15, 2.204, 3.68, 0.625, 0.025, 0.025);
     doc.addImage(alerticon, 'PNG', 0.31, 2.3095, 0.22, 0.19);
-    restrictionsLine = `${allRestrictions.join(', ')}`;
+    restrictionsLine = `${allRestrictions}`;
     doc.setFontStyle('normal');
     doc.setFontSize(7);
     doc.text(doc.splitTextToSize(restrictionsLine, 3.0416), 0.6979, 2.3795);
@@ -678,9 +775,10 @@ class PlatingTable extends React.Component {
     });
 
     orderedUserData.forEach((e, upperIndex) => {
-      // console.log(e);
 
       e.forEach((userData, index) => {
+        // console.log(userData.restrictions);
+
         if (this.state.mealTitle === 'Breakfast') {
           let labelGeneratedQty = 0;
 
