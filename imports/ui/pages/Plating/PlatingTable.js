@@ -162,15 +162,15 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
         case 'Dinner':
             totalQty = userData.bodybuilderDinner + userData.athleticDinner + userData.dinner;
             break;
-        case "Chef\'s Choice Breakfast":
+        case "Chef's Choice Breakfast":
             totalQty = userData.bodybuilderChefsChoiceBreakfast + userData.athleticChefsChoiceBreakfast + userData.chefsChoiceBreakfast;
             break;
 
-        case "Chef\'s Choice Lunch":
+        case "Chef's Choice Lunch":
             totalQty = userData.bodybuilderChefsChoiceLunch + userData.athleticChefsChoiceLunch + userData.chefsChoiceLunch;
             break;
 
-        case "Chef\'s Choice Dinner":
+        case "Chef's Choice Dinner":
             totalQty = userData.bodybuilderChefsChoiceDinner + userData.athleticChefsChoiceDinner + userData.chefsChoiceDinner;
             break;
 
@@ -221,7 +221,7 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
   } else if (doc.getStringUnitWidth(`${userData.name}`) * 18 / 72 <= 3.6875) {
     customerName = userData.name;
   } else {
-      customerName = `${userData.name.split(" ")[0]} ${userData.name.split(" ")[userData.name.split(" ").length - 1 || 1].charAt(0)}}.`;
+      customerName = `${userData.name.split(" ")[0]} ${userData.name.split(" ")[userData.name.split(" ").length - 1 || 1].charAt(0)}.`;
   }
 
   doc.setFontStyle('bold');
@@ -744,7 +744,7 @@ class PlatingTable extends React.Component {
           if (userData.athleticLunch > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticLunch; i++) {
               labelGeneratedQty += 1;
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch', ' athletic', this.props.currentSelectorDate, false, labelGeneratedQty);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Lunch', 'athletic', this.props.currentSelectorDate, false, labelGeneratedQty);
             }
           }
 
@@ -819,7 +819,7 @@ class PlatingTable extends React.Component {
           if (userData.athleticChefsChoiceDinner > 0 && upperIndex === 1) {
             for (let i = 1; i <= userData.athleticChefsChoiceDinner; i++) {
               labelGeneratedQty += 1;
-              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'athletic', this.props.currentSelectorDate, true. labelGeneratedQty);
+              renderUserDetailsOnLabel(doc, userData, currentPlate, 'Chef\'s Choice Dinner', 'athletic', this.props.currentSelectorDate, true, labelGeneratedQty);
             }
           }
 
