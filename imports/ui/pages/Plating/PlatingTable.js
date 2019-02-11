@@ -129,24 +129,25 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
   // total meals for this customer
   doc.setFontStyle('normal');
   doc.setFontSize(9);
-  // const totalMeals = userData.breakfast +
-  //   userData.athleticBreakfast +
-  //   userData.bodybuilderBreakfast +
-  //   userData.lunch +
-  //   userData.athleticLunch +
-  //   userData.bodybuilderLunch +
-  //   userData.dinner +
-  //   userData.athleticDinner +
-  //   userData.bodybuilderDinner +
-  //   userData.chefsChoiceBreakfast +
-  //   userData.athleticChefsChoiceBreakfast +
-  //   userData.bodybuilderChefsChoiceBreakfast +
-  //   userData.chefsChoiceLunch +
-  //   userData.athleticChefsChoiceLunch +
-  //   userData.bodybuilderChefsChoiceLunch +
-  //   userData.chefsChoiceDinner +
-  //   userData.athleticChefsChoiceDinner +
-  //   userData.bodybuilderChefsChoiceDinner;
+  const totalMeals = userData.breakfast +
+    userData.athleticBreakfast +
+    userData.bodybuilderBreakfast +
+    userData.lunch +
+    userData.athleticLunch +
+    userData.bodybuilderLunch +
+    userData.dinner +
+    userData.athleticDinner +
+    userData.bodybuilderDinner +
+    userData.chefsChoiceBreakfast +
+    userData.athleticChefsChoiceBreakfast +
+    userData.bodybuilderChefsChoiceBreakfast +
+    userData.chefsChoiceLunch +
+    userData.athleticChefsChoiceLunch +
+    userData.bodybuilderChefsChoiceLunch +
+    userData.chefsChoiceDinner +
+    userData.athleticChefsChoiceDinner +
+    userData.bodybuilderChefsChoiceDinner;
+
   // console.log(currentPlate);
     let totalQty = 0;
 
@@ -181,7 +182,8 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
     doc.setFontSize(7.5);
     doc.setFontStyle('bold');
 
-    const qtyText = `Qty: ${labelGeneratedQty} of ${totalQty}`;
+    // const qtyText = `Qty: ${labelGeneratedQty} of ${totalQty}`;
+    const qtyText = `Qty: ${totalMeals}`;
 
     doc.setLineWidth(0.01);
     doc.roundedRect(0.15625, 0.46875, doc.getTextWidth(qtyText) + 0.10, 0.21875, 0.025, 0.025);
@@ -231,7 +233,7 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
   // dish title
   doc.setFontStyle('bold');
   doc.setFontSize(10);
-  doc.text(doc.splitTextToSize(`${mealType}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.6875), 0.15, 1.257083333);
+  doc.text(doc.splitTextToSize(`${userData.lifestyleName} ${mealType}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.6875), 0.15, 1.257083333);
 
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
