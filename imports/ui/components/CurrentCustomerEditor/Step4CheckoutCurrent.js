@@ -8,6 +8,7 @@ import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
 import Input from 'material-ui/Input';
 import TextField from 'material-ui/TextField';
+import Card from 'material-ui/Card';
 import Paper from 'material-ui/Paper';
 import Typography from 'material-ui/Typography';
 import Radio, { RadioGroup } from 'material-ui/Radio';
@@ -212,6 +213,21 @@ class Step4CheckoutCurrent extends React.Component {
             paymentProfileDetails: res.paymentProfile,
           });
         }
+      });
+    }
+
+    if(this.props.subscription.authorizeCustomerProfileId && this.props.subscription.authorizePaymentProfileId){
+      Meteor.call('getCustomerPaymentProfile', this.props.subscription.authorizeCustomerProfileId, this.props.subscription.authorizePaymentProfileId, (err, res) => {
+          if (err) {
+              console.log(err);
+          } else {
+              console.log(res);
+
+              this.setState({
+                  paymentProfileLoading: false,
+                  paymentProfileDetails: res.paymentProfile,
+              });
+          }
       });
     }
 
@@ -984,12 +1000,12 @@ class Step4CheckoutCurrent extends React.Component {
   }
 
   handleDeliveryPersonnelAssignment(){
-    this.setState({ 
-      deliveryButtonLoading: true, 
+    this.setState({
+      deliveryButtonLoading: true,
     })
 
     Meteor.call('subscriptions.assignDeliveryPersonnel', {
-      deliveryPersonId: this.state.deliveryAssignedTo, 
+      deliveryPersonId: this.state.deliveryAssignedTo,
       subscriptionId: this.props.subscription._id
     }, (err, res) => {
       if(err){
@@ -1003,6 +1019,31 @@ class Step4CheckoutCurrent extends React.Component {
       }
     })
   }
+
+
+  switchToExistingCard(){
+      this.setState({
+          switchButtonLoading: true,
+      })
+
+      Meteor.call('changePaymentMethodToExistingCard', this.props.subscription._id, (err, res) => {
+          if(err){
+              this.props.popTheSnackbar({
+                  message: err.reason || err,
+              })
+          } else {
+              this.props.popTheSnackbar({
+                  message: 'Switched to existing card successfully',
+              });
+          }
+
+          this.setState({
+              dialogAddCard: false,
+              switchButtonLoading: false,
+              dialogEditPaymentMethod: false,
+          })
+      });
+    }
 
   render() {
     const buttonClassname = classNames({
@@ -1439,6 +1480,61 @@ class Step4CheckoutCurrent extends React.Component {
                     <ClearIcon onClick={this.closeAddCardDialog} style={{ paddingRight: '24px' }} />
                   </div>
                   <DialogContent>
+
+                    {this.props.subscription.authorizeCustomerProfileId && this.props.subscription.authorizePaymentProfileId && (
+                        <div>
+                          {this.state.paymentProfileLoading ? (
+                              <CircularProgress size={30} />
+                          ) : (
+                              this.state.paymentProfileDetails !== null && (
+                                <div>
+                                <Typography type="subheading" style={{ marginBottom: "1em" }}>Existing</Typography>
+                                <Card>
+                                    <div style={{ padding: '15px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                        <div style={{display: 'flex', alignItems: 'center', justifyContent: 'space-between'}}>
+                                            <div>
+                                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Visa' && (<img width="80" src="/visa.svg" />)}
+
+                                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Mastercard' && (<img width="80" src="/mastercard.svg" />)}
+
+                                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'AmericanExpress' && (<img width="80" src="/amex.svg" />)}
+
+                                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'Discover' && (<img width="80" src="/discover.svg" />)}
+
+                                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'JCB' && (<img width="80" src="/jcb.svg" />)}
+
+                                              {this.state.paymentProfileDetails.payment.creditCard.cardType == 'DinersClub' && (<img width="80" src="/diners.svg" />)}
+                                            </div>
+                                          <div style={{ marginLeft: '10px' }}>
+                                              <Typography type="body2">{this.state.paymentProfileDetails.billTo.firstName} {this.state.paymentProfileDetails.billTo.lastName || ''}</Typography>
+                                              <Typography type="body2">{this.state.paymentProfileDetails.payment.creditCard.cardNumber} {this.state.paymentProfileDetails.payment.creditCard.expirationDate}</Typography>
+                                              {/*<Typography type="body2"></Typography>*/}
+                                          </div>
+                                        </div>
+                                        <Button
+                                            disabled={this.state.switchButtonLoading}
+                                            raised
+                                            className={`${buttonClassname}`}
+                                            onClick={this.switchToExistingCard}
+                                        >
+                                            Switch
+                                            {this.state.switchButtonLoading && (
+                                                <CircularProgress
+                                                    size={24}
+                                                    className={this.props.classes.buttonProgress}
+                                                />
+                                            )}
+                                        </Button>
+                                    </div>
+                                </Card>
+                              </div>)
+                          )}
+                        </div>
+                    )}
+
+
+                    <Typography style={{ marginTop: "25px" }} type="subheading">Add new</Typography>
+
                     <form
                       id="add-card-form"
                       ref={form => (this.form = form)}

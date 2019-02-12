@@ -1654,6 +1654,8 @@ Meteor.methods({
     check(paymentProfileId, String);
     check(customerProfileId, String);
 
+    console.log("YES")
+
     const syncGetCustomerPaymentProfile = Meteor.wrapAsync(getCustomerPaymentProfile);
     const getCustomerPaymentProfileRes = syncGetCustomerPaymentProfile(customerProfileId, paymentProfileId);
 
@@ -1998,6 +2000,28 @@ Meteor.methods({
       },
     );
 
+  },
+
+
+  changePaymentMethodToExistingCard(subscriptionId) {
+    check(subscriptionId, String);
+
+    const subscription = Subscriptions.findOne({_id: subscriptionId});
+
+    if (!subscription) {
+        throw new Meteor.Error('500', 'Subscription doesn\'t exist');
+    }
+
+    try {
+      Subscriptions.update({ _id: subscriptionId },{
+          $set: {
+            paymentMethod: "card",
+          }
+      })
+    } catch(error) {
+        throw new Meteor.Error('500', error.message);
+
+    }
   },
 
   changePaymentMethodNonCard(type, userId) {
