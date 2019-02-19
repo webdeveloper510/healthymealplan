@@ -193,12 +193,12 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
   if (userData.pairing !== null) {
     if (userData.pairing === 2) {
       console.log('Has pairing 2');
-      doc.addImage(TwoDayPairingIcon, 'PNG', 0.875, 0.46875, 0.92708, 0.2187);
+      doc.addImage(TwoDayPairingIcon, 'PNG', 0.70, 0.46875, 0.92708, 0.2187);
     }
 
     if (userData.pairing === 3) {
       console.log('Has pairing 3');
-      doc.addImage(ThreeDayPairingIcon, 'PNG', 0.875, 0.46875, 0.92708, 0.21875);
+      doc.addImage(ThreeDayPairingIcon, 'PNG', 0.70, 0.46875, 0.92708, 0.21875);
     }
 
     // if (renderBirthdayCake(userData.birthday, true)) {
@@ -541,7 +541,7 @@ function renderSummaryLabel(doc, currentPlate, dataCurrentLifestyle, lifestyleTi
   // dish title
   doc.setFontStyle('bold');
   doc.setFontSize(16);
-  doc.text(doc.splitTextToSize(`${mealTitle}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.6875), 0.15, 0.76);
+  doc.text(doc.splitTextToSize(`${lifestyleTitle} ${mealTitle}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.6875), 0.15, 0.76);
 
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
