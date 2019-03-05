@@ -73,7 +73,7 @@ class OrderSummary extends React.Component {
                   style={{ textAlign: 'right' }}
                 >
                   ${this.state.primaryProfileBilling
-                    ? this.state.primaryProfileBilling.breakfast
+                    ? parseFloat(this.state.primaryProfileBilling.breakfast
                       .totalQty *
                     this.state.primaryProfileBilling
                       .breakfastPrice +
@@ -91,7 +91,7 @@ class OrderSummary extends React.Component {
                     this.state.primaryProfileBilling.chefsChoiceLunchPrice +
                     this.state.primaryProfileBilling.chefsChoiceDinner
                       .totalQty *
-                    this.state.primaryProfileBilling.chefsChoiceDinnerPrice
+                    this.state.primaryProfileBilling.chefsChoiceDinnerPrice).toFixed(2)
                     : ''}
                 </Typography>
               </Grid>
@@ -126,9 +126,7 @@ class OrderSummary extends React.Component {
                       type="subheading"
                       style={{ textAlign: 'right' }}
                     >
-                      -${
-                        this.state.primaryProfileBilling.discountActual
-                      }{' '}
+                      -${parseFloat(this.state.primaryProfileBilling.discountActual).toFixed(2)}
                     </Typography>
                   </Grid>
 
@@ -167,20 +165,14 @@ class OrderSummary extends React.Component {
                       type="subheading"
                       style={{ textAlign: 'right' }}
                     >
-                      ${
-                        this.state.primaryProfileBilling
-                          .totalAthleticSurcharge
-                      }{' '}
+                      ${parseFloat(this.state.primaryProfileBilling.totalAthleticSurcharge).toFixed(2)}{' '}
                       ({this.state.primaryProfileBilling.lifestyle
-                        .discountOrExtraTypeAthletic == 'Fixed amount'
+                        .discountOrExtraTypeAthletic === 'Fixed amount'
                         ? '$'
                         : ''}
-                      {
-                        this.state.primaryProfileBilling.lifestyle
-                          .extraAthletic
-                      }
+                      {parseFloat(this.state.primaryProfileBilling.lifestyle.extraAthletic).toFixed(2)}
                       {this.state.primaryProfileBilling.lifestyle
-                        .discountOrExtraTypeAthletic == 'Percentage'
+                        .discountOrExtraTypeAthletic === 'Percentage'
                         ? '%'
                         : ''})
                     </Typography>
@@ -204,21 +196,16 @@ class OrderSummary extends React.Component {
                       type="subheading"
                       style={{ textAlign: 'right' }}
                     >
-                      ${
-                        this.state.primaryProfileBilling
-                          .totalBodybuilderSurcharge
-                      }{' '}
+                      ${parseFloat(this.state.primaryProfileBilling.totalBodybuilderSurcharge).toFixed(2)}{' '}
                       ({this.state.primaryProfileBilling.lifestyle
-                        .discountOrExtraTypeBodybuilder ==
+                        .discountOrExtraTypeBodybuilder ===
                         'Fixed amount'
                         ? '$'
                         : ''}
-                      {
-                        this.state.primaryProfileBilling.lifestyle
-                          .extraBodybuilder
-                      }
+                      {parseFloat(this.state.primaryProfileBilling.lifestyle.extraBodybuilder).toFixed(2)}
+
                       {this.state.primaryProfileBilling.lifestyle
-                        .discountOrExtraTypeBodybuilder == 'Percentage'
+                        .discountOrExtraTypeBodybuilder === 'Percentage'
                         ? '%'
                         : ''})
                     </Typography>
@@ -251,14 +238,22 @@ class OrderSummary extends React.Component {
                   <Grid container key={i}>
                     <Grid item xs={12} sm={6}>
                       <Typography type="subheading">
-                        {e.title} ({e.discountOrExtraType ==
-                          'Fixed amount'
-                          ? '$'
-                          : ''}
-                        {e.extra}
-                        {e.discountOrExtraType == 'Percentage'
-                          ? '%'
-                          : ''})
+                        {e.title}
+                          {e.discountOrExtraType && (
+                              <span>
+                                    (
+                                      {e.discountOrExtraType ===
+                                          'Fixed amount'
+                                          ? '$'
+                                      : ''}
+                                        {parseFloat(e.extra).toFixed(2)}
+                                        {e.discountOrExtraType === 'Percentage'
+                                          ? '%'
+                                      : ''}
+                                    )
+                            </span>
+                          )}
+
                       </Typography>
                     </Grid>
                     <Grid item xs={12} sm={6}>
@@ -266,10 +261,7 @@ class OrderSummary extends React.Component {
                         type="subheading"
                         style={{ textAlign: 'right' }}
                       >
-                        ${
-                          this.state.primaryProfileBilling
-                            .restrictionsSurcharges[i]
-                        }
+                        ${parseFloat(this.state.primaryProfileBilling.restrictionsSurcharges[i]).toFixed(2)}
                       </Typography>
                     </Grid>
                   </Grid>
@@ -340,12 +332,12 @@ class OrderSummary extends React.Component {
                         type="subheading"
                         style={{ textAlign: 'right' }}
                       >
-                        ${e.breakfast.totalQty * e.breakfastPrice +
+                        ${parseFloat(e.breakfast.totalQty * e.breakfastPrice +
                           e.lunch.totalQty * e.lunchPrice +
                           e.dinner.totalQty * e.dinnerPrice +
                           e.chefsChoiceBreakfast.totalQty * e.chefsChoiceBreakfastPrice +
                           e.chefsChoiceLunch.totalQty * e.chefsChoiceLunchPrice +
-                          e.chefsChoiceDinner.totalQty * e.chefsChoiceDinnerPrice}
+                          e.chefsChoiceDinner.totalQty * e.chefsChoiceDinnerPrice).toFixed(2)}
                       </Typography>
                     </Grid>
                   </Grid>
@@ -376,7 +368,7 @@ class OrderSummary extends React.Component {
                             type="subheading"
                             style={{ textAlign: 'right' }}
                           >
-                            -${e.discountActual}{' '}
+                            -${parseFloat(e.discountActual).toFixed(2)}{' '}
                           </Typography>
                         </Grid>
                       </Grid>
@@ -409,14 +401,14 @@ class OrderSummary extends React.Component {
                           type="subheading"
                           style={{ textAlign: 'right' }}
                         >
-                          ${e.totalAthleticSurcharge} ({e.lifestyle
-                            .discountOrExtraTypeAthletic ==
+                          ${parseFloat(e.totalAthleticSurcharge).toFixed(2)} ({e.lifestyle
+                            .discountOrExtraTypeAthletic ===
                             'Fixed amount'
                             ? '$'
                             : ''}
-                          {e.lifestyle.extraAthletic}
+                          {parseFloat(e.lifestyle.extraAthletic).toFixed(2)}
                           {e.lifestyle
-                            .discountOrExtraTypeAthletic ==
+                            .discountOrExtraTypeAthletic ===
                             'Percentage'
                             ? '%'
                             : ''})
@@ -439,15 +431,15 @@ class OrderSummary extends React.Component {
                           type="subheading"
                           style={{ textAlign: 'right' }}
                         >
-                          ${e.totalBodybuilderSurcharge} ({e
+                          ${parseFloat(e.totalBodybuilderSurcharge).toFixed(2)} ({e
                             .lifestyle
-                            .discountOrExtraTypeBodybuilder ==
+                            .discountOrExtraTypeBodybuilder ===
                             'Fixed amount'
                             ? '$'
                             : ''}
-                          {e.lifestyle.extraBodybuilder}
+                          {parseFloat(e.lifestyle.extraBodybuilder).toFixed(2)}
                           {e.lifestyle
-                            .discountOrExtraTypeBodybuilder ==
+                            .discountOrExtraTypeBodybuilder ===
                             'Percentage'
                             ? '%'
                             : ''})
@@ -476,14 +468,21 @@ class OrderSummary extends React.Component {
                       <Grid container key={ind}>
                         <Grid item xs={12} sm={6}>
                           <Typography type="subheading">
-                            {el.title} ({el.discountOrExtraType ==
-                              'Fixed amount'
-                              ? '$'
-                              : ''}
-                            {el.extra}
-                            {el.discountOrExtraType == 'Percentage'
-                              ? '%'
-                              : ''})
+                            {el.title}
+                              {el.discountOrExtraType && (
+                                  <span>
+                                        (
+                                          {el.discountOrExtraType ===
+                                          'Fixed amount'
+                                          ? '$'
+                                          : ''}
+                                            {parseFloat(el.extra).toFixed(2)}
+                                            {el.discountOrExtraType === 'Percentage'
+                                              ? '%'
+                                              : ''}
+                                        )
+                                  </span>
+                              )}
                           </Typography>
                         </Grid>
                         <Grid item xs={12} sm={6}>
@@ -491,7 +490,7 @@ class OrderSummary extends React.Component {
                             type="subheading"
                             style={{ textAlign: 'right' }}
                           >
-                            ${e.restrictionsSurcharges[ind]}
+                            ${parseFloat(e.restrictionsSurcharges[ind]).toFixed(2)}
                           </Typography>
                         </Grid>
                       </Grid>
@@ -572,10 +571,7 @@ class OrderSummary extends React.Component {
                       {this.state.primaryProfileBilling &&
                         this.state.primaryProfileBilling
                           .deliverySurcharges > 0
-                        ? `$${
-                        this.state.primaryProfileBilling
-                          .deliverySurcharges
-                        }`
+                        ? `$${this.state.primaryProfileBilling.deliverySurcharges.toFixed(2)}`
                         : ''}
                     </Typography>
                   </Grid>
@@ -594,7 +590,7 @@ class OrderSummary extends React.Component {
                     <Typography type="body2">
                       {this.props.discountSelected 
                       && this.props.discounts 
-                      && this.props.discounts.find(e => this.props.discountSelected == e.title || this.props.discountSelected == e._id).title}
+                      && this.props.discounts.find(e => this.props.discountSelected === e.title || this.props.discountSelected === e._id).title}
                     </Typography>
                   </Grid>
                   <Grid item xs={12} sm={6}>
@@ -602,7 +598,7 @@ class OrderSummary extends React.Component {
                       type="subheading"
                       style={{ textAlign: 'right' }}
                     >
-                      -${this.state.primaryProfileBilling.discountTotal}
+                      -${parseFloat(this.state.primaryProfileBilling.discountTotal).toFixed(2)}
                     </Typography>
                   </Grid>
                 </Grid>
@@ -648,7 +644,7 @@ class OrderSummary extends React.Component {
                     style={{ textAlign: 'right' }}
                   >
                     ${this.state.primaryProfileBilling &&
-                      this.state.primaryProfileBilling.taxes}
+                      parseFloat(this.state.primaryProfileBilling.taxes).toFixed(2)}
                   </Typography>
                 </Grid>
               </Grid>
@@ -669,12 +665,12 @@ class OrderSummary extends React.Component {
                 >
                   {this.state.taxExempt
                     ? this.state.primaryProfileBilling &&
-                    `$${this.state.primaryProfileBilling
+                    `$${parseFloat(this.state.primaryProfileBilling
                       .groupTotal -
-                    this.state.primaryProfileBilling.taxes}/week`
+                    this.state.primaryProfileBilling.taxes).toFixed(2)}/week`
                     : this.state.primaryProfileBilling &&
                     `$${
-                    this.state.primaryProfileBilling.groupTotal
+                    parseFloat(this.state.primaryProfileBilling.groupTotal).toFixed(2)
                     }/week`}
                 </Typography>
               </Grid>

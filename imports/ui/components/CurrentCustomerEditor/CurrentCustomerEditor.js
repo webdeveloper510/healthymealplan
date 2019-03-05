@@ -600,7 +600,7 @@ class CurrentCustomerEditor extends React.Component {
     });
   }
 
-  saveSecondStep() {
+  saveSecondStep(updateWhen) {
     console.log($('#step2').valid());
 
     if (!$('#step2').valid()) {
@@ -763,6 +763,7 @@ class CurrentCustomerEditor extends React.Component {
 
     const step2Data = {
       id: this.props.customer._id,
+      updateWhen,
       address,
       subscriptionId: this.props.subscription ? this.props.subscription._id : '',
       subIngredients: this.state.subIngredients,
@@ -774,7 +775,7 @@ class CurrentCustomerEditor extends React.Component {
       restrictions: this.state.restrictions,
       scheduleReal: this.state.scheduleReal,
       platingNotes: this.state.platingNotes,
-      secondary: this.props.customer.secondary != undefined,
+      secondary: this.props.customer.secondary !== undefined,
       secondaryProfiles: this.state.secondaryProfilesData,
       secondaryProfilesRemoved: this.state.secondaryProfilesRemoved,
       completeSchedule: this.state.completeSchedule,
@@ -7893,7 +7894,7 @@ class CurrentCustomerEditor extends React.Component {
 
                     <DialogContent>
                       <DialogContentText>
-                        Select if it's a preference or if it's a restriction
+                        Select if it's an allergy or a dislike
                       </DialogContentText>
                       <FormControl component="fieldset">
                         <RadioGroup
@@ -7906,12 +7907,12 @@ class CurrentCustomerEditor extends React.Component {
                           <FormControlLabel
                             value="Restriction"
                             control={<Radio selected />}
-                            label="Restriction"
+                            label="Allergy"
                           />
                           <FormControlLabel
                             value="Preference"
                             control={<Radio />}
-                            label="Preference"
+                            label="Dislike"
                             selected
                           />
                         </RadioGroup>
@@ -7969,56 +7970,15 @@ class CurrentCustomerEditor extends React.Component {
                     </DialogActions>
                   </Dialog>
 
-                  <Grid container>
-                    <Grid item xs={12} sm={6}>
+                  <Grid container justify="space-between">
+
+
+                    <Grid item xs={12} sm={6} md={3}>
                       <Typography
                         type="subheading"
                         className="text-uppercase font-medium"
                       >
-                        Dislikes
-                      </Typography>
-
-                      <div
-                        style={{
-                          display: 'flex',
-                          alignItems: 'center',
-                          flexWrap: 'wrap',
-                          marginTop: '25px',
-                        }}
-                      >
-                        {this.state.subIngredients.length ? (
-                          this.state.subIngredients.map((subIngredient, i) => (
-                            <Chip
-                              avatar={
-                                <Avatar>
-                                  {' '}
-                                  {this.getSubIngredientAvatar(subIngredient)}{' '}
-                                </Avatar>
-                              }
-                              style={{
-                                marginRight: '8px',
-                                marginBottom: '8px',
-                              }}
-                              label={this.getSubIngredientTitle(subIngredient)}
-                              key={i}
-                              onDelete={this.handleSubIngredientChipDelete.bind(
-                                this,
-                                subIngredient,
-                              )}
-                            />
-                          ))
-                        ) : (
-                          <Chip className="chip--bordered" label="Ingredient" />
-                        )}
-                      </div>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <Typography
-                        type="subheading"
-                        className="text-uppercase font-medium"
-                      >
-                        Restrictions
+                        Allergies
                       </Typography>
 
                       <div
@@ -8059,6 +8019,48 @@ class CurrentCustomerEditor extends React.Component {
                         )}
                       </div>
                     </Grid>
+                      <Grid item xs={12} sm={6} md={3}>
+                          <Typography
+                              type="subheading"
+                              className="text-uppercase font-medium"
+                          >
+                              Dislikes
+                          </Typography>
+
+                          <div
+                              style={{
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  flexWrap: 'wrap',
+                                  marginTop: '25px',
+                              }}
+                          >
+                              {this.state.subIngredients.length ? (
+                                  this.state.subIngredients.map((subIngredient, i) => (
+                                      <Chip
+                                          avatar={
+                                              <Avatar>
+                                                  {' '}
+                                                  {this.getSubIngredientAvatar(subIngredient)}{' '}
+                                              </Avatar>
+                                          }
+                                          style={{
+                                              marginRight: '8px',
+                                              marginBottom: '8px',
+                                          }}
+                                          label={this.getSubIngredientTitle(subIngredient)}
+                                          key={i}
+                                          onDelete={this.handleSubIngredientChipDelete.bind(
+                                              this,
+                                              subIngredient,
+                                          )}
+                                      />
+                                  ))
+                              ) : (
+                                  <Chip className="chip--bordered" label="Ingredient" />
+                              )}
+                          </div>
+                      </Grid>
                   </Grid>
                   <Grid container>
                     <Grid item xs={12}>
@@ -8594,7 +8596,7 @@ class CurrentCustomerEditor extends React.Component {
 
                             <DialogContent>
                               <DialogContentText>
-                                Select if it's a preference or if it's a restriction
+                                  Select if it is an allergy or a dislike
                               </DialogContentText>
                               <FormControl component="fieldset">
                                 <RadioGroup
@@ -8609,12 +8611,12 @@ class CurrentCustomerEditor extends React.Component {
                                   <FormControlLabel
                                     value="Restriction"
                                     control={<Radio selected />}
-                                    label="Restriction"
+                                    label="Allergy"
                                   />
                                   <FormControlLabel
                                     value="Preference"
                                     control={<Radio />}
-                                    label="Preference"
+                                    label="Dislike"
                                     selected
                                   />
                                 </RadioGroup>
@@ -8677,8 +8679,62 @@ class CurrentCustomerEditor extends React.Component {
                             </DialogActions>
                           </Dialog>
 
-                          <Grid container>
-                            <Grid item xs={12} sm={6}>
+                          <Grid container justify="space-between">
+                              <Grid item xs={12} sm={6} md={3}>
+                                  <Typography
+                                      type="body1"
+                                      className="text-uppercase font-medium"
+                                  >
+                                      Allergies
+                                  </Typography>
+
+                                  <div
+                                      style={{
+                                          display: 'flex',
+                                          alignItems: 'center',
+                                          flexWrap: 'wrap',
+                                          marginTop: '25px',
+                                      }}
+                                  >
+                                      {this.state.secondaryProfilesData[profileIndex]
+                                          .specificRestrictions.length ? (
+                                          this.state.secondaryProfilesData[
+                                              profileIndex
+                                              ].specificRestrictions.map((subIngredient, i) => (
+                                              <Chip
+                                                  avatar={
+                                                      <Avatar>
+                                                          {' '}
+                                                          {this.getSubIngredientAvatar(
+                                                              subIngredient,
+                                                          )}{' '}
+                                                      </Avatar>
+                                                  }
+                                                  style={{
+                                                      marginRight: '8px',
+                                                      marginBottom: '8px',
+                                                  }}
+                                                  label={this.getSubIngredientTitle(
+                                                      subIngredient,
+                                                  )}
+                                                  key={i}
+                                                  onDelete={this.handleSubIngredientChipDeleteSpecificRestrictionSecondary.bind(
+                                                      this,
+                                                      subIngredient,
+                                                      profileIndex,
+                                                  )}
+                                              />
+                                          ))
+                                      ) : (
+                                          <Chip
+                                              className="chip--bordered"
+                                              label="Ingredient"
+                                          />
+                                      )}
+                                  </div>
+                              </Grid>
+                            
+                            <Grid item xs={12} sm={6} md={3}>
                               <Typography
                                 type="body1"
                                 className="text-uppercase font-medium"
@@ -8729,59 +8785,7 @@ class CurrentCustomerEditor extends React.Component {
                               </div>
                             </Grid>
 
-                            <Grid item xs={12} sm={6}>
-                              <Typography
-                                type="body1"
-                                className="text-uppercase font-medium"
-                              >
-                                Restrictions
-                              </Typography>
 
-                              <div
-                                style={{
-                                  display: 'flex',
-                                  alignItems: 'center',
-                                  flexWrap: 'wrap',
-                                  marginTop: '25px',
-                                }}
-                              >
-                                {this.state.secondaryProfilesData[profileIndex]
-                                  .specificRestrictions.length ? (
-                                    this.state.secondaryProfilesData[
-                                      profileIndex
-                                    ].specificRestrictions.map((subIngredient, i) => (
-                                      <Chip
-                                        avatar={
-                                          <Avatar>
-                                            {' '}
-                                            {this.getSubIngredientAvatar(
-                                              subIngredient,
-                                            )}{' '}
-                                          </Avatar>
-                                        }
-                                        style={{
-                                          marginRight: '8px',
-                                          marginBottom: '8px',
-                                        }}
-                                        label={this.getSubIngredientTitle(
-                                          subIngredient,
-                                        )}
-                                        key={i}
-                                        onDelete={this.handleSubIngredientChipDeleteSpecificRestrictionSecondary.bind(
-                                          this,
-                                          subIngredient,
-                                          profileIndex,
-                                        )}
-                                      />
-                                    ))
-                                  ) : (
-                                    <Chip
-                                      className="chip--bordered"
-                                      label="Ingredient"
-                                    />
-                                  )}
-                              </div>
-                            </Grid>
                           </Grid>
 
                           <Grid container>
@@ -9249,7 +9253,7 @@ class CurrentCustomerEditor extends React.Component {
                             placeholder="Street address"
                             initialValue={this.state.streetAddress}
                             onChange={(value) => { this.setState({ streetAddress: value }); }}
-                            onSuggestSelect={(suggest) => { this.setState({ streetAddress: suggest.label }); }}
+                            onSuggestSelect={(suggest) => { suggest && this.setState({ streetAddress: suggest.label }); }}
                             name="streetAddress"
                           />
                         </Grid>
@@ -9652,13 +9656,19 @@ class CurrentCustomerEditor extends React.Component {
               >
                 <AppBar className={this.props.classes.appBar}>
                   <Toolbar>
+
                     <IconButton color="inherit" onClick={this.handleClose} aria-label="Close">
                       <CloseIcon />
                     </IconButton>
                     <Typography type="title" color="inherit" className={this.props.classes.flex}>
                       Subscription update
                     </Typography>
-                    <Button color="inherit" onClick={() => this.saveSecondStep()}>Save</Button>
+
+                    <div>
+                        <Button color="inherit" onClick={() => this.saveSecondStep('now')}>Update now</Button>
+                        <Button color="inherit" onClick={() => this.saveSecondStep('friday')}>Schedule for Friday night</Button>
+                    </div>
+
                   </Toolbar>
                 </AppBar>
                 <OrderSummary
@@ -9674,7 +9684,7 @@ class CurrentCustomerEditor extends React.Component {
             </div>
           )}
 
-          {this.state.currentTab == 2 && (
+          {this.state.currentTab === 2 && (
 
             <Paper elevation={2} style={{ width: '100%' }} className="paper-for-fields">
               <Typography type="headline" style={{ marginBottom: '1em' }}>Activity</Typography>
@@ -9690,31 +9700,32 @@ class CurrentCustomerEditor extends React.Component {
                     onClick={() => this.setState({ [e._id]: !this.state[e._id] })}
                   >
                     <Typography type="body1">
-                      {e.type == 'editSubscriptionJob' ? 'Edit subscription' : e.type
+                      {e.type === 'editSubscriptionJob' ? 'Edit subscription' : e.type
                           === 'editSubscriptionJobNonCard' ? 'Edit subscription (non card)' : e.type
                           === 'setSubscriptionCancelledJob' ? 'Cancel subscription (non card)' : e.type
                           === 'setSubscriptionCancelledCardJob' ? 'Cancel subscription' : e.type
                           === 'setSubscriptionActiveJob' ? 'Activate subscription (non card)' : e.type
                           === 'setSubscriptionActiveCardJob' ? 'Activate subscription' : e.type
-                          === 'setSubscriptionActive' ? 'Activate subscription' : ''}
+                          === 'setSubscriptionActive' ? 'Activate subscription' : e.type
+                          === 'setSubscriptionPausedJob' ? `Pause subscription (activates on ${moment(e.activationDate).format('MMMM D, YYYY')})` : ''}
                       {' '}({e.status}) {`runs ${moment(e.after).format('dddd, MMMM D YYYY h:m A')}`}
                       {e.data.hasOwnProperty('jobCreatedBy') && (
                         <React.Fragment>
-                          {e.data.jobCreatedBy == 'customer' ? (
+                          {e.data.jobCreatedBy === 'customer' ? (
                             ' by customer'
                           ) : ''}
                         </React.Fragment>
                       )}
                     </Typography>
 
-                    <Typography>{`Added ${moment(e.created).format('dddd, MMMM D YYYY h:m A')}`}</Typography>
+                    <Typography>{`Added ${moment(e.created).format('dddd, MMMM D YYYY hh:mm a')}`}</Typography>
                   </Grid>
                   <Collapse
                     in={Boolean(this.state[e._id])}
                     transitionDuration="auto"
                     component="div"
                   >
-                    {e.type == 'editSubscriptionJob' || e.type == 'editSubscriptionJobNonCard' ? (
+                    {e.type === 'editSubscriptionJob' || e.type === 'editSubscriptionJobNonCard' ? (
                       <React.Fragment>
                         {e.data.completeSchedule.map((compScheuleDay, compScheduleIndex) => (
                           <div>
@@ -9731,7 +9742,7 @@ class CurrentCustomerEditor extends React.Component {
                         {e.data.delivery.map((deliveryVal, deliveryIndex) => (
                           <div>
                             <Typography type="body2">
-                              {`${moment().isoWeekday(deliveryIndex + 1).format('dddd')}: ${deliveryVal == 'false' || deliveryVal == '' ? 'N/A' : deliveryVal}`}
+                              {`${moment().isoWeekday(deliveryIndex + 1).format('dddd')}: ${deliveryVal === 'false' || deliveryVal === '' ? 'N/A' : deliveryVal}`}
                             </Typography>
                           </div>
                         ))}
@@ -9747,7 +9758,7 @@ class CurrentCustomerEditor extends React.Component {
             </Paper>
           )}
 
-          {(this.state.currentTab === 3 && this.props.customer && this.props.subscription != undefined && this.props.customer.secondary == undefined) ? (
+          {(this.state.currentTab === 3 && this.props.customer && this.props.subscription !== undefined && this.props.customer.secondary === undefined) ? (
             <Step4CheckoutCurrent
               secondaryAccounts={this.props.secondaryAccounts}
               activeStep={this.state.currentTab}

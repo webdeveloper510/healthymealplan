@@ -374,6 +374,7 @@ Meteor.methods({
 
     check(data, {
       id: String,
+      updateWhen: String,
       address: Object,
       lifestyle: String,
       discount: String,
@@ -417,44 +418,9 @@ Meteor.methods({
       friday = moment().add(1, 'weeks').isoWeekday(5).hour(23).toDate();
     }
 
+    console.log("Edit customer Step 2 for ID: " + data.id);
 
-    if (sub.paymentMethod == 'card') {
-
-      console.log('Inside card');
-
-      // const syncGetSubscription = Meteor.wrapAsync(getSubscription);
-
-      // const getSubscriptionRes = syncGetSubscription(sub.authorizeSubscriptionId);
-
-      // console.log(getSubscriptionRes);
-
-      // if (getSubscriptionRes.messages.resultCode != 'Ok') {
-      //   throw new Meteor.Error(500, 'There was a problem fetching the subscription [Authorize.Net]');
-      // }
-
-      // const subscriptionStartDate = getSubscriptionRes.subscription.paymentSchedule.startDate;
-      // const subscriptionTotalOccurrences = getSubscriptionRes.subscription.paymentSchedule.totalOccurrences;
-      // console.log('Total: ' + '');
-      // console.log(subscriptionTotalOccurrences);
-      // console.log(moment(subscriptionStartDate).hour(23).minute(30));
-      // console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
-
-      // // this changes subscription amount immediately if first charge hasn't happened
-      // if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))) {
-      //   console.log('Inside card if');
-
-      //   console.log("Subscription hasn't been charged");
-
-      //   const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
-
-      //   const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
-
-      //   if (updateSubscriptionRes.messages.resultCode != 'Ok') {
-      //     throw new Meteor.Error(500, 'There was a problem updating the subscription [Authorize.Net]');
-      //   }
-
-      // } else {
-      console.log('Inside card else');
+    if (data.updateWhen === "friday") {
 
       const jobExists = Jobs.findOne({ type: 'editSubscriptionJob', 'data.id': data.id, status: 'waiting' });
 
@@ -482,12 +448,7 @@ Meteor.methods({
       return {
         subUpdateScheduled: true,
       };
-
-      // }
-
     }
-
-    console.log('Inside card after return');
 
     if (data.secondaryProfiles && data.secondaryProfiles.length > 0) {
 
