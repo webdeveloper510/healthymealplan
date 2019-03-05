@@ -586,7 +586,7 @@ class DirectionsTable extends React.Component {
 
 
               {this.state.selectedCheckboxes.length > 0 ? (
-                <div className="table-container--delete-rows-container" style={{ backgroundColor: '#607d8b' }}>
+                <div className="table-container__delivery-actions table-container--delete-rows-container" style={{ backgroundColor: '#607d8b' }}>
                   <Typography style={{ color: '#fff' }} className="subheading" type="subheading">
                     {this.state.selectedCheckboxesNumber} deliver{this.state.selectedCheckboxes.length > 1 ? ('ies') : 'y'} selected
                   </Typography>

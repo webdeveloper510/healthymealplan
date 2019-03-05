@@ -67,3 +67,22 @@ tr.status {
    }
 
 }
+
+.table-container__delivery-actions  {
+  position: fixed !important;
+  z-index: 100;
+  top: inherit !important;
+  right: 0 !important;
+  bottom: 0 !important;
+
+  width: calc(100% - 32px);
+
+  @media(min-width: 1025px) {
+    width: calc(100% - 300px);
+    right: 0 !important;
+    left: inherit !important;
+  }
+
+
+
+}
