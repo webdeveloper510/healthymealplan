@@ -737,11 +737,12 @@ class Step4CheckoutCurrent extends React.Component {
   }
 
 
-  handleSaveDiscount() {
+  handleSaveDiscount(updateWhen) {
 
     const discountDetails = {
       discountCode: this.state.discountSelected,
       id: this.props.customer._id,
+      updateWhen,
     };
 
     Meteor.call('edit.customer.step4', discountDetails, (err, res) => {
@@ -782,12 +783,13 @@ class Step4CheckoutCurrent extends React.Component {
   }
 
   // this methods removes the discount and opens up the subscription update dialog (similar to step 2)
-  handleRemoveDiscount() {
+  handleRemoveDiscount(updateWhen) {
 
     const discountDetails = {
       discountCode: this.state.discountSelected,
       id: this.props.customer._id,
       removeDiscount: true,
+      updateWhen,
     };
 
     Meteor.call('edit.customer.step4', discountDetails, (err, res) => {
@@ -858,6 +860,28 @@ class Step4CheckoutCurrent extends React.Component {
     this.setState({
       taxExempt: checked,
     });
+  }
+
+  handleTaxExemptSubmit() {
+
+      const dataToSend = {
+          subscriptionId: this.props.subscription._id,
+          taxExempt: this.state.taxExempt,
+      };
+
+      console.log(dataToSend);
+
+      Meteor.call('edit.customer.taxExempt', dataToSend, (err, res) => {
+          if(err) {
+              this.props.popTheSnackbar({
+                  message: err || err.message || err.reason,
+              })
+          } else {
+              this.props.popTheSnackbar({
+                  message: `Successfully updated tax exempt status`
+              });
+          }
+      });
   }
 
   handleChangeRadioPaymentMethod(event, value) {
@@ -1123,8 +1147,9 @@ class Step4CheckoutCurrent extends React.Component {
                 {this.state.paymentMethod === 'interac' ||
                   this.state.paymentMethod === 'cash' && (
                     <Grid container>
-                      <Grid item xs={12} sm={6}>
+                      <Grid justify={'space-between'} item xs={12} md={12}>
                         <FormControlLabel
+                            style={{ marginLeft: '10px' }}
                           control={
                             <Checkbox
                               value="taxExempt"
@@ -1134,6 +1159,10 @@ class Step4CheckoutCurrent extends React.Component {
                           onChange={this.handleTaxExempt.bind(this)}
                           label="Customer is tax exempt"
                         />
+
+                        <Button disabled={this.state.taxExempt === this.props.subscription.taxExempt} onClick={this.handleTaxExemptSubmit}>
+                            Save
+                        </Button>
                       </Grid>
                     </Grid>
                   )}
@@ -2267,26 +2296,21 @@ class Step4CheckoutCurrent extends React.Component {
                       <Typography type="title" color="inherit" className={this.props.classes.flex}>
                         Subscription update
                       </Typography>
-                      {/*<div>*/}
-                          {/*<Button*/}
-                              {/*color="inherit"*/}
-                              {/*onClick={this.state.discountBeingRemoved ? this.handleRemoveDiscount : this.handleSaveDiscount}*/}
-                          {/*>*/}
-                              {/*Update immediately*/}
-                          {/*</Button>*/}
-                          {/*<Button*/}
-                              {/*color="inherit"*/}
-                              {/*onClick={this.state.discountBeingRemoved ? this.handleRemoveDiscount : this.handleSaveDiscount}*/}
-                          {/*>*/}
-                              {/*Update on Friday night*/}
-                          {/*</Button>*/}
-                      {/*</div>*/}
-                        <Button
-                            color="inherit"
-                            onClick={this.state.discountBeingRemoved ? this.handleRemoveDiscount : this.handleSaveDiscount}
-                        >
-                            Save
-                        </Button>
+                      <div>
+                          <Button
+                              color="inherit"
+                              onClick={() => this.state.discountBeingRemoved ? this.handleRemoveDiscount('now') : this.handleSaveDiscount('now')}
+                          >
+                              Update now
+                          </Button>
+                          <Button
+                              color="inherit"
+                              onClick={() => this.state.discountBeingRemoved ? this.handleRemoveDiscount('friday') : this.handleSaveDiscount('friday')}
+                          >
+                              Schedule for friday night
+                          </Button>
+                      </div>
+
                     </Toolbar>
                   </AppBar>
                   <OrderSummary

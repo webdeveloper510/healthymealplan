@@ -2173,8 +2173,8 @@ class Step4Checkout extends React.Component {
                                   style={{ textAlign: 'right' }}
                                 >
                                   ${
-                                    this.state.primaryProfileBilling
-                                      .restrictionsSurcharges[i]
+                                    parseFloat(this.state.primaryProfileBilling
+                                      .restrictionsSurcharges[i]).toFixed(2)
                                   }
                                 </Typography>
                               </Grid>
@@ -2246,12 +2246,12 @@ class Step4Checkout extends React.Component {
                                   type="subheading"
                                   style={{ textAlign: 'right' }}
                                 >
-                                  ${e.breakfast.totalQty * e.breakfastPrice +
+                                  ${parseFloat(e.breakfast.totalQty * e.breakfastPrice +
                                     e.lunch.totalQty * e.lunchPrice +
                                     e.dinner.totalQty * e.dinnerPrice +
                                     e.chefsChoiceBreakfast.totalQty * e.chefsChoiceBreakfastPrice +
                                     e.chefsChoiceLunch.totalQty * e.chefsChoiceLunchPrice +
-                                    e.chefsChoiceDinner.totalQty * e.chefsChoiceDinnerPrice}
+                                    e.chefsChoiceDinner.totalQty * e.chefsChoiceDinnerPrice).toFixed(2)}
                                 </Typography>
                               </Grid>
                             </Grid>
@@ -2282,7 +2282,7 @@ class Step4Checkout extends React.Component {
                                       type="subheading"
                                       style={{ textAlign: 'right' }}
                                     >
-                                      -${e.discountActual}{' '}
+                                      -${parseFloat(e.discountActual).toFixed(2)}{' '}
                                     </Typography>
                                   </Grid>
                                 </Grid>
@@ -2315,14 +2315,14 @@ class Step4Checkout extends React.Component {
                                     type="subheading"
                                     style={{ textAlign: 'right' }}
                                   >
-                                    ${e.totalAthleticSurcharge} ({e.lifestyle
-                                      .discountOrExtraTypeAthletic ==
+                                    ${parseFloat(e.totalAthleticSurcharge).toFixed(2)} ({e.lifestyle
+                                      .discountOrExtraTypeAthletic ===
                                       'Fixed amount'
                                       ? '$'
                                       : ''}
-                                    {e.lifestyle.extraAthletic}
+                                      {parseFloat(e.lifestyle.extraAthletic).toFixed(2)}
                                     {e.lifestyle
-                                      .discountOrExtraTypeAthletic ==
+                                      .discountOrExtraTypeAthletic ===
                                       'Percentage'
                                       ? '%'
                                       : ''})

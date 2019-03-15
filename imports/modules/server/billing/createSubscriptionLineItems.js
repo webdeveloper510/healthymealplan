@@ -97,7 +97,7 @@ export default function createSubscriptionLineItems(
       primaryProfileBilling.deliverySurcharges;
   }
 
-  primaryProfileLineItems.taxes = primaryProfileBilling.taxes;
+  primaryProfileLineItems.taxes = primaryProfileBilling.groupTotal - primaryProfileBilling.taxes;
 
   if (taxExempt) {
     primaryProfileLineItems.taxes =

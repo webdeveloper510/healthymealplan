@@ -573,10 +573,87 @@ Meteor.methods({
 
   },
 
+  'edit.customer.taxExempt': function editCustomerTaxExempt(data) {
+
+      //Fix line items before doing receipts
+
+      check(data, {
+          subscriptionId: String,
+          taxExempt: Boolean,
+      });
+
+      const sub = Subscriptions.findOne({ _id: data.subscriptionId });
+
+      if(!sub) {
+        throw new Meteor.Error('404', 'Subscription does not exist.');
+      }
+
+      const primaryUser = Meteor.users.findOne({ _id: sub.customerId });
+
+      const billingData = {
+          id: primaryUser._id,
+          address: primaryUser.address,
+          lifestyle: primaryUser.lifestyle,
+          discount: primaryUser.discount,
+          discountCode: sub.discountApplied || '',
+          discountCodeRemove: false,
+          restrictions: primaryUser.restrictions,
+          specificRestrictions: primaryUser.specificRestrictions,
+          subIngredients: primaryUser.preferences,
+          platingNotes: primaryUser.platingNotes,
+          secondary: false,
+          completeSchedule: sub.completeSchedule,
+          secondaryProfiles: [],
+          subscriptionId: sub._id,
+          delivery: sub.delivery,
+          scheduleReal: primaryUser.schedule,
+          notifications: primaryUser.notifications,
+          coolerBag: primaryUser.coolerBag,
+          secondaryProfilesRemoved: [],
+      };
+
+      if (primaryUser.associatedProfiles > 0) {
+          billingData.secondary = true;
+          const secondaries = Meteor.users.find({ primaryAccount: primaryUser._id }).fetch();
+
+          secondaries.forEach((e, i) => {
+              billingData.secondaryProfiles.push({
+                  first_name: e.profile.name.first || "",
+                  last_name: e.profile.name.last || "",
+                  lifestyle: e.lifestyle,
+                  scheduleReal: e.schedule,
+                  subIngredients: e.preferences,
+                  restrictions: e.restrictions,
+                  specificRestrictions: e.specificRestrictions,
+                  discount: e.discount,
+              });
+          });
+      }
+
+      const billing = calculateSubscriptionCost(billingData);
+
+      console.log(billing);
+
+      try {
+          Subscriptions.update({
+              _id: data.subscriptionId,
+          }, {
+              $set: {
+                  taxExempt: data.taxExempt,
+                  amount: data.taxExempt ? billing.primaryProfileBilling.groupTotal - billing.primaryProfileBilling.taxes : billing.primaryProfileBilling.groupTotal,
+                  lineItems: billing.lineItems,
+              },
+          });
+      } catch (exception) {
+          throw new Meteor.Error('500', exception);
+      }
+  },
+
   'edit.customer.step4': function editStep4(data) {
 
     check(data, {
       id: String,
+      updateWhen: String,
       discountCode: String,
       removeDiscount: Match.Optional(Boolean),
     });
@@ -587,6 +664,9 @@ Meteor.methods({
     const discountCodeActual = Discounts.findOne({ title: data.discountCode });
     let discountCodeToSend = '';
     let discountCodeRemove = false;
+
+    console.log("Begin Edit customer step 4 for customer ID "  + data.id);
+
 
     if (sub.hasOwnProperty('discountApplied')) {
       discountCodeToSend = sub.discountApplied;
@@ -661,64 +741,26 @@ Meteor.methods({
         .toDate();
     }
 
-    if (sub.paymentMethod == 'card') {
+    if (data.updateWhen === "friday") {
 
-      console.log('Payment method is card');
+      console.log('Edit customer step 4 scheduled on friday for customer ID ' + data.id);
 
+      const jobExists = Jobs.findOne({ type: 'editSubscriptionJob', 'data.id': data.id, status: 'waiting' });
 
-      // const syncGetSubscription = Meteor.wrapAsync(getSubscription);
-
-      // const getSubscriptionRes = syncGetSubscription(sub.authorizeSubscriptionId);
-
-      // console.log(getSubscriptionRes);
-
-      // if (getSubscriptionRes.messages.resultCode != 'Ok') {
-      //   throw new Meteor.Error(500, 'There was a problem fetching the subscription [Authorize.Net]');
-      // }
-
-      // const subscriptionStartDate = getSubscriptionRes.subscription.paymentSchedule.startDate;
-      // const subscriptionTotalOccurrences = getSubscriptionRes.subscription.paymentSchedule.totalOccurrences;
-
-      // console.log(moment(subscriptionStartDate).hour(23).minute(30));
-      // console.log(moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'));
-
-      // // this changes subscription amount immediately if first charge hasn't happened
-      // if ((subscriptionTotalOccurrences == 9999) && (moment().isBefore(moment(subscriptionStartDate).hour(23).minute(30), 'minute'))
-      //   && sub.status == "paused") {
-
-      //   console.log("Subscription hasn't been charged");
-
-      //   const syncUpdateSubscription = Meteor.wrapAsync(updateSubscription);
-
-      //   const updateSubscriptionRes = syncUpdateSubscription(sub.authorizeSubscriptionId, billing.actualTotal);
-
-      //   if (updateSubscriptionRes.messages.resultCode != 'Ok') {
-      //     throw new Meteor.Error(500, 'There was a problem updating the subscription [Authorize.Net]');
-      //   }
-
-      // } else {
-
-        const jobExists = Jobs.findOne({ type: 'editSubscriptionJob', 'data.id': data.id, status: 'waiting' });
-
-        if (jobExists) {
-          // throw new Meteor.Error('cancel-job-already-present', `This subscription is already scheduled for update on ${moment(jobExists.after).format('YYYY-MM-DD')}`);
-
-          console.log('Going in job exists');
-
-          Jobs.update({ _id: jobExists._id }, { $set: { 'data.discountCodeRemove': discountCodeRemove, 'data.discountCode': discountCodeToSend } })
-
-          return {
-            subUpdateScheduled: true,
-          };
-        }
-
-        const job = new Job(Jobs, 'editSubscriptionJob', billingData);
-        job.priority('normal').after(friday).save(); // Commit it to the server
+      if (jobExists) {
+        Jobs.update({ _id: jobExists._id }, { $set: { 'data.discountCodeRemove': discountCodeRemove, 'data.discountCode': discountCodeToSend } })
 
         return {
           subUpdateScheduled: true,
         };
-      // }
+      }
+
+      const job = new Job(Jobs, 'editSubscriptionJob', billingData);
+      job.priority('normal').after(friday).save(); // Commit it to the server
+
+      return {
+        subUpdateScheduled: true,
+      };
     }
 
     const keysToUnset = {};
