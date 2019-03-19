@@ -39,6 +39,22 @@ Sides.schema = new SimpleSchema({
     label: 'URL slug',
   },
 
+  price: {
+    type: String,
+    optional: true,
+  },
+
+  variants: {
+    type: Array,
+    optional: true,
+    blackbox: true,
+  },
+
+  'variants.$': {
+    type: Object,
+    blackbox: true,
+  },
+
   // mealCategory: {
   //   type: String,
   //   label: 'Plate category',

@@ -22,6 +22,8 @@ Meteor.methods({
       instructionId: Match.Optional(String),
       ingredients: Array,
       nutritional: Object,
+      price: Match.OneOf(Number, String),
+      variants: Array,
     });
 
     check(side.nutritional, {
@@ -96,6 +98,7 @@ Meteor.methods({
     plateToInsert.title = plateToInsert.title.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
     plateToInsert.subtitle = plateToInsert.subtitle.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
 
+    plateToInsert.price = parseFloat(plateToInsert.price).toFixed(2)
     
     try {
       return Sides.insert(plateToInsert);
@@ -104,6 +107,7 @@ Meteor.methods({
     }
   },
   'sides.update': function sidesUpdate(side) {
+    console.log(side);
     check(side, {
       _id: String,
       title: String,
@@ -116,6 +120,8 @@ Meteor.methods({
       instructionId: Match.Optional(String),
       ingredients: Array,
       nutritional: Object,
+      price: Match.OneOf(Number, String),
+      variants: Array,
     });
 
     check(side.nutritional, {

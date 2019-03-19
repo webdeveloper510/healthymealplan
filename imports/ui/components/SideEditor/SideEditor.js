@@ -13,7 +13,7 @@ import Autosuggest from 'react-autosuggest';
 import _ from 'lodash';
 
 import { Meteor } from 'meteor/meteor';
-
+import { Random } from 'meteor/random';
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
@@ -21,6 +21,8 @@ import Checkbox from 'material-ui/Checkbox';
 import FormControlLabel from 'material-ui/Form/FormControlLabel';
 import Select from 'material-ui/Select';
 import Radio, { RadioGroup } from 'material-ui/Radio';
+import CloseIcon from 'material-ui-icons/Close';
+import IconButton from 'material-ui/IconButton';
 
 import Dialog, {
   DialogActions,
@@ -126,7 +128,7 @@ class SideEditor extends React.Component {
           ? _.sortBy(this.props.plate.ingredients, 'title')
           : [],
 
-    deleteDialogOpen: false,
+      deleteDialogOpen: false,
 
       hasFormChanged: false,
       imageFieldChanged: false,
@@ -141,6 +143,10 @@ class SideEditor extends React.Component {
 
       submitLoading: false,
       submitSuccess: false,
+
+      price: this.props.plate && this.props.plate.hasOwnProperty('price') ? this.props.plate.price : '0',
+      variants: this.props.plate && this.props.plate.hasOwnProperty('variants') ? this.props.plate.variants : [],
+
     };
 
     autoBind(this);
@@ -174,6 +180,9 @@ class SideEditor extends React.Component {
         type: {
           required: true,
         },
+        price: {
+            required: true,
+        }
       },
       messages: {
         title: {
@@ -370,12 +379,14 @@ class SideEditor extends React.Component {
       submitLoading: true,
     });
 
+    // console.log(document.getElementById('#price'));
+
     const plate = {
       title: document.querySelector('#title').value.trim(),
       subtitle: document.querySelector('#subtitle').value.trim(),
       description: document.querySelector('#description').value.trim(),
-      // madeBy: this.state.madeBy,
-      // mealCategory: this.state.mealCategory,
+      price: this.state.price,
+      variants: this.state.variants,
       allergens: this.state.allergens,
       mealType: this.state.valueMealType.trim().toLowerCase(),
       custom: this.state.custom,
@@ -402,6 +413,7 @@ class SideEditor extends React.Component {
       },
     };
 
+    console.log(price);
 
     if (this.state.generatedTags.length > 0) {
       plate.generatedTags = this.state.generatedTags;
@@ -847,6 +859,51 @@ class SideEditor extends React.Component {
     });
   }
 
+  handleVariantRemove(index) {
+
+    const variantsCopy = this.state.variants.slice();
+
+    variantsCopy.splice(index, 1);
+
+    this.setState({
+        variants: variantsCopy,
+        hasFormChanged: true,
+    })
+
+  }
+
+  handleVariantAdd() {
+    const variantName = document.getElementById('variantAddName');
+    const variantPrice = document.getElementById('variantAddPrice');
+
+    const newVariant = {
+    _id: Random.id(),   
+      name: variantName.value,
+      price: variantPrice.value,
+    };
+
+    if (variantName.value === "" || variantPrice.value === "") {
+
+      this.props.popTheSnackbar({
+          message: 'Name and price cannot be empty',
+      });
+
+      return;
+    }
+
+    const variantsCopy = this.state.variants.slice();
+
+    variantsCopy.push(newVariant);
+
+    this.setState({
+        variants: variantsCopy,
+        hasFormChanged: true,
+    });
+
+    variantName.value = "";
+    variantPrice.value = "";
+  }
+
   render() {
     const { plate, history, loading } = this.props;
 
@@ -988,6 +1045,7 @@ class SideEditor extends React.Component {
                     onChange={this.titleFieldChanged.bind(this)}
                   />
 
+
                   {/* <Grid container style={{ marginTop: '25px' }}>
                     <Grid item xs={12}>
                       <Typography>Chef</Typography>
@@ -1014,6 +1072,105 @@ class SideEditor extends React.Component {
               </Grid>
             </Grid>
           </Grid>
+        </Grid>
+
+        <Grid container justify="center" style={{ marginBottom: '50px' }}>
+          <Grid item xs={12}>
+              <Grid container>
+                <Grid item xs={12} sm={4}>
+                  <Typography
+                    type="subheading"
+                    className="subheading font-medium"
+                  >
+                      Price
+                  </Typography>
+                </Grid>
+                <Grid item xs={12} sm={8}>
+                    <Paper elevation={2} className="paper-for-fields">
+                      <TextField
+                          type="number"
+                          margin="normal"
+                          id="price"
+                          label="Price"
+                          name="price"
+                          fullWidth
+                          value={this.state.price}
+                          onChange={e => this.setState({ price: e.target.value, hasFormChanged: true, })}
+                      />
+
+                      <Typography style={{marginTop: '1.2em'}} type="subheading">Variants</Typography>
+
+                      {this.state.variants.length > 0 && this.state.variants.map((e, i) => {
+                          return (
+                              <React.Fragment>
+                                  <Grid container alignItems="baseline">
+                                    <Grid item xs={12} sm={4}>
+                                        <TextField
+                                            type="text"
+                                            margin="normal"
+                                            id="variantName"
+                                            label="Name"
+                                            name="variantName"
+                                            defaultValue={e.name}
+                                            onChange={this.titleFieldChanged.bind(this)}
+                                        />
+                                    </Grid>
+                                    <Grid item xs={12} sm={4}>
+                                        <TextField
+                                            type="number"
+                                            margin="normal"
+                                            id="variantPrice"
+                                            label="Price"
+                                            name="variantPrice"
+                                            defaultValue={e.price}
+                                            onChange={this.titleFieldChanged.bind(this)}
+                                        />
+                                    </Grid>
+                                    <IconButton onClick={() => this.handleVariantRemove(i)} ><CloseIcon /></IconButton>
+                                  </Grid>
+
+
+                              </React.Fragment>
+                          )
+                      })}
+
+                      <React.Fragment>
+                          <Typography style={{marginTop: '2em'}} type="body1">Add a variant</Typography>
+                          <Grid container alignItems='baseline'>
+                            <Grid item xs={12} sm={4}>
+                                <TextField
+                                  type="text"
+                                  margin="normal"
+                                  id="variantAddName"
+                                  label="Name"
+                                  name="variantAddName"
+                                  fullWidth
+                                  onChange={this.titleFieldChanged.bind(this)}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={4}>
+                                <TextField
+                                  type="number"
+                                  margin="normal"
+                                  id="variantAddPrice"
+                                  label="Price"
+                                  name="variantAddPrice"
+                                  fullWidth
+                                  onChange={this.titleFieldChanged.bind(this)}
+                                />
+                            </Grid>
+
+                            <Grid item xs={12} sm={4}>
+                                <Button raised secondary default onClick={this.handleVariantAdd}>Add</Button>
+                            </Grid>
+                          </Grid>
+                      </React.Fragment>
+                    </Paper>
+                </Grid>
+              </Grid>
+          </Grid>
+
         </Grid>
 
 
