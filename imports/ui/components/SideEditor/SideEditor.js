@@ -17,6 +17,7 @@ import { Random } from 'meteor/random';
 import Button from 'material-ui/Button';
 import { MenuItem } from 'material-ui/Menu';
 import TextField from 'material-ui/TextField';
+import { InputLabel, InputAdornment } from 'material-ui/Input';
 import Checkbox from 'material-ui/Checkbox';
 import FormControlLabel from 'material-ui/Form/FormControlLabel';
 import Select from 'material-ui/Select';
@@ -144,7 +145,6 @@ class SideEditor extends React.Component {
       submitLoading: false,
       submitSuccess: false,
 
-      price: this.props.plate && this.props.plate.hasOwnProperty('price') ? this.props.plate.price : '0',
       variants: this.props.plate && this.props.plate.hasOwnProperty('variants') ? this.props.plate.variants : [],
 
     };
@@ -180,9 +180,6 @@ class SideEditor extends React.Component {
         type: {
           required: true,
         },
-        price: {
-            required: true,
-        }
       },
       messages: {
         title: {
@@ -379,13 +376,10 @@ class SideEditor extends React.Component {
       submitLoading: true,
     });
 
-    // console.log(document.getElementById('#price'));
-
     const plate = {
       title: document.querySelector('#title').value.trim(),
       subtitle: document.querySelector('#subtitle').value.trim(),
       description: document.querySelector('#description').value.trim(),
-      price: this.state.price,
       variants: this.state.variants,
       allergens: this.state.allergens,
       mealType: this.state.valueMealType.trim().toLowerCase(),
@@ -412,8 +406,6 @@ class SideEditor extends React.Component {
         },
       },
     };
-
-    console.log(price);
 
     if (this.state.generatedTags.length > 0) {
       plate.generatedTags = this.state.generatedTags;
@@ -872,6 +864,21 @@ class SideEditor extends React.Component {
 
   }
 
+  changeVariantField(e, index, type){
+    console.log(e.target.value)
+      console.log(index);
+    console.log(type);
+
+    const variantsCopy = this.state.variants.slice();
+
+    variantsCopy[index][type] = e.target.value;
+
+    this.setState({
+        variants: variantsCopy,
+        hasFormChanged: true,
+    })
+  }
+
   handleVariantAdd() {
     const variantName = document.getElementById('variantAddName');
     const variantPrice = document.getElementById('variantAddPrice');
@@ -1087,23 +1094,23 @@ class SideEditor extends React.Component {
                 </Grid>
                 <Grid item xs={12} sm={8}>
                     <Paper elevation={2} className="paper-for-fields">
-                      <TextField
-                          type="number"
-                          margin="normal"
-                          id="price"
-                          label="Price"
-                          name="price"
-                          fullWidth
-                          value={this.state.price}
-                          onChange={e => this.setState({ price: e.target.value, hasFormChanged: true, })}
-                      />
 
-                      <Typography style={{marginTop: '1.2em'}} type="subheading">Variants</Typography>
+                      <Typography style={{marginTop: '1.2em'}} type="subheading">Variants </Typography>
 
                       {this.state.variants.length > 0 && this.state.variants.map((e, i) => {
                           return (
                               <React.Fragment>
                                   <Grid container alignItems="baseline">
+                                    {i == 0 && (
+                                        <Grid item xs={12}>
+                                            <Typography style={{
+                                                marginBottom: '-1em',
+                                                marginTop: '1em',
+                                                position: 'relative',
+                                                top: '8px'
+                                            }}>Default</Typography>
+                                        </Grid>
+                                    )}
                                     <Grid item xs={12} sm={4}>
                                         <TextField
                                             type="text"
@@ -1111,8 +1118,8 @@ class SideEditor extends React.Component {
                                             id="variantName"
                                             label="Name"
                                             name="variantName"
-                                            defaultValue={e.name}
-                                            onChange={this.titleFieldChanged.bind(this)}
+                                            value={e.name}
+                                            onChange={(el) => this.changeVariantField(el, i, 'name')}
                                         />
                                     </Grid>
                                     <Grid item xs={12} sm={4}>
@@ -1122,8 +1129,14 @@ class SideEditor extends React.Component {
                                             id="variantPrice"
                                             label="Price"
                                             name="variantPrice"
-                                            defaultValue={e.price}
-                                            onChange={this.titleFieldChanged.bind(this)}
+                                            value={e.price}
+                                            InputProps={{
+                                                'aria-label': 'Description',
+                                                startAdornment: <InputAdornment position="start">
+                                                    {'$'}
+                                                </InputAdornment>,
+                                            }}
+                                            onChange={(el) => this.changeVariantField(el, i, 'price')}
                                         />
                                     </Grid>
                                     <IconButton onClick={() => this.handleVariantRemove(i)} ><CloseIcon /></IconButton>
@@ -1157,6 +1170,12 @@ class SideEditor extends React.Component {
                                   label="Price"
                                   name="variantAddPrice"
                                   fullWidth
+                                  InputProps={{
+                                    'aria-label': 'Description',
+                                    startAdornment: <InputAdornment position="start">
+                                        {'$'}
+                                    </InputAdornment>,
+                                  }}
                                   onChange={this.titleFieldChanged.bind(this)}
                                 />
                             </Grid>

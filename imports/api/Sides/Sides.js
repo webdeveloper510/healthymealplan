@@ -39,11 +39,6 @@ Sides.schema = new SimpleSchema({
     label: 'URL slug',
   },
 
-  price: {
-    type: String,
-    optional: true,
-  },
-
   variants: {
     type: Array,
     optional: true,
