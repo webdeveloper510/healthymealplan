@@ -131,7 +131,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
       if (index === 0) {
         if (e === 'nightBefore') {
           if (nextDay === 'nightBeforePaired' && dayAfterTomorrow === 'nightBeforePaired') {
-            if (this.deliveryDay == 0) {
+            if (this.deliveryDay === 0) {
               daysPaired.push(1);
               daysPaired.push(2);
 
@@ -164,8 +164,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
             // set cooking as sunday
           } else if (nextDay === '' && dayAfterTomorrow === 'nightBeforePaired') {
-            if (this.deliveryDay == 0) {
+            if (this.deliveryDay === 0) {
               daysPaired.push(2);
+              daysPaired.push(3);
 
               // set delivery for monday and wednesday as sunday night
               delivery.title = 'nightBefore';
@@ -192,7 +193,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
             // set cooking as sunday
           } else if (nextDay === 'nightBeforePaired') {
-            if (this.deliveryDay == 0) {
+            if (this.deliveryDay === 0) {
               daysPaired.push(1);
 
               // set delivery for monday and tuesday as sunday night
@@ -221,7 +222,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             // set cooking as sunday
           } else {
             // set delivery for monday as sunday night
-            if (this.deliveryDay == 0) {
+            if (this.deliveryDay === 0) {
               delivery.title = 'nightBefore';
               delivery.onDate = currentDay;
 
@@ -249,9 +250,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           delivery.onDate = currentDay;
 
           if (nextDay === 'dayOfPaired' && dayAfterTomorrow === 'dayOfPaired') {
-            if (this.deliveryDay == 1) {
+            if (this.deliveryDay === 1) {
               daysPaired.push(1);
               daysPaired.push(2);
+              daysPaired.push(3);
 
               // set delivery for monday tuesday and wednesday as monday day
 
@@ -279,8 +281,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               }
             }
           } else if (nextDay === '' && dayAfterTomorrow === 'dayOfPaired') {
-            if (this.deliveryDay == 1) {
-              daysPaired.push(2);
+            if (this.deliveryDay === 1) {
+              daysPaired.push(1);
+              daysPaired.push(3)
               // set delivery for monday and wednesday as monday day
 
 
@@ -307,8 +310,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
             // set cooking for sunday
           } else if (nextDay === 'dayOfPaired') {
-            if (this.deliveryDay == 1) {
+            if (this.deliveryDay === 1) {
               daysPaired.push(1);
+              daysPaired.push(2);
               // set delivery for monday tuesday as monday day
 
               // summation of monday and and tuesday meals
@@ -335,7 +339,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             // set cooking as sunday
           } else {
             // set delivery for monday as monday day
-            if (this.deliveryDay == 1) {
+            if (this.deliveryDay === 1) {
               // sumation of monday meals
 
               delivery.meals.push({
@@ -368,9 +372,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           delivery.onDate = currentDay;
 
           if (nextDay === 'nightBeforePaired' && dayAfterTomorrow === 'nightBeforePaired') {
-            if (this.deliveryDay == 1) {
+            if (this.deliveryDay === 1) {
               daysPaired.push(2);
               daysPaired.push(3);
+              daysPaired.push(4)
               // set delivery for tuesday, wednesday and thursday as monday night
 
               // summation of tuesday, wednesday and thursday meals
@@ -397,8 +402,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
             // set cooking as monday
           } else if (nextDay === '' && dayAfterTomorrow === 'nightBeforePaired') {
-            if (this.deliveryDay == 1) {
-              daysPaired.push(3);
+            if (this.deliveryDay === 1) {
+              daysPaired.push(2);
+              daysPaired.push(4);
               // set delivery for tuesday and thursday as monday night
 
               // summation of tuesday and thursday meals
@@ -423,8 +429,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
             // set cooking as monday
           } else if (nextDay === 'nightBeforePaired') {
-            if (this.deliveryDay == 1) {
+            if (this.deliveryDay === 1) {
               daysPaired.push(2);
+              daysPaired.push(3);
               // set delivery for tuesday and wednesday as monday night
 
               // summation of tuesday and wednesday meals
@@ -450,7 +457,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             // set cooking as monday
           } else {
             // set delivery for tuesday as monday night
-            if (this.deliveryDay == 1) {
+            if (this.deliveryDay === 1) {
               // summation of tuesday meals
               delivery.meals.push({
                 name: primaryCustomerName,
@@ -476,9 +483,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           delivery.onDate = currentDay;
 
           if (nextDay === 'dayOfPaired' && dayAfterTomorrow === 'dayOfPaired') {
-            if (this.deliveryDay == 2) {
+            if (this.deliveryDay === 2) {
               daysPaired.push(2);
               daysPaired.push(3);
+              daysPaired.push(4);
               // set delivery for tuesday, wednesday and thursday as tuesday day
 
               // summation of tuesday wednesday and thursday meals
@@ -504,8 +512,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             }
           } // set cooking as monday
           else if (nextDay === '' && dayAfterTomorrow === 'dayOfPaired') {
-            if (this.deliveryDay == 2) {
-              daysPaired.push(3);
+            if (this.deliveryDay === 2) {
+              daysPaired.push(2);
+              daysPaired.push(4);
 
               // set delivery for tuesday and thursday as tuesday day
 
@@ -531,10 +540,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
             // set cooking as monday
           } else if (nextDay === 'dayOfPaired') {
-            if (this.deliveryDay == 2) {
+            if (this.deliveryDay === 2) {
               daysPaired.push(2);
+              daysPaired.push(3);
 
-              // set delivery for tuesday and wednesday as tuesday day
+                // set delivery for tuesday and wednesday as tuesday day
 
               // summation of tuesday and wednesday meals
               delivery.meals.push({
@@ -560,7 +570,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           } else {
             // set delivery for tuesday as tuesday day
 
-            if (this.deliveryDay == 2) {
+            if (this.deliveryDay === 2) {
               // summation of tuesday meals
               delivery.meals.push({
                 name: primaryCustomerName,
@@ -583,7 +593,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           }
         } else if (e === 'sundayNight') {
           // set delivery for tuesday as sunday night
-          if (this.deliveryDay == 0) {
+          if (this.deliveryDay === 0) {
             delivery.title = 'nightBefore';
             delivery.onDate = currentDay;
 
@@ -607,11 +617,12 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           // set cooking as sunday
         } else if (e === 'dayOfMonday') {
 
-          if (nextDay == "dayOfPaired") { // set delivery for tuesday and wednesday as monday day
+          if (nextDay === "dayOfPaired") { // set delivery for tuesday and wednesday as monday day
 
-            if (this.deliveryDay == 1) {
+            if (this.deliveryDay === 1) {
 
               daysPaired.push(2);
+              daysPaired.push(3);
 
               delivery.title = 'dayOf';
               delivery.onDate = currentDay;
@@ -635,7 +646,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             }
           } else {          // set delivery for tuesday as monday day
 
-            if (this.deliveryDay == 1) {
+            if (this.deliveryDay === 1) {
               delivery.title = 'dayOf';
               delivery.onDate = currentDay;
 
@@ -668,10 +679,12 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
 
           if (nextDay === 'nightBeforePaired' && dayAfterTomorrow === 'nightBeforePaired') {
-            if (this.deliveryDay == 2) {
+            if (this.deliveryDay === 2) {
               daysPaired.push(3);
               daysPaired.push(4);
-              // set delivery for wednesday, thursday and friday as tuesday night
+              daysPaired.push(5);
+
+                // set delivery for wednesday, thursday and friday as tuesday night
 
               // summation of wednesday thursday and friday meals
               delivery.meals.push({
@@ -697,9 +710,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
             // set cooking as tuesday
           } else if (nextDay === '' && dayAfterTomorrow === 'nightBeforePaired') {
-            if (this.deliveryDay == 2) {
-              daysPaired.push(4);
-              // set delivery for wednesday and friday as tuesday night
+            if (this.deliveryDay === 2) {
+              daysPaired.push(3);
+              daysPaired.push(5);
+
+                // set delivery for wednesday and friday as tuesday night
 
               // summation of wednesday and friday meals
               delivery.meals.push({
@@ -723,9 +738,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
             // set cooking as tuesday
           } else if (nextDay === 'nightBeforePaired') {
-            if (this.deliveryDay == 2) {
+            if (this.deliveryDay === 2) {
               daysPaired.push(3);
-              // set delivery for wednesday and thursday as tuesday night
+              daysPaired.push(4);
+
+                // set delivery for wednesday and thursday as tuesday night
 
               // summation of wednesday and thursay meals
               delivery.meals.push({
@@ -749,7 +766,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             // set cooking as tuesday
           } else {
             // set delivery for wendesday as tuesday night
-            if (this.deliveryDay == 2) {
+            if (this.deliveryDay === 2) {
               // summation of wednesday meals
               delivery.meals.push({
                 name: primaryCustomerName,
@@ -775,9 +792,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
 
           if (nextDay === 'dayOfPaired' && dayAfterTomorrow === 'dayOfPaired') {
-            if (this.deliveryDay == 3) {
+            if (this.deliveryDay === 3) {
               daysPaired.push(3);
               daysPaired.push(4);
+              daysPaired.push(5);
+
               // set delivery for wednesday, thursday and friday as wednesday day
 
               // summation of wednesday thursday and friday meals
@@ -804,8 +823,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
             // set cooking as tuesday
           } else if (nextDay === '' && dayAfterTomorrow === 'dayOfPaired') {
-            if (this.deliveryDay == 3) {
-              daysPaired.push(4);
+            if (this.deliveryDay === 3) {
+              daysPaired.push(3);
+              daysPaired.push(5);
               // set delivery for wednesday and friday as wednesday day
 
               // summation of wednesday and friday meals
@@ -829,8 +849,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             }
             // set cooking as tuesday
           } else if (nextDay === 'dayOfPaired') {
-            if (this.deliveryDay == 3) {
+            if (this.deliveryDay === 3) {
               daysPaired.push(3);
+              daysPaired.push(4);
               // set delivery for wednesday and thursday as wednesday day
 
               // summation of wednesday and thursday meals
@@ -856,7 +877,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             // set cooking as tuesday
           } else {
             // set delivery for wednesday as wednesday day
-            if (this.deliveryDay == 3) {
+            if (this.deliveryDay === 3) {
               // summation of wednesday meals
               delivery.meals.push({
                 name: primaryCustomerName,
@@ -878,7 +899,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             // set cooking as tuesday
           }
         } else if (e === 'sundayNight') {
-          if (this.deliveryDay == 0) {
+          if (this.deliveryDay === 0) {
             // set delivery for wednesday as sunday night
             delivery.title = 'nightBefore';
             delivery.onDate = currentDay;
@@ -904,7 +925,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           // set cooking as sunday
         } else if (e === 'dayOfMonday') {
           // set delivery for wednesday as monday day
-          if (this.deliveryDay == 1) {
+          if (this.deliveryDay === 1) {
             delivery.title = 'dayOf';
             delivery.onDate = currentDay;
 
@@ -929,7 +950,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           // set cooking as sunday
         } else if (e === 'nightBeforeMonday') {
           // set delivery for wednesday as monday night
-          if (this.deliveryDay == 1) {
+          if (this.deliveryDay === 1) {
             delivery.title = 'nightBefore';
             delivery.onDate = currentDay;
 
@@ -953,7 +974,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           // set cooking as monday
         } else if (e === 'dayOfTuesday') {
           // set delivery for wednesday as tuesday day
-          if (this.deliveryDay == 2) {
+          if (this.deliveryDay === 2) {
             delivery.title = 'dayOf';
             delivery.onDate = currentDay;
 
@@ -985,16 +1006,16 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           delivery.onDate = currentDay;
 
           if (nextDay === 'nightBeforePaired') {
-            if (this.deliveryDay == 3) {
-              daysPaired.push(3);
+            if (this.deliveryDay === 3) {
               daysPaired.push(4);
+              daysPaired.push(5);
+
               // set delivery for thursday and friday as wednesday night
               delivery.meals.push({
                 name: primaryCustomerName,
                 total: addMealsForTheDay(primarySchedule[index]) +
                   addMealsForTheDay(primarySchedule[index + 1]),
               });
-
 
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
@@ -1004,8 +1025,6 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                       addMealsForTheDay(secondarySchedule[index + 1]),
                   });
                 });
-
-                // console.log(delivery.meals);
               }
             }
 
@@ -1014,7 +1033,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             // set cooking as wednesday
           } else {
             // set delivery for thursday as wednesday night
-            if (this.deliveryDay == 3) {
+            if (this.deliveryDay === 3) {
               // summation
               delivery.meals.push({
                 name: primaryCustomerName,
@@ -1040,9 +1059,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           delivery.onDate = currentDay;
 
           if (nextDay === 'dayOfPaired') {
-            if (this.deliveryDay == 4) {
-              daysPaired.push(3);
+            if (this.deliveryDay === 4) {
               daysPaired.push(4);
+              daysPaired.push(5);
               // set delivery for thursday and friday as thursday day
               delivery.meals.push({
                 name: primaryCustomerName,
@@ -1065,7 +1084,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
             // set cooking as wednesday
           } else {
-            if (this.deliveryDay == 4) {
+            if (this.deliveryDay === 4) {
               // set delivery for thursday as thursday day
               delivery.meals.push({
                 name: primaryCustomerName,
@@ -1086,7 +1105,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             // set cooking as wednesday
           }
         } else if (e === 'mondayNight') {
-          if (this.deliveryDay == 1) {
+          if (this.deliveryDay === 1) {
             // set delivery for thursday as monday night
             delivery.title = 'nightBefore';
             delivery.onDate = currentDay;
@@ -1110,7 +1129,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
           // set cooking as monday
         } else if (e === 'dayOfTuesday') {
-          if (this.deliveryDay == 2) {
+          if (this.deliveryDay === 2) {
             delivery.title = 'dayOf';
             delivery.onDate = currentDay;
             // set delivery for thursday as tuesday day
@@ -1135,7 +1154,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
           // set cooking as monday
         } else if (e === 'nightBeforeTuesday') {
-          if (this.deliveryDay == 2) {
+          if (this.deliveryDay === 2) {
             delivery.title = 'nightBefore';
             delivery.onDate = currentDay;
             // set delivery for thursday as tuesday night
@@ -1158,7 +1177,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           }
           // set cooking as tuesday
         } else if (e === 'dayOfWednesday') {
-          if (this.deliveryDay == 3) {
+          if (this.deliveryDay === 3) {
             delivery.title = 'dayOf';
             delivery.onDate = currentDay;
             // set delivery for thursday as wednesday day
@@ -1189,9 +1208,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           delivery.title = 'nightBefore';
           delivery.onDate = currentDay;
 
-          if (nextDay == 'nightBeforeThursday') {
-            if (this.deliveryDay == 4) {
+          if (nextDay === 'nightBeforeThursday') {
+            if (this.deliveryDay === 4) {
               daysPaired.push(5);
+              daysPaired.push(6);
               // set delivery to friday, saturday and sundays to thursday night
 
               // summation of friday, saturday and sundays meals
@@ -1219,7 +1239,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             }
 
             // set cooking for fri, sat and sun to thursday
-          } else if (this.deliveryDay == 4) {
+          } else if (this.deliveryDay === 4) {
             delivery.meals.push({
               name: primaryCustomerName,
               total: addMealsForTheDay(primarySchedule[index]),
@@ -1240,9 +1260,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           delivery.title = 'dayOf';
           delivery.onDate = currentDay;
 
-          if (nextDay == 'dayOfFriday' || nextDay == 'dayOf') {
-            if (this.deliveryDay == 5) {
+          if (nextDay === 'dayOfFriday' || nextDay === 'dayOf') {
+            if (this.deliveryDay === 5) {
               daysPaired.push(5);
+              daysPaired.push(6);
 
               delivery.meals.push({
                 name: primaryCustomerName,
@@ -1264,7 +1285,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 // console.log(delivery.meals);
               }
             }
-          } else if (this.deliveryDay == 5) {
+          } else if (this.deliveryDay === 5) {
             delivery.meals.push({
               name: primaryCustomerName,
               total: addMealsForTheDay(primarySchedule[index]),
@@ -1282,7 +1303,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             }
           }
         } else if (e === 'tuesdayNight') {
-          if (this.deliveryDay == 2) {
+          if (this.deliveryDay === 2) {
             // set delivery for friday as tuesday night
             delivery.title = 'nightBefore';
             delivery.onDate = currentDay;
@@ -1305,7 +1326,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           // set cooking as tuesday
         } else if (e === 'dayOfWednesday') {
           // set delivery for friday as wednesday day
-          if (this.deliveryDay == 3) {
+          if (this.deliveryDay === 3) {
             delivery.title = 'dayOf';
             delivery.onDate = currentDay;
             delivery.meals.push({
@@ -1327,7 +1348,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           // set cooking as tuesday
         } else if (e === 'nightBeforeWednesday') {
           // set delivery for friday as wednesday night
-          if (this.deliveryDay == 3) {
+          if (this.deliveryDay === 3) {
             delivery.title = 'nightBefore';
             delivery.onDate = currentDay;
             delivery.meals.push({
@@ -1350,7 +1371,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           // set cooking as wednesday
         } else if (e === 'dayOfThursday') {
           // set delivery for friday as thursday day
-          if (this.deliveryDay == 4) {
+          if (this.deliveryDay === 4) {
             delivery.title = 'dayOf';
             delivery.onDate = currentDay;
 
@@ -1376,9 +1397,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
       } // friday
 
       if (index === 5) {
-        if (e === 'nightBeforeThursday' && previousDay != 'nightBefore') {
+        if (e === 'nightBeforeThursday' && previousDay !== 'nightBefore') {
           // set delivery for saturday-sunday as thursday night
-          if (this.deliveryDay == 4) {
+          if (this.deliveryDay === 4) {
             delivery.title = 'nightBefore';
             delivery.onDate = currentDay;
 
@@ -1406,7 +1427,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
           // set cooking as thursday
         } else if ((e === 'dayOfFriday' || e === 'dayOf') && previousDay != 'dayOf') {
           // set delivery for saturday-sunday as friday day
-          if (this.deliveryDay == 5) {
+          if (this.deliveryDay === 5) {
             delivery.title = 'dayOf';
             delivery.onDate = currentDay;
             delivery.meals.push({
@@ -1439,7 +1460,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
 
       // if a day is not paired and not empty then push the document into deliveries array
 
-      if ((e != '' || e != 'false') && daysPaired.indexOf(index) == -1) {
+      if ((e !== '' || e !== 'false') && daysPaired.indexOf(index) === -1) {
         // console.log('Pushing this delivery');
         if (delivery.meals.length > 0) {
           deliveries.push(delivery);
@@ -1455,6 +1476,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
     }
   }); // aggregate loop
 
+    console.log(this.deliveriesForCurrentDay.find(e => e.customerId === "mZcimsGoxRehPQxey"))
 
   return this.deliveriesForCurrentDay;
 }
