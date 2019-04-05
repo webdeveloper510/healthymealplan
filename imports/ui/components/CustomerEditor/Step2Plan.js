@@ -3213,7 +3213,7 @@ class Step2Plan extends React.Component {
                             Restrictions
                           </Typography>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={3}>
                           <FormControl component="fieldset">
                             <FormLabel component="legend">Allergies</FormLabel>
                             <FormGroup>
@@ -3260,7 +3260,7 @@ class Step2Plan extends React.Component {
                             </FormGroup>
                           </FormControl>
                         </Grid>
-                        <Grid item xs={4}>
+                        <Grid item xs={3}>
                           <FormControl component="fieldset">
                             <FormLabel component="legend">Dietary</FormLabel>
                             <FormGroup>
@@ -3307,12 +3307,59 @@ class Step2Plan extends React.Component {
                             </FormGroup>
                           </FormControl>
                         </Grid>
-                        <Grid item xs={4}>
+                          <Grid item xs={3}>
+                              <FormControl component="fieldset">
+                                  <FormLabel component="legend">Religious</FormLabel>
+                                  <FormGroup>
+                                      {this.props.restrictions
+                                          .filter(e => e.restrictionType === 'religious')
+                                          .map((e, i) => {
+                                              const isSelected = this.state
+                                                  .secondaryProfilesData[profileIndex]
+                                                  .restrictions
+                                                  ? this.state.secondaryProfilesData[
+                                                  profileIndex
+                                                  ].restrictions.indexOf(e._id) != -1
+                                                  : false;
+                                              const isAlreadyChecked = this.state
+                                                  .secondaryProfilesData[profileIndex]
+                                                  .lifestyleRestrictions
+                                                  ? this.state.secondaryProfilesData[
+                                                      profileIndex
+                                                      ].lifestyleRestrictions.indexOf(e._id) !=
+                                                  -1
+                                                  : false;
+
+                                              return (
+                                                  <FormControlLabel
+                                                      key={i}
+                                                      disabled={isAlreadyChecked}
+                                                      control={
+                                                          <Checkbox
+                                                              checked={
+                                                                  isSelected || isAlreadyChecked
+                                                              }
+                                                              onChange={this.handleChangeSecondary.bind(
+                                                                  this,
+                                                                  profileIndex,
+                                                                  e._id,
+                                                              )}
+                                                              value={e.title.toLowerCase()}
+                                                          />
+                                                      }
+                                                      label={e.title}
+                                                  />
+                                              );
+                                          })}
+                                  </FormGroup>
+                              </FormControl>
+                          </Grid>
+                        <Grid item xs={3}>
                           <FormControl component="fieldset">
-                            <FormLabel component="legend">Religious</FormLabel>
+                            <FormLabel component="legend">Preference</FormLabel>
                             <FormGroup>
                               {this.props.restrictions
-                                .filter(e => e.restrictionType === 'religious')
+                                .filter(e => e.restrictionType === 'preference')
                                 .map((e, i) => {
                                   const isSelected = this.state
                                     .secondaryProfilesData[profileIndex]
@@ -3353,6 +3400,8 @@ class Step2Plan extends React.Component {
                             </FormGroup>
                           </FormControl>
                         </Grid>
+
+
                       </Grid>
 
                       <Dialog
