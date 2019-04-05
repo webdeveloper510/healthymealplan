@@ -90,7 +90,7 @@ class CustomerEditor extends React.Component {
     this.state = {
       // value: '', // Autosuggest
       // suggestions: [],
-      // subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],
+      // subIngredients: this.props.ingredient ? _.sortBy(this.props.ingredient.subIngredients, 'title') : [],Nspa
       // selectedType: this.props.ingredient.typeId,
       deleteDialogOpen: false,
       hasFormChanged: false,

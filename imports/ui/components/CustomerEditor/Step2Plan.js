@@ -2552,7 +2552,7 @@ class Step2Plan extends React.Component {
                     Restrictions
                   </Typography>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                   <FormControl component="fieldset">
                     <FormLabel component="legend">Allergies</FormLabel>
                     <FormGroup>
@@ -2586,7 +2586,7 @@ class Step2Plan extends React.Component {
                     </FormGroup>
                   </FormControl>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                   <FormControl component="fieldset">
                     <FormLabel component="legend">Dietary</FormLabel>
                     <FormGroup>
@@ -2620,7 +2620,7 @@ class Step2Plan extends React.Component {
                     </FormGroup>
                   </FormControl>
                 </Grid>
-                <Grid item xs={4}>
+                <Grid item xs={3}>
                   <FormControl component="fieldset">
                     <FormLabel component="legend">Religious</FormLabel>
                     <FormGroup>
@@ -2654,6 +2654,41 @@ class Step2Plan extends React.Component {
                     </FormGroup>
                   </FormControl>
                 </Grid>
+
+                  <Grid item xs={3}>
+                      <FormControl component="fieldset">
+                          <FormLabel component="legend">Preference</FormLabel>
+                          <FormGroup>
+                              {this.props.restrictions
+                                  .filter(e => e.restrictionType === 'preference')
+                                  .map((e, i) => {
+                                      const isSelected = this.state.restrictions.length
+                                          ? this.state.restrictions.indexOf(e._id) != -1
+                                          : false;
+
+                                      const isAlreadyChecked = this.state
+                                          .lifestyleRestrictions
+                                          ? this.state.lifestyleRestrictions.indexOf(e._id) !=
+                                          -1
+                                          : false;
+                                      return (
+                                          <FormControlLabel
+                                              key={i}
+                                              disabled={isAlreadyChecked}
+                                              control={
+                                                  <Checkbox
+                                                      checked={isSelected || isAlreadyChecked}
+                                                      onChange={this.handleChange.bind(this, e._id)}
+                                                      value={e.title.toLowerCase()}
+                                                  />
+                                              }
+                                              label={e.title}
+                                          />
+                                      );
+                                  })}
+                          </FormGroup>
+                      </FormControl>
+                  </Grid>
               </Grid>
 
               <Dialog
@@ -2674,7 +2709,7 @@ class Step2Plan extends React.Component {
 
                 <DialogContent>
                   <DialogContentText>
-                    Select if it's a preference or if it's a restriction
+                      Select if it's an allergy or a dislike
                   </DialogContentText>
                   <FormControl component="fieldset">
                     <RadioGroup
@@ -2687,12 +2722,12 @@ class Step2Plan extends React.Component {
                       <FormControlLabel
                         value="Restriction"
                         control={<Radio selected />}
-                        label="Restriction"
+                        label="Allergy"
                       />
                       <FormControlLabel
                         value="Preference"
                         control={<Radio />}
-                        label="Preference"
+                        label="Dislike"
                         selected
                       />
                     </RadioGroup>
@@ -2751,12 +2786,58 @@ class Step2Plan extends React.Component {
               </Dialog>
 
               <Grid container>
+                  <Grid item xs={12} sm={6}>
+                      <Typography
+                          type="subheading"
+                          className="text-uppercase font-medium"
+                      >
+                        Allergies
+                      </Typography>
+
+                      <div
+                          style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              flexWrap: 'wrap',
+                              marginTop: '25px',
+                          }}
+                      >
+                          {this.state.specificRestrictions.length ? (
+                              this.state.specificRestrictions.map(
+                                  (subIngredient, i) => (
+                                      <Chip
+                                          avatar={
+                                              <Avatar>
+                                                  {' '}
+                                                  {this.getSubIngredientAvatar(
+                                                      subIngredient,
+                                                  )}{' '}
+                                              </Avatar>
+                                          }
+                                          style={{
+                                              marginRight: '8px',
+                                              marginBottom: '8px',
+                                          }}
+                                          label={this.getSubIngredientTitle(subIngredient)}
+                                          key={i}
+                                          onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                                              this,
+                                              subIngredient,
+                                          )}
+                                      />
+                                  ),
+                              )
+                          ) : (
+                              <Chip className="chip--bordered" label="Ingredient" />
+                          )}
+                      </div>
+                  </Grid>
                 <Grid item xs={12} sm={6}>
                   <Typography
                     type="subheading"
                     className="text-uppercase font-medium"
                   >
-                    Preferences
+                    Dislikes
                   </Typography>
 
                   <div
@@ -2794,52 +2875,7 @@ class Step2Plan extends React.Component {
                   </div>
                 </Grid>
 
-                <Grid item xs={12} sm={6}>
-                  <Typography
-                    type="subheading"
-                    className="text-uppercase font-medium"
-                  >
-                    Restrictions
-                  </Typography>
 
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      flexWrap: 'wrap',
-                      marginTop: '25px',
-                    }}
-                  >
-                    {this.state.specificRestrictions.length ? (
-                      this.state.specificRestrictions.map(
-                        (subIngredient, i) => (
-                          <Chip
-                            avatar={
-                              <Avatar>
-                                {' '}
-                                {this.getSubIngredientAvatar(
-                                  subIngredient,
-                                )}{' '}
-                              </Avatar>
-                            }
-                            style={{
-                              marginRight: '8px',
-                              marginBottom: '8px',
-                            }}
-                            label={this.getSubIngredientTitle(subIngredient)}
-                            key={i}
-                            onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
-                              this,
-                              subIngredient,
-                            )}
-                          />
-                        ),
-                      )
-                    ) : (
-                        <Chip className="chip--bordered" label="Ingredient" />
-                      )}
-                  </div>
-                </Grid>
               </Grid>
               <Grid container>
                 <Grid item xs={12}>
@@ -3340,7 +3376,7 @@ class Step2Plan extends React.Component {
 
                         <DialogContent>
                           <DialogContentText>
-                            Select if it's a preference or if it's a restriction
+                              Select if it's an allergy or a dislike
                           </DialogContentText>
                           <FormControl component="fieldset">
                             <RadioGroup
@@ -3355,12 +3391,12 @@ class Step2Plan extends React.Component {
                               <FormControlLabel
                                 value="Restriction"
                                 control={<Radio selected />}
-                                label="Restriction"
+                                label="Allergy"
                               />
                               <FormControlLabel
                                 value="Preference"
                                 control={<Radio />}
-                                label="Preference"
+                                label="Dislike"
                                 selected
                               />
                             </RadioGroup>
@@ -3424,13 +3460,66 @@ class Step2Plan extends React.Component {
                       </Dialog>
 
                       <Grid container>
-                        <Grid item xs={12} sm={6}>
+                          <Grid item xs={12} sm={6}>
+                              <Typography
+                                  type="body1"
+                                  className="text-uppercase font-medium"
+                              >
+                                  Allergies
+                              </Typography>
+
+                              <div
+                                  style={{
+                                      display: 'flex',
+                                      alignItems: 'center',
+                                      flexWrap: 'wrap',
+                                      marginTop: '25px',
+                                  }}
+                              >
+                                  {this.state.secondaryProfilesData[profileIndex]
+                                      .specificRestrictions.length ? (
+                                      this.state.secondaryProfilesData[
+                                          profileIndex
+                                          ].specificRestrictions.map((subIngredient, i) => (
+                                          <Chip
+                                              avatar={
+                                                  <Avatar>
+                                                      {' '}
+                                                      {this.getSubIngredientAvatar(
+                                                          subIngredient,
+                                                      )}{' '}
+                                                  </Avatar>
+                                              }
+                                              style={{
+                                                  marginRight: '8px',
+                                                  marginBottom: '8px',
+                                              }}
+                                              label={this.getSubIngredientTitle(
+                                                  subIngredient,
+                                              )}
+                                              key={i}
+                                              onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
+                                                  this,
+                                                  subIngredient,
+                                              )}
+                                          />
+                                      ))
+                                  ) : (
+                                      <Chip
+                                          className="chip--bordered"
+                                          label="Ingredient"
+                                      />
+                                  )}
+                              </div>
+                          </Grid>
+
+                          <Grid item xs={12} sm={6}>
                           <Typography
                             type="body1"
                             className="text-uppercase font-medium"
                             style={{ marginTop: '25px' }}
                           >
-                            Preferences
+                            Dislikes
                           </Typography>
 
                           <div
@@ -3478,58 +3567,7 @@ class Step2Plan extends React.Component {
                           </div>
                         </Grid>
 
-                        <Grid item xs={12} sm={6}>
-                          <Typography
-                            type="body1"
-                            className="text-uppercase font-medium"
-                          >
-                            Restrictions
-                          </Typography>
 
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              flexWrap: 'wrap',
-                              marginTop: '25px',
-                            }}
-                          >
-                            {this.state.secondaryProfilesData[profileIndex]
-                              .specificRestrictions.length ? (
-                                this.state.secondaryProfilesData[
-                                  profileIndex
-                                ].specificRestrictions.map((subIngredient, i) => (
-                                  <Chip
-                                    avatar={
-                                      <Avatar>
-                                        {' '}
-                                        {this.getSubIngredientAvatar(
-                                          subIngredient,
-                                        )}{' '}
-                                      </Avatar>
-                                    }
-                                    style={{
-                                      marginRight: '8px',
-                                      marginBottom: '8px',
-                                    }}
-                                    label={this.getSubIngredientTitle(
-                                      subIngredient,
-                                    )}
-                                    key={i}
-                                    onDelete={this.handleSubIngredientChipDeleteSpecificRestriction.bind(
-                                      this,
-                                      subIngredient,
-                                    )}
-                                  />
-                                ))
-                              ) : (
-                                <Chip
-                                  className="chip--bordered"
-                                  label="Ingredient"
-                                />
-                              )}
-                          </div>
-                        </Grid>
                       </Grid>
 
                       <Grid container>
