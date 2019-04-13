@@ -40,7 +40,8 @@ Restrictions.schema = new SimpleSchema({
   },
   "types.$": {
     type: String,
-    label: "The id of each type"
+    label: "The id of each type",
+      optional: true,
   },
   ingredients: {
     type: Array,
@@ -48,7 +49,8 @@ Restrictions.schema = new SimpleSchema({
   },
   "ingredients.$": {
     type: String,
-    label: "The id of each ingredient"
+    label: "The id of each ingredient",
+    optional: true,
   },
   discount: {
     type: Number,

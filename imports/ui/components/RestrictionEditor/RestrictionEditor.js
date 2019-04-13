@@ -8,6 +8,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import { Meteor } from "meteor/meteor";
+import autoBind from 'react-autobind';
 
 import Autosuggest from "react-autosuggest";
 import _ from "lodash";
@@ -136,6 +137,8 @@ class RestrictionEditor extends React.Component {
             : this.props.restriction.extra
           : ""
     };
+
+    autoBind(this);
   }
 
   componentDidMount() {
@@ -151,27 +154,27 @@ class RestrictionEditor extends React.Component {
 
       rules: {
         title: {
-          required: true
+          required: true,
         },
         restrictionType: {
-          required: true
+          required: true,
         },
         discountOrExtraValue: {
           min: -100,
-          max: 100
-        }
+          max: 100,
+        },
       },
       messages: {
         title: {
-          required: "Name required."
+          required: "Name required.",
         },
         restrictionType: {
-          required: "Restriction type required."
-        }
+          required: "Restriction type required.",
+        },
       },
-      submitHandler() {
+/*      submitHandler() {
         component.handleSubmit();
-      }
+      }*/
     });
   }
 
@@ -445,6 +448,20 @@ class RestrictionEditor extends React.Component {
   }
 
   handleSubmit() {
+    if (!$(this.form).valid()) {
+      return;
+    }
+
+    if ( this.state.discountOrExtraSelected ) {
+      if ( this.state.discountOrExtraAmount === '' ) {
+        this.props.popTheSnackbar({
+            message: 'Please enter the discount or extra amount',
+        });
+
+        return;
+      }
+    }
+
     const { history, popTheSnackbar } = this.props;
     const existingRestriction =
       this.props.restriction && this.props.restriction._id;
@@ -462,9 +479,7 @@ class RestrictionEditor extends React.Component {
 
     if (this.state.discountOrExtraSelected) {
       const discountOrExtra = this.state.valueDiscountOrExtra;
-      restriction[discountOrExtra] = parseFloat(
-        this.state.discountOrExtraAmount
-      );
+      restriction[discountOrExtra] = parseFloat(this.state.discountOrExtraAmount);
       restriction.discountOrExtraType = this.state.discountType;
     }
 
@@ -482,8 +497,11 @@ class RestrictionEditor extends React.Component {
 
     Meteor.call(methodToCall, restriction, (error, restrictionId) => {
       if (error) {
+
+        console.log(error);
+
         popTheSnackbar({
-          message: error.reason
+          message: error.reason || error
         });
       } else {
         localStorage.setItem(
@@ -514,7 +532,7 @@ class RestrictionEditor extends React.Component {
     return this.props.restriction ? (
       <Dialog
         open={this.state.deleteDialogOpen}
-        onClose={this.deleteDialogHandleRequestClose.bind(this)}
+        onClose={this.deleteDialogHandleRequestClose}
       >
         <Typography
           style={{
@@ -540,7 +558,7 @@ class RestrictionEditor extends React.Component {
         </DialogContent>
         <DialogActions>
           <Button
-            onClick={this.deleteDialogHandleRequestClose.bind(this)}
+            onClick={this.deleteDialogHandleRequestClose}
             color="default"
           >
             Cancel
@@ -548,7 +566,7 @@ class RestrictionEditor extends React.Component {
           <Button
             stroked
             className="button--bordered button--bordered--accent"
-            onClick={this.handleRemoveActual.bind(this)}
+            onClick={this.handleRemoveActual}
             color="accent"
           >
             Delete
@@ -784,11 +802,11 @@ class RestrictionEditor extends React.Component {
                 Cancel
               </Button>
               <Button
-                disabled={!this.state.hasFormChanged}
                 className="btn btn-primary"
                 raised
                 type="submit"
                 color="contrast"
+                onClick={this.handleSubmit}
               >
                 Save
               </Button>
@@ -817,7 +835,7 @@ class RestrictionEditor extends React.Component {
                     defaultValue={restriction && restriction.title}
                     ref={title => (this.title = title)}
                     inputProps={{}}
-                    onChange={this.titleFieldChanged.bind(this)}
+                    onChange={this.titleFieldChanged}
                   />
                 </Paper>
               </Grid>
@@ -851,9 +869,7 @@ class RestrictionEditor extends React.Component {
                           aria-label="discountOrExtra"
                           name="discountOrExtra"
                           value={this.state.valueDiscountOrExtra}
-                          onChange={this.handleDiscountOrExtraRadioChange.bind(
-                            this
-                          )}
+                          onChange={this.handleDiscountOrExtraRadioChange}
                           style={{ flexDirection: "row" }}
                         >
                           <FormControlLabel
@@ -905,7 +921,7 @@ class RestrictionEditor extends React.Component {
                         value={
                           this.state.discountType ? this.state.discountType : ""
                         }
-                        onChange={this.handleDiscountChange.bind(this)}
+                        onChange={this.handleDiscountChange}
                         SelectProps={{ native: false }}
                       >
                         <MenuItem key={1} value="Percentage">
@@ -924,9 +940,7 @@ class RestrictionEditor extends React.Component {
                         id="discountOrExtraValue"
                         name="discountOrExtraValue"
                         disabled={!this.state.discountOrExtraSelected}
-                        onChange={this.handleDiscountOrExtraValueChange.bind(
-                          this
-                        )}
+                        onChange={this.handleDiscountOrExtraValueChange}
                         label="Amount"
                         inputProps={{
                           "aria-label": "Description",
@@ -962,7 +976,7 @@ class RestrictionEditor extends React.Component {
                       name="restrictionType"
                       value={this.state.valueRestriction}
                       style={{ flexDirection: "row" }}
-                      onChange={this.handleRestrictionTypeChange.bind(this)}
+                      onChange={this.handleRestrictionTypeChange}
                     >
                       <FormControlLabel
                         className="radiobuttonlabel"
@@ -1035,20 +1049,14 @@ class RestrictionEditor extends React.Component {
                         listStyleType: "none"
                       }
                     }}
-                    renderInputComponent={this.renderInput.bind(this)}
+                    renderInputComponent={this.renderInput}
                     suggestions={this.state.suggestions}
-                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested.bind(
-                      this
-                    )}
-                    onSuggestionsClearRequested={this.onSuggestionsClearRequested.bind(
-                      this
-                    )}
-                    onSuggestionSelected={this.onSuggestionSelected.bind(this)}
-                    getSuggestionValue={this.getSuggestionValue.bind(this)}
-                    renderSuggestion={this.renderSuggestion.bind(this)}
-                    renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                      this
-                    )}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequested}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequested}
+                    onSuggestionSelected={this.onSuggestionSelected}
+                    getSuggestionValue={this.getSuggestionValue}
+                    renderSuggestion={this.renderSuggestion}
+                    renderSuggestionsContainer={this.renderSuggestionsContainer}
                     focusInputOnSuggestionClick={false}
                     inputProps={{
                       placeholder: "Search",
@@ -1134,20 +1142,12 @@ class RestrictionEditor extends React.Component {
                     }}
                     renderInputComponent={this.renderInput.bind(this)}
                     suggestions={this.state.suggestionsTypes}
-                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes.bind(
-                      this
-                    )}
-                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes.bind(
-                      this
-                    )}
-                    onSuggestionSelected={this.onSuggestionSelectedTypes.bind(
-                      this
-                    )}
-                    getSuggestionValue={this.getSuggestionValueTypes.bind(this)}
-                    renderSuggestion={this.renderSuggestion.bind(this)}
-                    renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                      this
-                    )}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedTypes}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedTypes}
+                    onSuggestionSelected={this.onSuggestionSelectedTypes}
+                    getSuggestionValue={this.getSuggestionValueTypes}
+                    renderSuggestion={this.renderSuggestion}
+                    renderSuggestionsContainer={this.renderSuggestionsContainer}
                     focusInputOnSuggestionClick={false}
                     inputProps={{
                       placeholder: "Search",
@@ -1235,24 +1235,14 @@ class RestrictionEditor extends React.Component {
                         listStyleType: "none"
                       }
                     }}
-                    renderInputComponent={this.renderInput.bind(this)}
+                    renderInputComponent={this.renderInput}
                     suggestions={this.state.suggestionsCategories}
-                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedCategories.bind(
-                      this
-                    )}
-                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedCategories.bind(
-                      this
-                    )}
-                    onSuggestionSelected={this.onSuggestionSelectedCategories.bind(
-                      this
-                    )}
-                    getSuggestionValue={this.getSuggestionValueCategories.bind(
-                      this
-                    )}
-                    renderSuggestion={this.renderSuggestion.bind(this)}
-                    renderSuggestionsContainer={this.renderSuggestionsContainer.bind(
-                      this
-                    )}
+                    onSuggestionsFetchRequested={this.onSuggestionsFetchRequestedCategories}
+                    onSuggestionsClearRequested={this.onSuggestionsClearRequestedCategories}
+                    onSuggestionSelected={this.onSuggestionSelectedCategories}
+                    getSuggestionValue={this.getSuggestionValueCategories}
+                    renderSuggestion={this.renderSuggestion}
+                    renderSuggestionsContainer={this.renderSuggestionsContainer}
                     focusInputOnSuggestionClick={false}
                     inputProps={{
                       placeholder: "Search",
@@ -1336,11 +1326,12 @@ class RestrictionEditor extends React.Component {
                     Cancel
                   </Button>
                   <Button
-                    disabled={!this.state.hasFormChanged}
+
                     type="submit"
                     className="btn btn-primary"
                     raised
                     color="contrast"
+                    onClick={this.handleSubmit}
                   >
                     Save
                   </Button>
