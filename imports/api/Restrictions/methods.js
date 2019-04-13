@@ -18,9 +18,7 @@ Meteor.methods({
       discountOrExtraType: Match.Maybe(String)
     });
 
-    const existsRestriction = Restrictions.findOne({
-      title: restriction.title
-    });
+    const existsRestriction = Restrictions.findOne({ title: restriction.title });
 
     if (existsRestriction) {
       throw new Meteor.Error("500", `${restriction.title} is already present`);
@@ -36,7 +34,6 @@ Meteor.methods({
       categories: restriction.categories,
       types: restriction.types,
       ingredients: restriction.ingredients,
-
       owner: this.userId
     };
 
@@ -47,8 +44,6 @@ Meteor.methods({
       restrictionToInsert.extra = restriction.extra;
       restrictionToInsert.discountOrExtraType = restriction.discountOrExtraType;
     }
-
-    console.log(restrictionToInsert);
 
     try {
       return Restrictions.insert(restrictionToInsert);
