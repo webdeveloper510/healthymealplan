@@ -112,7 +112,7 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
 
   // VITTLE LOGO
 
-  doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
+  // doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
 
 
   // plating day + 1
