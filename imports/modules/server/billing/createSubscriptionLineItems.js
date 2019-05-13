@@ -31,6 +31,10 @@ export default function createSubscriptionLineItems(
         primaryProfileBilling.chefsChoiceDinner.totalQty *
         primaryProfileBilling.chefsChoiceDinnerPrice,
     },
+
+    sides: primaryProfileBilling.sides,
+    sidesTotal: primaryProfileBilling.sidesTotal,
+    sidesTotalQty: primaryProfileBilling.sidesTotalQty,
     restrictions: [],
   };
 
@@ -138,7 +142,12 @@ export default function createSubscriptionLineItems(
             secondaryProfilesBilling[i].chefsChoiceDinner.totalQty *
             secondaryProfilesBilling[i].chefsChoiceDinnerPrice,
         },
-        restrictions: [],
+
+          sides: secondaryProfilesBilling[i].sides,
+          sidesTotal: secondaryProfilesBilling[i].sidesTotal,
+          sidesTotalQty: secondaryProfilesBilling[i].sidesTotalQty,
+
+          restrictions: [],
       };
 
       if (secondaryProfilesBilling[i].discountActual > 0) {

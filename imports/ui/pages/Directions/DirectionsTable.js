@@ -51,14 +51,13 @@ import ClearIcon from 'material-ui-icons/Clear';
 
 import './DirectionsTable.scss';
 
-function renderDeliveryLabelData(doc, delivery, formalType, currentTabValue, multiple = false, multipleCurrent = 0, multipleTotal = 0) {
+function renderDeliveryLabelData(doc, sides, delivery, formalType, currentTabValue, multiple = false, multipleCurrent = 0, multipleTotal = 0) {
   doc.addPage();
 
-    // doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
-  // doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6, 0.19);
+  // doc.addImage(hmpbase64, 'JPEG', 1.18, 0.15, 1.6,     // doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);0.19);
 
   if (multiple) {
-    doc.setFontSize(10); // name
+      doc.setFontSize(10); // name
 
     doc.text(`${multipleCurrent}/${multipleTotal}`, 3.5, 0.285);
   }
@@ -92,6 +91,22 @@ function renderDeliveryLabelData(doc, delivery, formalType, currentTabValue, mul
   const info = [`${formalType} ${moment(delivery.onDate).format('MMMM D')} `, `${postalCode} `, coolerBag];
 
   doc.text(info, 1.5, 2.4);
+
+
+  if (delivery.sides) {
+    if (delivery.sides.length > 0) {
+        doc.addPage();
+        let sideText = "";
+
+        delivery.sides.forEach((e, sideInd) => {
+          const currentSide = sides.find(side => side._id === e._id);
+          const variant = currentSide.variants.find(el => el._id === e.variantId);
+          sideText += `${sideInd >= 1 ? ' • ' : ''}${currentSide.title} ${variant.name} x${e.quantity}`;
+        });
+
+        doc.text(doc.splitTextToSize(sideText, 3.25), 0.15, .65);
+    }
+  }
 }
 
 class DirectionsTable extends React.Component {
@@ -441,10 +456,10 @@ class DirectionsTable extends React.Component {
             const totalBags = Math.ceil(mealTotal / perBag);
 
             for (let index = 1; index <= totalBags; index++) {
-              renderDeliveryLabelData(doc, e, formalType, deliveryAssignedToInitials, true, index, totalBags);
+              renderDeliveryLabelData(doc, this.props.sides, e, formalType, deliveryAssignedToInitials, true, index, totalBags);
             }
           } else {
-            renderDeliveryLabelData(doc, e, formalType, deliveryAssignedToInitials);
+            renderDeliveryLabelData(doc,this.props.sides, e, formalType, deliveryAssignedToInitials);
           }
         });
       }
@@ -706,12 +721,6 @@ class DirectionsTable extends React.Component {
                         </TableCell>
 
                         <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '10%' }} padding="none">
-                          {/* {e.deliveryAssignedTo === 'unassigned' ? ( */}
-                          {/* <Typography type="subheading" className="subheading">Unassigned</Typography> */}
-                          {/* ) : ( */}
-                          {/* <Typography type="subheading" className="subheading">{this.props.deliveryGuys.find(guy => guy._id === e.deliveryAssignedTo).profile.name.first || ''}</Typography> */}
-                          {/* )} */}
-
                           {e.customer.phone ? (
                             <React.Fragment>
                               <a style={{ textDecoration: 'none', color: 'inherit' }} href={`tel:${e.customer.phone}`}>{e.customer.phone}</a>
@@ -721,10 +730,10 @@ class DirectionsTable extends React.Component {
 
                         <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '10%' }} padding="none">
                           <Typography type="subheading" className="subheading" style={{ textTransform: 'capitalize' }}>
-                            {sumBy(e.meals, 'total')}
+                            {sumBy(e.meals, 'total') === 0 ? '0 mains' : sumBy(e.meals, 'total') > 1 ? `${sumBy(e.meals, 'total')} mains` : sumBy(e.meals, 'total') === 1 ? '1 main' : '0 mains'}
                           </Typography>
 
-                          <Typography className="body1" type="body1" style={{ color: 'rgba(0, 0, 0, .54)' }}>0 sides</Typography>
+                          <Typography className="subheading" type="subheading">{e.sidesTotal == 0 ? '0 Sides' : e.sidesTotal > 1 ? `${e.sidesTotal} Sides` : e.sidesTotal == 1 ? '1 Side' : ''}</Typography>
                         </TableCell>
 
                         <TableCell style={{ paddingTop: '10px', paddingBottom: '10px', width: '13%' }} padding="none">

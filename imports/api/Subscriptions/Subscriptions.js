@@ -56,6 +56,10 @@ Subscriptions.schema = new SimpleSchema({
   'completeSchedule.$.chefsChoiceDinner': {
     type: Number,
   },
+  'completeSchedule.$.sides': {
+    type: Number,
+    blackbox: true,
+  },
   authorizeSubscriptionId: {
     type: String,
     label: 'Authorize.Net subscriptionId (Card only)',
@@ -127,66 +131,6 @@ Subscriptions.schema = new SimpleSchema({
     blackbox: true,
   },
 
-  // "subscriptionItems.$.lifestyle": {
-  //   type: Object,
-  //   label: "lifestyle"
-  // },
-
-  // "subscriptionItems.$.lifestyle.title": {
-  //   type: String,
-  //   label: "lifestyle"
-  // },
-
-  // "subscriptionItems.$.lifestyle.meals:": {
-  //   type: Number,
-  //   label: "lifestyle"
-  // },
-
-  // "subscriptionItems.$.lifestyle.price:": {
-  //   type: Number,
-  //   label: "lifestyle"
-  // },
-
-  // "subscriptionItems.$.extraAthletic:": {
-  //   type: Object,
-  //   label: "lifestyle",
-  //   optional: true
-  // },
-
-  // "subscriptionItems.$.extraBodybuilder:": {
-  //   type: Object,
-  //   label: "lifestyle",
-  //   optional: true
-  // },
-
-  // "subscriptionItems.$.restrictions:": {
-  //   type: Array,
-  //   label: "lifestyle"
-  // },
-
-  // "subscriptionItems.$.deliveryCost:": {
-  //   type: Number,
-  //   label: "lifestyle",
-  //   optional: true
-  // },
-
-  // "subscriptionItems.$.taxes:": {
-  //   type: Number,
-  //   label: "lifestyle",
-  //   optional: true
-  // },
-
-  // "subscriptionItems.$.taxExempt:": {
-  //   type: Number,
-  //   label: "lifestyle",
-  //   optional: true
-  // },
-
-  // "subscriptionItems.$.total:": {
-  //   type: Number,
-  //   label: "lifestyle",
-  //   optional: true
-  // },
   deliveryAssignedTo: {
     type: String,
     label: "Delivery personnel",

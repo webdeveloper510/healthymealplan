@@ -10,6 +10,7 @@ import IngredientTypes from '../../../api/IngredientTypes/IngredientTypes';
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
 import Restrictions from '../../../api/Restrictions/Restrictions';
 import PostalCodes from '../../../api/PostalCodes/PostalCodes';
+import Sides from '../../../api/Sides/Sides';
 
 import CustomerEditor from '../../components/CustomerEditor/CustomerEditor';
 
@@ -24,6 +25,7 @@ const NewCustomer = ({
   postalCodes,
   abandoned,
   abandonedCustomer,
+  sides,
 }) => (
     <div>
       <Grid
@@ -41,7 +43,7 @@ const NewCustomer = ({
           postalCodes={postalCodes}
           abandonedCustomer={abandonedCustomer}
           abandoned={abandoned}
-
+          sides={sides}
         />
       </Grid>
     </div>
@@ -55,14 +57,14 @@ NewCustomer.propTypes = {
 export default createContainer(({ match }) => {
 
   const customerId = match.params._id;
-  const subscription6 = Meteor.subscribe('user.customer.single', customerId);
-
 
   const subscription = Meteor.subscribe('ingredients');
   const subscription2 = Meteor.subscribe('ingredientTypes');
   const subscription3 = Meteor.subscribe('lifestyles');
   const subscription4 = Meteor.subscribe('restrictions');
   const subscription5 = Meteor.subscribe('postalcodes');
+  const subscription6 = Meteor.subscribe('user.customer.single', customerId);
+  const subscription7 = Meteor.subscribe('sides', {}, {});
 
   return {
     loading:
@@ -71,12 +73,14 @@ export default createContainer(({ match }) => {
       !subscription3.ready() &&
       !subscription4.ready() &&
       !subscription5.ready() &&
-      !subscription6.ready(),
+      !subscription6.ready() &&
+      !subscription7.ready(),
     ingredients: Ingredients.find().fetch(),
     ingredientTypes: IngredientTypes.find().fetch(),
     lifestyles: Lifestyles.find().fetch(),
     restrictions: Restrictions.find().fetch(),
     postalCodes: PostalCodes.find().fetch(),
+    sides: Sides.find().fetch(),
     abandonedCustomer: Meteor.users.find({ _id: customerId }).fetch(),
     abandoned: customerId ? true : false,
   };

@@ -33,6 +33,7 @@ import $ from 'jquery';
 import validate from '../../../modules/validate';
 
 import { DELIVERYCOST } from '../../../modules/constants';
+import Sides from "../../../api/Sides/Sides";
 
 const styles = theme => ({
   root: {
@@ -179,6 +180,9 @@ class Step4Checkout extends React.Component {
           athleticQty: 0,
           bodybuilderQty: 0,
         },
+        sides: [],
+        sidesTotal: 0,
+        sidesTotalQty: 0,
         // coolerBag: this.props.customerInfo.coolerBag ? 20 : 0,
         coolerBag: 0,
         deliveryCost: 0,
@@ -325,6 +329,27 @@ class Step4Checkout extends React.Component {
           }
 
           thisDaysQty += parseInt(e.chefsChoiceDinner.quantity, 10);
+        }
+
+        if (e.sides.length > 0) {
+            console.log(e.sides);
+            //maybe use reduce wull prolly take two loops one after other
+            e.sides.forEach(currentSide => {
+                console.log("going here")
+                const side = this.props.sides.find(sideEl => currentSide._id === sideEl._id);
+                const variant = side.variants.find(el => el._id === currentSide.variantId);
+
+                console.log("going here")
+                primaryCustomer.sidesTotalQty += parseInt(currentSide.quantity, 10);
+                primaryCustomer.sidesTotal += parseFloat(variant.price) * parseInt(currentSide.quantity, 10);
+                primaryCustomer.sides.push({
+                    title: currentSide.title,
+                    _id: currentSide._id,
+                    lineItemPrice: parseFloat(variant.price) * parseInt(currentSide.quantity, 10),
+                    quantity: currentSide.quantity,
+                    variantTitle: variant.name,
+                });
+            });
         }
 
         customerScheduleTotals.push(thisDaysQty);
@@ -846,6 +871,9 @@ class Step4Checkout extends React.Component {
               athleticQty: 0,
               bodybuilderQty: 0,
             },
+            sides: [],
+            sidesTotal: 0,
+            sidesTotalQty: 0,
             deliveryCost: 0,
             discount: this.props.customerInfo.secondaryProfiles[index].discount,
             discountActual: 0,
@@ -1021,6 +1049,26 @@ class Step4Checkout extends React.Component {
                   10,
                 );
               }
+            }
+
+            if (e.sides.length > 0) {
+
+                //maybe use reduce wull prolly take two loops one after other
+                e.sides.forEach(currentSide => {
+                    const side = this.props.sides.find(el => currentSide._id === el._id);
+                    const variant = side.variants.find(sideVariant => sideVariant._id === currentSide.variantId);
+
+                    currentCustomer.sidesTotalQty += parseInt(currentSide.quantity, 10);
+                    currentCustomer.sidesTotal += parseFloat(variant.price) * parseInt(currentSide.quantity, 10);
+                    currentCustomer.sides.push({
+                        title: currentSide.title,
+                        _id: currentSide._id,
+                        lineItemPrice: parseFloat(variant.price) * parseInt(currentSide.quantity, 10),
+                        quantity: currentSide.quantity,
+                        variantTitle: variant.name,
+                    });
+                });
+
             }
           });
 
@@ -1424,9 +1472,10 @@ class Step4Checkout extends React.Component {
             currentCustomer.totalAthleticSurcharge +
             currentCustomer.totalBodybuilderSurcharge +
             _.sum(currentCustomer.restrictionsSurcharges) +
-            _.sum(currentCustomer.specificRestrictionsSurcharges);
+            _.sum(currentCustomer.specificRestrictionsSurcharges) +
+            currentCustomer.sidesTotal;
 
-          currentCustomer.totalCost -= currentCustomer.discountActual;
+            currentCustomer.totalCost -= currentCustomer.discountActual;
 
           console.log(currentCustomer);
 
@@ -1588,7 +1637,8 @@ class Step4Checkout extends React.Component {
         primaryCustomer.coolerBag +
         _.sum(primaryCustomer.restrictionsSurcharges) +
         _.sum(primaryCustomer.specificRestrictionsSurcharges) +
-        primaryCustomer.deliveryCost + primaryCustomer.deliverySurcharges;
+        primaryCustomer.deliveryCost + primaryCustomer.deliverySurcharges +
+          primaryCustomer.sidesTotal;
 
       primaryCustomer.totalCost -= primaryCustomer.discountActual;
 
@@ -2217,6 +2267,53 @@ class Step4Checkout extends React.Component {
                           )
                         : "" */}
 
+                        {this.state.primaryProfileBilling && (
+                            this.state.primaryProfileBilling.sides && this.state.primaryProfileBilling.sides.length > 0 && (
+                                <React.Fragment>
+                                    <Grid container>
+                                        <Grid item xs={12}>
+                                            <Typography
+                                                type="body2"
+                                                style={{
+                                                    marginTop: '.75em',
+                                                    marginBottom: '.75em',
+                                                }}
+                                            >
+                                                SIDES
+                                            </Typography>
+                                        </Grid>
+                                    </Grid>
+                                    <Grid container>
+                                        {this.state.primaryProfileBilling.sides.map(side => {
+                                            return (
+                                                <React.Fragment>
+                                                    <Grid item xs={12} sm={6}>
+                                                        <Typography type="subheading">
+                                                            {side.title}
+                                                        </Typography>
+                                                        <Typography type="body1">
+                                                            {side.variantTitle} x{side.quantity}
+                                                        </Typography>
+                                                    </Grid>
+
+                                                    <Grid item xs={12} sm={6}>
+                                                        <Typography
+                                                            type="subheading"
+                                                            style={{ textAlign: 'right' }}
+                                                        >
+                                                            ${side.lineItemPrice}
+                                                        </Typography>
+                                                    </Grid>
+                                                </React.Fragment>
+                                            );
+                                        })}
+
+                                    </Grid>
+                                </React.Fragment>
+                            )
+                        )}
+
+
                       {this.state.secondaryProfilesBilling
                         ? this.state.secondaryProfilesBilling.map((e, i) => (
                           <div>
@@ -2402,6 +2499,50 @@ class Step4Checkout extends React.Component {
                                   </Grid>
                                 </Grid>
                               ))}
+
+                              {e.sides && e.sides.length > 0 && (
+                                  <React.Fragment>
+                                      <Grid container>
+                                          <Grid item xs={12}>
+                                              <Typography
+                                                  type="body2"
+                                                  style={{
+                                                      marginTop: '.75em',
+                                                      marginBottom: '.75em',
+                                                  }}
+                                              >
+                                                  SIDES
+                                              </Typography>
+                                          </Grid>
+                                      </Grid>
+                                      <Grid container>
+                                          {e.sides.map(side => {
+                                              return (
+                                                  <React.Fragment>
+                                                      <Grid item xs={12} sm={6}>
+                                                          <Typography type="subheading">
+                                                              {side.title}
+                                                          </Typography>
+                                                          <Typography type="body1">
+                                                              {side.variantTitle} x{side.quantity}
+                                                          </Typography>
+                                                      </Grid>
+
+                                                      <Grid item xs={12} sm={6}>
+                                                          <Typography
+                                                              type="subheading"
+                                                              style={{ textAlign: 'right' }}
+                                                          >
+                                                              ${side.lineItemPrice}
+                                                          </Typography>
+                                                      </Grid>
+                                                  </React.Fragment>
+                                              );
+                                          })}
+
+                                      </Grid>
+                                  </React.Fragment>
+                              )}
 
                             {/* e.specificRestrictionsActual.length > 0 &&
                                 e.specificRestrictionsActual.map((el, ind) => (

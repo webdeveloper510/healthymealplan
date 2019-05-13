@@ -1881,6 +1881,51 @@ class Step4CheckoutCurrent extends React.Component {
                       )
                       : ''}
 
+                      {this.state.primaryProfileBilling && (
+                          this.state.primaryProfileBilling.sides && this.state.primaryProfileBilling.sides.length > 0 && (
+                              <React.Fragment>
+                                  <Grid container>
+                                      <Grid item xs={12}>
+                                          <Typography
+                                              type="body2"
+                                              style={{
+                                                  marginTop: '.75em',
+                                                  marginBottom: '.75em',
+                                              }}
+                                          >
+                                              SIDES
+                                          </Typography>
+                                      </Grid>
+                                  </Grid>
+                                  <Grid container>
+                                      {this.state.primaryProfileBilling.sides.map(side => {
+                                          return (
+                                              <React.Fragment>
+                                                  <Grid item xs={12} sm={6}>
+                                                      <Typography type="subheading">
+                                                          {side.title}
+                                                      </Typography>
+                                                      <Typography type="body1">
+                                                          {side.variantTitle} x{side.quantity}
+                                                      </Typography>
+                                                  </Grid>
+
+                                                  <Grid item xs={12} sm={6}>
+                                                      <Typography
+                                                          type="subheading"
+                                                          style={{ textAlign: 'right' }}
+                                                      >
+                                                          ${side.lineItemPrice}
+                                                      </Typography>
+                                                  </Grid>
+                                              </React.Fragment>
+                                          );
+                                      })}
+
+                                  </Grid>
+                              </React.Fragment>
+                          )
+                      )}
                     {/* this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling
                         .specificRestrictionsActual.length > 0
@@ -2099,6 +2144,50 @@ class Step4CheckoutCurrent extends React.Component {
                               </Grid>
                             ))}
 
+                            {e.sides && e.sides.length > 0 && (
+                                    <React.Fragment>
+                                        <Grid container>
+                                            <Grid item xs={12}>
+                                                <Typography
+                                                    type="body2"
+                                                    style={{
+                                                        marginTop: '.75em',
+                                                        marginBottom: '.75em',
+                                                    }}
+                                                >
+                                                    SIDES
+                                                </Typography>
+                                            </Grid>
+                                        </Grid>
+                                        <Grid container>
+                                            {e.sides.map(side => {
+                                                return (
+                                                    <React.Fragment>
+                                                        <Grid item xs={12} sm={6}>
+                                                            <Typography type="subheading">
+                                                                {side.title}
+                                                            </Typography>
+                                                            <Typography type="body1">
+                                                                {side.variantTitle} x{side.quantity}
+                                                            </Typography>
+                                                        </Grid>
+
+                                                        <Grid item xs={12} sm={6}>
+                                                            <Typography
+                                                                type="subheading"
+                                                                style={{ textAlign: 'right' }}
+                                                            >
+                                                                ${side.lineItemPrice}
+                                                            </Typography>
+                                                        </Grid>
+                                                    </React.Fragment>
+                                                );
+                                            })}
+
+                                        </Grid>
+                                    </React.Fragment>
+                            )}
+
                           {/* e.specificRestrictionsActual.length > 0 &&
                                 e.specificRestrictionsActual.map((el, ind) => (
                                   <Grid container key={ind}>
@@ -2129,7 +2218,7 @@ class Step4CheckoutCurrent extends React.Component {
                       : ''}
 
                     {/*  delivery and other stuff  */}
-                    <Grid container>
+                    <Grid container style={{ marginTop: '1em' }}>
                       <Grid item xs={6}>
                         <Typography type="subheading">Delivery</Typography>
                       </Grid>
@@ -2177,7 +2266,8 @@ class Step4CheckoutCurrent extends React.Component {
                           </Grid>
                         </Grid>
                       )}
-                    {this.state.primaryProfileBilling.discountTotal > 0 && !this.state.discountBeingRemoved
+                      {this.state.primaryProfileBilling && (
+                    this.state.primaryProfileBilling.discountTotal > 0 && !this.state.discountBeingRemoved
                       && this.props.subscription.hasOwnProperty('discountApplied') ? (
                         <div style={{ marginTop: '25px' }}>
                           <Grid container>
@@ -2204,7 +2294,8 @@ class Step4CheckoutCurrent extends React.Component {
                             </Grid>
                           </Grid>
                         </div>
-                      ) : ''}
+                      ) : ''
+                    )}
 
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.coolerBag > 0 && (

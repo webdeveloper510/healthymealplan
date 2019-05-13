@@ -15,7 +15,7 @@ import { Meteor } from 'meteor/meteor';
 import { Accounts } from 'meteor/accounts-base';
 
 import Button from 'material-ui/Button';
-import { MenuItem } from 'material-ui/Menu';
+import Menu, { MenuItem } from 'material-ui/Menu';
 import Switch from 'material-ui/Switch';
 
 import Radio, { RadioGroup } from 'material-ui/Radio';
@@ -172,6 +172,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -180,6 +181,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -188,6 +190,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -196,6 +199,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -204,6 +208,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -212,6 +217,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -220,6 +226,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
       ],
 
@@ -310,6 +317,7 @@ class CurrentCustomerEditor extends React.Component {
       primaryProfileBilling: null,
       secondaryProfilesBilling: null,
 
+      selectedSide: '',
     };
 
     autoBind(this);
@@ -646,13 +654,13 @@ class CurrentCustomerEditor extends React.Component {
     }
 
     const scheduleSummation = [
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
     ];
 
     this.state.scheduleReal.forEach((e, i) => {
@@ -679,6 +687,11 @@ class CurrentCustomerEditor extends React.Component {
       if (e.chefsChoiceDinner.active) {
         scheduleSummation[i].chefsChoiceDinner += parseInt(e.chefsChoiceDinner.quantity, 10);
       }
+
+      if (e.sides.length > 0) {
+          scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+      }
+
     });
 
     this.state.secondaryProfilesData.forEach((e, i) => {
@@ -708,6 +721,10 @@ class CurrentCustomerEditor extends React.Component {
 
         if (el.chefsChoiceDinner.active) {
           scheduleSummation[index].chefsChoiceDinner += parseInt(el.chefsChoiceDinner.quantity, 10);
+        }
+
+        if (el.sides.length > 0) {
+          scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
         }
       });
     });
@@ -959,13 +976,13 @@ class CurrentCustomerEditor extends React.Component {
     scheduleRealCopy[index][mealType].quantity = event.target.value;
 
     const scheduleSummation = [
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
     ];
 
     this.state.scheduleReal.forEach((e, i) => {
@@ -991,6 +1008,10 @@ class CurrentCustomerEditor extends React.Component {
 
       if (e.chefsChoiceDinner.active) {
         scheduleSummation[i].chefsChoiceDinner += parseInt(e.chefsChoiceDinner.quantity, 10);
+      }
+
+      if (e.sides.length > 0) {
+        scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
       }
     });
 
@@ -1021,6 +1042,10 @@ class CurrentCustomerEditor extends React.Component {
 
         if (el.chefsChoiceDinner.active) {
           scheduleSummation[index].chefsChoiceDinner += parseInt(el.chefsChoiceDinner.quantity, 10);
+        }
+
+        if (el.sides.length > 0) {
+          scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
         }
       });
     });
@@ -1053,13 +1078,13 @@ class CurrentCustomerEditor extends React.Component {
       scheduleReal: scheduleRealCopy,
     }, () => {
       const scheduleSummation = [
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0 },
       ];
 
       this.state.scheduleReal.forEach((e, i) => {
@@ -1085,6 +1110,10 @@ class CurrentCustomerEditor extends React.Component {
 
         if (e.chefsChoiceDinner.active) {
           scheduleSummation[i].chefsChoiceDinner += parseInt(e.chefsChoiceDinner.quantity, 10);
+        }
+
+        if (e.sides.length > 0) {
+            scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
         }
       });
 
@@ -1115,6 +1144,10 @@ class CurrentCustomerEditor extends React.Component {
 
           if (el.chefsChoiceDinner.active) {
             scheduleSummation[index].chefsChoiceDinner += parseInt(el.chefsChoiceDinner.quantity, 10);
+          }
+
+          if (el.sides.length > 0) {
+              scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
           }
         });
       });
@@ -1854,6 +1887,47 @@ class CurrentCustomerEditor extends React.Component {
 
           </FormControl>
         </Grid>
+        <Grid item xs={12}>
+          <Typography type="body1" className="text-uppercase">
+              Sides
+          </Typography>
+            <Grid container style={{marginTop: '25px'}}>
+            {this.state.scheduleReal[index].sides.map((side, ind) => {
+                const currentSide = this.props.sides.find(e => e._id === side._id);
+                return (
+                <Grid item xs={12} sm={4}>
+                    <Typography type="body2">{currentSide.title}</Typography>
+                    <FormControl component="fieldset">
+                        <RadioGroup
+                            aria-label=""
+                            name=""
+                            value={side.variantId}
+                            onChange={this.handleChangeSideVariant.bind(this, side._id, null)}
+                            style={{ flexDirection: 'row' }}
+                        >
+                            {currentSide.variants.map(variant => (
+                                <FormControlLabel
+                                    key={variant._id}
+                                    value={variant._id}
+                                    control={<Radio />}
+                                    label={variant.name}
+                                />
+                            ))}
+                        </RadioGroup>
+                    </FormControl>
+                      <Typography type="body1" className="text-uppercase">Quantity</Typography>
+                      <FormControl component="fieldset">
+                        <TextField
+                          value={this.state.scheduleReal[index].sides[ind].quantity}
+                          onChange={this.handleChangeSideQuantity.bind(this, side._id, null)}
+                          inputProps={{type: 'number', min: 1,}}
+                        />
+                      </FormControl>
+                    <Button style={{display: 'block', marginTop: '15px'}} onClick={() => this.removeSideFromCurrentDay(side._id, null)}>Remove</Button>
+                </Grid>
+                )})}
+            </Grid>
+        </Grid>
       </Grid>
     );
   }
@@ -1904,6 +1978,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -1912,6 +1987,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -1920,6 +1996,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -1928,6 +2005,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -1936,6 +2014,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -1944,6 +2023,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
         {
           breakfast: { active: false, portions: 'regular', quantity: '1' },
@@ -1952,6 +2032,7 @@ class CurrentCustomerEditor extends React.Component {
           chefsChoiceBreakfast: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceLunch: { active: false, portions: 'regular', quantity: '1' },
           chefsChoiceDinner: { active: false, portions: 'regular', quantity: '1' },
+          sides: [],
         },
       ],
       platingNotes: '',
@@ -1982,13 +2063,13 @@ class CurrentCustomerEditor extends React.Component {
     console.log(toBeRemoved);
 
     const scheduleSummation = [
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+      { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
     ];
 
     this.state.scheduleReal.forEach((e, i) => {
@@ -2014,6 +2095,11 @@ class CurrentCustomerEditor extends React.Component {
 
       if (e.chefsChoiceDinner.active) {
         scheduleSummation[i].chefsChoiceDinner += parseInt(e.chefsChoiceDinner.quantity, 10);
+      }
+
+      if (e.sides.length > 0) {
+          scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+          console.log(scheduleSummation[i]);
       }
     });
 
@@ -2045,6 +2131,11 @@ class CurrentCustomerEditor extends React.Component {
         if (el.chefsChoiceDinner.active) {
           scheduleSummation[index].chefsChoiceDinner += parseInt(el.chefsChoiceDinner.quantity, 10);
         }
+
+        if (el.sides.length > 0) {
+          scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+        }
+
       });
     });
 
@@ -2088,13 +2179,13 @@ class CurrentCustomerEditor extends React.Component {
       secondaryProfilesData: secondaryProfilesDataCopy,
     }, () => {
       const scheduleSummation = [
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
       ];
 
       this.state.scheduleReal.forEach((e, i) => {
@@ -2120,6 +2211,10 @@ class CurrentCustomerEditor extends React.Component {
 
         if (e.chefsChoiceDinner.active) {
           scheduleSummation[i].chefsChoiceDinner += parseInt(e.chefsChoiceDinner.quantity, 10);
+        }
+
+        if (e.sides.length > 0) {
+            scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
         }
       });
 
@@ -2150,6 +2245,10 @@ class CurrentCustomerEditor extends React.Component {
 
           if (el.chefsChoiceDinner.active) {
             scheduleSummation[index].chefsChoiceDinner += parseInt(el.chefsChoiceDinner.quantity, 10);
+          }
+
+          if (el.sides.length > 0) {
+            scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
           }
         });
       });
@@ -2190,13 +2289,13 @@ class CurrentCustomerEditor extends React.Component {
       secondaryProfilesData: secondaryProfilesDataCopy,
     }, () => {
       const scheduleSummation = [
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
-        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0 },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
+        { breakfast: 0, lunch: 0, dinner: 0, chefsChoiceBreakfast: 0, chefsChoiceLunch: 0, chefsChoiceDinner: 0, sides: 0, },
       ];
 
       this.state.scheduleReal.forEach((e, i) => {
@@ -2222,6 +2321,10 @@ class CurrentCustomerEditor extends React.Component {
 
         if (e.chefsChoiceDinner.active) {
           scheduleSummation[i].chefsChoiceDinner += parseInt(e.chefsChoiceDinner.quantity, 10);
+        }
+
+        if (e.sides.length > 0) {
+            scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
         }
       });
 
@@ -2252,6 +2355,10 @@ class CurrentCustomerEditor extends React.Component {
 
           if (el.chefsChoiceDinner.active) {
             scheduleSummation[index].chefsChoiceDinner += parseInt(el.chefsChoiceDinner.quantity, 10);
+          }
+
+          if (el.sides.length > 0) {
+            scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
           }
         });
       });
@@ -3098,6 +3205,48 @@ class CurrentCustomerEditor extends React.Component {
               }}
             />
           </FormControl>
+        </Grid>
+
+        <Grid item xs={12}>
+            <Typography type="body1" className="text-uppercase">
+                Sides
+            </Typography>
+            <Grid container style={{marginTop: '25px'}}>
+                {this.state.secondaryProfilesData[profileIndex].scheduleReal[stepIndex].sides.map((side, ind) => {
+                    const currentSide = this.props.sides.find(e => e._id === side._id);
+                    return (
+                        <Grid item xs={12} sm={4}>
+                            <Typography type="body2">{currentSide.title}</Typography>
+                            <FormControl component="fieldset">
+                                <RadioGroup
+                                    aria-label=""
+                                    name=""
+                                    value={side.variantId}
+                                    onChange={this.handleChangeSideVariant.bind(this, side._id, profileIndex)}
+                                    style={{ flexDirection: 'row' }}
+                                >
+                                    {currentSide.variants.map(variant => (
+                                        <FormControlLabel
+                                            key={variant._id}
+                                            value={variant._id}
+                                            control={<Radio />}
+                                            label={variant.name}
+                                        />
+                                    ))}
+                                </RadioGroup>
+                            </FormControl>
+                            <Typography type="body1" className="text-uppercase">Quantity</Typography>
+                            <FormControl component="fieldset">
+                                <TextField
+                                    value={this.state.secondaryProfilesData[profileIndex].scheduleReal[stepIndex].sides[ind].quantity}
+                                    onChange={this.handleChangeSideQuantity.bind(this, side._id, profileIndex)}
+                                    inputProps={{type: 'number', min: 1,}}
+                                />
+                            </FormControl>
+                            <Button style={{display: 'block', marginTop: '15px'}} onClick={() => this.removeSideFromCurrentDay(side._id, profileIndex)}>Remove</Button>
+                        </Grid>
+                    )})}
+            </Grid>
         </Grid>
 
       </Grid>
@@ -7286,6 +7435,149 @@ class CurrentCustomerEditor extends React.Component {
     });
   }
 
+    removeSideFromCurrentDay(sideId, profileIndex = null) {
+        if (profileIndex !== null ) {
+            const secondaryProfilesData = this.state.secondaryProfilesData;
+            const mealScheduleStep = this.state.secondaryProfilesData[profileIndex].activeMealScheduleStep;
+            const scheduleRealCopy = this.state.secondaryProfilesData[profileIndex].scheduleReal;
+
+            scheduleRealCopy[mealScheduleStep].sides = scheduleRealCopy[mealScheduleStep].sides.filter(e => e._id !== sideId);
+
+            this.setState({
+                scheduleReal: scheduleRealCopy
+            });
+
+        } else {
+            console.log(sideId);
+            const mealScheduleStep = this.state.activeMealScheduleStep;
+            const scheduleRealCopy = this.state.scheduleReal;
+
+            scheduleRealCopy[mealScheduleStep].sides = scheduleRealCopy[mealScheduleStep].sides.filter(e => e._id !== sideId);
+
+            this.setState({
+                scheduleReal: scheduleRealCopy
+            });
+        }
+
+
+    }
+
+  addSelectedSideToCurrentDay(event, profileIndex = null){
+      console.log("Going here 1");
+      console.log(event);
+      console.log(profileIndex);
+    if (profileIndex !== null) {
+      console.log("going index");
+        const secondaryProfilesData = this.state.secondaryProfilesData;
+        const mealScheduleStep = secondaryProfilesData[profileIndex].activeMealScheduleStep;
+        const selectedSide = this.props.sides.find(e => e._id === this.state.selectedSide);
+
+        if (secondaryProfilesData[profileIndex].scheduleReal[mealScheduleStep].sides.findIndex(e => e._id === this.state.selectedSide) !== -1) {
+            this.props.popTheSnackbar({
+                message: `${selectedSide.title} is already present on this day.`
+            });
+
+            return;
+        }
+
+        secondaryProfilesData[profileIndex].scheduleReal[mealScheduleStep].sides.push({
+            _id: selectedSide._id,
+            variantId: selectedSide.variants[0]._id,
+            title: selectedSide.title,
+            quantity: 1,
+        });
+
+        this.setState({
+            secondaryProfilesData,
+        });
+
+    } else {
+
+    const mealScheduleStep = this.state.activeMealScheduleStep;
+    const scheduleRealCopy = this.state.scheduleReal;
+    const selectedSide = this.props.sides.find(e => e._id === this.state.selectedSide);
+
+    if (scheduleRealCopy[mealScheduleStep].sides.findIndex(e => e._id === this.state.selectedSide) !== -1) {
+          this.props.popTheSnackbar({
+              message: `${selectedSide.title} is already present on this day.`
+          });
+
+          return;
+    }
+
+      scheduleRealCopy[mealScheduleStep].sides.push({
+          _id: selectedSide._id,
+          variantId: selectedSide.variants[0]._id,
+          title: selectedSide.title,
+          quantity: 1,
+      });
+
+        this.setState({
+            scheduleReal: scheduleRealCopy,
+        });
+
+    }
+  }
+
+  handleChangeSideQuantity(sideId, profileIndex = null, event) {
+
+      if (profileIndex !== null) {
+          const secondaryProfilesData = this.state.secondaryProfilesData;
+          const scheduleRealCopy = this.state.secondaryProfilesData[profileIndex].scheduleReal;
+          const activeMealScheduleStep = secondaryProfilesData[profileIndex].activeMealScheduleStep;
+          const sideIndex = scheduleRealCopy[activeMealScheduleStep].sides.findIndex(e => e._id === sideId);
+
+          scheduleRealCopy[activeMealScheduleStep].sides[sideIndex].quantity = event.target.value;
+          secondaryProfilesData[profileIndex].scheduleReal = scheduleRealCopy;
+
+          this.setState({
+              secondaryProfilesData
+          });
+
+      } else {
+          const { activeMealScheduleStep, scheduleReal } = this.state;
+
+          const sideIndex = scheduleReal[activeMealScheduleStep].sides.findIndex(e => e._id === sideId);
+          scheduleReal[activeMealScheduleStep].sides[sideIndex].quantity = event.target.value;
+
+          this.setState({
+              scheduleReal,
+          });
+      }
+  }
+
+  handleChangeSideVariant(sideId, profileIndex = null, event, value){
+    if (profileIndex !== null) {
+        const secondaryProfilesData = this.state.secondaryProfilesData;
+        const scheduleRealCopy = this.state.secondaryProfilesData[profileIndex].scheduleReal;
+        const activeMealScheduleStep = secondaryProfilesData[profileIndex].activeMealScheduleStep;
+        const sideIndex = scheduleRealCopy[activeMealScheduleStep].sides.findIndex(e => e._id === sideId);
+
+        scheduleRealCopy[activeMealScheduleStep].sides[sideIndex].variantId = value;
+        secondaryProfilesData[profileIndex].scheduleReal = scheduleRealCopy;
+
+        this.setState({
+            secondaryProfilesData
+        });
+
+    } else {
+      const { activeMealScheduleStep, scheduleReal } = this.state;
+
+      const sideIndex = scheduleReal[activeMealScheduleStep].sides.findIndex(e => e._id === sideId);
+      scheduleReal[activeMealScheduleStep].sides[sideIndex].variantId = value;
+
+      this.setState({
+          scheduleReal,
+      });
+    }
+  }
+
+  selectSide(event) {
+      this.setState({
+        selectedSide: event.target.value,
+    })
+  }
+
 
   render() {
     const buttonClassname = classNames({
@@ -7726,6 +8018,22 @@ class CurrentCustomerEditor extends React.Component {
                     ) : (
                       ''
                     )}
+
+                      <Grid container style={{marginTop: '30px'}}>
+                          <Grid item xs={12}>
+                              <Typography type="subheading">Add a side</Typography>
+                          </Grid>
+                          <Grid item xs={12}>
+                              <select style={{padding: '8px', marginRight: '10px'}} onChange={this.selectSide}>
+                                  {this.props.sides.sort((a, b) => a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1).map((side) => (
+                                      <option value={side._id}>
+                                          {side.title}
+                                      </option>
+                                  ))}
+                              </select>
+                              <Button disabled={this.state.selectedSide === ""} onClick={() => this.addSelectedSideToCurrentDay(false)}>Add</Button>
+                          </Grid>
+                      </Grid>
                   </div>
                   <Grid container style={{ marginBottom: '3em' }}>
                     <Grid item xs={12} style={{ marginTop: '25px' }}>
@@ -8375,6 +8683,23 @@ class CurrentCustomerEditor extends React.Component {
                               ) : (
                                 ''
                               )}
+
+                              <Grid container style={{marginTop: '30px'}}>
+                                  <Grid item xs={12}>
+                                      <Typography type="subheading">Add a side</Typography>
+                                  </Grid>
+                                  <Grid item xs={12}>
+                                      <select style={{padding: '8px', marginRight: '10px'}} onChange={this.selectSide}>
+                                          {this.props.sides.sort((a, b) => a.title.toLowerCase() > b.title.toLowerCase() ? 1 : -1).map((side) => (
+                                              <option value={side._id}>
+                                                  {side.title}
+                                              </option>
+                                          ))}
+                                      </select>
+                                      <Button disabled={this.state.selectedSide === ""} onClick={(e) => this.addSelectedSideToCurrentDay(e, profileIndex)}>Add</Button>
+                                  </Grid>
+                              </Grid>
+
                           </div>
 
                           <Grid container style={{ marginBottom: '3em' }}>

@@ -268,7 +268,51 @@ class OrderSummary extends React.Component {
                 ),
               )
               : ''}
+              {this.state.primaryProfileBilling && (
+                  this.state.primaryProfileBilling.sides && this.state.primaryProfileBilling.sides.length > 0 && (
+                      <React.Fragment>
+                          <Grid container>
+                              <Grid item xs={12}>
+                                  <Typography
+                                      type="body2"
+                                      style={{
+                                          marginTop: '.75em',
+                                          marginBottom: '.75em',
+                                      }}
+                                  >
+                                      SIDES
+                                  </Typography>
+                              </Grid>
+                          </Grid>
+                          <Grid container>
+                              {this.state.primaryProfileBilling.sides.map(side => {
+                                  return (
+                                      <React.Fragment>
+                                          <Grid item xs={12} sm={6}>
+                                              <Typography type="subheading">
+                                                  {side.title}
+                                              </Typography>
+                                              <Typography type="body1">
+                                                  {side.variantTitle} x{side.quantity}
+                                              </Typography>
+                                          </Grid>
 
+                                          <Grid item xs={12} sm={6}>
+                                              <Typography
+                                                  type="subheading"
+                                                  style={{ textAlign: 'right' }}
+                                              >
+                                                  ${side.lineItemPrice}
+                                              </Typography>
+                                          </Grid>
+                                      </React.Fragment>
+                                  );
+                              })}
+
+                          </Grid>
+                      </React.Fragment>
+                  )
+              )}
             {/* this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling
                         .specificRestrictionsActual.length > 0
@@ -496,6 +540,50 @@ class OrderSummary extends React.Component {
                       </Grid>
                     ))}
 
+                    {e.sides && e.sides.length > 0 && (
+                        <React.Fragment>
+                            <Grid container>
+                                <Grid item xs={12}>
+                                    <Typography
+                                        type="body2"
+                                        style={{
+                                            marginTop: '.75em',
+                                            marginBottom: '.75em',
+                                        }}
+                                    >
+                                        SIDES
+                                    </Typography>
+                                </Grid>
+                            </Grid>
+                            <Grid container>
+                                {e.sides.map(side => {
+                                    return (
+                                        <React.Fragment>
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography type="subheading">
+                                                    {side.title}
+                                                </Typography>
+                                                <Typography type="body1">
+                                                    {side.variantTitle} x{side.quantity}
+                                                </Typography>
+                                            </Grid>
+
+                                            <Grid item xs={12} sm={6}>
+                                                <Typography
+                                                    type="subheading"
+                                                    style={{ textAlign: 'right' }}
+                                                >
+                                                    ${side.lineItemPrice}
+                                                </Typography>
+                                            </Grid>
+                                        </React.Fragment>
+                                    );
+                                })}
+
+                            </Grid>
+                        </React.Fragment>
+                    )}
+
                   {/* e.specificRestrictionsActual.length > 0 &&
                                 e.specificRestrictionsActual.map((el, ind) => (
                                   <Grid container key={ind}>
@@ -524,6 +612,8 @@ class OrderSummary extends React.Component {
                 </div>
               ))
               : ''}
+
+
 
             {/*  delivery and other stuff  */}
             <Grid container>

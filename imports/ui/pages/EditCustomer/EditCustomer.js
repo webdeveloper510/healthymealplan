@@ -16,6 +16,7 @@ import PostalCodes from '../../../api/PostalCodes/PostalCodes';
 import Discounts from '../../../api/Discounts/Discounts';
 import GiftCards from '../../../api/GiftCards/GiftCards';
 import Jobs from '../../../api/Jobs/JobsClient';
+import Sides from '../../../api/Sides/Sides';
 
 const EditCustomer = ({
   customer,
@@ -31,6 +32,7 @@ const EditCustomer = ({
   discounts,
   jobs,
   giftCards,
+  sides,
   deliveryGuys,
 }) => (loading ? <Loading /> : customer ? (
   <div className="EditCurrentCustomer">
@@ -50,6 +52,7 @@ const EditCustomer = ({
         jobs={jobs}
         giftCards={giftCards}
         deliveryGuys={deliveryGuys}
+        sides={sides}
       />
     </Grid>
   </div>
@@ -62,6 +65,8 @@ EditCustomer.propTypes = {
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
   deliveryGuys: PropTypes.array,
+  sides: PropTypes.array,
+
 };
 
 export default withTracker(({ match }) => {
@@ -77,11 +82,13 @@ export default withTracker(({ match }) => {
   const subscription9 = Meteor.subscribe('jobs.subscription', customerId);
   const subscription10 = Meteor.subscribe('giftcards');
   const subscription11 = Meteor.subscribe('users.deliveryGuys');
+  const subscription12 = Meteor.subscribe('sides', {}, {});
 
 
-  return {
+
+    return {
     loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready()
-      && !subscription6.ready() && !subscription7.ready() && !subscription8.ready() && !subscription9.ready() && !subscription10.ready() && !subscription11.ready(),
+      && !subscription6.ready() && !subscription7.ready() && !subscription8.ready() && !subscription9.ready() && !subscription10.ready() && !subscription11.ready() && !subscription12.ready(),
     customer: Meteor.users.findOne(customerId),
     subscription: Subscriptions.findOne({ customerId }),
     secondaryAccounts: Meteor.users.find({ secondary: true, primaryAccount: customerId }).fetch(),
@@ -92,6 +99,7 @@ export default withTracker(({ match }) => {
     discounts: Discounts.find().fetch(),
     jobs: Jobs.find().fetch(),
     giftCards: GiftCards.find().fetch(),
+    sides: Sides.find().fetch(),
     deliveryGuys: Meteor.users.find({ roles: ['admin', 'delivery'] }).fetch(),
   };
 })(EditCustomer);

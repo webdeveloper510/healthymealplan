@@ -4,6 +4,7 @@ import PostalCodes from '../../../api/PostalCodes/PostalCodes';
 import Ingredients from '../../../api/Ingredients/Ingredients';
 import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 import Discounts from '../../../api/Discounts/Discounts';
+import Sides from '../../../api/Sides/Sides';
 
 import createSubscriptionLineItems from './createSubscriptionLineItems';
 
@@ -59,6 +60,9 @@ export default function calculateSubscriptionCost(customerInfo) {
       athleticQty: 0,
       bodybuilderQty: 0,
     },
+    sides: [],
+    sidesTotal: 0,
+    sidesTotalQty: 0,
     // coolerBag: customerInfo.coolerBag ? 20 : 0,
     coolerBag: 0,
     deliveryCost: 0,
@@ -234,6 +238,29 @@ export default function calculateSubscriptionCost(customerInfo) {
       }
 
       thisDaysQty += parseInt(e.chefsChoiceDinner.quantity, 10);
+    }
+
+    if (e.sides.length > 0) {
+      console.log(e.sides);
+      //maybe use reduce wull prolly take two loops one after other
+      e.sides.forEach(currentSide => {
+        console.log("going here")
+          const side = Sides.findOne({ _id: currentSide._id });
+
+          const variant = side.variants.find(e => e._id === currentSide.variantId);
+
+          console.log("going here")
+          primaryCustomer.sidesTotalQty += parseInt(currentSide.quantity, 10);
+          primaryCustomer.sidesTotal += parseFloat(variant.price) * parseInt(currentSide.quantity, 10);
+          primaryCustomer.sides.push({
+              title: currentSide.title,
+              _id: currentSide._id,
+              variantId: currentSide.variantId,
+              lineItemPrice: parseFloat(variant.price) * parseInt(currentSide.quantity, 10),
+              quantity: currentSide.quantity,
+              variantTitle: variant.name,
+          });
+      });
     }
 
     customerScheduleTotals.push(thisDaysQty);
@@ -748,6 +775,9 @@ export default function calculateSubscriptionCost(customerInfo) {
           athleticQty: 0,
           bodybuilderQty: 0,
         },
+          sides: [],
+          sidesTotal: 0,
+          sidesTotalQty: 0,
         deliveryCost: 0,
 
         discount: customerInfo.secondaryProfiles[index].discount,
@@ -926,6 +956,27 @@ export default function calculateSubscriptionCost(customerInfo) {
               10,
             );
           }
+        }
+
+        if (e.sides.length > 0) {
+
+          //maybe use reduce wull prolly take two loops one after other
+          e.sides.forEach(currentSide => {
+              const side = Sides.findOne({ _id: currentSide._id });
+              const variant = side.variants.find(sideVariant => sideVariant._id === currentSide.variantId);
+
+              currentCustomer.sidesTotalQty += parseInt(currentSide.quantity, 10);
+              currentCustomer.sidesTotal += parseFloat(variant.price) * parseInt(currentSide.quantity, 10);
+              currentCustomer.sides.push({
+                  title: currentSide.title,
+                  _id: currentSide._id,
+                  variantId: currentSide.variantId,
+                  lineItemPrice: parseFloat(variant.price) * parseInt(currentSide.quantity, 10),
+                  quantity: currentSide.quantity,
+                  variantTitle: variant.name,
+              });
+          });
+
         }
       });
 
@@ -1315,7 +1366,8 @@ export default function calculateSubscriptionCost(customerInfo) {
         currentCustomer.totalAthleticSurcharge +
         currentCustomer.totalBodybuilderSurcharge +
         sum(currentCustomer.restrictionsSurcharges) +
-        sum(currentCustomer.specificRestrictionsSurcharges);
+        sum(currentCustomer.specificRestrictionsSurcharges) +
+        currentCustomer.sidesTotal;
 
       currentCustomer.totalCost -= currentCustomer.discountActual;
 
@@ -1482,7 +1534,8 @@ export default function calculateSubscriptionCost(customerInfo) {
     primaryCustomer.coolerBag +
     sum(primaryCustomer.restrictionsSurcharges) +
     sum(primaryCustomer.specificRestrictionsSurcharges) +
-    primaryCustomer.deliveryCost + primaryCustomer.deliverySurcharges;
+    primaryCustomer.deliveryCost + primaryCustomer.deliverySurcharges +
+    primaryCustomer.sidesTotal;
 
   primaryCustomer.totalCost -= primaryCustomer.discountActual;
 
@@ -1510,7 +1563,6 @@ export default function calculateSubscriptionCost(customerInfo) {
 
   primaryCustomer.taxes = parseFloat(primaryCustomer.taxes.toFixed(2));
   primaryCustomer.groupTotal = parseFloat(primaryCustomer.groupTotal.toFixed(2));
-
 
 
   let taxExempt = false;

@@ -33,6 +33,19 @@ function addMealsForTheDay(day) {
   return sum;
 }
 
+function addSidesForTheDay(day){
+
+  let sum = 0;
+
+  if (day.sides) {
+    if (day.sides.length > 0) {
+      day.sides.forEach(e => sum += parseInt(e.quantity, 10));
+    }
+  }
+
+  return sum;
+}
+
 export default function deliveriesDataMapper(aggregation, currentDay) {
   // console.log(currentDay);
   this.deliveriesForCurrentDay = [];
@@ -121,6 +134,8 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
         status: deliveryExists ? deliveryExists.status : 'Scheduled',
         deliveryAssignedTo: el.deliveryAssignedTo || 'unassigned',
         meals: [],
+        sides: [],
+        sidesTotal: 0,
       };
 
 
@@ -148,6 +163,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides, ...primarySchedule[index + 2].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                  addSidesForTheDay(primarySchedule[index + 1]) +
+                  addSidesForTheDay(primarySchedule[index + 2]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -156,6 +176,14 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                       addMealsForTheDay(secondarySchedule[index + 1]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                    delivery.sides.push(...secondarySchedule[index].sides,
+                        ...secondarySchedule[index + 1].sides,
+                        ...secondarySchedule[index + 2].sides);
+
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                        addSidesForTheDay(secondarySchedule[index + 1]) +
+                        addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -178,6 +206,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 2].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) + addSidesForTheDay(primarySchedule[index + 2]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -185,6 +216,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 2].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) + addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -206,6 +240,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 1]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) + addSidesForTheDay(primarySchedule[index + 1]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -213,6 +250,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 1]),
                   });
+                    delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides);
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) + addSidesForTheDay(secondarySchedule[index]);
+
                 });
 
                 // console.log(delivery.meals);
@@ -231,12 +271,19 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 total: addMealsForTheDay(primarySchedule[index]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
+
                 });
 
                 // console.log(delivery.meals);
@@ -266,6 +313,8 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides, ...primarySchedule[index + 2].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) + addSidesForTheDay(primarySchedule[index + 1]) + addSidesForTheDay(primarySchedule[index + 2]);
 
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
@@ -275,6 +324,12 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                       addMealsForTheDay(secondarySchedule[index + 1]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides, ...secondarySchedule[index + 2].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 1]) +
+                      addSidesForTheDay(secondarySchedule[index + 2]);
+
                 });
 
                 // console.log(delivery.meals);
@@ -295,6 +350,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 2].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) + addSidesForTheDay(...primarySchedule[index + 2].sides);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -302,6 +360,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                    delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 2].sides);
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) + addSidesForTheDay(secondarySchedule[index + 2]);
+
                 });
 
                 // console.log(delivery.meals);
@@ -323,6 +385,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 1]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) + addSidesForTheDay(primarySchedule[index + 1]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -330,6 +395,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 1]),
                   });
+
+                    delivery.sides.push(...secondarySchedule[index].sides,
+                        ...secondarySchedule[index + 1].sides);
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                        addSidesForTheDay(secondarySchedule[index + 1]);
                 });
 
                 // console.log(delivery.meals);
@@ -347,12 +417,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 total: addMealsForTheDay(primarySchedule[index]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
                 });
 
                 // console.log(delivery.meals);
@@ -386,6 +462,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides, ...primarySchedule[index + 2].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                  addSidesForTheDay(primarySchedule[index + 1]) +
+                  addSidesForTheDay(primarySchedule[index + 2]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -394,6 +475,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                       addMealsForTheDay(secondarySchedule[index + 1]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                    delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides, ...secondarySchedule[index + 2].sides);
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                        addSidesForTheDay(secondarySchedule[index + 1]) +
+                        addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -414,6 +500,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 2].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                  addSidesForTheDay(primarySchedule[index + 2]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -421,6 +511,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 2].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 2]);
+
                 });
 
                 // console.log(delivery.meals);
@@ -441,6 +536,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 1]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                  addSidesForTheDay(primarySchedule[index + 1]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -448,6 +547,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 1]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides,
+                      ...secondarySchedule[index + 1].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 1]);
                 });
 
                 // console.log(delivery.meals);
@@ -464,12 +568,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 total: addMealsForTheDay(primarySchedule[index]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
                 });
 
                 // console.log(delivery.meals);
@@ -497,6 +607,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides, ...primarySchedule[index + 2].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                  addSidesForTheDay(primarySchedule[index + 1]) +
+                  addSidesForTheDay(primarySchedule[index + 2]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -505,6 +620,13 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                       addMealsForTheDay(secondarySchedule[index + 1]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides,
+                      ...secondarySchedule[index + 1].sides,
+                      ...secondarySchedule[index + 2].sides);
+                  delivery.sidesTotal +=  addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 1]) +
+                      addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -525,6 +647,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 2].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                  addSidesForTheDay(primarySchedule[index + 2]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -532,6 +658,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 2].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -553,6 +683,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 1]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides);
+              delivery.sidesTotal +=  addSidesForTheDay(primarySchedule[index]) +
+                  addSidesForTheDay(primarySchedule[index + 1]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -560,6 +694,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 1]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 1]);
                 });
 
                 // console.log(delivery.meals);
@@ -577,6 +715,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 total: addMealsForTheDay(primarySchedule[index]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -584,6 +725,10 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                     total: addMealsForTheDay(secondarySchedule[index]),
 
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
+
                 });
 
                 // console.log(delivery.meals);
@@ -603,12 +748,17 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
+            delivery.sides.push(...primarySchedule[index].sides);
+            delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
             if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+                delivery.sides.push(...secondarySchedule[index].sides);
+                delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -633,12 +783,19 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 total: addMealsForTheDay(primarySchedule[index]) + addMealsForTheDay(primarySchedule[index + 1]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) + addSidesForTheDay(primarySchedule[index + 1]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]) + addMealsForTheDay(secondarySchedule[index + 1]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) + addSidesForTheDay(secondarySchedule[index + 1]);
+
                 });
 
                 // console.log(delivery.meals);
@@ -656,12 +813,19 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 total: addMealsForTheDay(primarySchedule[index]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
+
                 });
 
                 // console.log(delivery.meals);
@@ -694,6 +858,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides, ...primarySchedule[index + 2].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                  addSidesForTheDay(primarySchedule[index + 1]) +
+                  addSidesForTheDay(primarySchedule[index + 2]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
@@ -702,6 +871,13 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                       addMealsForTheDay(secondarySchedule[index + 1]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides,
+                      ...secondarySchedule[index + 1].sides,
+                      ...secondarySchedule[index + 2].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 1]) +
+                      addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -714,8 +890,7 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               daysPaired.push(3);
               daysPaired.push(5);
 
-                // set delivery for wednesday and friday as tuesday night
-
+              // set delivery for wednesday and friday as tuesday night
               // summation of wednesday and friday meals
               delivery.meals.push({
                 name: primaryCustomerName,
@@ -723,13 +898,21 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 2].sides);
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                    addSidesForTheDay(primarySchedule[index + 2]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 2].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -751,13 +934,21 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 1]),
               });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides);
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                    addSidesForTheDay(primarySchedule[index + 1]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 1]),
                   });
+
+                    delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides);
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                        addSidesForTheDay(secondarySchedule[index + 1]);
                 });
 
                 // console.log(delivery.meals);
@@ -768,17 +959,24 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             // set delivery for wendesday as tuesday night
             if (this.deliveryDay === 2) {
               // summation of wednesday meals
-              delivery.meals.push({
-                name: primaryCustomerName,
-                total: addMealsForTheDay(primarySchedule[index]),
-              });
+                delivery.meals.push({
+                  name: primaryCustomerName,
+                  total: addMealsForTheDay(primarySchedule[index]),
+                });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides);
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
+
                 });
 
                 // console.log(delivery.meals);
@@ -807,7 +1005,15 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides,
+                    ...primarySchedule[index + 1].sides,
+                    ...primarySchedule[index + 2].sides);
+
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                    addSidesForTheDay(primarySchedule[index + 1]) +
+                    addSidesForTheDay(primarySchedule[index + 2]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
@@ -815,6 +1021,13 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                       addMealsForTheDay(secondarySchedule[index + 1]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides,
+                      ...secondarySchedule[index + 1].sides,
+                      ...secondarySchedule[index + 2].sides);
+                  delivery.sidesTotal +=  addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 1]) +
+                      addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -835,13 +1048,21 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 2].sides);
+                delivery.sidesTotal +=  addSidesForTheDay(primarySchedule[index]) +
+                    addSidesForTheDay(primarySchedule[index + 2]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 2].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -861,16 +1082,22 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 1]),
               });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides);
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                    addSidesForTheDay(primarySchedule[index + 1]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 1]),
                   });
-                });
 
-                // console.log(delivery.meals);
+                  delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 1]);
+                });
               }
             }
 
@@ -884,12 +1111,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 total: addMealsForTheDay(primarySchedule[index]),
               });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides);
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
                 });
 
                 // console.log(delivery.meals);
@@ -910,12 +1143,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                delivery.sides.push(...secondarySchedule[index].sides);
+                delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -935,13 +1174,19 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
-              secondarySchedules.forEach((secondarySchedule, profileIndex) => {
-                delivery.meals.push({
-                  name: secondaryCustomerNames[profileIndex],
-                  total: addMealsForTheDay(secondarySchedule[index]),
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
+                secondarySchedules.forEach((secondarySchedule, profileIndex) => {
+                  delivery.meals.push({
+                    name: secondaryCustomerNames[profileIndex],
+                    total: addMealsForTheDay(secondarySchedule[index]),
+                  });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
                 });
-              });
 
               // console.log(delivery.meals);
             }
@@ -960,12 +1205,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -984,12 +1235,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -1017,13 +1274,21 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 1]),
               });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides);
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                    addSidesForTheDay(primarySchedule[index + 1]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 1]),
                   });
+
+                    delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides);
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                        addSidesForTheDay(secondarySchedule[index + 1]);
                 });
               }
             }
@@ -1040,12 +1305,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 total: addMealsForTheDay(primarySchedule[index]),
               });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides);
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]),
                   });
+
+                    delivery.sides.push(...secondarySchedule[index].sides);
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
                 });
 
                 // console.log(delivery.meals);
@@ -1069,13 +1340,21 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 1]),
               });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides);
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                    addSidesForTheDay(primarySchedule[index + 1]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]) +
                       addMealsForTheDay(secondarySchedule[index + 1]),
                   });
+
+                    delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides);
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                        addSidesForTheDay(secondarySchedule[index + 1]);
                 });
 
                 // console.log(delivery.meals);
@@ -1091,13 +1370,21 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 total: addMealsForTheDay(primarySchedule[index]),
               });
 
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
               if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
                     total: addMealsForTheDay(secondarySchedule[index]),
                   });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
+
                 });
+
 
                 // console.log(delivery.meals);
               }
@@ -1115,12 +1402,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -1134,18 +1427,24 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
             delivery.onDate = currentDay;
             // set delivery for thursday as tuesday day
 
-
             delivery.meals.push({
               name: primaryCustomerName,
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                delivery.sides.push(...secondarySchedule[index].sides);
+                delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
+
               });
 
               // console.log(delivery.meals);
@@ -1164,12 +1463,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                delivery.sides.push(...secondarySchedule[index].sides);
+                delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -1187,12 +1492,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -1223,8 +1534,13 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
+                delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides, ...primarySchedule[index + 2].sides);
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                    addSidesForTheDay(primarySchedule[index + 1]) +
+                    addSidesForTheDay(primarySchedule[index + 2]);
 
-              if (containsSecondaries) {
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
@@ -1232,6 +1548,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                       addMealsForTheDay(secondarySchedule[index + 1]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                    delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides, ...secondarySchedule[index + 2].sides);
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                        addSidesForTheDay(secondarySchedule[index + 1]) +
+                        addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -1245,12 +1566,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -1272,7 +1599,14 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   addMealsForTheDay(primarySchedule[index + 2]),
               });
 
-              if (containsSecondaries) {
+                delivery.sides.push(...primarySchedule[index].sides,
+                    ...primarySchedule[index + 1].sides,
+                    ...primarySchedule[index + 2].sides);
+                delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                    addSidesForTheDay(primarySchedule[index + 1]) +
+                    addSidesForTheDay(primarySchedule[index + 2]);
+
+                if (containsSecondaries) {
                 secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                   delivery.meals.push({
                     name: secondaryCustomerNames[profileIndex],
@@ -1280,6 +1614,11 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                       addMealsForTheDay(secondarySchedule[index + 1]) +
                       addMealsForTheDay(secondarySchedule[index + 2]),
                   });
+
+                    delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides, ...secondarySchedule[index + 2].sides);
+                    delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                        addSidesForTheDay(secondarySchedule[index + 1]) +
+                        addSidesForTheDay(secondarySchedule[index + 2]);
                 });
 
                 // console.log(delivery.meals);
@@ -1291,12 +1630,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -1312,12 +1657,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -1334,12 +1685,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
-            if (containsSecondaries) {
+              delivery.sides.push(...primarySchedule[index].sides);
+              delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -1356,6 +1713,8 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
+            delivery.sides.push(...primarySchedule[index].sides);
+            delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
 
             if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
@@ -1363,6 +1722,9 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -1380,13 +1742,18 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               total: addMealsForTheDay(primarySchedule[index]),
             });
 
+            delivery.sides.push(...primarySchedule[index].sides);
+            delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]);
 
-            if (containsSecondaries) {
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]),
                 });
+
+                  delivery.sides.push(...secondarySchedule[index].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]);
               });
 
               // console.log(delivery.meals);
@@ -1409,18 +1776,23 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
                 addMealsForTheDay(primarySchedule[index + 1]),
             });
 
+            delivery.sides.push(...primarySchedule[index].sides, ...primarySchedule[index + 1].sides);
+            delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                addSidesForTheDay(primarySchedule[index + 1]);
 
-            if (containsSecondaries) {
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]) +
                     addMealsForTheDay(secondarySchedule[index + 1]),
-
                 });
-              });
 
-              // console.log(delivery.meals);
+                  delivery.sides.push(...secondarySchedule[index].sides,
+                      ...secondarySchedule[index + 1].sides);
+                  delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                      addSidesForTheDay(secondarySchedule[index + 1]);
+              });
             }
           }
 
@@ -1434,17 +1806,23 @@ export default function deliveriesDataMapper(aggregation, currentDay) {
               name: primaryCustomerName,
               total: addMealsForTheDay(primarySchedule[index]) +
                 addMealsForTheDay(primarySchedule[index + 1]),
-
             });
 
-            if (containsSecondaries) {
+            delivery.sides.push(...primarySchedule[index].side, ...primarySchedule[index + 1].sides);
+            delivery.sidesTotal += addSidesForTheDay(primarySchedule[index]) +
+                addSidesForTheDay(primarySchedule[index + 1]);
+
+              if (containsSecondaries) {
               secondarySchedules.forEach((secondarySchedule, profileIndex) => {
                 delivery.meals.push({
                   name: secondaryCustomerNames[profileIndex],
                   total: addMealsForTheDay(secondarySchedule[index]) +
                     addMealsForTheDay(secondarySchedule[index + 1]),
-
                 });
+
+                delivery.sides.push(...secondarySchedule[index].sides, ...secondarySchedule[index + 1].sides);
+                delivery.sidesTotal += addSidesForTheDay(secondarySchedule[index]) +
+                    addSidesForTheDay(secondarySchedule[index + 1]);
               });
 
               // console.log(delivery.meals);

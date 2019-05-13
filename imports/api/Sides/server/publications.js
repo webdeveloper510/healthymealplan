@@ -8,7 +8,7 @@ import Sides from '../Sides';
 
 Meteor.publish('sides', (selector, options) => {
   check(selector, Match.Any);
-  check(options, Match.Any);
+    check(options, Match.Any);
 
   return Sides.find(selector, options);
 });

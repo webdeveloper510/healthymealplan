@@ -46,6 +46,7 @@ import Step3Delivery from './Step3Delivery';
 import Step4Checkout from './Step4Checkout';
 import moment from 'moment';
 import assign from 'lodash/assign';
+import autoBind from  'react-autobind';
 
 import Loading from '../Loading/Loading';
 
@@ -117,36 +118,43 @@ class CustomerEditor extends React.Component {
             breakfast: { active: false, portions: 'regular', quantity: '1' },
             lunch: { active: false, portions: 'regular', quantity: '1' },
             dinner: { active: false, portions: 'regular', quantity: '1' },
+            sides: [],
           },
           {
             breakfast: { active: false, portions: 'regular', quantity: '1' },
             lunch: { active: false, portions: 'regular', quantity: '1' },
             dinner: { active: false, portions: 'regular', quantity: '1' },
+            sides: [],
           },
           {
             breakfast: { active: false, portions: 'regular', quantity: '1' },
             lunch: { active: false, portions: 'regular', quantity: '1' },
             dinner: { active: false, portions: 'regular', quantity: '1' },
+            sides: [],
           },
           {
             breakfast: { active: false, portions: 'regular', quantity: '1' },
             lunch: { active: false, portions: 'regular', quantity: '1' },
             dinner: { active: false, portions: 'regular', quantity: '1' },
+            sides: [],
           },
           {
             breakfast: { active: false, portions: 'regular', quantity: '1' },
             lunch: { active: false, portions: 'regular', quantity: '1' },
             dinner: { active: false, portions: 'regular', quantity: '1' },
+            sides: [],
           },
           {
             breakfast: { active: false, portions: 'regular', quantity: '1' },
             lunch: { active: false, portions: 'regular', quantity: '1' },
             dinner: { active: false, portions: 'regular', quantity: '1' },
+            sides: [],
           },
           {
             breakfast: { active: false, portions: 'regular', quantity: '1' },
             lunch: { active: false, portions: 'regular', quantity: '1' },
             dinner: { active: false, portions: 'regular', quantity: '1' },
+            sides: [],
           },
         ],
 
@@ -163,18 +171,18 @@ class CustomerEditor extends React.Component {
         },
         coolerBag: false,
         completeSchedule: [
-          { breakfast: 0, lunch: 0, dinner: 0 },
-          { breakfast: 0, lunch: 0, dinner: 0 },
-          { breakfast: 0, lunch: 0, dinner: 0 },
-          { breakfast: 0, lunch: 0, dinner: 0 },
-          { breakfast: 0, lunch: 0, dinner: 0 },
-          { breakfast: 0, lunch: 0, dinner: 0 },
-          { breakfast: 0, lunch: 0, dinner: 0 },
+          { breakfast: 0, lunch: 0, dinner: 0, sides: 0, },
+          { breakfast: 0, lunch: 0, dinner: 0, sides: 0, },
+          { breakfast: 0, lunch: 0, dinner: 0, sides: 0, },
+          { breakfast: 0, lunch: 0, dinner: 0, sides: 0, },
+          { breakfast: 0, lunch: 0, dinner: 0, sides: 0, },
+          { breakfast: 0, lunch: 0, dinner: 0, sides: 0, },
+          { breakfast: 0, lunch: 0, dinner: 0, sides: 0, },
         ],
       },
     };
 
-    this.getStepContent = this.getStepContent.bind(this);
+    autoBind(this);
   }
 
   renderStartDays() {
@@ -216,61 +224,6 @@ class CustomerEditor extends React.Component {
   }
 
   getStepContent(step) {
-    // switch (step) {
-    //   case 0:
-    //     return (
-    //       <Step1Eligibility
-    //         handleNext={this.handleNext.bind(this)}
-    //         saveValues={this.saveValues.bind(this)}
-    //         customerInfo={this.state.customerInfo}
-    //         popTheSnackbar={this.props.popTheSnackbar.bind(this)}
-    //       />
-    //     );
-
-    //   case 1:
-    //     return (
-    //       <Step2Plan
-    //         handleNext={this.handleNext.bind(this)}
-    //         handleBack={this.handleBack.bind(this)}
-    //         saveValues={this.saveValues.bind(this)}
-    //         customerInfo={this.state.customerInfo}
-    //         popTheSnackbar={this.props.popTheSnackbar.bind(this)}
-    //         potentialSubIngredients={this.props.potentialSubIngredients}
-    //         lifestyles={this.props.lifestyles}
-    //         restrictions={this.props.restrictions}
-    //         postalCodes={this.props.postalCodes}
-    //       />
-    //     );
-    //   case 2:
-    //     return (
-    //       <Step3Delivery
-    //         handleNext={this.handleNext.bind(this)}
-    //         handleBack={this.handleBack.bind(this)}
-    //         saveValues={this.saveValues.bind(this)}
-    //         customerInfo={this.state.customerInfo}
-    //         popTheSnackbar={this.props.popTheSnackbar.bind(this)}
-    //       />
-    //     );
-    //   case 3:
-    //     return (
-    //       <Step4Checkout
-    //         handleNext={this.handleNext.bind(this)}
-    //         handleBack={this.handleBack.bind(this)}
-    //         saveValues={this.saveValues.bind(this)}
-    //         customerInfo={this.state.customerInfo}
-    //         popTheSnackbar={this.props.popTheSnackbar.bind(this)}
-    //         lifestyles={this.props.lifestyles}
-    //         restrictions={this.props.restrictions}
-    //         ingredients={this.props.potentialSubIngredients}
-    //         postalCodes={this.props.postalCodes}
-    //         history={this.props.history}
-    //       />
-    //     );
-    //   default:
-    //     return "Unknown step";
-    // }
-
-
     return (
       <div>
         <div style={{ display: step === 0 ? 'block' : 'none' }}>
@@ -294,6 +247,7 @@ class CustomerEditor extends React.Component {
             lifestyles={this.props.lifestyles}
             restrictions={this.props.restrictions}
             postalCodes={this.props.postalCodes}
+            sides={this.props.sides}
           />
         </div>
         <div style={{ display: step === 2 ? 'block' : 'none' }}>
@@ -304,6 +258,7 @@ class CustomerEditor extends React.Component {
             saveValues={this.saveValues.bind(this)}
             customerInfo={this.state.customerInfo}
             popTheSnackbar={this.props.popTheSnackbar.bind(this)}
+            sides={this.props.sides}
           />
         </div>
 
@@ -320,6 +275,7 @@ class CustomerEditor extends React.Component {
             ingredients={this.props.potentialSubIngredients}
             postalCodes={this.props.postalCodes}
             history={this.props.history}
+            sides={this.props.sides}
           />
         </div>
       </div>

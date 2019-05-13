@@ -33,7 +33,7 @@ import RightArrow from 'material-ui-icons/ArrowForward';
 import moment from 'moment';
 import autoBind from 'react-autobind';
 
-
+import Sides from '../../../api/Sides/Sides';
 import Deliveries from '../../../api/Deliveries/Deliveries';
 import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 import PostalCodes from '../../../api/PostalCodes/PostalCodes';
@@ -348,6 +348,7 @@ class Directions extends React.Component {
 
           <DirectionsTable
             deliveries={this.props.deliveries}
+            sides={this.props.sides}
             popTheSnackbar={this.props.popTheSnackbar}
             searchTerm={this.state.searchSelector}
             rowsLimit={this.state.rowsVisible}
@@ -458,7 +459,7 @@ export default withTracker(() => {
   const deliveriesDataVar = deliveriesData.get();
 
   const subscription = Meteor.subscribe('deliveries.onDate', deliveriesDataVar.onDate);
-  // const subscription2 = Meteor.subscribe('postalcodes');
+  const subscription2 = Meteor.subscribe('sides', {}, {});
   // const subscription3 = Meteor.subscribe('routes');
   // const subscription4 = Meteor.subscribe('subscriptions');
   // const subscription5 = Meteor.subscribe('users.customers', {}, {});
@@ -466,9 +467,10 @@ export default withTracker(() => {
 
   return {
     // loading: !subscription.ready() && !subscription2.ready() && !subscription3.ready() && !subscription4.ready() && !subscription5.ready() && !subscription6.ready() && Meteor.user(),
-    loading: !subscription.ready() && !subscription6.ready() && Meteor.user(),
+    loading: !subscription.ready() &&  !subscription2.ready() && !subscription6.ready() && Meteor.user(),
     deliveries: Deliveries.find().fetch(),
     routes: Routes.find().fetch(),
+    sides: Sides.find().fetch(),
     postalCodes: PostalCodes.find().fetch(),
     deliveryGuys: Meteor.users.find({ roles: ['admin', 'delivery'] }).fetch(),
   };
