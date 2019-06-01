@@ -25,6 +25,7 @@ import MealPlannerColl from '../../../api/MealPlanner/MealPlanner';
 import Lifestyles from '../../../api/Lifestyles/Lifestyles';
 import Meals from '../../../api/Meals/Meals';
 import PlatesCollection from '../../../api/Plates/Plates';
+import Sides from '../../../api/Sides/Sides';
 
 import Loading from '../../components/Loading/Loading';
 import PlatingTable from './PlatingTable';
@@ -190,6 +191,7 @@ class Plating extends React.Component {
               lifestyles={this.props.lifestyles}
               meals={this.props.meals}
               plates={this.props.plates}
+              sides={this.props.sides}
             />
           </ListContainer>
         </Grid>
@@ -211,11 +213,13 @@ export default createContainer(() => {
   const subscription1 = Meteor.subscribe('lifestyles');
   const subscription2 = Meteor.subscribe('Meals');
   const subscription4 = Meteor.subscribe('plates', {}, {});
+  const subscription5 = Meteor.subscribe('sides', {}, {});
 
   return {
-    loading: !subscription1.ready() && !subscription2.ready() && !subscription4.ready(),
+    loading: !subscription1.ready() && !subscription2.ready() && !subscription4.ready() && !subscription5.ready(),
     lifestyles: Lifestyles.find().fetch(),
     meals: Meals.find().fetch(),
     plates: PlatesCollection.find().fetch(),
+    sides: Sides.find().fetch(),
   };
 }, Plating);

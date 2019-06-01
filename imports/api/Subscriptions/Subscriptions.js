@@ -57,8 +57,7 @@ Subscriptions.schema = new SimpleSchema({
     type: Number,
   },
   'completeSchedule.$.sides': {
-    type: Number,
-    blackbox: true,
+    type: Number
   },
   authorizeSubscriptionId: {
     type: String,

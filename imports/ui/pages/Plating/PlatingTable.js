@@ -1144,6 +1144,87 @@ class PlatingTable extends React.Component {
     doc.save(`Plating_summary_${this.state.lifestyleTitle}_${this.state.mealTitle}_${moment(this.state.currentSelectorDate).format('dddd, MMMM D')}.pdf`);
   }
 
+  printSidesSummary() {
+      let columns = ['Customer', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+      let rows = [];
+
+      const doc = new jsPDF({
+          orientation: 'landscape',
+          format: 'letter',
+          unit: 'pt',
+      });
+
+      doc.setFontSize(18);
+      doc.text(`Sides summary for week of ${moment(this.state.currentSelectorDate).add(1, 'w').startOf('isoWeek').format('dddd, MMMM D')}`, 40, 30);
+
+      const sideSubscriptions = this.state.sidesSummary;
+
+      sideSubscriptions.forEach(sub => {
+
+        const rowToInsert = [];
+
+        sub.customers.forEach(customer => {
+          const toPush = [];
+
+          if (customer.schedule.some(e => e.sides !== [])) {
+            toPush[0] = customer.profile.name.first + " " + customer.profile.name.last || '';
+
+            customer.schedule.forEach((e, i) => {
+
+              if (e.sides) {
+                if (e.sides.length > 0) {
+                  let sideText = "";
+
+                  e.sides.forEach(side => {
+                    const currentSide = this.props.sides.find(s => s._id === side._id);
+                    const currentVariant = currentSide.variants.find(v => v._id === side.variantId);
+                    sideText += `• ${currentSide.title} ${currentVariant.name} x ${side.quantity} `;
+
+                  });
+
+                  toPush[i + 1] = sideText;
+                }
+              }
+
+            })
+          }
+
+          rows.push(toPush);
+
+        });
+
+      });
+
+      doc.autoTable(columns, rows, {
+          startY: 80,
+          styles: {
+              overflow: 'linebreak',
+              columnWidth: 90,
+          },
+          headerStyles: {
+              fillColor: [0, 0, 0],
+              fontSize: 10,
+          },
+          columnStyles: {
+              fontSize: 9,
+          }
+          // afterPageContent: (data) => {
+          //     let footerStr = `Page ${doc.internal.getNumberOfPages()}`;
+          //     if (typeof doc.putTotalPages === 'function') {
+          //         footerStr = `${footerStr} of ${totalPagesExp}`;
+          //     }
+          //     doc.setFontSize(8);
+          //     doc.text(footerStr, data.settings.margin.right, doc.internal.pageSize.height - 10);
+          // },
+      });
+      //
+      // if (typeof doc.putTotalPages === 'function') {
+      //     doc.putTotalPages(totalPagesExp);
+      // }
+
+      doc.save(`Plating_summary_${this.state.lifestyleTitle}_${this.state.mealTitle}_${moment(this.state.currentSelectorDate).format('dddd, MMMM D')}.pdf`);
+  }
+
   compareLifestyles(a, b) {
     if (a.title > b.title) {
       return -1;
@@ -1154,6 +1235,33 @@ class PlatingTable extends React.Component {
     return 0;
   }
 
+  fetchSidesSummary() {
+    console.log("Going here");
+
+    Meteor.call('fetchSidesSummary', (err, res) => {
+      console.log(err);
+      console.log(res);
+      if (res) {
+        if (typeof res === "string") {
+            this.props.popTheSnackbar({
+                message: 'No customers with sides found or there was an error with',
+            });
+        } else {
+          this.setState({
+              sidesSummary: res,
+          }, () => {
+            this.printSidesSummary();
+          });
+        }
+      } else {
+        this.props.popTheSnackbar({
+            message: 'There was an error fetching the summarry for sides.',
+        });
+      }
+
+    });
+  }
+
   render() {
     return (
       <div>
@@ -1162,6 +1270,10 @@ class PlatingTable extends React.Component {
         <Paper elevation={2} className="table-container">
           <div style={{ padding: '20px 20px 1em', borderBottom: '1px solid rgba(235, 235, 235, 1)', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
             <Typography type="headline" gutterBottom style={{ fontWeight: 500 }}>Plating for {moment(this.props.currentSelectorDate).format('dddd, MMMM D')}</Typography>
+
+              {moment(this.props.currentSelectorDate).isoWeekday() == 6 &&  (
+                <Button onClick={this.fetchSidesSummary}>Print Sides Summary</Button>
+              )}
           </div>
           <Table className="table-container plating-table" style={{ tableLayout: 'fixed' }}>
             <TableHead>

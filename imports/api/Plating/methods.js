@@ -112,11 +112,65 @@ Meteor.methods({
 
     return result;
   },
+
+  fetchSidesSummary() {
+    // check(saturday, String);
+
+    const subs = Subscriptions.aggregate([
+      {
+          $match: {
+              status: 'active',
+              completeSchedule: {
+                  $elemMatch: {
+                      sides: {
+                          $gt: 0,
+                      }
+                  }
+              }
+          },
+      },
+
+      {
+          $lookup: {
+              from: 'users',
+              localField: '_id',
+              foreignField: 'subscriptionId',
+              as: 'customers',
+          },
+      },
+
+      {
+          $project: {
+              _id: 1,
+              completeSchedule: 1,
+              delivery: 1,
+              customers: {
+                  _id: 1,
+                  profile: {
+                      name: 1,
+                      birthday: 1,
+                  },
+                  secondary: 1,
+                  primaryAccount: 1,
+                  lifestyle: 1,
+                  restrictions: 1,
+                  specificRestrictions: 1,
+                  preferences: 1,
+                  schedule: 1,
+                  platingNotes: 1,
+              },
+          },
+      },
+    ]);
+
+    return subs;
+  },
 });
 
 rateLimit({
   methods: [
     'getPlatingAggregatedData',
+    'fetchSidesSummary',
   ],
   limit: 5,
   timeRange: 1000,
