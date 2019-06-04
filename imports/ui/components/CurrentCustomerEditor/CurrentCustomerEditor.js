@@ -137,10 +137,12 @@ class CurrentCustomerEditor extends React.Component {
   constructor(props) {
     super(props);
 
+    const paramActiveTab = (new URL(document.location)).searchParams.get("activeTab");
+
     this.state = {
 
       // ui
-      currentTab: 0,
+      currentTab: paramActiveTab === "plan" ? 1 : 0,
       activeMealScheduleStep: 0,
 
       birthDay: props.customer.profile.hasOwnProperty('birthday') ? parseInt(props.customer.profile.birthday.day, 10) : '',
@@ -355,58 +357,63 @@ class CurrentCustomerEditor extends React.Component {
   }
 
   componentDidMount() {
-    const component = this;
+      const component = this;
 
-    validate(component.form, {
-      errorPlacement(error, element) {
-        error.insertAfter(
-          $(element)
-            .parent()
-            .parent(),
-        );
-      },
+      validate(component.form, {
+          errorPlacement(error, element) {
+              error.insertAfter(
+                  $(element)
+                      .parent()
+                      .parent(),
+              );
+          },
 
-      rules: {
-        first_name: {
-          required: true,
-        },
+          rules: {
+              first_name: {
+                  required: true,
+              },
 
-        last_name: {
-          required: this.props.customer.secondary === undefined,
-        },
+              last_name: {
+                  required: this.props.customer.secondary === undefined,
+              },
 
-        email: {
-          required: true,
-          email: this.props.customer.secondary === undefined,
-        },
+              email: {
+                  required: true,
+                  email: this.props.customer.secondary === undefined,
+              },
 
-        phoneNumber: {
-          minlength: 10,
-          maxlength: 10,
-          number: this.props.customer.secondary === undefined,
-        },
+              phoneNumber: {
+                  minlength: 10,
+                  maxlength: 10,
+                  number: this.props.customer.secondary === undefined,
+              },
 
-        postal_code: {
-          cdnPostal: true,
-          required: this.props.customer.secondary === undefined,
-        },
-        birthMonth: {
-          number: true,
-          maxlength: 2,
-          max: 12,
-          min: 1,
-        },
-        birthDay: {
-          number: true,
-          maxlength: 2,
-          max: 31,
-          min: 1,
-        },
-      },
-      submitHandler() {
-        component.saveFirstStep();
-      },
-    });
+              postal_code: {
+                  cdnPostal: true,
+                  required: this.props.customer.secondary === undefined,
+              },
+              birthMonth: {
+                  number: true,
+                  maxlength: 2,
+                  max: 12,
+                  min: 1,
+              },
+              birthDay: {
+                  number: true,
+                  maxlength: 2,
+                  max: 31,
+                  min: 1,
+              },
+          },
+          submitHandler() {
+              component.saveFirstStep();
+          },
+      });
+
+    if ((new URL(document.location)).searchParams.get("activeTab") === "plan") {
+      window.scrollTo(0, document.getElementById("platingNotes").getBoundingClientRect().top)
+    }
+
   }
 
   handleResetPassword() {
@@ -7578,6 +7585,15 @@ class CurrentCustomerEditor extends React.Component {
     })
   }
 
+  navigateToPrimaryProfile(){
+    const primaryId = this.props.customer.primaryAccount;
+  
+    console.log(primaryId);
+    
+    
+    this.props.history.push(`/customers/${primaryId}/edit?activeTab=plan#platingNotes`);
+    
+  }
 
   render() {
     const buttonClassname = classNames({
@@ -7852,6 +7868,17 @@ class CurrentCustomerEditor extends React.Component {
                     />
                   )}
                 </Button>
+
+                {this.props.customer && this.props.customer.secondary && (
+                  <Button
+                      raised
+                      color="primary"
+                      onClick={this.navigateToPrimaryProfile}
+                      style={{ marginTop: '25px', marginLeft: '20px' }}>
+                    See Primary Profile
+                  </Button>
+                )}
+
                 {/* <Button onClick={() => this.props.history.push(`/customers/add/type=abandoned&firstName=${customer.profile.name.first}&lastName=${customer.profile.name.last ? customer.profile.name.last : ' '}&email=${customer.emails[0].address}&postalCode=${customer.postalCode}`)} */}
 
                 {this.props.subscription == undefined && this.props.customer.secondary == undefined && (
