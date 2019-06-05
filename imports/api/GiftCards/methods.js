@@ -60,6 +60,7 @@ Meteor.methods({
       codeType: String,
       initialAmountPreset: Match.OneOf(String, Number),
       initialAmount: Match.OneOf(String, Number),
+      balance: Match.OneOf(String, Number),
 
       customerType: Match.Optional(String),
       customer: Match.Optional(String),

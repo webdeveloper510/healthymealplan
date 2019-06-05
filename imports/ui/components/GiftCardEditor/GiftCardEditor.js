@@ -164,6 +164,10 @@ class GiftCardEditor extends React.Component {
         purchaseAmount: {
           required: true,
         },
+        balance: {
+          number: true,
+          min: 0,
+        },
       },
       messages: {
         title: {
@@ -332,6 +336,7 @@ class GiftCardEditor extends React.Component {
       codeType: this.state.codeType,
       
       initialAmountPreset: this.state.initialAmountPreset,
+      balance: this.state.balance,
 
       customerType: this.state.customerType,
       customer: this.state.customer || '',
