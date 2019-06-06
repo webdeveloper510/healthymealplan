@@ -1,8 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
-import { withTracker } from 'meteor/react-meteor-data';
+import { createContainer } from 'meteor/react-meteor-data';
 import { ReactiveVar } from 'meteor/reactive-var';
+import { ExportToCsv } from 'export-to-csv';
 
 import $ from 'jquery';
 
@@ -14,17 +15,26 @@ import SearchIcon from 'material-ui-icons/Search';
 import ClearIcon from 'material-ui-icons/Clear';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
+import Dialog, {
+    DialogTitle,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+} from 'material-ui/Dialog';
+import Checkbox from 'material-ui/Checkbox';
+import {
+    FormControl,
+    FormControlLabel,
+    FormGroup,
+} from 'material-ui/Form';
+import moment from 'moment';
 
 import LifestylesColl from '../../../api/Lifestyles/Lifestyles';
 
 import { CircularProgress } from 'material-ui/Progress';
 import Loading from '../../components/Loading/Loading';
 import CustomersTable from './CustomersTable';
-
-import { JoinClient } from 'meteor-publish-join';
-import { Tracker } from 'meteor/tracker';
 import cloneDeep from 'lodash/cloneDeep';
-
 import autoBind from 'react-autobind';
 
 const tableConfig = new ReactiveVar({
@@ -242,6 +252,59 @@ class Customers extends React.Component {
     this.getCustomers();
   }
 
+  handleExportCustomersToCsv() {
+
+    const customerData = {
+        all: this.state.customersExportAll || false,
+        active: this.state.customersExportActive || false,
+        cancelled: this.state.customersExportCancelled || false,
+        paused: this.state.customersExportPaused || false,
+        abandoned: this.state.customersExportAbandoned || false,
+    };
+
+    Meteor.call('users.exportToCSV', customerData, (err, res) => {
+      if (!err) {
+            this.props.popTheSnackbar({
+                message: 'Customers exported to CSV successfully.'
+            });
+
+            console.log(res);
+
+          const options = {
+              fieldSeparator: ',',
+              quoteStrings: '"',
+              decimalSeparator: '.',
+              showLabels: true,
+              showTitle: true,
+              title: '',
+              useTextFile: false,
+              useBom: true,
+              useKeysAsHeaders: true,
+          };
+
+          if (this.state.customersExportAll) {
+              options.fileName = `All_Customers_Export_${moment().format('YYYY_MM_DD')}`
+          } else if (this.state.customersExportAbandoned || this.state.customersExportActive || this.state.customersExportCancelled || this.state.customersExportPaused) {
+              options.fileName = `${this.state.customersExportAbandoned && 'Abandoned_'}${this.state.customersExportActive && 'Active_'}${this.state.customersExportCancelled && 'Cancelled_'}${this.state.customersExportPaused && 'Paused_'}Customers_Export_${moment().format('YYYY_MM_DD')}`
+          }
+
+          const csvExporter = new ExportToCsv(options);
+          csvExporter.generateCsv(res);
+
+      } else {
+          console.log(err);
+
+          this.props.popTheSnackbar({
+              message: 'There was a problem exporting customers.'
+          });
+      }
+
+      this.setState({
+          exportDialogOpen: false,
+      })
+    });
+  }
+
   render() {
     const { history } = this.props;
 
@@ -263,6 +326,7 @@ class Customers extends React.Component {
               </Typography>
             </Grid>
             <Grid item xs={6}>
+
               <Button
                 className="btn btn-primary"
                 onClick={() => history.push('/customers/new')}
@@ -271,6 +335,13 @@ class Customers extends React.Component {
                 style={{ float: 'right' }}
               >
                 Add customer
+              </Button>
+              <Button
+                  onClick={() => this.setState({ exportDialogOpen: true, })}
+                  color="secondary"
+                  style={{ float: 'right', marginRight: '1em', }}
+              >
+                  Export
               </Button>
             </Grid>
           </Grid>
@@ -357,6 +428,63 @@ class Customers extends React.Component {
             tableConfig={tableConfig}
             getCustomers={this.getCustomers}
           />
+
+            <Dialog open={this.state.exportDialogOpen} onClose={() => { this.setState({ exportDialogOpen: false, }) }}>
+                <DialogTitle id="simple-dialog-title">Export customers by status</DialogTitle>
+                <DialogContent>
+                    <FormControl component="fieldset">
+                        <FormGroup>
+                            <FormControlLabel
+                                key={12}
+                                checked={this.state.customersExportAll}
+                                onChange={(event) => { this.setState({ customersExportAll: event.target.checked, }) }}
+                                control={<Checkbox value={'all'} />}
+                                label={'All'}
+                            />
+                            <FormControlLabel
+                                key={12}
+                                checked={this.state.customersExportAbandoned}
+                                onChange={(event) => {
+                                    this.setState({ customersExportAbandoned: event.target.checked });
+                                }}
+                                control={<Checkbox value={'abandoned'} />}
+                                label={'Abandoned'}
+                            />
+                            <FormControlLabel
+                                key={12}
+                                checked={this.state.customersExportActive}
+                                onChange={(event) => {
+                                    this.setState({ customersExportActive: event.target.checked });
+                                }}
+                                control={<Checkbox value={'active'} />}
+                                label={'Active'}
+                            />
+                            <FormControlLabel
+                                key={12}
+                                checked={this.state.customersExportPaused}
+                                onChange={(event) => {
+                                    this.setState({ customersExportPaused: event.target.checked });
+                                }}
+                                control={<Checkbox value={'paused'} />}
+                                label={'Paused'}
+                            />
+                            <FormControlLabel
+                                key={12}
+                                checked={this.state.customersExportCancelled}
+                                onChange={(event) => {
+                                    this.setState({ customersExportCancelled: event.target.checked });
+                                }}
+                                control={<Checkbox value={'cancelled'} />}
+                                label={'Cancelled'}
+                            />
+                        </FormGroup>
+                    </FormControl>
+                </DialogContent>
+
+                <DialogActions>
+                  <Button raised type="primary" className="btn btn-primary" onClick={this.handleExportCustomersToCsv}>Export</Button>
+                </DialogActions>
+              </Dialog>
         </Grid>
       </div>
     );
@@ -369,7 +497,7 @@ Customers.propTypes = {
   history: PropTypes.isRequired,
 };
 
-export default withTracker(() => {
+export default createContainer(() => {
   const config = tableConfig.get();
 
   // const skip = config.pageProperties.currentPage < 0 ? 0 :
@@ -397,12 +525,8 @@ export default withTracker(() => {
     }
   });
 
-  // const clientusers = JoinClient.get('clientUsers');
-  // const clientUsersLoaded = !JoinClient.has('clientUsers');
-
   return {
-    // loading: clientUsersLoaded,
-    // customers: clientusers,
     lifestyles: LifestylesColl.find().fetch(),
   };
-})(Customers);
+
+}, Customers);
