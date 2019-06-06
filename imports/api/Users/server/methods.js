@@ -1380,35 +1380,9 @@ Meteor.methods({
     const previousWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(3, 'd').hour(23).toDate();
 
     console.log(lastWeeksSaturday);
-
-    // subscription
-    // const createSubscriptionFromCustomerProfileRes = syncCreateSubscriptionFromCustomerProfile(
-    //   createCustomerProfileRes.customerProfileId,
-    //   createCustomerProfileRes.customerPaymentProfileIdList.numericString[0],
-    //   moment(lastWeeksSaturday).format('YYYY-MM-DD'),
-    //   actualTotal,
-    // );
-
-    // console.log('Subscription data');
-    // console.log(createSubscriptionFromCustomerProfileRes);
-
-    // if (
-    //   createSubscriptionFromCustomerProfileRes.messages.resultCode &&
-    //   createSubscriptionFromCustomerProfileRes.messages.resultCode != 'Ok'
-    // ) {
-    //   throw new Meteor.Error(
-    //     500,
-    //     'There was a problem creating subscription from user profile.',
-    //   );
-    // }
-
     console.log('create customer profile res');
-
     console.log(createCustomerProfileRes);
 
-    // console.log('create subscription from profile res');
-
-    // console.log(createSubscriptionFromCustomerProfileRes);
 
     const subscriptionItemsReal = [];
 
@@ -2072,6 +2046,95 @@ Meteor.methods({
 
 
   },
+
+  'users.exportToCSV': function usersExportToCsv(whichStatusesToExport) {
+      check(whichStatusesToExport, Match.Any);
+
+      let jsonCustomers = [];
+
+      if (whichStatusesToExport.abandoned || whichStatusesToExport.all) {
+            const abandonedUsers = Meteor.users.aggregate([
+
+                { $match: { subscriptionId: { $exists: false }, roles:{ $nin: ['admin', 'super-admin', 'delivery', 'chef'] }} },
+
+                { $project: { 'profile.name.first': 1, 'profile.name.last': 1, 'emails.address': 1,  } },
+
+                {
+                    $project: {
+                        _id: 0,
+                        firstName: '$profile.name.first',
+                        lastName: '$profile.name.last',
+                        email: '$emails.address',
+                    }
+                },
+
+                { $unwind: '$email' }
+            ]);
+
+          jsonCustomers = jsonCustomers.concat(abandonedUsers);
+      }
+
+      if (whichStatusesToExport.active || whichStatusesToExport.paused || whichStatusesToExport.cancelled || whichStatusesToExport.all) {
+
+          const statuses = [];
+
+          if (whichStatusesToExport.active || whichStatusesToExport.all) {
+            statuses.push('active');
+          }
+
+          if (whichStatusesToExport.paused || whichStatusesToExport.all) {
+              statuses.push('paused');
+          }
+
+          if (whichStatusesToExport.cancelled || whichStatusesToExport.all) {
+              statuses.push('cancelled');
+          }
+
+          const otherStatuses = Subscriptions.aggregate([
+              {
+                  $match: {
+                      status: { $in: statuses },
+                  },
+
+              },
+              {
+                  $lookup: {
+                      from: 'users',
+                      localField: 'customerId',
+                      foreignField: '_id',
+                      as: 'customer',
+                  },
+              },
+              {
+                  $project: {
+                      customer: {
+                          profile: 1,
+                          emails: 1
+                      },
+                  },
+
+              },
+              { $unwind: '$customer' },
+
+              {
+                  $project: {
+                      _id: 0,
+                      firstName: '$customer.profile.name.first',
+                      lastName: '$customer.profile.name.last',
+                      email: '$customer.emails.address'
+                  },
+
+              },
+
+              { $unwind: '$email' },
+          ]);
+
+
+          jsonCustomers = jsonCustomers.concat(otherStatuses);
+      }
+
+      return jsonCustomers;
+    }
 });
 
 rateLimit({
