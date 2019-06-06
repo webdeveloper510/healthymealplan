@@ -264,12 +264,11 @@ class Customers extends React.Component {
 
     Meteor.call('users.exportToCSV', customerData, (err, res) => {
       if (!err) {
-            this.props.popTheSnackbar({
-                message: 'Customers exported to CSV successfully.'
-            });
+        this.props.popTheSnackbar({
+            message: 'Customers exported to CSV successfully.'
+        });
 
-            console.log(res);
-
+           console.log(res);
           const options = {
               fieldSeparator: ',',
               quoteStrings: '"',
