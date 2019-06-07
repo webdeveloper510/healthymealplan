@@ -251,11 +251,12 @@ class MealPresetEditor extends React.Component {
     const inputValue = value.trim().toLowerCase();
     const inputLength = inputValue.length;
 
-    return inputLength === 0
-      ? []
-      : this.props.plates.filter(
-        plate => plate.title.toLowerCase().slice(0, inputLength) === inputValue,
-      );
+    if (inputLength !== 0) {
+        const searchString = new RegExp(inputValue);
+        return this.props.plates.filter(p => searchString.test(p.title.toLowerCase()));
+    }
+
+    return [];
   }
 
   // When suggestion is clicked, Autosuggest needs to populate the input
