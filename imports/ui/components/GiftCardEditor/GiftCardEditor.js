@@ -336,7 +336,6 @@ class GiftCardEditor extends React.Component {
       codeType: this.state.codeType,
       
       initialAmountPreset: this.state.initialAmountPreset,
-      balance: this.state.balance,
 
       customerType: this.state.customerType,
       customer: this.state.customer || '',
@@ -345,8 +344,10 @@ class GiftCardEditor extends React.Component {
       status: this.state.status,
     };
 
-    if(existingGiftCard){
+    if (existingGiftCard){
       giftCard._id = existingGiftCard;
+    } else {
+        giftCard.balance = this.state.balance;
     }
 
     if (this.state.initialAmountPreset == 'custom') {
