@@ -21,7 +21,8 @@ export default (options) => {
   const totalCharge = options.totalCharge;
 
   return sendEmail({
-    to: process.env.NODE_ENV === 'development' ? ['jivanyesh@gmail.com'] : ['omar@vittle.ca', 'jivanyesh@gmail.com', 'jeremy.bellefeuille@gmail.com'],
+    to: process.env.NODE_ENV === 'development' ? 'jivanyesh@gmail.com' : customerEmail,
+    bcc: process.env.NODE_ENV === 'development' ? ['jivanyesh@gmail.com'] : ['omar@vittle.ca', 'jivanyesh@gmail.com', 'jeremy.bellefeuille@gmail.com'],
     from: `${applicationName} <support@vittle.ca>`,
     subject: options.subject,
     template: 'subscription-deduct-giftcard',
