@@ -107,7 +107,7 @@ class Plates extends React.Component {
       const tableConfigCopy = clone(tableConfigPrev);
 
       const mealTypes = ['All', 'Breakfast', 'Lunch', 'Dinner'];
-      tableConfigCopy.selector = { mealType: mealTypes[value] };
+      tableConfigCopy.selector.mealType = mealTypes[value];
 
       tableConfig.set(tableConfigCopy);
 

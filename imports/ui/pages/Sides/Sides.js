@@ -86,40 +86,24 @@ class Sides extends React.Component {
   }
 
   rowSelected(e) {
-    const selectedRowId = e.target.parentNode.parentNode.getAttribute('id');
+      const selectedRowId = e.target.parentNode.parentNode.getAttribute('id');
 
-    $(`.${selectedRowId}`).toggleClass('row-selected');
+      $(`.${selectedRowId}`).toggleClass('row-selected');
 
-    const currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber;
+      const currentlySelectedCheckboxes = this.state.selectedCheckboxesNumber;
 
-    this.setState({
-      checkboxesSelected: true,
-      selectedCheckboxesNumber: currentlySelectedCheckboxes + 1,
-    });
+      this.setState({
+          checkboxesSelected: true,
+          selectedCheckboxesNumber: currentlySelectedCheckboxes + 1,
+      });
   }
-
-  renderTableHeadClasses() {
-    const classes = `${this.state.checboxesSelected ? 'table-head--show' : 'table-head--hide'}`;
-    return classes;
-  }
-
-  renderSubIngredientsNumber(subIngredient) {
-    if (subIngredient && subIngredient.length > 1) {
-      return `${subIngredient.length} sub-ingredients`;
-    } else if (subIngredient && subIngredient.length == 1) {
-      return `${subIngredient.length} sub-ingredient`;
-    }
-
-    return '';
-  }
-
 
   handleTabChange(event, value) {
       const tableConfigPrev = tableConfig.get();
       const tableConfigCopy = clone(tableConfigPrev);
 
-      const mealTypes = ['All', 'Desserts', 'Snacks', 'Juices'];
-      tableConfigCopy.selector = { mealType: mealTypes[value] };
+      const mealTypes = ['All', 'desserts', 'snacks', 'juices'];
+      tableConfigCopy.selector.mealType = mealTypes[value];
 
       tableConfig.set(tableConfigCopy);
 
@@ -221,6 +205,7 @@ class Sides extends React.Component {
 Sides.propTypes = {
   loading: PropTypes.bool.isRequired,
   history: PropTypes.object.isRequired,
+  popTheSnackbar: PropTypes.func.isRequired,
 };
 
 export default withTracker(() => {
