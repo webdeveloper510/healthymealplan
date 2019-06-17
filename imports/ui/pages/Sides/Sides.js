@@ -1,41 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Meteor } from 'meteor/meteor';
-import { createContainer } from 'meteor/react-meteor-data';
-import { teal, red } from 'material-ui/colors';
+import { withTracker } from 'meteor/react-meteor-data';
 import Containers from 'meteor/jivanysh:react-list-container';
-import Card, { CardActions, CardContent, CardMedia } from 'material-ui/Card';
+import { ReactiveVar } from 'meteor/reactive-var';
+import clone from 'lodash/clone';
+import $ from 'jquery';
 
 const ListContainer = Containers.ListContainer;
 
-import Button from 'material-ui/Button';
-import Grid from 'material-ui/Grid';
-import Input from 'material-ui/Input';
-
-
-import $ from 'jquery';
-
-import Toolbar from 'material-ui/Toolbar';
 import Typography from 'material-ui/Typography';
-import Paper from 'material-ui/Paper';
-import Checkbox from 'material-ui/Checkbox';
-import IconButton from 'material-ui/IconButton';
-import Tooltip from 'material-ui/Tooltip';
-import DeleteIcon from 'material-ui-icons/Delete';
-import FilterListIcon from 'material-ui-icons/FilterList';
 import SearchIcon from 'material-ui-icons/Search';
 import ClearIcon from 'material-ui-icons/Clear';
 import AppBar from 'material-ui/AppBar';
 import Tabs, { Tab } from 'material-ui/Tabs';
+import Button from 'material-ui/Button';
+import Grid from 'material-ui/Grid';
+import Input from 'material-ui/Input';
 
 import SidesCollection from '../../../api/Sides/Sides';
 import SidesGrid from './SidesGrid.js';
-
 import Loading from '../../components/Loading/Loading';
 
 
-const primary = teal[500];
-const danger = red[700];
+const tableConfig = new ReactiveVar({
+    selector: {
+        mealType: 'All',
+    },
+});
 
 class Sides extends React.Component {
   constructor(props) {
@@ -123,12 +115,19 @@ class Sides extends React.Component {
 
 
   handleTabChange(event, value) {
-    this.setState({ currentTabValue: value });
+      const tableConfigPrev = tableConfig.get();
+      const tableConfigCopy = clone(tableConfigPrev);
+
+      const mealTypes = ['All', 'Desserts', 'Snacks', 'Juices'];
+      tableConfigCopy.selector = { mealType: mealTypes[value] };
+
+      tableConfig.set(tableConfigCopy);
+
+      this.setState({ currentTabValue: value });
   }
 
   render() {
     return (
-      (!this.props.loading ? (
         <div>
 
           <Grid container className="SideContent SideContent--spacer-2x--top SideContent--spacer-2x--horizontal">
@@ -190,8 +189,9 @@ class Sides extends React.Component {
                 }}
               />
             </div>
+
             <ListContainer
-              limit={20}
+              limit={40}
               collection={SidesCollection}
               options={this.state.options}
               selector={{
@@ -201,59 +201,33 @@ class Sides extends React.Component {
 
             >
 
-              <SidesGrid
-                popTheSnackbar={this.props.popTheSnackbar}
-                searchTerm={this.state.searchSelector}
-                history={this.props.history}
-                sortByOptions={this.sortByOption.bind(this)}
-              />
+              {!this.props.loading ? (
+                <SidesGrid
+                  popTheSnackbar={this.props.popTheSnackbar}
+                  searchTerm={this.state.searchSelector}
+                  history={this.props.history}
+                  sortByOptions={this.sortByOption.bind(this)}
+                />
+              ) : <Loading />}
 
             </ListContainer>
 
-
-            {/*    options={this.state.options}
-              selector={{ $or: [{ title: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } },
-                { SKU: { $regex: new RegExp(this.state.searchSelector), $options: 'i' } }] }}
-
-                 joins={[{
-                localProperty: 'imageId',
-                collection: PlateImages,
-                joinAs: 'image',
-              }]}
-
-                joins={[{
-                    localProperty: "typeId",
-                    collection: IngredientTypes,
-                    joinAs: "typeMain"
-                },{
-                  localProperty: "subIngredients",
-                  collection: IngredientsCollection,
-                  joinAs: "subs"
-                }]}
-            */}
-
           </Grid>
         </div>
-      ) : <Loading />)
-
     );
   }
 }
 
-// const Ingredients = ({ loading, ingredients, match, history }) => ;
-
 Sides.propTypes = {
   loading: PropTypes.bool.isRequired,
-  // ingredients: PropTypes.arrayOf(PropTypes.object),
-  // ingredientTypes: PropTypes.isRequired,
   history: PropTypes.object.isRequired,
 };
 
-export default createContainer(() => {
-  const subscription = Meteor.subscribe('sides', {}, {});
+export default withTracker(() => {
+  const tableConfigCopy = tableConfig.get();
+  const subscription = Meteor.subscribe('sides', tableConfigCopy.selector.mealType === "All" ? {} : tableConfigCopy.selector, {});
 
   return {
     loading: !subscription.ready(),
-    // plates: SidesCollection.find().fetch(),
   };
-}, Sides);
+})(Sides);
