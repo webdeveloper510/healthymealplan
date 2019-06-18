@@ -1,5 +1,6 @@
 import { Job } from 'meteor/vsivsi:job-collection';
 import { Meteor } from 'meteor/meteor';
+import moment from 'moment';
 
 import Subscriptions from '../../../api/Subscriptions/Subscriptions';
 import GiftCards from '../../../api/GiftCards/GiftCards';
@@ -7,6 +8,7 @@ import Discounts from '../../../api/Discounts/Discounts';
 import Jobs from '../../../api/Jobs/Jobs';
 
 import calculateSubscriptionCost from '../../../modules/server/billing/calculateSubscriptionCost';
+import removeDiscountCodeFromSubscription from '../../../modules/server/billing/removeDiscountCodeFromSubscription';
 import chargeCustomerPaymentProfile from '../../../modules/server/authorize/chargeCustomerPaymentProfile';
 
 import sendTransactionSuccessfulDetails from './sendTransactionSuccessfulDetails';
@@ -25,13 +27,11 @@ const worker = Job.processJobs(
   (job, cb) => {
     const jobData = job.data;
 
-    console.log(`Logging from SLAVE job ${new Date()}`);
-
-    // maybe discount removal here is bad => shift everything to editSubscriptionJob
-    // let this just deduct gift card and charge
+    console.log(`Logging from SLAVE CHARGE JOB for Subscription ID: ${jobData.subscriptionId} ${new Date()}`);
 
     const subscription = Subscriptions.findOne({ _id: jobData.subscriptionId });
     const primaryUser = Meteor.users.findOne({ _id: subscription.customerId });
+    let discountOnSubscription = null;
 
     const dataToSend = {
       id: primaryUser._id,
@@ -70,22 +70,9 @@ const worker = Job.processJobs(
     }
 
     if (subscription.hasOwnProperty('discountApplied')) {
-      const discount = Discounts.findOne({ _id: subscription.discountApplied });
-      dataToSend.discountCode = discount._id;
-
-      if (discount.hasOwnProperty('usageLimitType')) {
-        if (discount.usageLimitType == 'firstOrderOnly') {
-          Subscriptions.update({ _id: jobData.subscriptionId }, {
-            $unset: {
-              discountApplied: '',
-            },
-          });
-
-          dataToSend.discountCodeRemove = true;
-        } else {
-          dataToSend.discountCodeRemove = false;
-        }
-      }
+      discountOnSubscription = Discounts.findOne({ _id: subscription.discountApplied });
+      dataToSend.discountCode = discountOnSubscription._id;
+      dataToSend.discountCodeRemove = false;
     }
 
     const finalSubscriptionAmount = calculateSubscriptionCost(dataToSend);
@@ -111,25 +98,31 @@ const worker = Job.processJobs(
             },
           });
 
-          sendGiftCardDeductionDetails({
-            paymentMethodIsCard: subscription.paymentMethod === 'card',
-            paymentMethod: subscription.paymentMethod,
+            if (subscription.hasOwnProperty('discountApplied')) {
+                removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+            }
 
-            customerId: primaryUser._id,
-            customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
-            customerEmail: primaryUser.emails[0].address,
-            subscriptionId: jobData.subscriptionId,
-            subscriptionAmount: finalSubscriptionAmount.actualTotal,
+            sendGiftCardDeductionDetails({
+              paymentMethodIsCard: subscription.paymentMethod === 'card',
+              paymentMethod: subscription.paymentMethod,
 
-            giftCardPresent: true,
-            partialCharge: false,
-            giftCardCode: giftCard.code,
-            giftCardDeductionAmount: finalSubscriptionAmount.actualTotal,
+              customerId: primaryUser._id,
+              customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+              customerEmail: primaryUser.emails[0].address,
+              subscriptionId: jobData.subscriptionId,
+              subscriptionAmount: finalSubscriptionAmount.actualTotal,
 
-            totalCharge: finalSubscriptionAmount.actualTotal,
+              giftCardPresent: true,
+              partialCharge: false,
+              giftCardCode: giftCard.code,
+              giftCardDeductionAmount: finalSubscriptionAmount.actualTotal,
 
-            subject: `$${finalSubscriptionAmount.actualTotal} Gift card transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
-          });
+              totalCharge: finalSubscriptionAmount.actualTotal,
+
+              // subject: `$${finalSubscriptionAmount.actualTotal} Gift card transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+              subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
+
+            });
 
           // record the transaction
 
@@ -138,7 +131,6 @@ const worker = Job.processJobs(
           console.log('PARTIAL DEDUCTION');// DEDUCT_GIFT_CARD(0);
           let partialCardChargeAmount = 0;
           partialCardChargeAmount = finalSubscriptionAmount.actualTotal - giftCard.balance;
-          console.log(partialCardChargeAmount);
 
           const syncChargeCustomerPaymentProfile = Meteor.wrapAsync(chargeCustomerPaymentProfile);
 
@@ -148,10 +140,13 @@ const worker = Job.processJobs(
             parseFloat(partialCardChargeAmount.toFixed(2)),
           );
 
-          if (chargeCustomerPaymentProfileRes.messages.resultCode == 'Ok'
+          if (chargeCustomerPaymentProfileRes.messages.resultCode === 'Ok'
             && chargeCustomerPaymentProfileRes.transactionResponse.responseCode === '1') {
             console.log('transaction successful');
 
+            if (subscription.hasOwnProperty('discountApplied')) {
+                removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+            }
 
             sendTransactionSuccessfulDetails({
               paymentMethodIsCard: true,
@@ -172,7 +167,8 @@ const worker = Job.processJobs(
 
               totalCharge: partialCardChargeAmount,
 
-              subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+              // subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+              subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
             });
 
             GiftCards.update({ _id: giftCard._id }, {
@@ -201,9 +197,13 @@ const worker = Job.processJobs(
 
           console.log(chargeCustomerPaymentProfileRes);
 
-          if (chargeCustomerPaymentProfileRes.messages.resultCode == 'Ok' &&
-            chargeCustomerPaymentProfileRes.transactionResponse.responseCode == '1') {
+          if (chargeCustomerPaymentProfileRes.messages.resultCode === 'Ok' &&
+            chargeCustomerPaymentProfileRes.transactionResponse.responseCode === '1') {
             console.log('transaction successful');
+
+            if (subscription.hasOwnProperty('discountApplied')) {
+                removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+            }
 
             // send email to us
             sendTransactionSuccessfulDetails({
@@ -226,7 +226,9 @@ const worker = Job.processJobs(
 
               totalCharge: finalSubscriptionAmount.actualTotal,
 
-              subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+              // subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+              subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
+
             });
 
             // record card transaction receipt
@@ -248,9 +250,15 @@ const worker = Job.processJobs(
 
         console.log(chargeCustomerPaymentProfileRes);
 
-        if (chargeCustomerPaymentProfileRes.messages.resultCode == 'Ok' &&
-          chargeCustomerPaymentProfileRes.transactionResponse.responseCode == '1') {
+        if (chargeCustomerPaymentProfileRes.messages.resultCode === 'Ok' &&
+          chargeCustomerPaymentProfileRes.transactionResponse.responseCode === '1') {
+
           console.log('transaction successful');
+
+          if (subscription.hasOwnProperty('discountApplied')) {
+              removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+          }
+
           sendTransactionSuccessfulDetails({
             paymentMethodIsCard: true,
             authorizeTransactionId: chargeCustomerPaymentProfileRes.transactionResponse.transId,
@@ -270,7 +278,9 @@ const worker = Job.processJobs(
 
             totalCharge: finalSubscriptionAmount.actualTotal,
 
-            subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+            // subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+              subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
+
           });
 
         } else {
@@ -299,6 +309,10 @@ const worker = Job.processJobs(
             },
           });
 
+            if (subscription.hasOwnProperty('discountApplied')) {
+                removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+            }
+
           sendGiftCardDeductionDetails({
             paymentMethodIsCard: subscription.paymentMethod === 'card',
             paymentMethod: subscription.paymentMethod,
@@ -316,12 +330,17 @@ const worker = Job.processJobs(
 
             totalCharge: finalSubscriptionAmount.actualTotal,
 
-            subject: `$${finalSubscriptionAmount.actualTotal} Gift card transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+            // subject: `$${finalSubscriptionAmount.actualTotal} Gift card transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+            subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
           });
 
         } else if (giftCardBalance < finalSubscriptionAmount.actualTotal && giftCardBalance != 0) {
           let partialCardChargeAmount = 0;
           partialCardChargeAmount = finalSubscriptionAmount.actualTotal - giftCardBalance;
+
+            if (subscription.hasOwnProperty('discountApplied')) {
+                removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+            }
 
           sendGiftCardDeductionDetails({
             paymentMethodIsCard: subscription.paymentMethod === 'card',
@@ -340,7 +359,8 @@ const worker = Job.processJobs(
 
             totalCharge: partialCardChargeAmount,
 
-            subject: `$${finalSubscriptionAmount.actualTotal} Partial Gift card transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+            // subject: `$${finalSubscriptionAmount.actualTotal} Partial Gift card transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+            subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
           });
 
 
@@ -354,6 +374,9 @@ const worker = Job.processJobs(
 
         } else {
 
+            if (subscription.hasOwnProperty('discountApplied')) {
+                removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+            }
         }
       }
     }
