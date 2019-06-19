@@ -734,6 +734,16 @@ class PlateEditor extends React.Component {
     }
   }
 
+  getSubstitutePlateTitle(substitutePlate) {
+
+      const subPlate = this.props.potentialPlates.find(e => e._id === substitutePlate._id);
+
+      if (subPlate) {
+          return subPlate.title;
+      }
+
+      return substitutePlate.title;
+  }
 
   getSubIngredientAvatar(subIngredient) {
     if (subIngredient.title) {
@@ -1057,6 +1067,8 @@ class PlateEditor extends React.Component {
                     </Grid>
 
                   </Grid>
+
+
                 </Paper>
               </Grid>
             </Grid>
@@ -1554,7 +1566,7 @@ class PlateEditor extends React.Component {
                           </Avatar>
                         }
                         style={{ marginRight: '8px', marginBottom: '8px' }}
-                        label={this.getSubIngredientTitle(this.state.substitutePlate)}
+                        label={this.getSubstitutePlateTitle(this.state.substitutePlate)}
                         onDelete={this.handleSubstitutePlateDelete.bind(
                           this,
                           this.state.substitutePlate,
@@ -1563,6 +1575,20 @@ class PlateEditor extends React.Component {
 
                     ) : (
                       <Chip className="chip--bordered" label="Dish" />
+                    )}
+
+                    {!this.props.loading && this.state.substitutePlate && (
+                        <Grid container>
+                          <Grid item xs={12}>
+                            <React.Fragment>
+                                <Button style={{ marginTop: "25px" }} onClick={() => {
+                                    window.location.href = `/plates/${this.state.substitutePlate._id}/edit`;
+                                }}>
+                                    View substitute dish
+                                </Button>
+                            </React.Fragment>
+                          </Grid>
+                      </Grid>
                     )}
                   </div>
                 </Paper>
