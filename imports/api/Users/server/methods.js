@@ -404,17 +404,10 @@ Meteor.methods({
 
     const billing = calculateSubscriptionCost(data);
 
-    // console.log("IN BILLING");
-    // console.log(billing);
-
     let friday = '';
-
-    // if we haven't yet passed the day of the week that I need:
     if (moment().isoWeekday() <= 5) {
-      // then just give me this week's instance of that day
       friday = moment().isoWeekday(5).hour(23).toDate();
     } else {
-      // otherwise, give me next week's instance of that day
       friday = moment().add(1, 'weeks').isoWeekday(5).hour(23).toDate();
     }
 
@@ -508,28 +501,16 @@ Meteor.methods({
       });
     }
 
-    console.log('Secondaries to remove');
-
-    console.log(data.secondaryProfilesRemoved);
-
     if (data.secondaryProfilesRemoved.length > 0) {
       Meteor.users.remove({ _id: { $in: data.secondaryProfilesRemoved } });
     }
 
-    const secondaryAccounts = Meteor.users.find({
-      primaryAccount: data.id,
-    }).fetch();
-
-    // console.log(secondaryAccounts);
-
+    const secondaryAccounts = Meteor.users.find({ primaryAccount: data.id }).fetch();
     const secondaryAccountIds = [];
 
     secondaryAccounts.forEach((e) => {
       secondaryAccountIds.push(e._id);
     });
-
-    console.log(secondaryAccounts);
-
 
     Meteor.users.update({ _id: data.id }, {
       $set: {
@@ -557,7 +538,6 @@ Meteor.methods({
       }
 
       return e;
-
     });
 
     Subscriptions.update({
@@ -667,7 +647,6 @@ Meteor.methods({
 
     console.log("Begin Edit customer step 4 for customer ID "  + data.id);
 
-
     if (sub.hasOwnProperty('discountApplied')) {
       discountCodeToSend = sub.discountApplied;
     }
@@ -688,7 +667,7 @@ Meteor.methods({
       lifestyle: primaryUser.lifestyle,
       discount: primaryUser.discount,
       discountCode: discountCodeToSend,
-      discountCodeRemove: discountCodeRemove,
+      discountCodeRemove,
       restrictions: primaryUser.restrictions,
       specificRestrictions: primaryUser.specificRestrictions,
       subIngredients: primaryUser.preferences,
@@ -732,13 +711,10 @@ Meteor.methods({
     // if we haven't yet passed the day of the week that I need:
     if (moment().isoWeekday() <= 5) {
       // then just give me this week's instance of that day
-      friday = moment().isoWeekday(5).hour(23).minute(30)
-        .toDate();
+      friday = moment().isoWeekday(5).hour(23).minute(30).toDate();
     } else {
       // otherwise, give me next week's instance of that day
-      friday = moment().add(1, 'weeks').isoWeekday(5).hour(23)
-        .minute(30)
-        .toDate();
+      friday = moment().add(1, 'weeks').isoWeekday(5).hour(23).minute(30).toDate();
     }
 
     if (data.updateWhen === "friday") {
@@ -795,11 +771,7 @@ Meteor.methods({
       birthMonth: Match.Optional(Match.OneOf(String, Number)),
     });
 
-    const postalCodeExists = PostalCodes.findOne({
-      title: data.postalCode.substr(0, 3).toUpperCase(),
-    });
-
-    console.log(postalCodeExists);
+    const postalCodeExists = PostalCodes.findOne({ title: data.postalCode.substr(0, 3).toUpperCase() });
 
     if (!postalCodeExists) {
       throw new Meteor.Error('postal-code-not-found', 'Postal code does not exist.');
@@ -818,7 +790,6 @@ Meteor.methods({
         day: data.birthDay,
         month: data.birthMonth,
       };
-
     }
 
     try {
@@ -1198,9 +1169,7 @@ Meteor.methods({
 
     if (customerInfo.activeImmediate == false) {
 
-      const lastWeeksSaturday = moment(
-        customerInfo.subscriptionStartDateRaw,
-      ).tz('America/Toronto').subtract(2, 'd');
+      const lastWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).tz('America/Toronto').subtract(3, 'd').toDate();
 
       const job = new Job(
         Jobs,
@@ -1210,17 +1179,8 @@ Meteor.methods({
           customerId: customerInfo.id,
         },
       );
-      const a = moment(lastWeeksSaturday).tz('America/Toronto');
-      const b = moment().tz('America/Toronto').startOf('day');
-      a.diff(b);
 
-      console.log(a.diff(b));
-
-      job
-        .priority('normal')
-        .delay(Math.abs(a.diff(b))) // Wait an hour before first try
-        .save(); // Commit it to the server
-
+      job.priority('normal').after(lastWeeksFriday).save()
     }
   },
 
@@ -1239,9 +1199,6 @@ Meteor.methods({
 
 
     const syncCreateCustomerProfile = Meteor.wrapAsync(createCustomerProfile);
-    // const syncCreateSubscriptionFromCustomerProfile = Meteor.wrapAsync(
-    //   createSubscriptionFromCustomerProfile,
-    // );
 
     // create primary profile over on Authorize
     const createCustomerProfileRes = syncCreateCustomerProfile(
@@ -1262,9 +1219,6 @@ Meteor.methods({
     ) {
       throw new Meteor.Error(500, 'There was a problem creating user profile.');
     }
-
-    console.log('Customer');
-    console.log(createCustomerProfileRes);
 
     // primary profile created successfully on authorize
 
@@ -1369,20 +1323,7 @@ Meteor.methods({
 
     actualTotal = parseFloat(actualTotal.toFixed(2));
 
-    console.log(actualTotal);
-
-
-    // subscriptionDate (Previous saturday)
-    const lastWeeksSaturday = moment(
-      customerInfo.subscriptionStartDateRaw,
-    ).subtract(2, 'd');
-
     const previousWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(3, 'd').hour(23).toDate();
-
-    console.log(lastWeeksSaturday);
-    console.log('create customer profile res');
-    console.log(createCustomerProfileRes);
-
 
     const subscriptionItemsReal = [];
 
@@ -1592,7 +1533,7 @@ Meteor.methods({
 
     });
 
-    const subscriptionId = Subscriptions.insert({
+    Subscriptions.insert({
       _id: subscriptionIdToSave,
       customerId: customerInfo.id,
       authorizeCustomerProfileId:
@@ -1624,7 +1565,6 @@ Meteor.methods({
     return getSubscriptionRes;
 
   },
-
 
   getCustomerPaymentProfile(customerProfileId, paymentProfileId) {
 
