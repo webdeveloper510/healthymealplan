@@ -1149,10 +1149,6 @@ Meteor.methods({
 
     });
 
-
-    // console.log(newDeliveryType);
-
-
     const subscriptionId = Subscriptions.insert({
       _id: subscriptionIdToSave,
       customerId: customerInfo.id,
@@ -1169,7 +1165,7 @@ Meteor.methods({
 
     if (customerInfo.activeImmediate == false) {
 
-      const lastWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).tz('America/Toronto').subtract(3, 'd').toDate();
+      const lastWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(1, 'w').isoWeekday(5).hour(23).toDate();
 
       const job = new Job(
         Jobs,
@@ -1323,7 +1319,7 @@ Meteor.methods({
 
     actualTotal = parseFloat(actualTotal.toFixed(2));
 
-    const previousWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(3, 'd').hour(23).toDate();
+    const previousWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(1, 'w').isoWeekday(5).hour(23).toDate();
 
     const subscriptionItemsReal = [];
 
