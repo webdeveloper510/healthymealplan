@@ -1899,7 +1899,7 @@ class CurrentCustomerEditor extends React.Component {
               Sides
           </Typography>
             <Grid container style={{marginTop: '25px'}}>
-            {!this.props.loading && this.state.scheduleReal[index].sides.map((side, ind) => {
+            {!this.props.loading && this.props.sides && this.state.scheduleReal[index].sides.map((side, ind) => {
                 const currentSide = this.props.sides.find(e => e._id === side._id);
                 return (
                 <Grid item xs={12} sm={4}>
@@ -3219,7 +3219,7 @@ class CurrentCustomerEditor extends React.Component {
                 Sides
             </Typography>
             <Grid container style={{marginTop: '25px'}}>
-                {this.state.secondaryProfilesData[profileIndex].scheduleReal[stepIndex].sides.map((side, ind) => {
+                {!this.props.loading && this.props.sides && this.state.secondaryProfilesData[profileIndex].scheduleReal[stepIndex].sides.map((side, ind) => {
                     const currentSide = this.props.sides.find(e => e._id === side._id);
                     return (
                         <Grid item xs={12} sm={4}>
