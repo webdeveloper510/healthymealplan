@@ -1165,7 +1165,7 @@ Meteor.methods({
 
     if (customerInfo.activeImmediate == false) {
 
-      const lastWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(1, 'w').isoWeekday(5).hour(23).toDate();
+      const lastWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(1, 'w').isoWeekday(5).hour(23).minute(0).toDate();
 
       const job = new Job(
         Jobs,
@@ -1319,7 +1319,7 @@ Meteor.methods({
 
     actualTotal = parseFloat(actualTotal.toFixed(2));
 
-    const previousWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(1, 'w').isoWeekday(5).hour(23).toDate();
+    const previousWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(1, 'w').isoWeekday(5).hour(23).minute(30).toDate();
 
     const subscriptionItemsReal = [];
 
