@@ -66,7 +66,10 @@ EditCustomer.propTypes = {
   popTheSnackbar: PropTypes.func.isRequired,
   deliveryGuys: PropTypes.array,
   sides: PropTypes.array,
+};
 
+EditCustomer.defaultProps = {
+    sides: [],
 };
 
 export default withTracker(({ match }) => {

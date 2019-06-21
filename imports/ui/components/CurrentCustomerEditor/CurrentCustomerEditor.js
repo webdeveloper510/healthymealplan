@@ -1899,7 +1899,7 @@ class CurrentCustomerEditor extends React.Component {
               Sides
           </Typography>
             <Grid container style={{marginTop: '25px'}}>
-            {!this.props.loading && this.props.sides && this.state.scheduleReal[index].sides.map((side, ind) => {
+            {!this.props.loading && this.props.sides.length > 0 && this.state.scheduleReal[index].sides.map((side, ind) => {
                 const currentSide = this.props.sides.find(e => e._id === side._id);
                 return (
                 <Grid item xs={12} sm={4}>
@@ -3219,8 +3219,9 @@ class CurrentCustomerEditor extends React.Component {
                 Sides
             </Typography>
             <Grid container style={{marginTop: '25px'}}>
-                {!this.props.loading && this.props.sides && this.state.secondaryProfilesData[profileIndex].scheduleReal[stepIndex].sides.map((side, ind) => {
+                {!this.props.loading && this.props.sides.length > 0 && this.state.secondaryProfilesData[profileIndex].scheduleReal[stepIndex].sides.map((side, ind) => {
                     const currentSide = this.props.sides.find(e => e._id === side._id);
+
                     return (
                         <Grid item xs={12} sm={4}>
                             <Typography type="body2">{currentSide.title}</Typography>
@@ -10139,11 +10140,13 @@ class CurrentCustomerEditor extends React.Component {
 }
 
 CurrentCustomerEditor.defaultProps = {
+  sides: []
 };
 
 CurrentCustomerEditor.propTypes = {
   history: PropTypes.object.isRequired,
   popTheSnackbar: PropTypes.func.isRequired,
+  sides: PropTypes.array.isRequired,
 };
 
 export default withStyles(styles)(CurrentCustomerEditor);
