@@ -723,19 +723,23 @@ class PlateEditor extends React.Component {
   }
 
   getSubIngredientTitle(subIngredient) {
-    // console.log(subIngredient);
-
-    if (subIngredient.title) {
-      return subIngredient.title;
+    if (subIngredient._id) {
+        const ingredient = this.props.potentialSubIngredients.find(el => el._id === subIngredient._id);
+        if (ingredient) {
+            return ingredient.title;
+        }
     }
 
-    if (this.props.allIngredients) {
-      return this.props.allIngredients.find(el => el._id === subIngredient);
+    if (subIngredient.title) {
+        return subIngredient.title;
+    }
+
+    if (this.props.potentialSubIngredients) {
+      return this.props.potentialSubIngredients.find(el => el._id === subIngredient);
     }
   }
 
   getSubstitutePlateTitle(substitutePlate) {
-
       const subPlate = this.props.potentialPlates.find(e => e._id === substitutePlate._id);
 
       if (subPlate) {
@@ -745,15 +749,26 @@ class PlateEditor extends React.Component {
       return substitutePlate.title;
   }
 
-  getSubIngredientAvatar(subIngredient) {
+  getSubIngredientAvatar(subIngredient){
+
+    console.log(subIngredient);
+
+    if (subIngredient._id) {
+        const ingredient = this.props.potentialSubIngredients.find(el => el._id === subIngredient._id);
+        if (ingredient) {
+          return ingredient.title;
+        }
+    }
+
     if (subIngredient.title) {
       return subIngredient.title.charAt(0);
     }
 
-    if (this.props.allIngredients) {
-      const avatarToReturn = this.props.allIngredients.find(
+    if (this.props.potentialSubIngredients) {
+      const avatarToReturn = this.props.potentialSubIngredients.find(
         el => el._id === subIngredient,
       );
+
       return avatarToReturn.title.charAt(0);
     }
   }
@@ -1426,7 +1441,7 @@ class PlateEditor extends React.Component {
                       flexWrap: 'wrap',
                     }}
                   >
-                    {this.state.subIngredients ? (
+                    {!this.props.loading && this.state.subIngredients ? (
                       this.state.subIngredients.map((subIngredient, i) => (
                         <Chip
                           avatar={
