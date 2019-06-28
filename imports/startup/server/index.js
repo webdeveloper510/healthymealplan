@@ -21,6 +21,7 @@ import './jobs/enableDiscountJob';
 import './jobs/disableDiscountJob';
 
 import './jobs/sendFirstRecoveryEmailJob';
+import './jobs/sendFeedbackEmail';
 
 import '../../modules/server/authorize/webhooks/';
 

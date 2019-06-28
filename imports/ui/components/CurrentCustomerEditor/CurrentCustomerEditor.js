@@ -10060,6 +10060,7 @@ class CurrentCustomerEditor extends React.Component {
                           === 'setSubscriptionActiveJob' ? 'Activate subscription (non card)' : e.type
                           === 'setSubscriptionActiveCardJob' ? 'Activate subscription' : e.type
                           === 'setSubscriptionActive' ? 'Activate subscription' : e.type
+                          === 'sendFeedbackEmailJob' ? 'Feedback Email' : e.type
                           === 'setSubscriptionPausedJob' ? `Pause subscription (activates on ${moment(e.data.activationDate).format('MMMM D, YYYY')})` : ''}
                       {' '}({e.status}) {`runs ${moment(e.after).format('dddd, MMMM D YYYY h:m A')}`}
                       {e.data.hasOwnProperty('jobCreatedBy') && (

@@ -1,0 +1,10 @@
+Hi {{ firstName }},
+
+I want to thank you again for joining Vittle! It's been a few days now since you've been eating healthy, ready-to-eat meals from Vittle, so I wanted to check in and get your feedback.
+
+Is there anything we can improve? Is there anything that you absolutely think we should continue doing? I'd love to know! Your feedback will help us improve Vittle.
+
+Bon appétit!
+
+Omar, Vittle
+Founder
