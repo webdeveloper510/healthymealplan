@@ -36,6 +36,5 @@ Meteor.publish('jobs.editSubscription', function jobsEditSubscription() {
       updated: 1,
       after: 1,
     },
-
   });
 });
