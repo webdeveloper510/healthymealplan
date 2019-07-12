@@ -133,107 +133,132 @@ const worker = Job.processJobs(
           partialCardChargeAmount = finalSubscriptionAmount.actualTotal - giftCard.balance;
 
           const syncChargeCustomerPaymentProfile = Meteor.wrapAsync(chargeCustomerPaymentProfile);
+            let chargeCustomerPaymentProfileRes;
 
-          const chargeCustomerPaymentProfileRes = syncChargeCustomerPaymentProfile(
-            subscription.authorizeCustomerProfileId,
-            subscription.authorizePaymentProfileId,
-            parseFloat(partialCardChargeAmount.toFixed(2)),
-          );
+            try {
+                chargeCustomerPaymentProfileRes = syncChargeCustomerPaymentProfile(
+                    subscription.authorizeCustomerProfileId,
+                    subscription.authorizePaymentProfileId,
+                    parseFloat(partialCardChargeAmount.toFixed(2)),
+                );
 
-          if (chargeCustomerPaymentProfileRes.messages.resultCode === 'Ok'
-            && chargeCustomerPaymentProfileRes.transactionResponse.responseCode === '1') {
-            console.log('transaction successful');
+            } catch (e) {
+                console.log("Error in catch");
+                console.log(e);
 
-            if (subscription.hasOwnProperty('discountApplied')) {
-                removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+                // send failure email
+                job.fail();
+
+                cb();
             }
 
-            sendTransactionSuccessfulDetails({
-              paymentMethodIsCard: true,
-              authorizeTransactionId: chargeCustomerPaymentProfileRes.transactionResponse.transId,
-              accountNumber: chargeCustomerPaymentProfileRes.transactionResponse.accountNumber,
-              accountType: chargeCustomerPaymentProfileRes.transactionResponse.accountType,
+            if (chargeCustomerPaymentProfileRes) {
+              if (chargeCustomerPaymentProfileRes.messages.resultCode === 'Ok'
+                && chargeCustomerPaymentProfileRes.transactionResponse.responseCode === '1') {
+                console.log('transaction successful');
 
-              customerId: primaryUser._id,
-              customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
-              customerEmail: primaryUser.emails[0].address,
-              subscriptionId: jobData.subscriptionId,
-              subscriptionAmount: finalSubscriptionAmount.actualTotal,
+                if (subscription.hasOwnProperty('discountApplied')) {
+                    removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+                }
 
-              giftCardPresent: true,
-              partialCharge: true,
-              giftCardCode: giftCard.code,
-              giftCardDeductionAmount: giftCard.balance,
+                sendTransactionSuccessfulDetails({
+                  paymentMethodIsCard: true,
+                  authorizeTransactionId: chargeCustomerPaymentProfileRes.transactionResponse.transId,
+                  accountNumber: chargeCustomerPaymentProfileRes.transactionResponse.accountNumber,
+                  accountType: chargeCustomerPaymentProfileRes.transactionResponse.accountType,
 
-              totalCharge: partialCardChargeAmount,
+                  customerId: primaryUser._id,
+                  customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+                  customerEmail: primaryUser.emails[0].address,
+                  subscriptionId: jobData.subscriptionId,
+                  subscriptionAmount: finalSubscriptionAmount.actualTotal,
 
-              // subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
-              subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
-            });
+                  giftCardPresent: true,
+                  partialCharge: true,
+                  giftCardCode: giftCard.code,
+                  giftCardDeductionAmount: giftCard.balance,
 
-            GiftCards.update({ _id: giftCard._id }, {
-              $set: {
-                balance: 0,
-                isDepleted: true,
-              },
-            });
+                  totalCharge: partialCardChargeAmount,
+
+                  // subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+                  subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
+                });
+
+                GiftCards.update({ _id: giftCard._id }, {
+                  $set: {
+                    balance: 0,
+                    isDepleted: true,
+                  },
+                });
 
 
-            // record partial charge
-          } else {
-            console.log('transaction failed');
-          }
-
+                // record partial charge
+              } else {
+                console.log('transaction failed');
+              }
+            }
 
         } else {
 
           const syncChargeCustomerPaymentProfile = Meteor.wrapAsync(chargeCustomerPaymentProfile);
+          let chargeCustomerPaymentProfileRes;
+          try {
+                chargeCustomerPaymentProfileRes = syncChargeCustomerPaymentProfile(
+                    subscription.authorizeCustomerProfileId,
+                    subscription.authorizePaymentProfileId,
+                    parseFloat(finalSubscriptionAmount.actualTotal.toFixed(2)),
+                );
 
-          const chargeCustomerPaymentProfileRes = syncChargeCustomerPaymentProfile(
-            subscription.authorizeCustomerProfileId,
-            subscription.authorizePaymentProfileId,
-            parseFloat(finalSubscriptionAmount.actualTotal.toFixed(2)),
-          );
+            } catch (e) {
+                console.log("Error in catch");
+                console.log(e);
+
+                // send failure email
+                job.fail();
+                cb();
+            }
 
           console.log(chargeCustomerPaymentProfileRes);
 
-          if (chargeCustomerPaymentProfileRes.messages.resultCode === 'Ok' &&
-            chargeCustomerPaymentProfileRes.transactionResponse.responseCode === '1') {
-            console.log('transaction successful');
+          if (chargeCustomerPaymentProfileRes) {
+            if (chargeCustomerPaymentProfileRes.messages.resultCode === 'Ok' &&
+              chargeCustomerPaymentProfileRes.transactionResponse.responseCode === '1') {
+              console.log('transaction successful');
 
-            if (subscription.hasOwnProperty('discountApplied')) {
-                removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+              if (subscription.hasOwnProperty('discountApplied')) {
+                  removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+              }
+
+              // send email to us
+              sendTransactionSuccessfulDetails({
+                paymentMethodIsCard: true,
+
+                authorizeTransactionId: chargeCustomerPaymentProfileRes.transactionResponse.transId,
+                accountNumber: chargeCustomerPaymentProfileRes.transactionResponse.accountNumber,
+                accountType: chargeCustomerPaymentProfileRes.transactionResponse.accountType,
+
+                customerId: primaryUser._id,
+                customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+                customerEmail: primaryUser.emails[0].address,
+                subscriptionId: jobData.subscriptionId,
+                subscriptionAmount: finalSubscriptionAmount.actualTotal,
+
+                giftCardPresent: true,
+                partialCharge: false,
+                giftCardCode: giftCard.code,
+                giftCardDeductionAmount: 0,
+
+                totalCharge: finalSubscriptionAmount.actualTotal,
+
+                // subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+                subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
+
+              });
+
+              // record card transaction receipt
+            } else {
+              console.log('transaction failed');
             }
-
-            // send email to us
-            sendTransactionSuccessfulDetails({
-              paymentMethodIsCard: true,
-
-              authorizeTransactionId: chargeCustomerPaymentProfileRes.transactionResponse.transId,
-              accountNumber: chargeCustomerPaymentProfileRes.transactionResponse.accountNumber,
-              accountType: chargeCustomerPaymentProfileRes.transactionResponse.accountType,
-
-              customerId: primaryUser._id,
-              customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
-              customerEmail: primaryUser.emails[0].address,
-              subscriptionId: jobData.subscriptionId,
-              subscriptionAmount: finalSubscriptionAmount.actualTotal,
-
-              giftCardPresent: true,
-              partialCharge: false,
-              giftCardCode: giftCard.code,
-              giftCardDeductionAmount: 0,
-
-              totalCharge: finalSubscriptionAmount.actualTotal,
-
-              // subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
-              subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
-
-            });
-
-            // record card transaction receipt
-          } else {
-            console.log('transaction failed');
           }
         }
 
@@ -242,49 +267,60 @@ const worker = Job.processJobs(
         // if gift card not applied
         const syncChargeCustomerPaymentProfile = Meteor.wrapAsync(chargeCustomerPaymentProfile);
 
-        const chargeCustomerPaymentProfileRes = syncChargeCustomerPaymentProfile(
-          subscription.authorizeCustomerProfileId,
-          subscription.authorizePaymentProfileId,
-          finalSubscriptionAmount.actualTotal,
-        );
+        let chargeCustomerPaymentProfileRes;
 
-        console.log(chargeCustomerPaymentProfileRes);
+        try {
+            chargeCustomerPaymentProfileRes = syncChargeCustomerPaymentProfile(
+                subscription.authorizeCustomerProfileId,
+                subscription.authorizePaymentProfileId,
+                finalSubscriptionAmount.actualTotal,
+            );
 
-        if (chargeCustomerPaymentProfileRes.messages.resultCode === 'Ok' &&
-          chargeCustomerPaymentProfileRes.transactionResponse.responseCode === '1') {
+        } catch (e) {
+            console.log("Error in catch");
+            console.log(e);
 
-          console.log('transaction successful');
+            // send failure email
+          job.fail();
+        }
 
-          if (subscription.hasOwnProperty('discountApplied')) {
-              removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+        console.log("Charge customer profile RES: ");
+
+        if (chargeCustomerPaymentProfileRes) {
+          if (chargeCustomerPaymentProfileRes.messages.resultCode === 'Ok' &&
+            chargeCustomerPaymentProfileRes.transactionResponse.responseCode === '1') {
+
+            console.log('transaction successful');
+
+            if (subscription.hasOwnProperty('discountApplied')) {
+                removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+            }
+
+            sendTransactionSuccessfulDetails({
+              paymentMethodIsCard: true,
+              authorizeTransactionId: chargeCustomerPaymentProfileRes.transactionResponse.transId,
+              accountNumber: chargeCustomerPaymentProfileRes.transactionResponse.accountNumber,
+              accountType: chargeCustomerPaymentProfileRes.transactionResponse.accountType,
+
+              customerId: primaryUser._id,
+              customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+              customerEmail: primaryUser.emails[0].address,
+              subscriptionId: jobData.subscriptionId,
+              subscriptionAmount: finalSubscriptionAmount.actualTotal,
+
+              giftCardPresent: false,
+              partialCharge: false,
+              giftCardCode: '',
+              giftCardDeductionAmount: 0,
+              totalCharge: finalSubscriptionAmount.actualTotal,
+
+              // subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+                subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
+            });
+
+          } else {
+            console.log('transaction failed');
           }
-
-          sendTransactionSuccessfulDetails({
-            paymentMethodIsCard: true,
-            authorizeTransactionId: chargeCustomerPaymentProfileRes.transactionResponse.transId,
-            accountNumber: chargeCustomerPaymentProfileRes.transactionResponse.accountNumber,
-            accountType: chargeCustomerPaymentProfileRes.transactionResponse.accountType,
-
-            customerId: primaryUser._id,
-            customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
-            customerEmail: primaryUser.emails[0].address,
-            subscriptionId: jobData.subscriptionId,
-            subscriptionAmount: finalSubscriptionAmount.actualTotal,
-
-            giftCardPresent: false,
-            partialCharge: false,
-            giftCardCode: '',
-            giftCardDeductionAmount: 0,
-
-            totalCharge: finalSubscriptionAmount.actualTotal,
-
-            // subject: `[${chargeCustomerPaymentProfileRes.transactionResponse.transId}] $${finalSubscriptionAmount.actualTotal} Transaction successful for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
-              subject: `Receipt for your Vittle for ${moment().format('MMMM D, YYYY')}`,
-
-          });
-
-        } else {
-          console.log('transaction failed');
         }
         // let us know it failed
       }
@@ -309,9 +345,9 @@ const worker = Job.processJobs(
             },
           });
 
-            if (subscription.hasOwnProperty('discountApplied')) {
-                removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
-            }
+          if (subscription.hasOwnProperty('discountApplied')) {
+              removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
+          }
 
           sendGiftCardDeductionDetails({
             paymentMethodIsCard: subscription.paymentMethod === 'card',
