@@ -97,6 +97,7 @@ function setUpPlates(lifestyles, nextDay) {
             mealType: 1,
             nutritional: 1,
             ingredients: {
+              _id: 1,
               title: 1,
             },
           },

@@ -45,6 +45,8 @@ import Slide from 'material-ui/transitions/Slide';
 import jsPDF from 'jspdf';
 import autotable from 'jspdf-autotable';
 
+import blobStream from 'blob-stream';
+
 import vittlebase64 from '../../../modules/vittlelogobase64';
 import alerticon from '../../../modules/alerticonlabel';
 
@@ -108,8 +110,12 @@ function renderBirthdayCake(birthday, returnBool) {
 }
 
 function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPortion, currentSelectorDate, isChefsChoice = false, labelGeneratedQty) {
-  doc.addPage();
+    doc.addPage({
+        size: [288,216],
+        margin: 0,
+    });
 
+    // console.log(currentPlate);
   // VITTLE LOGO
 
   // doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
@@ -121,14 +127,14 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
   // const day = moment(currentSelectorDate).add(1, 'd').format('M/D/YYYY');
   // doc.text(day, 3.2, 0.38);
 
-  doc.setFontStyle('normal');
-  doc.setFontSize(7.5);
+  doc.font('Helvetica');
+  doc.fontSize(7.5);
   const day = moment(currentSelectorDate).format('MMMM D');
-  doc.text(`Made for you on ${day}`, 0.15, 2.89);
+  doc.text(`Made for you on ${day}`, 10.8, 204);
 
   // total meals for this customer
-  doc.setFontStyle('normal');
-  doc.setFontSize(9);
+  doc.font('Helvetica');
+  doc.fontSize(9);
   const totalMeals = userData.breakfast +
     userData.athleticBreakfast +
     userData.bodybuilderBreakfast +
@@ -179,158 +185,292 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
           break;
     }
 
-    doc.setFontSize(7.5);
-    doc.setFontStyle('bold');
-
+    doc.fontSize(7.5);
+    doc.font('Helvetica-Bold');
     // const qtyText = `Qty: ${labelGeneratedQty} of ${totalQty}`;
-    const qtyText = `Qty: ${totalMeals}`;
 
-    doc.setLineWidth(0.01);
-    doc.roundedRect(0.15625, 0.46875, doc.getTextWidth(qtyText) + 0.10, 0.21875, 0.025, 0.025);
-
-    doc.text(qtyText, 0.21, 0.615);
+    doc.roundedRect(11.25, 33.7464, doc.widthOfString(`Qty: ${totalMeals}`) + 7.2, 15.75, 1.8).stroke();
+    doc.text(`Qty: ${totalMeals}`, 15, 39);
 
   if (userData.pairing !== null) {
     if (userData.pairing === 2) {
-      console.log('Has pairing 2');
-      doc.addImage(TwoDayPairingIcon, 'PNG', 0.70, 0.46875, 0.92708, 0.2187);
+      // console.log('Has pairing 2');
+      doc.image(TwoDayPairingIcon, 50.4, 34, { width: 66.74, height: 15.74 });
     }
 
     if (userData.pairing === 3) {
-      console.log('Has pairing 3');
-      doc.addImage(ThreeDayPairingIcon, 'PNG', 0.70, 0.46875, 0.92708, 0.21875);
+      // console.log('Has pairing 3');
+      doc.image(ThreeDayPairingIcon, 50.4, 34, { width: 66.74, height: 15.74 });
     }
 
-    // if (renderBirthdayCake(userData.birthday, true)) {
-    //   doc.addImage(BirthdayIcon, 'PNG', 0.48, 0.18, 0.6979166667, 0.21875);
-    // }
+    if (renderBirthdayCake(userData.birthday, true)) {
+      doc.image(BirthdayIcon, 124, 34, { width: 50.2488, height: 15.74 });
+    }
+  } else {
+      if (renderBirthdayCake(userData.birthday, true)) {
+          doc.image(BirthdayIcon, 50.4, 34, {width: 50.2488, height: 15.74});
+      }
   }
-
-  // else if (renderBirthdayCake(userData.birthday, true)) {
-  //   doc.addImage(BirthdayIcon, 'PNG', 0.48, 0.18, 0.6979166667, 0.21875);
-  // }
 
 
   // name
   let customerName = "";
   // `Made for ${userData.name}`;
+// console.log(doc.widthOfString(`Made for ${userData.name}`) * 18 / 72)
+    doc.fontSize(18);
 
-    console.log(userData.name);
-    console.log(doc.getStringUnitWidth(`Made for ${userData.name}`) * 18 / 72)
-
-  if(doc.getStringUnitWidth(`Made for ${userData.name}`) * 18 / 72 <= 3.6875) {
+  if (doc.widthOfString(`Made for ${userData.name}`) <= 265.5) {
     customerName = `Made for ${userData.name}`;
-  } else if (doc.getStringUnitWidth(`${userData.name}`) * 18 / 72 <= 3.6875) {
+  } else if (doc.widthOfString(`${userData.name}`) <= 265.5) {
     customerName = userData.name;
   } else {
       customerName = `${userData.name.split(" ")[0]} ${userData.name.split(" ")[userData.name.split(" ").length - 1 || 1].charAt(0)}.`;
   }
 
-  doc.setFontStyle('bold');
-  doc.setFontSize(18);
-  doc.text(customerName, 0.15, 0.975833333);
+  doc.font('Helvetica-Bold');
+  doc.text(customerName, 10.8, 58, { width: 265.5 });
 
   // dish title
-  doc.setFontStyle('bold');
-  doc.setFontSize(10);
-  doc.text(doc.splitTextToSize(`${userData.lifestyleName} ${mealType}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.6875), 0.15, 1.257083333);
+  doc.font('Helvetica-Bold');
+  doc.fontSize(10);
+  doc.text(`${userData.lifestyleName} ${mealType}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`,  10.8, 82, { width: 265.5 });
 
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
-    doc.setFontSize(9);
-    doc.setFontStyle('normal');
-    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.6875), 0.15, 1.569583333);
+    doc.fontSize(9);
+    doc.font('Helvetica');
+
+    if ((userData.hasOwnProperty('restrictions') && userData.restrictions != null) ||
+        (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) ||
+        (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0)) {
+
+
+        currentPlate.plate.ingredients.forEach((ingredient, index) => {
+            let hasScratch = false;
+            // const currentIngredient = this.props.ingredients.find(ing => ing.title === ingredient.title);
+
+            if ((userData.hasOwnProperty('restrictions') && userData.restrictions != null)) {
+                // get the restriction
+                userData.restrictions.forEach(rest => {
+
+                  if (rest.types.findIndex(t => t === ingredient.typeId) !== -1) {
+                    hasScratch = true;
+                  } else if (rest.ingredients !== undefined) {
+                      if (rest.ingredients.findIndex(ing => ing === ingredient._id) !== -1) {
+                          hasScratch = true;
+                      }
+                  }
+
+                });
+            }
+
+            if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
+                if (userData.specificRestrictions.findIndex(srest => srest._id === ingredient._id) !== -1) {
+                  hasScratch = true;
+                }
+            }
+
+            if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
+                if (userData.preferences.findIndex(pref => pref._id === ingredient._id) !== -1) {
+                    hasScratch = true;
+                }
+            }
+
+            // console.log(hasScratch);
+            if (index === 0) {
+                doc.text(ingredient.title, 10.8, 108, { width: 265.5, continued: true, strike: hasScratch});
+                doc.text(', ', { continued: true, strike: false, });
+            } else if (index === currentPlate.plate.ingredients.length - 1) {
+                doc.text(ingredient.title, { continued: true, strike: hasScratch });
+            } else {
+                doc.text(ingredient.title, { continued: true, strike: hasScratch });
+                doc.text(', ', { continued: true, strike: false, });
+            }
+        });
+
+    } else {
+        doc.text(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 10.8, 108, { width: 265.5 });
+    }
   }
+
+  doc.fontSize(0);
+  doc.text(' ', 0, 0, { continued: false, strike: false, })
 
   // instructions
   if (currentPlate.hasOwnProperty('instruction')) {
-    doc.setFontStyle('bold');
-    doc.setFontSize(7.5);
-    doc.text(doc.splitTextToSize(currentPlate.instruction.description, 3.25), 0.15, 2.77);
+    doc.font('Helvetica-Bold');
+    doc.fontSize(7.5);
+    doc.text(currentPlate.instruction.description, 10.8, 196);
   }
 
-  let restrictionsLine = '';
-  let actualRestrictionsPresent = false;
-  let specificRestrictionsRendered = false;
-
-  let restrictionsPresent = false;
-  const allRestrictions = [];
 
   // restrictions
-  if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
-    actualRestrictionsPresent = true;
-    restrictionsPresent = true;
+    let restrictionsByType;
 
-    let restrictionsToRender = "";
-    // below is out of the loop because there are specific ingredient restrictions as well
-    // which are separate from actual "Restrictions"
+    if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
+    restrictionsByType = groupBy(userData.restrictions, (restriction) => restriction.restrictionType);
+  }
 
-    let restrictionAllergy = [];
+  if (userData.hasOwnProperty('restrictions') && userData.restrictions != null ||
+      userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0 ||
+      userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
 
-    const restrictionsByType = groupBy(userData.restrictions, (restriction) => restriction.restrictionType);
+    doc.roundedRect(10.8, 145, 265, 45, 1.8).stroke();
 
-    console.log(restrictionsByType);
+    doc.image(alerticon, 22.32, 154, { width: 15.84, height: 13.68 });
 
-    if(restrictionsByType['allergy']) {
-      restrictionsByType['allergy'].forEach(allergy => {
-          restrictionAllergy.push(allergy.title);
-      });
+    doc.fontSize(7);
 
-      if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
-          specificRestrictionsRendered = true;
-          restrictionAllergy.push(...userData.specificRestrictions.map(rest => rest.title));
+    // console.log('Restriction by type');
+
+    let hasRestrictionAllergy = false;
+    let hasRestrictionDietary = false;
+    let hasRestrictionReligious = false;
+    let hasDislikes = false;
+
+   // console.log(restrictionsByType);
+    if (restrictionsByType) {
+        if (restrictionsByType['allergy']) {
+            hasRestrictionAllergy = true;
+            doc.font('Helvetica-Bold');
+            doc.text('Allergies: ', 50, 153, { width: 218.99, continued: true, });
+
+            doc.font('Helvetica');
+            restrictionsByType['allergy'].forEach((allergy, index) => {
+                doc.text(allergy.title, { continued: true });
+
+                if (index !== restrictionsByType['allergy'].length - 1) {
+                    doc.text(', ', { continued: true, });
+                } else {
+                    doc.text('; ', { continued: true, });
+                }
+            });
+        }
+    }
+
+    if (userData.hasOwnProperty('specificRestrictions') &&
+        userData.specificRestrictions != null &&
+        userData.specificRestrictions.length > 0) {
+
+        doc.font('Helvetica-Bold');
+        if (!hasRestrictionAllergy) {
+            doc.text('Allergies: ', 50, 153, { width: 218.99, continued: true });
+        }
+
+        doc.font('Helvetica');
+        userData.specificRestrictions.forEach((rest, index) => {
+            doc.text(rest.title, { continued: true });
+            if (index !== userData.specificRestrictions.length - 1) {
+                doc.text(', ', { continued: true, });
+            } else {
+                doc.text('; ', { continued: true, });
+            }
+        });
+
+        hasRestrictionAllergy = true;
+    }
+
+    if (restrictionsByType) {
+
+        if (restrictionsByType['dietary']) {
+            hasRestrictionDietary = true;
+            doc.font('Helvetica-Bold');
+
+            if (hasRestrictionAllergy) {
+                doc.text('Dietary: ', { continued: true });
+            } else {
+                doc.text('Dietary: ', 50, 153, { width: 218.99, continued: true });
+            }
+
+            doc.font('Helvetica');
+            restrictionsByType.dietary.forEach((dietary, index) => {
+                doc.text(dietary.title, { continued: true });
+
+                if (index !== restrictionsByType.dietary.length - 1) {
+                    doc.text(', ', { continued: true, });
+                } else {
+                    doc.text('; ', { continued: true, });
+                }
+            });
+        }
+
+          if (restrictionsByType['religious']) {
+              hasRestrictionReligious = true;
+              doc.font('Helvetica-Bold');
+
+              if (hasRestrictionDietary || hasRestrictionAllergy) {
+                  doc.text('Religious: ', {continued: true});
+              } else {
+                  doc.text('Dietary: ', 50, 153, { width: 218.99, continued: true });
+              }
+
+              doc.font('Helvetica');
+
+              restrictionsByType.religious.map((religious, index) => {
+                  doc.text(religious.title, {continued: true});
+
+                  if (index !== restrictionsByType.religious.length - 1) {
+                      doc.text(', ', { continued: true, });
+                  }  else {
+                      doc.text('; ', { continued: true, });
+                  }
+              });
+          }
       }
 
-      restrictionsToRender += `Allergies: ${restrictionAllergy.join(", ")}; `;
-    }
+      if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
+            hasDislikes = true;
+          doc.font('Helvetica-Bold');
 
-    if(restrictionsByType['dietary']) {
-      restrictionsToRender += `Dietary: ${restrictionsByType.dietary.map(dietary => dietary.title).join(", ")}; `;
-    }
+          if (hasRestrictionDietary || hasRestrictionAllergy || hasRestrictionReligious) {
+              doc.text('Dislikes: ', { continued: true });
+          } else {
+              doc.text('Dislikes: ', 50, 153, { width: 218.99, continued: true });
+          }
 
-    if(restrictionsByType['religious']) {
-        restrictionsToRender += `Religious: ${restrictionsByType.religious.map(religious => religious.title).join(", ")}; `;
-    }
+          doc.font('Helvetica');
 
-    if(restrictionsByType['preference']) {
-      restrictionsToRender += `Preferences: ${restrictionsByType.preference.map(preference => preference.title).join(", ")}; `;
-    }
-
-      // allRestrictions.push(...userData.restrictions.map(rest => rest.title));
-      allRestrictions.push(restrictionsToRender);
-
-    console.log(allRestrictions);
-  }
-
-
-  if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
-      restrictionsPresent = true;
-      // allRestrictions.push(...userData.specificRestrictions.map(rest => rest.title));
-      if(!specificRestrictionsRendered) {
-        allRestrictions.push(`Allergies: ${userData.specificRestrictions.map(rest => rest.title).join(", ")}; `);
+          userData.preferences.map((dislike, index) => {
+              doc.text(dislike.title, { continued: true });
+              if (index !== userData.preferences.length - 1) {
+                  doc.text(', ', { continued: true, });
+              } else {
+                  doc.text('; ', { continued: true, });
+              }
+          });
       }
+
+      if (restrictionsByType) {
+          if (restrictionsByType['preference']) {
+
+              doc.font('Helvetica-Bold');
+
+              if (hasRestrictionDietary || hasRestrictionAllergy || hasRestrictionReligious || hasDislikes) {
+                  doc.text('Preferences: ', { continued: true });
+              } else {
+                  doc.text('Preferences: ', 50, 153, { width: 218.99, continued: true});
+              }
+
+              doc.font('Helvetica');
+
+              restrictionsByType.preference.map((preference, index) => {
+                  doc.text(preference.title, { continued: true });
+                  if (index !== restrictionsByType.preference.length - 1) {
+                      doc.text(', ', { continued: true, });
+                  } else {
+                      doc.text('; ', { continued: true, });
+                  }
+              });
+          }
+      }
+
   }
 
-  if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
-    restrictionsPresent = true;
-    // allRestrictions.push(...userData.preferences.map(rest => rest.title));
-
-    allRestrictions.push(`Dislikes: ${userData.preferences.map(rest => rest.title).join(", ")}; `);
-  }
-
-  if (restrictionsPresent) {
-    doc.setLineWidth(0.01);
-    doc.roundedRect(0.15, 1.9504, 3.68, 0.625, 0.025, 0.025);
-    doc.addImage(alerticon, 'PNG', 0.31, 2.0595, 0.22, 0.19);
-    restrictionsLine = `${allRestrictions}`;
-    doc.setFontStyle('normal');
-    doc.setFontSize(7);
-    doc.text(doc.splitTextToSize(restrictionsLine, 3.0416), 0.6979, 2.1295);
-  }
+   doc.text(' ', 0, 0, { continued: false, })
 
   if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
-    doc.setFontStyle('normal');
-    doc.setFontSize(7.5);
+    doc.font('Helvetica');
+    doc.fontSize(7.5);
 
     // calories
     let currentMealPortionCalories = '0';
@@ -342,32 +482,33 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
       currentMealPortionCalories = currentPlate.plate.nutritional[mealPortion].calories;
     }
 
-    doc.setFontStyle('bold');
-    doc.text(currentMealPortionCalories, 2.3, 2.77);
+    doc.font('Helvetica-Bold');
+    doc.text(currentMealPortionCalories, 165.6, 196);
 
-    doc.setFontStyle('normal');
-    doc.text('Calories', 2.3, 2.89);
+    doc.font('Helvetica');
+    doc.text('Calories', 165.6, 204);
 
     // protein
     if (currentPlate.plate.nutritional[mealPortion].proteins > 0) {
       currentMealPortionProteins = currentPlate.plate.nutritional[mealPortion].proteins;
     }
 
-    doc.setFontStyle('bold');
-    doc.text(`${currentMealPortionProteins}g`, 2.83, 2.77);
+    doc.font('Helvetica-Bold');
+    doc.text(`${currentMealPortionProteins}g`, 204, 196);
 
-    doc.setFontStyle('normal');
-    doc.text('Protein', 2.83, 2.89);
+    doc.font('Helvetica');
+    doc.text('Protein', 203.7, 204);
 
     // carbs
     if (currentPlate.plate.nutritional[mealPortion].carbs > 0) {
       currentMealPortionCarbs = currentPlate.plate.nutritional[mealPortion].carbs;
     }
-    doc.setFontStyle('bold');
-    doc.text(`${currentMealPortionCarbs}g`, 3.27, 2.77);
 
-    doc.setFontStyle('normal');
-    doc.text('Carbs', 3.27, 2.89);
+    doc.font('Helvetica-Bold');
+    doc.text(`${currentMealPortionCarbs}g`, 235, 196);
+
+    doc.font('Helvetica');
+    doc.text('Carbs', 235, 204);
 
 
     // fats
@@ -375,24 +516,18 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
       currentMealPortionFat = currentPlate.plate.nutritional[mealPortion].fat;
     }
 
-    doc.setFontStyle('bold');
-    doc.text(`${currentMealPortionFat}g`, 3.65, 2.77);
+    doc.font('Helvetica-Bold');
+    doc.text(`${currentMealPortionFat}g`, 262.8, 196);
 
-    doc.setFontStyle('normal');
-    doc.text('Fats', 3.65, 2.89);
+    doc.font('Helvetica');
+    doc.text('Fats', 262.8, 204);
   }
 
-  doc.setFontStyle('bold');
-  doc.text(mealPortion.charAt(0).toUpperCase() + mealPortion.substr(1), 1.62, 2.77);
+  doc.font('Helvetica-Bold');
+  doc.text(mealPortion.charAt(0).toUpperCase() + mealPortion.substr(1), 116, 196);
 
-  doc.setFontStyle('normal');
-  doc.text('Portion', 1.62, 2.89);
-
-  if (userData.platingNotes) {
-    // doc.setFontStyle('normal');
-    // doc.setFontSize(8);
-    // doc.text('See plating notes', 0.25, 2.7);
-  }
+  doc.font('Helvetica');
+  doc.text('Portion', 116, 204);
 }
 
 
@@ -417,157 +552,222 @@ function getMealTitle(mealTitle, firstInitialCapitalized = false) {
 }
 
 function renderPlatingNoteOnLabel(doc, userData) {
-  doc.addPage();
+    doc.addPage({
+        size: [288,216],
+        margin: 0,
+    });
 
   // VITTLE LOGO
-  doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
+  // doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
 
   // name
-  doc.setFontStyle('bold');
-  doc.setFontSize(18);
-  doc.text(doc.splitTextToSize(`Note for ${userData.name}`, 3.6875), 0.15, 0.76);
+  doc.font('Helvetica-Bold');
+  doc.fontSize(18);
+  doc.text(`Note for ${userData.name}`, 10.8, 54.72);
 
-  doc.setFontStyle('normal');
-  doc.setFontSize(9);
-  doc.text(doc.splitTextToSize(userData.platingNotes, 3.6875), 0.15, 1.25);
+  doc.font('Helvetica');
+  doc.fontSize(9);
+  doc.text(userData.platingNotes, 10.8, 90);
 
-  let restrictionsLine = '';
-  let actualRestrictionsPresent = false;
-  let specificRestrictionsRendered = false;
+    // restrictions
+    let restrictionsByType;
 
-  let restrictionsPresent = false;
-  const allRestrictions = [];
+    if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
+        restrictionsByType = groupBy(userData.restrictions, (restriction) => restriction.restrictionType);
+    }
 
-  // restrictions
-  if (userData.hasOwnProperty('restrictions') && userData.restrictions != null) {
-      actualRestrictionsPresent = true;
-      restrictionsPresent = true;
+    if (userData.hasOwnProperty('restrictions') && userData.restrictions != null ||
+        userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0 ||
+        userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
 
-      let restrictionsToRender = "";
-      // below is out of the loop because there are specific ingredient restrictions as well
-      // which are separate from actual "Restrictions"
+        doc.roundedRect(10.8, 145, 265, 45, 1.8).stroke();
 
-      let restrictionAllergy = [];
+        doc.image(alerticon, 22.32, 154, { width: 15.84, height: 13.68 });
 
-      const restrictionsByType = groupBy(userData.restrictions, (restriction) => restriction.restrictionType);
+        doc.fontSize(7);
 
-      console.log(restrictionsByType);
+        // console.log('Restriction by type');
 
-      if(restrictionsByType['allergy']) {
-          restrictionsByType['allergy'].forEach(allergy => {
-              restrictionAllergy.push(allergy.title);
-          });
+        let hasRestrictionAllergy = false;
+        let hasRestrictionDietary = false;
+        let hasRestrictionReligious = false;
+        let hasDislikes = false;
 
-          if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
-              specificRestrictionsRendered = true;
-              restrictionAllergy.push(...userData.specificRestrictions.map(rest => rest.title));
-          }
+        // console.log(restrictionsByType);
+        if (restrictionsByType) {
+            if (restrictionsByType['allergy']) {
+                hasRestrictionAllergy = true;
+                doc.font('Helvetica-Bold');
+                doc.text('Allergies: ', 50, 153, { width: 218.99, continued: true, });
 
-          restrictionsToRender += `Allergies: ${restrictionAllergy.join(", ")}; `;
-      }
+                doc.font('Helvetica');
+                restrictionsByType['allergy'].forEach((allergy, index) => {
+                    doc.text(allergy.title, { continued: true });
 
-      if(restrictionsByType['dietary']) {
-          restrictionsToRender += `Dietary: ${restrictionsByType.dietary.map(dietary => dietary.title).join(", ")}; `;
-      }
+                    if (index !== restrictionsByType['allergy'].length - 1) {
+                        doc.text(', ', { continued: true, });
+                    } else {
+                        doc.text('; ', { continued: true, });
+                    }
+                });
+            }
+        }
 
-      if(restrictionsByType['religious']) {
-          restrictionsToRender += `Religious: ${restrictionsByType.religious.map(religious => religious.title).join(", ")}; `;
-      }
+        if (userData.hasOwnProperty('specificRestrictions') &&
+            userData.specificRestrictions != null &&
+            userData.specificRestrictions.length > 0) {
 
-      if(restrictionsByType['preference']) {
-          restrictionsToRender += `Preferences: ${restrictionsByType.preference.map(preference => preference.title).join(", ")}; `;
-      }
+            doc.font('Helvetica-Bold');
+            if (!hasRestrictionAllergy) {
+                doc.text('Allergies: ', 50, 153, { width: 218.99, continued: true });
+            }
 
-      // allRestrictions.push(...userData.restrictions.map(rest => rest.title));
-      allRestrictions.push(restrictionsToRender);
+            doc.font('Helvetica');
+            userData.specificRestrictions.forEach((rest, index) => {
+                doc.text(rest.title, { continued: true });
+                if (index !== userData.specificRestrictions.length - 1) {
+                    doc.text(', ', { continued: true, });
+                } else {
+                    doc.text('; ', { continued: true, });
+                }
+            });
 
-      console.log(allRestrictions);
-  }
+            hasRestrictionAllergy = true;
+        }
 
+        if (restrictionsByType) {
 
-  if (userData.hasOwnProperty('specificRestrictions') && userData.specificRestrictions != null && userData.specificRestrictions.length > 0) {
-      restrictionsPresent = true;
-      // allRestrictions.push(...userData.specificRestrictions.map(rest => rest.title));
-      if(!specificRestrictionsRendered) {
-          allRestrictions.push(`Allergies: ${userData.specificRestrictions.map(rest => rest.title).join(", ")}; `);
-      }
-  }
+            if (restrictionsByType['dietary']) {
+                hasRestrictionDietary = true;
+                doc.font('Helvetica-Bold');
 
-  if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
-      restrictionsPresent = true;
-      // allRestrictions.push(...userData.preferences.map(rest => rest.title));
+                if (hasRestrictionAllergy) {
+                    doc.text('Dietary: ', { continued: true });
+                } else {
+                    doc.text('Dietary: ', 50, 153, { width: 218.99, continued: true });
+                }
 
-      allRestrictions.push(`Dislikes: ${userData.preferences.map(rest => rest.title).join(", ")}; `);
-  }
+                doc.font('Helvetica');
+                restrictionsByType.dietary.forEach((dietary, index) => {
+                    doc.text(dietary.title, { continued: true });
 
-  if (restrictionsPresent) {
-    doc.setLineWidth(0.01);
-    doc.roundedRect(0.15, 2.204, 3.68, 0.625, 0.025, 0.025);
-    doc.addImage(alerticon, 'PNG', 0.31, 2.3095, 0.22, 0.19);
-    restrictionsLine = `${allRestrictions}`;
-    doc.setFontStyle('normal');
-    doc.setFontSize(7);
-    doc.text(doc.splitTextToSize(restrictionsLine, 3.0416), 0.6979, 2.3795);
-  }
+                    if (index !== restrictionsByType.dietary.length - 1) {
+                        doc.text(', ', { continued: true, });
+                    } else {
+                        doc.text('; ', { continued: true, });
+                    }
+                });
+            }
+
+            if (restrictionsByType['religious']) {
+                hasRestrictionReligious = true;
+                doc.font('Helvetica-Bold');
+
+                if (hasRestrictionDietary || hasRestrictionAllergy) {
+                    doc.text('Religious: ', {continued: true});
+                } else {
+                    doc.text('Dietary: ', 50, 153, { width: 218.99, continued: true });
+                }
+
+                doc.font('Helvetica');
+
+                restrictionsByType.religious.map((religious, index) => {
+                    doc.text(religious.title, {continued: true});
+
+                    if (index !== restrictionsByType.religious.length - 1) {
+                        doc.text(', ', { continued: true, });
+                    }  else {
+                        doc.text('; ', { continued: true, });
+                    }
+                });
+            }
+        }
+
+        if (userData.hasOwnProperty('preferences') && userData.preferences != null && userData.preferences.length > 0) {
+            hasDislikes = true;
+            doc.font('Helvetica-Bold');
+
+            if (hasRestrictionDietary || hasRestrictionAllergy || hasRestrictionReligious) {
+                doc.text('Dislikes: ', { continued: true });
+            } else {
+                doc.text('Dislikes: ', 50, 153, { width: 218.99, continued: true });
+            }
+
+            doc.font('Helvetica');
+
+            userData.preferences.map((dislike, index) => {
+                doc.text(dislike.title, { continued: true });
+                if (index !== userData.preferences.length - 1) {
+                    doc.text(', ', { continued: true, });
+                } else {
+                    doc.text('; ', { continued: true, });
+                }
+            });
+        }
+
+        if (restrictionsByType) {
+            if (restrictionsByType['preference']) {
+
+                doc.font('Helvetica-Bold');
+
+                if (hasRestrictionDietary || hasRestrictionAllergy || hasRestrictionReligious || hasDislikes) {
+                    doc.text('Preferences: ', { continued: true });
+                } else {
+                    doc.text('Preferences: ', 50, 153, { width: 218.99, continued: true});
+                }
+
+                doc.font('Helvetica');
+
+                restrictionsByType.preference.map((preference, index) => {
+                    doc.text(preference.title, { continued: true });
+                    if (index !== restrictionsByType.preference.length - 1) {
+                        doc.text(', ', { continued: true, });
+                    } else {
+                        doc.text('; ', { continued: true, });
+                    }
+                });
+            }
+        }
+    }
 }
 
 function renderSummaryLabel(doc, currentPlate, dataCurrentLifestyle, lifestyleTitle, mealTitle, currentSelectorDate, count) {
-  doc.addPage();
+  doc.addPage({
+      size: [288,216],
+      margin: 0,
+  });
 
-  // VITTLE LOGO
-  doc.addImage(vittlebase64, 'PNG', 1.55208333, 0.08500, 0.895833333, 0.260416667);
-
-  // plating day + 1
-  // doc.setFontStyle('normal');
-  // doc.setFontSize(9);
-  // const day = moment(currentSelectorDate).add(1, 'd').format('M/D/YYYY');
-  // doc.text(day, 3.2, 0.55);
-
-
-  // total meals for this customer
-  doc.setFontStyle('normal');
-  doc.setFontSize(9);
+  doc.font('Helvetica');
+  doc.fontSize(9);
 
   const totalMeals = dataCurrentLifestyle[getMealTitle(mealTitle)].regular +
     dataCurrentLifestyle[getMealTitle(mealTitle)].athletic +
     dataCurrentLifestyle[getMealTitle(mealTitle)].bodybuilder;
 
-  // doc.text(`${totalMeals}`, 0.25, 0.55);
-  //
-  // doc.setFontStyle('normal');
-  // doc.setFontSize(14);
-  // doc.text(`${mealTitle}`, 0.25, 1);
-
   // dish title
-  doc.setFontStyle('bold');
-  doc.setFontSize(16);
-  doc.text(doc.splitTextToSize(`${lifestyleTitle} ${mealTitle}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 3.6875), 0.15, 0.76);
+  doc.font('Helvetica-Bold');
+  doc.fontSize(13);
+  doc.text(`${lifestyleTitle} ${mealTitle}: ${currentPlate.plate.title} ${currentPlate.plate.subtitle || ''}`, 10.8, 54.72, { width: 265.5});
 
   // dish ingredients
   if (currentPlate.plate.ingredients && currentPlate.plate.ingredients.length > 0) {
-    doc.setFontStyle('normal');
-    doc.setFontSize(14);
-    doc.text(doc.splitTextToSize(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 3.6875), 0.15, 1.48);
+    doc.font('Helvetica');
+    doc.fontSize(11);
+    doc.text(`${currentPlate.plate.ingredients.map(ing => ing.title).join(', ')}`, 10.8, 115.56, { width: 265.5 });
   }
-  //
-  // doc.setFontSize(8);
-  // doc.text(`With restrictions: Regular ${count.regularRestrictionsCount} Athletic ${count.athleticRestrictionsCount} Bodybuilder ${count.bodybuilderRestrictionsCount}`, 0.25, 2.2);
-  //
-  // doc.setFontSize(8);
-  // doc.text(`Without restrictions: Regular ${count.regularWithoutRestrictionsCount} Athletic ${count.athleticWithoutRestrictionsCount} Bodybuilder ${count.bodybuilderWithoutRestrictionsCount}`, 0.25, 2.35);
 
-  doc.setFontSize(9);
-  doc.setFontStyle('normal');
+  doc.fontSize(9);
+  doc.font('Helvetica');
 
-  doc.text('Regular', 0.15, 2.78);
-  doc.text('Athletic', 0.70833, 2.78);
-  doc.text('Bodybuilder', 1.25, 2.78);
+  doc.text('Regular', 10.8, 200);
+  doc.text('Athletic', 51, 200);
+  doc.text('Bodybuilder', 90, 200);
 
-  doc.setFontStyle('bold');
+  // doc.font('Helvetica-Bold');
 
-  doc.text(`${dataCurrentLifestyle[getMealTitle(mealTitle)].regular}`, 0.15, 2.64208);
-  doc.text(`${dataCurrentLifestyle[getMealTitle(mealTitle)].athletic}`, 0.70833, 2.64208);
-  doc.text(`${dataCurrentLifestyle[getMealTitle(mealTitle)].bodybuilder}`, 1.25, 2.64208);
+  doc.text(`${dataCurrentLifestyle[getMealTitle(mealTitle)].regular}`, 10.8, 190);
+  doc.text(`${dataCurrentLifestyle[getMealTitle(mealTitle)].athletic}`, 51, 190);
+  doc.text(`${dataCurrentLifestyle[getMealTitle(mealTitle)].bodybuilder}`, 90, 190);
 }
 
 class PlatingTable extends React.Component {
@@ -673,11 +873,8 @@ class PlatingTable extends React.Component {
       return;
     }
 
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'in',
-      format: [4, 3],
-    });
+    const doc = new PDFDocument({ autoFirstPage: false, });
+    let stream = doc.pipe(blobStream());
 
     const usersWithSelectedLifestyle = this.state.aggregateData.userData.filter(user =>
       user.lifestyleId === this.state.lifestyleSelected && user.platingNotes,
@@ -685,9 +882,22 @@ class PlatingTable extends React.Component {
       renderPlatingNoteOnLabel(doc, user);
     });
 
-    doc.deletePage(1);
+    doc.end();
 
-    doc.save(`Notes_${this.state.lifestyleTitle}_${new Date().toDateString()} `);
+    stream.on('finish', () => {
+        const blob = stream.toBlob("application/pdf");
+
+        const link = document.createElement('a');
+        // create a blobURI pointing to our Blob
+        link.href = URL.createObjectURL(blob);
+        link.download = `Notes_${this.state.lifestyleTitle}_${new Date().toDateString()}.pdf`;
+
+        document.body.append(link);
+        link.click();
+        link.remove();
+        // in case the Blob uses a lot of memory
+        window.addEventListener('focus', (e) => URL.revokeObjectURL(link.href), { once: true });
+    });
   }
 
   printLabels() {
@@ -770,11 +980,14 @@ class PlatingTable extends React.Component {
 
     const dataCurrentLifestyle = this.state.aggregateData && this.state.aggregateData.tableData.find(el => el.id === this.state.lifestyleSelected);
 
-    const doc = new jsPDF({
-      orientation: 'landscape',
-      unit: 'in',
-      format: [4, 3],
-    });
+    // const doc = new jsPDF({
+    //   orientation: 'landscape',
+    //   unit: 'in',
+    //   format: [4, 3],
+    // });
+
+    const doc = new PDFDocument({ autoFirstPage: false, });
+    let stream = doc.pipe(blobStream());
 
     orderedUserData.forEach((e, upperIndex) => {
 
@@ -935,9 +1148,24 @@ class PlatingTable extends React.Component {
 
     renderSummaryLabel(doc, currentPlate, dataCurrentLifestyle, this.state.lifestyleTitle, this.state.mealTitle, this.props.currentSelectorDate, this.usersWithoutRestrictions());
 
-    doc.deletePage(1);
+    doc.end();
 
-    doc.save(`Plating_${this.state.lifestyleTitle} _${this.state.mealTitle} _${new Date().toDateString()} `);
+    stream.on('finish', () => {
+        const blob = stream.toBlob("application/pdf");
+
+        const link = document.createElement('a');
+        // create a blobURI pointing to our Blob
+        link.href = URL.createObjectURL(blob);
+        link.download = `Plating_${this.state.lifestyleTitle} _${this.state.mealTitle} _${new Date().toDateString()}.pdf`;
+
+        document.body.append(link);
+        link.click();
+        link.remove();
+        // in case the Blob uses a lot of memory
+        window.addEventListener('focus', (e) => URL.revokeObjectURL(link.href), { once: true });
+    });
+
+    // doc.save(``);
   }
 
   closeAssignDialog() {
