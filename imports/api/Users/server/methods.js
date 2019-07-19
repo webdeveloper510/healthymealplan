@@ -2070,6 +2070,91 @@ Meteor.methods({
       }
 
       return jsonCustomers;
+    },
+
+    'users.editUser': function addNewUser(data) {
+        check(data, {
+            userId: String,
+            email: String,
+            firstName: String,
+            lastName: String,
+            roles: Array,
+        });
+
+        try {
+          Meteor.users.update(
+                { _id: data.userId, },
+              {
+              $set: {
+                  'emails.0.address': data.email,
+                  profile: {
+                      name: {
+                          first: data.firstName,
+                          last: data.lastName,
+                      },
+                  },
+                  roles: [],
+              }
+            });
+
+            Roles.addUsersToRoles(data.userId, [...data.roles]);
+
+        } catch (err) {
+            throw new Meteor.Error(500, err);
+        }
+    },
+
+    'users.addNew': function addNewUser(data) {
+      check(data, {
+        email: String,
+        password: String,
+        firstName: String,
+        lastName: String,
+        roles: Array,
+      });
+
+      try {
+
+        const empId = Accounts.createUser({
+            email: data.email,
+            password: data.password,
+            profile: {
+              name: {
+                first: data.firstName,
+                last: data.lastName,
+              },
+            }
+        });
+
+        Roles.addUsersToRoles(empId, [...data.roles]);
+
+      } catch (err) {
+        throw new Meteor.Error(500, err);
+      }
+    },
+
+    'users.deleteUser': function (userId) {
+      check(userId, String);
+
+      if(!Roles.userIsInRole(this.userId, 'super-admin')) {
+        throw new Meteor.Error(401, 'You are not allowed to delete users');
+      }
+
+      try {
+        Meteor.users.remove({ _id: userId });
+      } catch (err) {
+        throw new Meteor.Error(500, err);
+      }
+    },
+
+    'users.sendResetPassword': function (userId) {
+        check(userId, String);
+
+        try {
+           Accounts.sendResetPasswordEmail(userId);
+        } catch (err) {
+            throw new Meteor.Error(500, err);
+        }
     }
 });
 

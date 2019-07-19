@@ -8,9 +8,9 @@ const Authenticated = ({ loggingIn, authenticated, component, path, exact, roles
     path={path}
     exact={exact}
     render={props => (
-      authenticated && roles.indexOf('admin') !== -1 ?
+      authenticated && roles.join(' ').match(/(super-admin|chef|delivery|kitchen)/) ?
         (React.createElement(component, { ...props, ...rest, loggingIn, authenticated })) :
-        authenticated && roles.indexOf('admin') == -1 ? <Redirect to="/login" /> && Meteor.logout() :
+        authenticated && !roles.join(' ').match(/(super-admin|chef|delivery|kitchen)/) ? <Redirect to="/login" /> && Meteor.logout() :
           (<Redirect to="/login" />)
     )}
   />

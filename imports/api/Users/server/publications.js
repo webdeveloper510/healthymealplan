@@ -15,9 +15,7 @@ Meteor.publish('users.editProfile', function usersProfile() {
   });
 });
 
-Meteor.publish('users.owners', () => Meteor.users.find({ roles: ['owner'] }));
-
-Meteor.publish('users.staff', () => Meteor.users.find({ roles: ['staff'] }));
+Meteor.publish('users.team', () => Meteor.users.find({ roles: { $in: ['admin', 'super-admin', 'chef', 'deliveries', 'delivery'] } }));
 
 Meteor.publish('users.customers', (query, selector) => {
   check(query, Match.Maybe(Object));
@@ -27,7 +25,6 @@ Meteor.publish('users.customers', (query, selector) => {
 });
 
 Meteor.publish('users.deliveryGuys', () => Meteor.users.find({ roles: ['admin', 'delivery'] }));
-
 
 Meteor.publish('users.customers.new', function newMethod(selector, options, skip, limit) {
   check(selector, Object);

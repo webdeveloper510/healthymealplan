@@ -615,7 +615,7 @@ class App extends React.Component {
                     />
 
                     <Authorized
-                      allowedRoles={['admin', 'deliveries']}
+                      allowedRoles={['super-admin', 'deliveries', 'delivery']}
                       exact
                       path="/directions"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
@@ -977,7 +977,8 @@ class App extends React.Component {
                       {...this.props}
                     />
 
-                    <Authenticated
+                    <Authorized
+                      allowedRoles={['super-admin']}
                       exact
                       path="/team"
                       popTheSnackbar={this.popTheSnackbar.bind(this)}
