@@ -616,8 +616,12 @@ class RestrictionEditor extends React.Component {
 
   handleIngredientsChipDelete(type) {
     const stateCopy = this.state.ingredients.slice();
+    console.log(type);
+    
+    console.log(stateCopy);
+    console.log(stateCopy.indexOf(type));
 
-    stateCopy.splice(stateCopy.indexOf(type), 1);
+    stateCopy.splice(stateCopy.indexOf(typeof type === "object" ? type._id : type), 1);
 
     this.setState({
       ingredients: stateCopy,
@@ -628,7 +632,7 @@ class RestrictionEditor extends React.Component {
   handleTypeChipDelete(type) {
     const stateCopy = this.state.types.slice();
 
-    stateCopy.splice(stateCopy.indexOf(type), 1);
+    stateCopy.splice(stateCopy.indexOf(typeof type === "object" ? type._id : type), 1);
 
     this.setState({
       types: stateCopy,
@@ -638,10 +642,8 @@ class RestrictionEditor extends React.Component {
 
   handleCategoryChipDelete(category) {
     console.log(category);
-
     const stateCopy = this.state.categories.slice();
-
-    stateCopy.splice(stateCopy.indexOf(category), 1);
+    stateCopy.splice(stateCopy.indexOf(typeof category === "object" ? category._id : category), 1);
 
     this.setState({
       categories: stateCopy,

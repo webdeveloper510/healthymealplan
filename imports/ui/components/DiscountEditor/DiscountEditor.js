@@ -347,17 +347,20 @@ class DiscountEditor extends React.Component {
       ? 'discounts.update'
       : 'discounts.insert';
 
+    let  customerEligibilityValueClone = this.state.customerEligibilityValue.slice();
+    let newCustomerEligibiltyValue = this.state.customerEligibilityType === 'everyone' ? '' : [];
 
-
-    const customerEligibilityValueClone = this.state.customerEligibilityValue.slice();
-
-    if (this.state.customerEligibilityType == "specific") {
-      const everyonePresent = customerEligibilityValueClone.findIndex(el => el == "everyone");
-
-      if (everyonePresent != -1) {
-        customerEligibilityValueClone.splice(everyonePresent, 1);
-      }
+    if (this.state.customerEligibilityType === 'specific') {
+        for (let i = 0; i < customerEligibilityValueClone.length; i++) {
+          if (this.props.customers.find(e => e._id === customerEligibilityValueClone[i]) !== undefined) {
+              newCustomerEligibiltyValue.push(customerEligibilityValueClone[i]);
+          }
+        }
+    } else {
+        newCustomerEligibiltyValue = '';
     }
+
+    // console.log(customerEligibilityValueClone);
 
     const discount = {
       title: this.state.discountCode.trim(),
@@ -375,12 +378,7 @@ class DiscountEditor extends React.Component {
       minimumRequirementValue: this.state.minimumRequirementType == 'none' ? 'none' : this.state.minimumRequirementValue,
 
       customerEligibilityType: this.state.customerEligibilityType,
-      customerEligibilityValue: this.state.customerEligibilityType == 'specific' ? customerEligibilityValueClone.map((e) => {
-        const foundCustomer = this.props.customers.find(el => el._id == e);
-
-        return foundCustomer._id;
-
-      }) : 'everyone',
+      customerEligibilityValue: newCustomerEligibiltyValue,
 
       status: moment(this.state.startDateValue).isSameOrBefore(moment(), 'day') ? 'active' :
         moment(this.state.startDateValue).isAfter(moment(), 'day') ? 'scheduled' :
