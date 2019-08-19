@@ -33,7 +33,6 @@ import Dialog, {
   DialogContent,
   DialogContentText,
 } from 'material-ui/Dialog';
-
 import moment from 'moment';
 
 import Geosuggest from 'react-geosuggest';
@@ -418,7 +417,7 @@ class CurrentCustomerEditor extends React.Component {
 
   handleResetPassword() {
     this.setState({
-      submitLoadingReset: true,
+      submitResetPassword: true,
       submitSuccessReset: false,
     });
 
@@ -7596,6 +7595,58 @@ class CurrentCustomerEditor extends React.Component {
     
   }
 
+    handleUserAction(e, action) {
+        if (action === 'set') {
+            this.setState({
+                actionsDialogOpen: false,
+                setDialogOpen: true,
+            });
+        } else if (action === 'reset') {
+            this.setState({
+                actionsDialogOpen: false,
+                resetDialogOpen: true,
+            });
+        } else if (action === 'feedback') {
+            this.setState({
+                actionsDialogOpen: false,
+                feedbackDialogOpen: true,
+            });
+        } else if (action === 'welcome') {
+            this.setState({
+                actionsDialogOpen: false,
+                welcomeDialogOpen: true,
+            });
+        }
+    }
+
+    removeJob(jobId) {
+        Meteor.call('removeJobById', jobId, (err, res) => {
+            if (err) {
+                this.props.popTheSnackbar({
+                    message: 'There was a problem removing the job.',
+                });
+            } else {
+                this.props.popTheSnackbar({
+                    message: 'Job removed successfully.',
+                });
+            }
+        });
+    }
+
+    cancelJob(jobId){
+      Meteor.call('cancelJobById', jobId, (err, res) => {
+        if (err) {
+            this.props.popTheSnackbar({
+                message: 'There was a problem cancelling the job.',
+            });
+        } else {
+            this.props.popTheSnackbar({
+                message: 'Job cancelled successfully.',
+            });
+        }
+      });
+    }
+
   render() {
     const buttonClassname = classNames({
       [this.props.classes.buttonSuccess]: this.state.submitSuccess,
@@ -10050,7 +10101,6 @@ class CurrentCustomerEditor extends React.Component {
                     xs={12}
                     justify="space-between"
                     style={{ display: 'flex', cursor: 'pointer' }}
-                    onClick={() => this.setState({ [e._id]: !this.state[e._id] })}
                   >
                     <Typography type="body1">
                       {e.type === 'editSubscriptionJob' ? 'Edit subscription' : e.type
@@ -10072,7 +10122,17 @@ class CurrentCustomerEditor extends React.Component {
                       )}
                     </Typography>
 
-                    <Typography>{`Added ${moment(e.created).format('dddd, MMMM D YYYY hh:mm a')}`}</Typography>
+                    <div style={{ display: 'flex' }}>
+                        <Typography style={{ marginLeft: '8px'}}>{`Added ${moment(e.created).format('dddd, MMMM D YYYY hh:mm a')}`}</Typography>
+                        {e.type === 'editSubscriptionJob' || e.type === 'editSubscriptionJobNonCard' ?
+                            <Typography style={{ marginLeft: '8px'}}
+                            onClick={() => this.setState({ [e._id]: !this.state[e._id] })}>
+                                {Boolean(this.state[e._id]) === false ? 'View' : 'Close'}
+                            </Typography> : ''}
+                        <Typography style={{ marginLeft: '8px'}} onClick={() => this.cancelJob(e._id)}>Cancel</Typography>
+                        <Typography style={{ marginLeft: '8px'}} onClick={() => this.removeJob(e._id)}>Remove</Typography>
+                    </div>
+
                   </Grid>
                   <Collapse
                     in={Boolean(this.state[e._id])}

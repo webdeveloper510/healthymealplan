@@ -849,8 +849,6 @@ Meteor.methods({
   'customer.step5.noCreditCard': function noCreditCard(customerInfo) {
     check(customerInfo, Object);
 
-    // console.log(customerInfo);
-
     const subscriptionIdToSave = Random.id();
 
     Meteor.users.update(
@@ -2155,6 +2153,15 @@ Meteor.methods({
         } catch (err) {
             throw new Meteor.Error(500, err);
         }
+    },
+
+    'removeJobById': function (jobId) {
+        check(jobId, String);
+        Jobs.remove({ _id: jobId });
+    },
+    'cancelJobById': function (jobId) {
+        check(jobId, String);
+        Jobs.update({ _id: jobId }, { $set: { status: 'cancelled' } });
     }
 });
 
