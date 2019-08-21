@@ -137,6 +137,35 @@ Subscriptions.schema = new SimpleSchema({
     defaultValue: 'unassigned',
   },
 
+  referralCode: {
+      type: String,
+      optional: true,
+  },
+
+  referralCredits: {
+      type: Number,
+      optional: true,
+  },
+
+  referralTransactions: {
+      type: Array,
+      optional: true,
+  },
+
+  referredBy: {
+      type: String,
+      optional: true,
+  },
+
+  referralCodeApplied: {
+      type: String,
+      optional: true,
+  },
+
+  referralChargeComplete: {
+      type: Boolean,
+      optional: true,
+  },
   createdAt: {
     type: String,
     label: 'The date this subscription was created.',
