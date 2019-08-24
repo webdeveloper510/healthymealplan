@@ -12,6 +12,7 @@ import removeDiscountCodeFromSubscription from '../../../modules/server/billing/
 import chargeCustomerPaymentProfile from '../../../modules/server/authorize/chargeCustomerPaymentProfile';
 
 import sendTransactionSuccessfulDetails from './sendTransactionSuccessfulDetails';
+import sendTransactionFailedDetails from './sendTransactionFailedDetails';
 import sendGiftCardDeductionDetails from './sendGiftCardDeductionDetails';
 
 
@@ -91,12 +92,12 @@ const worker = Job.processJobs(
           const balanceToUpdate = giftCardBalance - finalSubscriptionAmount.actualTotal;
           const isDepleted = giftCardBalance == 0;
 
-          GiftCards.update({ _id: giftCard._id }, {
-            $set: {
-              balance: balanceToUpdate,
-              isDepleted,
-            },
-          });
+            GiftCards.update({ _id: giftCard._id }, {
+              $set: {
+                balance: balanceToUpdate,
+                isDepleted,
+              },
+            });
 
             if (subscription.hasOwnProperty('discountApplied')) {
                 removeDiscountCodeFromSubscription(subscription, dataToSend, 'discount-first-order-only');
@@ -147,6 +148,23 @@ const worker = Job.processJobs(
                 console.log(e);
 
                 // send failure email
+                sendTransactionFailedDetails({
+                    customerId: primaryUser._id,
+                    customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+                    customerEmail: primaryUser.emails[0].address,
+                    subscriptionId: jobData.subscriptionId,
+                    subscriptionAmount: finalSubscriptionAmount.actualTotal,
+
+                    giftCardPresent: true,
+                    partialCharge: true,
+                    giftCardCode: giftCard.code,
+                    giftCardDeductionAmount: giftCard.balance,
+
+                    totalCharge: partialCardChargeAmount,
+
+                    subject: `Partial transaction failed for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}  ${moment().format('MMMM D, YYYY')}`,
+                });
+
                 job.fail();
 
                 cb();
@@ -214,6 +232,23 @@ const worker = Job.processJobs(
                 console.log(e);
 
                 // send failure email
+
+              sendTransactionFailedDetails({
+                  customerId: primaryUser._id,
+                  customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+                  customerEmail: primaryUser.emails[0].address,
+                  subscriptionId: jobData.subscriptionId,
+                  subscriptionAmount: finalSubscriptionAmount.actualTotal,
+
+                  giftCardPresent: true,
+                  partialCharge: false,
+                  giftCardCode: giftCard.code,
+                  giftCardDeductionAmount: 0,
+
+                  totalCharge: finalSubscriptionAmount.actualTotal,
+                  subject: `Transaction failed for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}  ${moment().format('MMMM D, YYYY')}`,
+              });
+
                 job.fail();
                 cb();
             }
@@ -279,6 +314,18 @@ const worker = Job.processJobs(
         } catch (e) {
             console.log("Error in catch");
             console.log(e);
+
+            sendTransactionFailedDetails({
+                customerId: primaryUser._id,
+                customerName: `${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}`,
+                customerEmail: primaryUser.emails[0].address,
+                subscriptionId: jobData.subscriptionId,
+                subscriptionAmount: finalSubscriptionAmount.actualTotal,
+                giftCardPresent: false,
+                partialCharge: false,
+                giftCardDeductionAmount: 0,
+                subject: `Transaction failed for ${primaryUser.profile.name.first} ${primaryUser.profile.name.last || ''}  ${moment().format('MMMM D, YYYY')}`,
+            });
 
             // send failure email
           job.fail();

@@ -2297,6 +2297,31 @@ class Step4CheckoutCurrent extends React.Component {
                       ) : ''
                     )}
 
+                    {this.state.primaryProfileBilling && (
+                        this.state.primaryProfileBilling.validReferralCodePresent ? (
+                            <div style={{ marginTop: '25px' }}>
+                                <Grid container>
+                                    <Grid item xs={12}>
+                                        <Typography type="title">Referral code</Typography>
+                                    </Grid>
+                                </Grid>
+                                <Grid container>
+                                    <Grid item xs={12} sm={6}>
+                                        <Typography type="body2">{this.props.subscription.referralCodeApplied}</Typography>
+                                    </Grid>
+                                    <Grid item xs={12} sm={6}>
+                                        <Typography
+                                            type="subheading"
+                                            style={{ textAlign: 'right' }}
+                                        >
+                                            -$20
+                                        </Typography>
+                                    </Grid>
+                                </Grid>
+                            </div>
+                        ) : ''
+                    )}
+
                     {this.state.primaryProfileBilling &&
                       this.state.primaryProfileBilling.coolerBag > 0 && (
                         <Grid container>

@@ -1,0 +1,1 @@
+{{#if partialCharge}}Partial{{/if}} Transaction failed for user {{ customerName }} of amount {{ totalCharge }}.

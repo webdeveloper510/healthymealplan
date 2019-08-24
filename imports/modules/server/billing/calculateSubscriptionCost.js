@@ -1545,7 +1545,17 @@ export default function calculateSubscriptionCost(customerInfo) {
 
   primaryCustomer.discountTotal = primaryCustomer.discountCodeAmount;
 
-  primaryCustomer.taxes = 0.13 * (primaryCustomer.totalCost + sumBy(secondaryCustomers, e => e.totalCost));
+  if (customerInfo.validReferralCodePresent && (primaryCustomer.totalCost + sumBy(secondaryCustomers, e => e.totalCost) >= 100)) {
+      const taxableTotalAfterReferral = (primaryCustomer.totalCost + sumBy(secondaryCustomers, e => e.totalCost)) - 20;
+      primaryCustomer.taxes = 0.13 * taxableTotalAfterReferral;
+  } else if (sub.referralCodeApplied && !sub.referralChargeComplete && (primaryCustomer.totalCost + sumBy(secondaryCustomers, e => e.totalCost) >= 100) ) {
+      const taxableTotalAfterReferral = (primaryCustomer.totalCost + sumBy(secondaryCustomers, e => e.totalCost)) - 20;
+      primaryCustomer.taxes = 0.13 * taxableTotalAfterReferral;
+      primaryCustomer.validReferralCodePresent = true;
+      primaryCustomer.referralCode = sub.referralCode;
+  } else {
+      primaryCustomer.taxes = 0.13 * (primaryCustomer.totalCost + sumBy(secondaryCustomers, e => e.totalCost));
+  }
 
   let secondaryGroupCost = 0;
 
@@ -1558,8 +1568,13 @@ export default function calculateSubscriptionCost(customerInfo) {
 
   primaryCustomer.secondaryGroupTotal = secondaryGroupCost;
 
-  primaryCustomer.groupTotal =
-    secondaryGroupCost + primaryCustomer.totalCost + primaryCustomer.taxes;
+  if (customerInfo.validReferralCodePresent && (primaryCustomer.totalCost + secondaryGroupCost >= 100)) {
+      primaryCustomer.groupTotal = ((secondaryGroupCost + primaryCustomer.totalCost) - 20) + primaryCustomer.taxes;
+  } else if (sub.referralCodeApplied && !sub.referralChargeComplete && (primaryCustomer.totalCost + sumBy(secondaryCustomers, e => e.totalCost) >= 100) ) {
+      primaryCustomer.groupTotal = ((secondaryGroupCost + primaryCustomer.totalCost) - 20) + primaryCustomer.taxes;
+  } else {
+      primaryCustomer.groupTotal = secondaryGroupCost + primaryCustomer.totalCost + primaryCustomer.taxes;
+  }
 
   primaryCustomer.taxes = parseFloat(primaryCustomer.taxes.toFixed(2));
   primaryCustomer.groupTotal = parseFloat(primaryCustomer.groupTotal.toFixed(2));
