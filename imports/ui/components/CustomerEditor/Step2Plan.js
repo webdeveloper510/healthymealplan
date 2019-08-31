@@ -274,36 +274,6 @@ class Step2Plan extends React.Component {
     });
   }
 
-  handleSubscriptionScheduleChange() {
-    const finalSchedule = _.cloneDeep(this.state.schedule);
-    const secondarySchedules = [];
-
-    if (this.state.secondaryProfileCount > 0) {
-      this.state.secondaryProfilesData.forEach((e, index) => {
-        for (i = 0; i <= 6; i++) {
-          finalSchedule[i].breakfast =
-            parseInt(finalSchedule[i].breakfast) +
-            parseInt(e.schedule[i].breakfast);
-          finalSchedule[i].lunch =
-            parseInt(finalSchedule[i].lunch) + parseInt(e.schedule[i].lunch);
-          finalSchedule[i].dinner =
-            parseInt(finalSchedule[i].dinner) + parseInt(e.schedule[i].dinner);
-          finalSchedule[i].chefsChoiceBreakfast =
-            parseInt(finalSchedule[i].chefsChoiceBreakfast) + parseInt(e.schedule[i].chefsChoiceBreakfast);
-          finalSchedule[i].chefsChoiceLunch =
-            parseInt(finalSchedule[i].chefsChoiceLunch) + parseInt(e.schedule[i].chefsChoiceLunch);
-          finalSchedule[i].chefsChoiceDinner =
-            parseInt(finalSchedule[i].chefsChoiceDinner) + parseInt(e.schedule[i].chefsChoiceDinner);
-        }
-      });
-    }
-    console.log(finalSchedule);
-
-    this.setState({
-      subscriptionSchedule: chefsChoice
-    });
-  }
-
   increaseProfileCount() {
     if (this.state.secondaryProfileCount === 7) {
       this.props.popTheSnackbar({
@@ -436,20 +406,8 @@ class Step2Plan extends React.Component {
   renderStartDays() {
     const allDates = [];
 
-    // thanks stackoverflow
-    function nextDay(x) {
-      const now = new Date();
-      now.setDate(now.getDate() + (x + (7 - now.getDay())) % 7);
-      return now;
-    }
-
-    const immediateMonday = nextDay(1);
-
-    allDates.push(new Date(immediateMonday));
-
-    for (let i = 1; i <= 4; i++) {
-      const nextMonday = immediateMonday.setDate(immediateMonday.getDate() + 7);
-      allDates.push(new Date(nextMonday));
+    for (let i = 1; i <= 5; i++) {
+      allDates.push(moment().add(i, 'w').isoWeekday(1).toDate());
     }
 
     return allDates;
@@ -3221,17 +3179,19 @@ class Step2Plan extends React.Component {
                               ]
                                 ? this.props.customerInfo.secondaryProfiles[
                                   profileIndex
-                                ].firstName
+                                ].first_name
                                 : ''
                             }
                             data-rule-required="true"
                             inputProps={{}}
                             onChange={(event) => {
-                              this.state.secondaryProfilesData[
-                                profileIndex
-                              ].first_name =
-                                event.target.value;
-                              this.forceUpdate();
+                              const cloneSecondaries = this.state.secondaryProfilesData.slice();
+
+                              cloneSecondaries[profileIndex].first_name = event.target.value;
+
+                              this.setState({
+                                  secondaryProfilesData: cloneSecondaries,
+                              });
                             }}
                           />
                         </Grid>
@@ -3249,9 +3209,17 @@ class Step2Plan extends React.Component {
                               ]
                                 ? this.props.customerInfo.secondaryProfiles[
                                   profileIndex
-                                ].lastName
+                                ].last_name
                                 : ''
                             }
+                            onChange={(event) => {
+                                const cloneSecondaries = this.state.secondaryProfilesData.slice();
+                                cloneSecondaries[profileIndex].last_name = event.target.value;
+
+                                this.setState({
+                                    secondaryProfilesData: cloneSecondaries,
+                                });
+                            }}
                             inputProps={{}}
                           />
                         </Grid>
