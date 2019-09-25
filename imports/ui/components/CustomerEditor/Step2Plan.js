@@ -378,14 +378,10 @@ class Step2Plan extends React.Component {
   }
 
   removeProfile(index) {
-    if (this.secondaryProfileCount < 1) {
-      return;
-    }
-
     const decreasedProfileCount = this.state.secondaryProfileCount - 1;
     const profileToRemove = this.state.secondaryProfilesData.slice();
 
-    profileToRemove.splice(profileToRemove.indexOf(index), 1);
+    profileToRemove.splice(index, 1);
 
     this.setState({
       secondaryProfileCount: decreasedProfileCount,
@@ -513,6 +509,8 @@ class Step2Plan extends React.Component {
 
       if (e.sides.length > 0) {
         scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+      } else {
+          scheduleSummation[i].sides = 0;
       }
 
     });
@@ -548,6 +546,8 @@ class Step2Plan extends React.Component {
 
         if (el.sides.length > 0) {
           scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+        } else {
+          scheduleSummation[index].sides = 0;
         }
       });
     });
@@ -3171,19 +3171,11 @@ class Step2Plan extends React.Component {
                             margin="normal"
                             id="first_name"
                             label="First name"
-                            name={`first_name${profileIndex + 1}`}
+                            name={`first_name${profileIndex}`}
                             fullWidth
-                            defaultValue={
-                              this.props.customerInfo.secondaryProfiles[
-                                profileIndex
-                              ]
-                                ? this.props.customerInfo.secondaryProfiles[
-                                  profileIndex
-                                ].first_name
-                                : ''
-                            }
                             data-rule-required="true"
                             inputProps={{}}
+                            value={this.state.secondaryProfilesData[profileIndex].first_name}
                             onChange={(event) => {
                               const cloneSecondaries = this.state.secondaryProfilesData.slice();
 
@@ -3203,15 +3195,7 @@ class Step2Plan extends React.Component {
                             name={`last_name${profileIndex + 1}`}
                             data-rule-required="true"
                             fullWidth
-                            defaultValue={
-                              this.props.customerInfo.secondaryProfiles[
-                                profileIndex
-                              ]
-                                ? this.props.customerInfo.secondaryProfiles[
-                                  profileIndex
-                                ].last_name
-                                : ''
-                            }
+                            value={this.state.secondaryProfilesData[profileIndex].last_name}
                             onChange={(event) => {
                                 const cloneSecondaries = this.state.secondaryProfilesData.slice();
                                 cloneSecondaries[profileIndex].last_name = event.target.value;

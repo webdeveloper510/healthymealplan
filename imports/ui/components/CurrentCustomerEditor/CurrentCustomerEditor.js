@@ -29,9 +29,10 @@ import IconButton from 'material-ui/IconButton';
 import CloseIcon from 'material-ui-icons/Close';
 
 import Dialog, {
-  DialogActions,
-  DialogContent,
-  DialogContentText,
+    DialogTitle,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
 } from 'material-ui/Dialog';
 import moment from 'moment';
 
@@ -140,6 +141,10 @@ class CurrentCustomerEditor extends React.Component {
 
     this.state = {
 
+        // step1
+      actionsDialogOpen: false,
+      setDialogOpen: false,
+    resetDialogOPen: false,
       // ui
       currentTab: paramActiveTab === "plan" ? 1 : 0,
       activeMealScheduleStep: 0,
@@ -424,8 +429,9 @@ class CurrentCustomerEditor extends React.Component {
     Meteor.call('users.resetPassword', this.props.customer._id, (err, res) => {
       if (err) {
         this.setState({
-          submitLoadingReset: false,
+          submitResetPassword: false,
           submitSuccessReset: false,
+            resetDialogOpen: false,
         });
 
         this.props.popTheSnackbar({
@@ -433,8 +439,9 @@ class CurrentCustomerEditor extends React.Component {
         });
       } else {
         this.setState({
-          submitLoadingReset: false,
+          submitResetPassword: false,
           submitSuccessReset: false,
+          resetDialogOpen: false,
         });
 
         this.props.popTheSnackbar({
@@ -696,6 +703,8 @@ class CurrentCustomerEditor extends React.Component {
 
       if (e.sides.length > 0) {
           scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+      } else {
+          scheduleSummation[i].sides = 0;
       }
 
     });
@@ -731,6 +740,8 @@ class CurrentCustomerEditor extends React.Component {
 
         if (el.sides.length > 0) {
           scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+        } else {
+          scheduleSummation[index].sides = 0;
         }
       });
     });
@@ -801,7 +812,7 @@ class CurrentCustomerEditor extends React.Component {
       secondary: this.props.customer.secondary !== undefined,
       secondaryProfiles: this.state.secondaryProfilesData,
       secondaryProfilesRemoved: this.state.secondaryProfilesRemoved,
-      completeSchedule: this.state.completeSchedule,
+      completeSchedule: scheduleSummation,
       delivery: this.state.deliveryType,
       coolerBag: this.state.coolerBag,
       notifications: {
@@ -1018,6 +1029,8 @@ class CurrentCustomerEditor extends React.Component {
 
       if (e.sides.length > 0) {
         scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+      } else {
+        scheduleSummation[i].sides = 0;
       }
     });
 
@@ -1052,6 +1065,8 @@ class CurrentCustomerEditor extends React.Component {
 
         if (el.sides.length > 0) {
           scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+        } else {
+            scheduleSummation[index].sides = 0;
         }
       });
     });
@@ -1120,6 +1135,8 @@ class CurrentCustomerEditor extends React.Component {
 
         if (e.sides.length > 0) {
             scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+        } else {
+            scheduleSummation[i].sides = 0;
         }
       });
 
@@ -1154,6 +1171,8 @@ class CurrentCustomerEditor extends React.Component {
 
           if (el.sides.length > 0) {
               scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+          } else {
+              scheduleSummation[index].sides = 0;
           }
         });
       });
@@ -2052,14 +2071,10 @@ class CurrentCustomerEditor extends React.Component {
   }
 
   removeProfile(index) {
-    if (this.secondaryProfileCount < 1) {
-      return;
-    }
-
     const decreasedProfileCount = this.state.secondaryProfileCount - 1;
     const profileToRemove = this.state.secondaryProfilesData.slice();
 
-    const toBeRemoved = profileToRemove.splice(profileToRemove.indexOf(index), 1);
+    const toBeRemoved = profileToRemove.splice(index, 1);
 
     const secondaryProfilesRemovedCopy = this.state.secondaryProfilesRemoved.slice();
 
@@ -2106,6 +2121,8 @@ class CurrentCustomerEditor extends React.Component {
       if (e.sides.length > 0) {
           scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
           console.log(scheduleSummation[i]);
+      } else {
+          scheduleSummation[i].sides = 0;
       }
     });
 
@@ -2140,6 +2157,8 @@ class CurrentCustomerEditor extends React.Component {
 
         if (el.sides.length > 0) {
           scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+        } else {
+          scheduleSummation[index].sides = 0;
         }
 
       });
@@ -2221,6 +2240,8 @@ class CurrentCustomerEditor extends React.Component {
 
         if (e.sides.length > 0) {
             scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+        } else {
+            scheduleSummation[i].sides = 0;
         }
       });
 
@@ -2255,6 +2276,8 @@ class CurrentCustomerEditor extends React.Component {
 
           if (el.sides.length > 0) {
             scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+          } else {
+              scheduleSummation[index].sides = 0;
           }
         });
       });
@@ -2331,6 +2354,8 @@ class CurrentCustomerEditor extends React.Component {
 
         if (e.sides.length > 0) {
             scheduleSummation[i].sides += e.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+        } else {
+            scheduleSummation[i].sides = 0;
         }
       });
 
@@ -2365,6 +2390,8 @@ class CurrentCustomerEditor extends React.Component {
 
           if (el.sides.length > 0) {
             scheduleSummation[index].sides += el.sides.reduce((total, side) => total + parseInt(side.quantity, 10), 0);
+          } else {
+            scheduleSummation[index].sides = 0;
           }
         });
       });
@@ -7500,17 +7527,17 @@ class CurrentCustomerEditor extends React.Component {
 
     } else {
 
-    const mealScheduleStep = this.state.activeMealScheduleStep;
-    const scheduleRealCopy = this.state.scheduleReal;
-    const selectedSide = this.props.sides.find(e => e._id === this.state.selectedSide);
+      const mealScheduleStep = this.state.activeMealScheduleStep;
+      const scheduleRealCopy = this.state.scheduleReal;
+      const selectedSide = this.props.sides.find(e => e._id === this.state.selectedSide);
 
-    if (scheduleRealCopy[mealScheduleStep].sides.findIndex(e => e._id === this.state.selectedSide) !== -1) {
-          this.props.popTheSnackbar({
-              message: `${selectedSide.title} is already present on this day.`
-          });
+      if (scheduleRealCopy[mealScheduleStep].sides.findIndex(e => e._id === this.state.selectedSide) !== -1) {
+            this.props.popTheSnackbar({
+                message: `${selectedSide.title} is already present on this day.`
+            });
 
-          return;
-    }
+            return;
+      }
 
       scheduleRealCopy[mealScheduleStep].sides.push({
           _id: selectedSide._id,
@@ -7519,9 +7546,9 @@ class CurrentCustomerEditor extends React.Component {
           quantity: 1,
       });
 
-        this.setState({
-            scheduleReal: scheduleRealCopy,
-        });
+      this.setState({
+          scheduleReal: scheduleRealCopy,
+      });
 
     }
   }
@@ -7534,7 +7561,7 @@ class CurrentCustomerEditor extends React.Component {
           const activeMealScheduleStep = secondaryProfilesData[profileIndex].activeMealScheduleStep;
           const sideIndex = scheduleRealCopy[activeMealScheduleStep].sides.findIndex(e => e._id === sideId);
 
-          scheduleRealCopy[activeMealScheduleStep].sides[sideIndex].quantity = event.target.value;
+          scheduleRealCopy[activeMealScheduleStep].sides[sideIndex].quantity = parseInt(event.target.value, 10);
           secondaryProfilesData[profileIndex].scheduleReal = scheduleRealCopy;
 
           this.setState({
@@ -7545,7 +7572,7 @@ class CurrentCustomerEditor extends React.Component {
           const { activeMealScheduleStep, scheduleReal } = this.state;
 
           const sideIndex = scheduleReal[activeMealScheduleStep].sides.findIndex(e => e._id === sideId);
-          scheduleReal[activeMealScheduleStep].sides[sideIndex].quantity = event.target.value;
+          scheduleReal[activeMealScheduleStep].sides[sideIndex].quantity = parseInt(event.target.value, 10);
 
           this.setState({
               scheduleReal,
@@ -7881,26 +7908,104 @@ class CurrentCustomerEditor extends React.Component {
                     </Grid>
                   </Grid>
                   {!customer.secondary && (
-                    <Grid container>
-                      <Grid item xs={12}>
-                        <Button
-                          style={{ marginTop: '25px' }}
-                          disabled={this.state.submitLoadingReset}
-                          raised
-                          className={`${buttonClassname}`}
-                          color="primary"
-                          onClick={this.handleResetPassword}
-                        >
-                          Reset password
-                          {this.state.submitLoadingReset && (
-                            <CircularProgress
-                              size={24}
-                              className={this.props.classes.buttonProgress}
-                            />
-                          )}
-                        </Button>
-                      </Grid>
-                    </Grid>
+                      <React.Fragment>
+                          <Grid container>
+                              <Grid item xs={12}>
+                                  {/*<Button*/}
+                                      {/*style={{ marginTop: '25px' }}*/}
+                                      {/*disabled={this.state.submitLoadingReset}*/}
+                                      {/*raised*/}
+                                      {/*className={`${buttonClassname}`}*/}
+                                      {/*color="primary"*/}
+                                      {/*onClick={this.handleResetPassword}*/}
+                                  {/*>*/}
+                                      {/*Reset password*/}
+                                      {/*{this.state.submitLoadingReset && (*/}
+                                          {/*<CircularProgress*/}
+                                              {/*size={24}*/}
+                                              {/*className={this.props.classes.buttonProgress}*/}
+                                          {/*/>*/}
+                                      {/*)}*/}
+                                  {/*</Button>*/}
+
+                                  <Button raised color="primary" style={{ marginTop: "25px"}} onClick={() => { this.setState({ actionsDialogOpen: true })}}>
+                                      Actions
+                                  </Button>
+
+                              </Grid>
+                          </Grid>
+
+                          <Dialog fullWidth={true} maxWidth="sm" open={this.state.actionsDialogOpen} onClose={() => { this.setState({ actionsDialogOpen: false, }) }}>
+                              <DialogTitle id="simple-dialog-title">{customer.profile.name.first} {customer.profile.name.last || ''}</DialogTitle>
+                              <DialogContent>
+                                  <List>
+                                      <ListItem button onClick={(e) => this.handleUserAction(e, 'reset')}>
+                                          <ListItemText primary="Reset password" />
+                                      </ListItem>
+                                      
+                                      {/*<ListItem button onClick={(e) => this.handleUserAction(e, 'set')}>*/}
+                                          {/*<ListItemText primary="Set password" />*/}
+                                      {/*</ListItem>*/}
+
+                                      {/*<ListItem button onClick={(e) => this.handleUserAction(e, 'welcome')}>*/}
+                                          {/*<ListItemText primary="Send welcome email" />*/}
+                                      {/*</ListItem>*/}
+
+                                      {/*<ListItem button onClick={(e) => this.handleUserAction(e, 'feedback')}>*/}
+                                          {/*<ListItemText primary="Send feedback email" />*/}
+                                      {/*</ListItem>*/}
+                                  </List>
+                              </DialogContent>
+                          </Dialog>
+
+                          <Dialog fullWidth={true} maxWidth="sm" open={this.state.resetDialogOpen} onClose={(ev) => { this.setState({ resetDialogOpen: false, }) }}>
+                              <DialogTitle id="simple-dialog-title">Reset password for {customer.profile.name.first} {customer.profile.name.last || ''}?</DialogTitle>
+                              <DialogContent>
+                                  <DialogContentText>
+                                      This will send password reset instructions to the users email
+                                  </DialogContentText>
+                              </DialogContent>
+                              <DialogActions>
+                                  <Button onClick={(ev) => { this.setState({ resetDialogOpen: false, }) }} >
+                                      Cancel
+                                  </Button>
+                                  <Button onClick={this.handleResetPassword} disabled={this.state.submitResetPassword} color="primary" autoFocus>
+                                      {this.state.submitResetPassword && (
+                                          <CircularProgress
+                                          size={24}
+                                          className={this.props.classes.buttonProgress}
+                                          />
+                                      )}
+                                      Reset
+                                  </Button>
+                              </DialogActions>
+                          </Dialog>
+
+                          <Dialog fullWidth={true} maxWidth="sm" open={this.state.setDialogOpen} onClose={(ev) => { this.setState({ setDialogOpen: false, }) }}>
+                              <DialogTitle id="simple-dialog-title">Set password for {customer.profile.name.first} {customer.profile.name.last || ''}?</DialogTitle>
+                              <DialogContent>
+                                  <DialogContentText>
+                                      This will send password set instructions to the users email
+                                  </DialogContentText>
+                              </DialogContent>
+                              <DialogActions>
+                                  <Button onClick={(ev) => { this.setState({ resetDialogOpen: false, }) }} >
+                                      Cancel
+                                  </Button>
+                                  <Button onClick={this.handleResetPassword} disabled={this.state.submitResetPassword} color="primary" autoFocus>
+                                      {this.state.submitResetPassword && (
+                                          <CircularProgress
+                                              size={24}
+                                              className={this.props.classes.buttonProgress}
+                                          />
+                                      )}
+                                      Reset
+                                  </Button>
+                              </DialogActions>
+                          </Dialog>
+
+
+                      </React.Fragment>
                   )}
                 </Paper>
 
