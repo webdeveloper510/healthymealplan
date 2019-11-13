@@ -111,6 +111,12 @@ Meteor.publish('user.customer.single', (customerId) => {
   return Meteor.users.find({ _id: customerId, roles: ['customer'] });
 });
 
+Meteor.publish('user.partner.single', (partnerId) => {
+    check(partnerId, String);
+
+    return Meteor.users.find({ _id: partnerId, roles: ['partner'] });
+});
+
 Meteor.publish('user.secondaryAccounts', (customerId) => {
   check(customerId, String);
 

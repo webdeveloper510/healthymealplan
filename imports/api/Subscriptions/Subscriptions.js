@@ -166,6 +166,15 @@ Subscriptions.schema = new SimpleSchema({
       type: Boolean,
       optional: true,
   },
+  partnerDiscountApplied: {
+    type: String,
+    optional: true,
+  },
+  partnerSignUpId: {
+    type: Boolean,
+    optional: true,
+    label: 'The user ID of the partner',
+  },
   createdAt: {
     type: String,
     label: 'The date this subscription was created.',

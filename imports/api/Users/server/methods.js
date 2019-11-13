@@ -63,7 +63,61 @@ Meteor.methods({
     return empId;
   },
 
-  getCustomersTable(selector, options, skip, limit) {
+    getPartnersTable(selector, options, skip, limit) {
+
+        check(selector, Object);
+        check(options, Object);
+        check(limit, Number);
+        check(skip, Number);
+
+        const data = Meteor.users.aggregate([
+            {
+              $match: {
+                roles: ['partner'],
+              }
+            },
+            {
+                $lookup: {
+                    from: 'Subscriptions',
+                    localField: '_id',
+                    foreignField: 'customerId',
+                    as: 'joinedSubscription',
+                },
+            },
+            {
+                $unwind: {
+                    path: '$joinedSubscription',
+                    preserveNullAndEmptyArrays: true,
+                },
+            },
+            {
+                $addFields: {
+                    name: { $concat: ['$profile.name.first', ' ', '$profile.name.last'] },
+                },
+            },
+            {
+                $match: selector,
+            },
+            {
+                $sort: options,
+            },
+            {
+                $skip: skip,
+            },
+            {
+                $limit: limit,
+            },
+        ], {
+            collation: {
+                locale: 'en_US',
+                strength: 1,
+            },
+        });
+
+        return data;
+    },
+
+    getCustomersTable(selector, options, skip, limit) {
 
     check(selector, Object);
     check(options, Object);
@@ -71,6 +125,11 @@ Meteor.methods({
     check(skip, Number);
 
     const data = Meteor.users.aggregate([
+        {
+            $match: {
+                roles: ['customer'],
+            }
+      },
       {
         $lookup: {
           from: 'Subscriptions',
@@ -393,6 +452,8 @@ Meteor.methods({
       coolerBag: Boolean,
       secondaryProfilesRemoved: Array,
     });
+
+    console.log(data.completeSchedule);
 
     const sub = Subscriptions.findOne({ customerId: data.id });
 
@@ -1162,7 +1223,7 @@ Meteor.methods({
     console.log(subscriptionId);
 
     if (customerInfo.activeImmediate == false) {
-
+      console.log(customerInfo.subscriptionStartDateRaw);
       const lastWeeksFriday = moment(customerInfo.subscriptionStartDateRaw).subtract(1, 'w').isoWeekday(5).hour(23).minute(0).toDate();
 
       const job = new Job(
@@ -2162,6 +2223,24 @@ Meteor.methods({
     'cancelJobById': function (jobId) {
         check(jobId, String);
         Jobs.update({ _id: jobId }, { $set: { status: 'cancelled' } });
+    },
+
+    'users.partnerPayout' : function clearPartnerPayout(partnerId){
+        check(partnerId, String);
+        const sub = Subscriptions.findOne({ customerId: partnerId });
+        try {
+          Subscriptions.update(
+              { customerId: partnerId },
+              {
+                $set: { referralCredits: 0 },
+                $push: { referralTransactions: { type: 'referral-payout', referralPayoutAmount: sub.referralCredits, createdAt: new Date().toISOString() } }
+              },
+          );
+        } catch (e) {
+          console.log(e);
+          throw new Meteor.Error(500, 'There was a problem clearing partner\'s referral credits');
+        }
+
     }
 });
 

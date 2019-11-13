@@ -85,6 +85,10 @@ import PostalCodes from '../../pages/PostalCodes/PostalCodes';
 import NewPostalCode from '../../pages/NewPostalCode/NewPostalCode';
 import EditPostalCode from '../../pages/EditPostalCode/EditPostalCode';
 
+import Partners from '../../pages/Partners/Partners';
+import EditPartner from '../../pages/EditPartner/EditPartner';
+import NewPartner from '../../pages/NewPartner/NewPartner';
+
 import Ingredients from '../../pages/Ingredients/Ingredients';
 import NewIngredient from '../../pages/NewIngredient/NewIngredient';
 import EditIngredient from '../../pages/EditIngredient/EditIngredient';
@@ -586,6 +590,7 @@ class App extends React.Component {
                       component={Customers}
                       {...this.props}
                     />
+
                     <Authorized
                       allowedRoles={['super-admin']}
                       exact
@@ -594,7 +599,6 @@ class App extends React.Component {
                       component={NewCustomer}
                       {...this.props}
                     />
-
 
                     <Authorized
                       allowedRoles={['super-admin']}
@@ -829,6 +833,32 @@ class App extends React.Component {
                       {...this.props}
                     />
 
+                    <Authorized
+                        allowedRoles={['super-admin']}
+                        exact
+                        path="/partners"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={Partners}
+                        {...this.props}
+                    />
+
+                    <Authorized
+                        allowedRoles={['super-admin']}
+                        exact
+                        path="/partners/new"
+                        popTheSnackbar={this.popTheSnackbar.bind(this)}
+                        component={NewPartner}
+                        {...this.props}
+                    />
+
+                    <Authorized
+                      allowedRoles={['super-admin']}
+                      exact
+                      path="/partners/:_id/edit"
+                      popTheSnackbar={this.popTheSnackbar.bind(this)}
+                      component={EditPartner}
+                      {...this.props}
+                  />
 
                     <Authorized
                       allowedRoles={['super-admin', 'chef']}

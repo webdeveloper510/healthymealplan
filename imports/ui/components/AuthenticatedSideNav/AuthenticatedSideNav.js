@@ -35,6 +35,7 @@ import RoutesIcon from 'material-ui-icons/MyLocation';
 import DriversIcon from 'material-ui-icons/DriveEta';
 
 import CustomersIcon from 'material-ui-icons/Person';
+import GroupIcon from 'material-ui-icons/Group';
 import SettingsIcon from 'material-ui-icons/Settings';
 import TeamIcon from 'material-ui-icons/SupervisorAccount';
 import EditIcon from 'material-ui-icons/Edit';
@@ -215,6 +216,15 @@ class AuthenticatedSideNav extends Component {
               </ListItemIcon>
               <ListItemText className="subheading" primary="Customers" />
             </ListItem>
+          </NavLink>
+
+          <NavLink onClick={this.props.handleDrawerToggle} to="/partners">
+              <ListItem button>
+                  <ListItemIcon>
+                      <GroupIcon className="side-nav-icon" />
+                  </ListItemIcon>
+                  <ListItemText className="subheading" primary="Partners" />
+              </ListItem>
           </NavLink>
 
           <ListItem button onClick={this.handleToggleKitchen.bind(this)}>
