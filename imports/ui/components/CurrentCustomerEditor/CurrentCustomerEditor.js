@@ -7947,7 +7947,7 @@ class CurrentCustomerEditor extends React.Component {
                                           {/*<ListItemText primary="Set password" />*/}
                                       {/*</ListItem>*/}
 
-                                      {/*<ListItem button onClick={(e) => this.handleUserAction(e, 'welcome')}>*/}
+                                      {/*<ListItem button onClick={(e) => this.ha   ndleUserAction(e, 'welcome')}>*/}
                                           {/*<ListItemText primary="Send welcome email" />*/}
                                       {/*</ListItem>*/}
 
@@ -10292,13 +10292,13 @@ class CurrentCustomerEditor extends React.Component {
               discounts={this.props.discounts}
               giftCards={this.props.giftCards}
               deliveryGuys={this.props.deliveryGuys}
+              partners={this.props.partners}
             />
           ) : this.state.currentTab === 3 ? (
             <Typography type="subheading">
               This account doesn't have a subscription yet.
             </Typography>
           ) : ''}
-
         </Grid>
       </div>
     );

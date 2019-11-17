@@ -784,13 +784,13 @@ class PartnerEditor extends React.Component {
                                                         {txn.type === 'referral-credit' && (
                                                             <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                                                                 <Typography type="body2"><strong>{txn.name}</strong> enjoyed Vittle! <Typography type="body1" style={{ display: 'block', color: '#999' }}>{moment(txn.createdAt).format('MMMM Do, YYYY')}</Typography></Typography>
-                                                                <Typography type="body2"><strong>You got {txn.amount}</strong></Typography>
+                                                                <Typography type="body2"><strong>Partner got ${txn.amount}</strong></Typography>
                                                             </div>
                                                         )}
 
                                                         {txn.type === 'referral-payout' && (
                                                             <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                                                                <Typography type="body2">Partner payout of ${txn.referralPayoutAmount}</Typography>
+                                                                <Typography type="body2">Partner payout of ${txn.referralPayoutAmount} <Typography type="body1" style={{ display: 'block', color: '#999' }}>{moment(txn.createdAt).format('MMMM Do, YYYY')}</Typography></Typography>
                                                             </div>
                                                         )}
                                                     </Grid>

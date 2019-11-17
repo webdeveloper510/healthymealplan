@@ -74,8 +74,7 @@ Meteor.methods({
                 //partner fields
                 referralCredits: 0,
                 referralTransactions: [],
-
-            })
+            });
         } catch (exception) {
             throw new Meteor.Error('500', exception);
         }
@@ -108,6 +107,7 @@ Meteor.methods({
         );
     },
 });
+
 
 rateLimit({
     methods: [

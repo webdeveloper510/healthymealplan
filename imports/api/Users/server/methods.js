@@ -2228,12 +2228,15 @@ Meteor.methods({
     'users.partnerPayout' : function clearPartnerPayout(partnerId){
         check(partnerId, String);
         const sub = Subscriptions.findOne({ customerId: partnerId });
+
         try {
           Subscriptions.update(
               { customerId: partnerId },
               {
                 $set: { referralCredits: 0 },
-                $push: { referralTransactions: { type: 'referral-payout', referralPayoutAmount: sub.referralCredits, createdAt: new Date().toISOString() } }
+                $push: {
+                  referralTransactions: { type: 'referral-payout', referralPayoutAmount: sub.referralCredits, createdAt: new Date().toISOString() }
+                }
               },
           );
         } catch (e) {

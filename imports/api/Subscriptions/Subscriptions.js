@@ -152,19 +152,31 @@ Subscriptions.schema = new SimpleSchema({
       optional: true,
   },
 
+    'referralTransactions.$' : {
+      type: Object,
+        optional: true,
+        blackbox: true,
+    },
+
   referredBy: {
       type: String,
       optional: true,
   },
-
   referralCodeApplied: {
       type: String,
       optional: true,
   },
-
   referralChargeComplete: {
       type: Boolean,
       optional: true,
+  },
+  partnerBusinessName: {
+      type: String,
+      optional: true,
+  },
+  partnerChargeComplete: {
+    type: Boolean,
+    optional: true,
   },
   partnerDiscountApplied: {
     type: String,

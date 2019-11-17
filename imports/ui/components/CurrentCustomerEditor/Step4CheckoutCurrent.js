@@ -1069,6 +1069,12 @@ class Step4CheckoutCurrent extends React.Component {
       });
     }
 
+  renderPartnerName() {
+    const partner = this.props.partners.find(e =>  e._id === this.props.subscription.partnerSignUpId);
+    console.log(partner);
+    return partner.businessName;
+  }
+
   render() {
     const buttonClassname = classNames({
       [this.props.classes.buttonSuccess]: this.state.submitSuccess,
@@ -1169,12 +1175,19 @@ class Step4CheckoutCurrent extends React.Component {
 
                 <Grid item xs={12}>
                   <Typography type="headline" style={{ margin: '25px 0', display: 'flex', alignItems: 'center' }}>Subscription
-                    <Chip style={{ marginLeft: '10px' }} label={this.props.subscription && this.props.subscription.status.toUpperCase()} /></Typography>
-
+                    <Chip style={{ marginLeft: '10px' }} label={this.props.subscription && this.props.subscription.status.toUpperCase()} />
+                    {this.props.subscription.hasOwnProperty('partnerSignUpId') && (<Chip style={{ marginLeft: '10px' }} label={'Partner'} />)}
+                  </Typography>
                 </Grid>
 
                 <Grid item xs={12}>
                   <Typography type="subheading">Customer since {moment(this.props.customer.createdAt && this.props.customer.createdAt).format('YYYY-MM-DD')}</Typography>
+
+                  {!this.props.loading && this.props.subscription.hasOwnProperty('partnerSignUpId') && (
+                      <Grid item xs={12}>
+                          <Typography type="subheading">Signed up through {this.renderPartnerName()} partner link. </Typography>
+                      </Grid>
+                  )}
 
                   <div style={{ margin: '20px 0' }}>
                     {this.props.subscription && (this.props.subscription.status == 'paused' || this.props.subscription.status == 'active') && (
@@ -1192,7 +1205,6 @@ class Step4CheckoutCurrent extends React.Component {
                 </Grid>
 
                 <Grid item xs={12}>
-
                   <Grid container>
                     <Grid item xs={8} style={{ position: 'relative' }}>
                       <Search
