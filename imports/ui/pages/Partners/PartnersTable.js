@@ -187,24 +187,6 @@ class PartnersTable extends React.Component {
     this.setState({ deleteDialogOpen: false });
   }
 
-  getStatusClass(e) {
-    if (e.joinedSubscription == undefined) {
-      return 'status status--abandoned';
-    }
-
-    if (e.joinedSubscription.status == 'active') {
-      return 'status status--active';
-    }
-
-    if (e.joinedSubscription.status == 'paused') {
-      return 'status status--paused';
-    }
-
-    if (e.joinedSubscription.status == 'cancelled') {
-      return 'status status--cancelled';
-    }
-  }
-
   handleClick(event, id) {
     this.setState({ [id]: true });
   }
@@ -240,6 +222,15 @@ class PartnersTable extends React.Component {
     this.props.getCustomers()
   }
 
+  renderPartnerDiscount(user) {
+
+    const discount =  this.props.discounts.find(e => e._id === user.partnerDiscountId);
+    console.log(discount);
+
+    return discount.title;
+
+  }
+
   render() {
     if (this.props.results == undefined) {
       return <Loading />;
@@ -269,26 +260,19 @@ class PartnersTable extends React.Component {
                   </Typography>
                 </TableCell>
                 <TableCell
-                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '32%' }}
+                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '22%' }}
                   onClick={() => this.props.sortByOptions('joinedSubscription.paymentMethod')}
                 >
                   <Typography className="body2" type="body2">
                     Referral credits
                   </Typography>
                 </TableCell>
-                {/* <TableCell
-                  style={{ paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
-                >
-                  <Typography className="body2" type="body2">
-                    Activity
-                  </Typography>
-                </TableCell> */}
                 <TableCell
-                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '12.5%' }}
+                  style={{ cursor: 'pointer', paddingTop: '10px', paddingBottom: '10px', width: '22.5%' }}
                   onClick={() => this.props.sortByOptions('joinedSubscription.status')}
                 >
                   <Typography className="body2" type="body2">
-                    Status
+                    Discount
                   </Typography>
                 </TableCell>
 
@@ -310,9 +294,6 @@ class PartnersTable extends React.Component {
                   name += ` ${e.profile.name.last}`;
                 }
 
-                const statusClass = this.getStatusClass(e);
-
-
                 return (
                   <TableRow hover className={`${e._id}`} key={e._id}>
 
@@ -323,16 +304,10 @@ class PartnersTable extends React.Component {
                     >
                       <Typography type="subheading">
                         {/* <span className="status-circle" /> */}
-                        {name}
+                        {e.businessName}
                       </Typography>
                       <Typography type="body2">
-                        {e.associatedProfiles
-                          ? `${e.associatedProfiles} profile`
-                          : ''}
-                        {e.associatedProfiles && e.associatedProfiles > 1
-                          ? 's'
-                          : ''}
-                        {e.primaryAccount && 'Secondary'}
+                          {name}
                       </Typography>
                     </TableCell>
 
@@ -342,7 +317,7 @@ class PartnersTable extends React.Component {
                       onClick={() => this.props.history.push(`/partners/${e._id}/edit`)}
                     >
                       <Typography type="subheading">
-                        {e.partnerCreditType === "Percentage" ? `%${e.partnerCreditValue}` : `$${e.partnerCreditValue}`}
+                        {e.partnerCreditType === "Percentage" ? `${e.partnerCreditValue}%` : `$${e.partnerCreditValue}`}
                       </Typography>
                     </TableCell>
 
@@ -362,7 +337,7 @@ class PartnersTable extends React.Component {
                         onClick={() => this.props.history.push(`/partners/${e._id}/edit`)}
                     >
                         <Typography type="subheading">
-                            {e.joinedLifestyle ? e.joinedLifestyle.title : ''}
+                            {!this.props.loading && this.props.discounts ? this.renderPartnerDiscount(e) || '' : ''}
                         </Typography>
                     </TableCell>
 
@@ -414,7 +389,6 @@ class PartnersTable extends React.Component {
                   backIconButtonProps={{ 'aria-label': 'Previous Page', }}
                   nextIconButtonProps={{ 'aria-label': 'Next Page', }}
                   onChangePage={this.handleChangePage}
-                // ActionsComponent={TablePaginationActionsWrapped}
                 />
               </TableRow>
             </TableFooter>

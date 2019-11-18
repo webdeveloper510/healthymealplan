@@ -28,7 +28,7 @@ import {
 } from 'material-ui/Form';
 import moment from 'moment';
 
-import LifestylesColl from '../../../api/Lifestyles/Lifestyles';
+import Discounts from '../../../api/Discounts/Discounts';
 
 import { CircularProgress } from 'material-ui/Progress';
 import Loading from '../../components/Loading/Loading';
@@ -354,8 +354,8 @@ class Partners extends React.Component {
 
                     <PartnersTable
                         // results={this.props.customers}
+                        loading={this.props.loading}
                         results={this.state.customers}
-                        lifestyles={this.props.lifestyles}
                         popTheSnackbar={this.props.popTheSnackbar}
                         searchTerm={this.state.searchSelector}
                         rowsLimit={this.state.rowsVisible}
@@ -363,6 +363,7 @@ class Partners extends React.Component {
                         sortByOptions={this.sortByOption}
                         tableConfig={tableConfig}
                         getCustomers={this.getCustomers}
+                        discounts={this.props.discounts}
                     />
 
                 </Grid>
@@ -380,6 +381,9 @@ Partners.propTypes = {
 export default createContainer(() => {
     const config = tableConfig.get();
 
+    const subscription = Meteor.subscribe('discounts');
+
+
     Meteor.call('getCustomersCount', { ...config.selector, roles: ['partner'] }, config.sort, (error, result) => {
         if (!error) {
             const configCopy = cloneDeep(config);
@@ -394,7 +398,8 @@ export default createContainer(() => {
     });
 
     return {
-        lifestyles: LifestylesColl.find().fetch(),
+        loading: !subscription.ready(),
+        discounts: Discounts.find().fetch(),
     };
 
 }, Partners);

@@ -94,6 +94,9 @@ Meteor.methods({
             { _id: data.partnerId },
             {
                 $set: {
+                    'profile.name.first': data.firstName,
+                    'profile.name.last': data.lastName,
+                    'emails.0.address': data.emailAddress,
                     partnerURL: data.partnerURL,
                     postalCode: data.postalCode,
                     phone: data.phoneNumber,
@@ -105,6 +108,14 @@ Meteor.methods({
                 },
             },
         );
+
+        Subscriptions.update({
+            customerId: data.partnerId,
+        }, {
+            $set: {
+                partnerBusinessName: data.businessName
+            }
+        })
     },
 });
 

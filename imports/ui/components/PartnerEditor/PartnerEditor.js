@@ -94,12 +94,12 @@ class PartnerEditor extends React.Component {
 
         creditType: !this.props.newPartner && !this.props.loading ? this.props.partner.partnerCreditType : 'Percentage',
         creditValue: !this.props.newPartner && !this.props.loading ? this.props.partner.partnerCreditValue : '',
-        creditTypeRecurring: !this.props.newPartner && !this.props.loading ? this.props.partner.creditTypeRecurring : false,
+        creditTypeRecurring: !this.props.newPartner && !this.props.loading ? this.props.partner.partnerCreditRecurring : false,
 
         suggestionsTypes: [],
         valueTypes: '',
 
-        discountSelected: '',
+        discountSelected: !this.props.newPartner && !this.props.loading ? this.props.partner.partnerDiscountId : false,
         discountApplied: !this.props.newPartner && !this.props.loading ? this.props.partner.partnerDiscountId : false,
 
         payoutModalOpen: false,
@@ -308,10 +308,10 @@ class PartnerEditor extends React.Component {
         this.props.popTheSnackbar({
             message: 'Please select a partner discount code',
         });
+        return;
     }
 
     const dataToBeSent = {
-
         firstName: this.state.firstName,
         lastName: this.state.lastName,
         businessName: this.state.businessName,
@@ -325,7 +325,7 @@ class PartnerEditor extends React.Component {
     };
 
     this.props.discounts.find(e => {
-        if (e.title === this.state.discountSelected) {
+        if (e.title === this.state.discountSelected || e._id === this.state.discountSelected) {
             dataToBeSent.partnerDiscountId = e._id;
         }
     });
@@ -615,9 +615,8 @@ class PartnerEditor extends React.Component {
                                             InputProps={{
                                                 'aria-label': 'Description',
                                                 type: 'number',
-                                                startAdornment: <InputAdornment position={this.state.creditType == 'Percentage' ? 'end' : 'start'}>
-                                                    {this.state.creditType == 'Percentage' ? '%' : '$'}
-                                                </InputAdornment>,
+                                                startAdornment: this.state.creditType === 'Fixed amount' ? <InputAdornment position="start">$</InputAdornment> : '',
+                                                endAdornment:  this.state.creditType === 'Percentage' ? <InputAdornment position="end">%</InputAdornment> : ''
                                             }}
                                         />
                                     </Grid>
@@ -626,15 +625,18 @@ class PartnerEditor extends React.Component {
                                 <Grid container>
                                     <Grid item xs={12}>
                                         <FormControlLabel
-                                            key={123456}
-                                            checked={this.state.creditTypeRecurring}
-                                            onChange={() => {
-                                                this.setState(previousState => ({
-                                                    creditTypeRecurring: !previousState.creditTypeRecurring,
-                                                    hasFormChanged: true,
-                                                }));
-                                            }}
-                                            control={<Checkbox value={'recurring'} />}
+                                            control={
+                                                <Checkbox
+                                                    onChange={(e) => {
+                                                        this.setState({
+                                                            creditTypeRecurring: e.target.checked,
+                                                            hasFormChanged: true,
+                                                        });}
+                                                    }
+                                                    checked={this.state.creditTypeRecurring}
+                                                    value={'recurring'}
+                                                />
+                                            }
                                             label={'Recurring credit'}
                                         />
                                     </Grid>
@@ -777,20 +779,20 @@ class PartnerEditor extends React.Component {
                                                         {txn.type === 'referral-sign-up' && (
                                                             <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                                                                 <Typography type="body2"><strong>{txn.name}</strong> signed up, but hasn't subscribed. <Typography type="body1" style={{ display: 'block', color: '#999' }}>{moment(txn.createdAt).format('MMMM Do, YYYY')}</Typography></Typography>
-                                                                <Typography type="body2" className="text-secondary">${txn.pendingAmount} pending</Typography>
+                                                                <Typography type="body2" className="text-secondary">${txn.pendingAmount.toFixed(2)} pending</Typography>
                                                             </div>
                                                         )}
 
                                                         {txn.type === 'referral-credit' && (
                                                             <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
                                                                 <Typography type="body2"><strong>{txn.name}</strong> enjoyed Vittle! <Typography type="body1" style={{ display: 'block', color: '#999' }}>{moment(txn.createdAt).format('MMMM Do, YYYY')}</Typography></Typography>
-                                                                <Typography type="body2"><strong>Partner got ${txn.amount}</strong></Typography>
+                                                                <Typography type="body2"><strong>Partner got ${txn.amount.toFixed(2)}</strong></Typography>
                                                             </div>
                                                         )}
 
                                                         {txn.type === 'referral-payout' && (
                                                             <div style={{ width: '100%', display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between' }}>
-                                                                <Typography type="body2">Partner payout of ${txn.referralPayoutAmount} <Typography type="body1" style={{ display: 'block', color: '#999' }}>{moment(txn.createdAt).format('MMMM Do, YYYY')}</Typography></Typography>
+                                                                <Typography type="body2">Partner payout of ${txn.referralPayoutAmount.toFixed(2)} <Typography type="body1" style={{ display: 'block', color: '#999' }}>{moment(txn.createdAt).format('MMMM Do, YYYY')}</Typography></Typography>
                                                             </div>
                                                         )}
                                                     </Grid>
