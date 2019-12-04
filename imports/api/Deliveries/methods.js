@@ -367,9 +367,16 @@ Meteor.methods({
       status: 'active',
     };
 
-    if (deliveryAssignedToPassed) {
+    console.log(deliveryAssignedToPassed);
+
+    if (typeof deliveryAssignedToPassed === 'string' || typeof deliveryAssignedToPassed === 'object') {
       matchObject.deliveryAssignedTo = deliveryAssignedToPassed;
+    } else {
+      matchObject.deliveryAssignedTo = { $exists: true };
     }
+
+    console.log("MATCH OBJ");
+    console.log(matchObject);
 
     const aggregation = Subscriptions.aggregate([
       {
@@ -383,6 +390,7 @@ Meteor.methods({
           as: 'customer',
         },
       },
+      { $match: { 'customer.roles': ['customer'] } },
       {
         $lookup: {
           from: 'PostalCodes',

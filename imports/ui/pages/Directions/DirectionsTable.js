@@ -439,6 +439,7 @@ class DirectionsTable extends React.Component {
 
           let deliveryAssignedToInitials = e.route.title === 'Downtown' ? 'DT' : e.route.title.charAt(0);
 
+          // below conditions are shit, simplify them, can be combined
           if (typeof this.state.currentTabValue === 'string' && this.state.currentTabValue !== 'unassigned') {
             const deliveryAssignedTo = this.props.deliveryGuys.find(deliveryGuy => deliveryGuy._id === this.state.currentTabValue);
             // console.log(deliveryAssignedTo);
@@ -446,8 +447,9 @@ class DirectionsTable extends React.Component {
           } else if (typeof this.state.currentTabValue === 'object') {
             if (e.deliveryAssignedTo !== 'unassigned') {
               const deliveryAssignedTo = this.props.deliveryGuys.find(deliveryGuy => deliveryGuy._id === e.deliveryAssignedTo);
-              // console.log(deliveryAssignedTo);
-              deliveryAssignedToInitials = deliveryAssignedTo.profile.name.first.charAt(0) + deliveryAssignedTo.profile.name.last.charAt(0);
+              if (deliveryAssignedTo !== undefined) {
+                  deliveryAssignedToInitials = deliveryAssignedTo.profile.name.first.charAt(0) + deliveryAssignedTo.profile.name.last.charAt(0);
+              }
             }
           }
 

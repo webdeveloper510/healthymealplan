@@ -361,6 +361,7 @@ class Directions extends React.Component {
             userId={this.props.userId}
             filterBy={this.state.filterBy}
             assignedUsersOrder={this.state.assignedUsersOrder}
+            loading={this.props.loading}
           />
 
 
