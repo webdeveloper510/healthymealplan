@@ -34,11 +34,31 @@ Meteor.methods({
             },
         };
 
+
+
         try {
-            userId = Accounts.createUser({
-                email: data.emailAddress,
-                profile,
-            });
+            let userPartnerDetails = {
+                partnerURL: data.partnerURL,
+                businessName: data.businessName,
+                partnerDiscountId: data.partnerDiscountId,
+                partnerCreditType: data.partnerCreditType,
+                partnerCreditValue: data.partnerCreditValue,
+                partnerCreditRecurring: data.partnerCreditRecurring,
+            };
+
+            const userExists = Meteor.users.findOne({ 'emails.0.address': data.emailAddress });
+            if (userExists) {
+                userId = userExists._id;
+            } else {
+
+                userId = Accounts.createUser({
+                    email: data.emailAddress,
+                    profile,
+                });
+
+                userPartnerDetails.postalCode = data.postalCode;
+                userPartnerDetails.phone = data.phoneNumber;
+            }
 
             const randomId = Random.id()
 
