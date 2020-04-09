@@ -16,40 +16,9 @@ Meteor.methods({
       subtitle: String,
       mealType: String,
       description: Match.Optional(String),
-      allergens: Match.Optional(Array),
-      nutritional: Object,
       variants: Array,
     });
-
-    check(grocery.nutritional, {
-      regular: Object,
-      athletic: Object,
-      bodybuilder: Object,
-    });
-
-    check(grocery.nutritional.regular, {
-      calories: String,
-      proteins: String,
-      carbs: String,
-      fat: String,
-    });
-
-    check(grocery.nutritional.athletic, {
-      calories: String,
-      proteins: String,
-      carbs: String,
-      fat: String,
-    });
-
-    check(grocery.nutritional.bodybuilder, {
-      calories: String,
-      proteins: String,
-      carbs: String,
-      fat: String,
-    });
-
     // console.log(grocery);
-
     // console.log('Reaching here');
     const existingSide = Groceries.findOne({ title: grocery.title });
     // console.log(existingSide);
@@ -98,37 +67,9 @@ Meteor.methods({
       subtitle: String,
       mealType: String,
       description: Match.Optional(String),
-      allergens: Match.Optional(Array),
-      nutritional: Object,
       variants: Array,
     });
 
-    check(grocery.nutritional, {
-      regular: Object,
-      athletic: Object,
-      bodybuilder: Object,
-    });
-
-    check(grocery.nutritional.regular, {
-      calories: String,
-      proteins: String,
-      carbs: String,
-      fat: String,
-    });
-
-    check(grocery.nutritional.athletic, {
-      calories: String,
-      proteins: String,
-      carbs: String,
-      fat: String,
-    });
-
-    check(grocery.nutritional.bodybuilder, {
-      calories: String,
-      proteins: String,
-      carbs: String,
-      fat: String,
-    });
 
     const keysToUnset = {};
 
@@ -166,7 +107,7 @@ Meteor.methods({
     }
   },
 
-  'groceries,updateImageUrl': function sidesUpdate(grocery) {
+  'groceries.updateImageUrl': function sidesUpdate(grocery) {
     check(grocery, {
       _id: String,
       imageUrl: String,
@@ -194,7 +135,7 @@ Meteor.methods({
     }
   },
 
-  'groceries,deleteImageUrl': function groceriesDeleteImageUrl(grocery) {
+  'groceries.deleteImageUrl': function groceriesDeleteImageUrl(grocery) {
     check(grocery, {
       _id: String,
       large: Boolean,
@@ -221,19 +162,19 @@ Meteor.methods({
     }
   },
 
-  'groceries,remove': function groceriesRemove(sideId) {
-    check(sideId, String);
+  'groceries.remove': function groceriesRemove(groceryId) {
+    check(groceryId, String);
 
     try {
-      return Groceries.remove(sideId);
+      return Groceries.remove(groceryId);
     } catch (exception) {
       throw new Meteor.Error('500', exception);
     }
   },
 
-  'groceries,batchRemove': function groceriesBatchRemove(groceryIds) {
+  'groceries.batchRemove': function groceriesBatchRemove(groceryIds) {
     check(groceryIds, Array);
-    console.log('Server: groceries,batchRemove');
+    console.log('Server: groceries.batchRemove');
 
     try {
       return Groceries.remove({ _id: { $in: groceryIds } });
@@ -245,11 +186,11 @@ Meteor.methods({
 
 rateLimit({
   methods: [
-    'groceries,insert',
-    'groceries,update',
-    'groceries,remove',
-    'groceries,batchRemove',
-    'groceries,updateImageId',
+    'groceries.insert',
+    'groceries.update',
+    'groceries.remove',
+    'groceries.batchRemove',
+    'groceries.updateImageId',
   ],
   limit: 5,
   timeRange: 1000,

@@ -114,7 +114,6 @@ class GroceryEditor extends React.Component {
       imageFieldChanged: false,
       largeImageFieldChanged: false,
 
-      allergens: this.props.plate && this.props.plate.allergens && this.props.plate.allergens.length > 0 ? this.props.plate.allergens : [],
       variants: this.props.plate && this.props.plate.hasOwnProperty('variants') ? this.props.plate.variants : [],
 
       hasFormChanged: false,
@@ -172,23 +171,6 @@ class GroceryEditor extends React.Component {
     this.setState({
       hasFormChanged: true,
       [event.target.name]: event.target.value,
-    });
-  }
-
-  handleChangeAllergens(event) {
-    console.log(event.target.value);
-    const allergensCopy = this.state.allergens.slice();
-    const ifPresentIndex = allergensCopy.indexOf(event.target.value);
-
-    if (ifPresentIndex >= 0) {
-      allergensCopy.splice(ifPresentIndex, 1);
-    } else {
-      allergensCopy.push(event.target.value);
-    }
-
-    this.setState({
-      hasFormChanged: true,
-      allergens: allergensCopy,
     });
   }
 
@@ -272,28 +254,7 @@ class GroceryEditor extends React.Component {
       subtitle: document.querySelector('#subtitle').value.trim(),
       description: document.querySelector('#description').value.trim(),
       variants: this.state.variants,
-      allergens: this.state.allergens,
       mealType: this.state.valueMealType.trim().toLowerCase(),
-      nutritional: {
-        regular: {
-          fat: $("[name='regular_fat']").val(),
-          calories: $('[name="regular_calories"]').val(),
-          proteins: $('[name="regular_proteins"]').val(),
-          carbs: $('[name="regular_carbs"]').val(),
-        },
-        athletic: {
-          calories: $('[name="athletic_calories"]').val(),
-          proteins: $('[name="athletic_proteins"]').val(),
-          carbs: $('[name="athletic_carbs"]').val(),
-          fat: $('[name="athletic_fat"]').val(),
-        },
-        bodybuilder: {
-          calories: $('[name="bodybuilder_calories"]').val(),
-          proteins: $('[name="bodybuilder_proteins"]').val(),
-          carbs: $('[name="bodybuilder_carbs"]').val(),
-          fat: $('[name="bodybuilder_fat"]').val(),
-        },
-      },
     };
 
     if (existingPlate) plate._id = existingPlate;
@@ -598,11 +559,19 @@ class GroceryEditor extends React.Component {
   handleVariantAdd() {
     const variantName = document.getElementById('variantAddName');
     const variantPrice = document.getElementById('variantAddPrice');
+    const calories = document.getElementById('calories');
+    const proteins = document.getElementById('proteins');
+    const carbs = document.getElementById('carbs');
+    const fat = document.getElementById('fat');
 
     const newVariant = {
-    _id: Random.id(),   
-      name: variantName.value,
-      price: variantPrice.value,
+      _id: Random.id(),
+      name: variantName.value.trim(),
+      price: variantPrice.value.trim(),
+      calories: calories.value.trim(),
+      proteins: proteins.value.trim(),
+      carbs: carbs.value.trim(),
+      fat: fat.value.trim(),
     };
 
     if (variantName.value === "" || variantPrice.value === "") {
@@ -615,7 +584,6 @@ class GroceryEditor extends React.Component {
     }
 
     const variantsCopy = this.state.variants.slice();
-
     variantsCopy.push(newVariant);
 
     this.setState({
@@ -625,6 +593,10 @@ class GroceryEditor extends React.Component {
 
     variantName.value = "";
     variantPrice.value = "";
+    calories.value = "";
+    proteins.value = "";
+    carbs.value = "";
+    fat.value = "";
   }
 
   render() {
@@ -767,30 +739,6 @@ class GroceryEditor extends React.Component {
                     multiline
                     onChange={this.titleFieldChanged.bind(this)}
                   />
-
-
-                  {/* <Grid container style={{ marginTop: '25px' }}>
-                    <Grid item xs={12}>
-                      <Typography>Chef</Typography>
-                    </Grid>
-
-                  </Grid>
-
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <RadioGroup
-                        name="madeBy"
-                        value={this.state.madeBy}
-                        onChange={this.handleChange.bind(this)}
-                        style={{ flexDirection: 'row' }}
-                      >
-                        <FormControlLabel value="mazen" control={<Radio color="primary" checked={this.state.madeBy == 'mazen'} />} label="Mazen Issa" />
-
-                        <FormControlLabel value="jansan" control={<Radio color="primary" checked={this.state.madeBy == 'jansan'} />} label="Jansan McCorkle" />
-                      </RadioGroup>
-                    </Grid>
-
-                  </Grid> */}
                 </Paper>
               </Grid>
             </Grid>
@@ -858,7 +806,111 @@ class GroceryEditor extends React.Component {
                                     <IconButton onClick={() => this.handleVariantRemove(i)} ><CloseIcon /></IconButton>
                                   </Grid>
 
+                                  <Grid container>
+                                    <Grid item xs={8}>
+                                        <Table className="table-lifestyles">
+                                            <TableHead>
+                                                <TableRow>
+                                                    <TableCell>
+                                                        <Typography
+                                                            type="subheading"
+                                                        >
+                                                            Calories
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography
+                                                            type="subheading"
+                                                        >
+                                                            Proteins
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography
+                                                            type="subheading"
+                                                        >
+                                                            Carbs
+                                                        </Typography>
+                                                    </TableCell>
+                                                    <TableCell>
+                                                        <Typography
+                                                            type="subheading"
+                                                        >
+                                                            Fat
+                                                        </Typography>
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                <TableRow>
+                                                    <TableCell>
+                                                        <TextField
+                                                            fullWidth
+                                                            margin="normal"
+                                                            style={{
+                                                                fontSize: '1rem',
+                                                                maxWidth: '100px',
+                                                                minWidth: '100px',
+                                                                textAlign: 'center',
+                                                            }}
+                                                            inputProps={{ type: 'number' }}
+                                                            defaultValue={e.calories}
+                                                            onChange={(el) => this.changeVariantField(el, i, 'calories')}
+                                                        />
+                                                    </TableCell>
 
+                                                    <TableCell style={{ textAlign: 'center' }}>
+                                                        <TextField
+                                                            fullWidth
+                                                            margin="normal"
+                                                            style={{
+                                                                fontSize: '1rem',
+                                                                maxWidth: '100px',
+                                                                minWidth: '100px',
+                                                                textAlign: 'center',
+                                                            }}
+                                                            inputProps={{ type: 'number' }}
+                                                            defaultValue={e.proteins}
+                                                            onChange={(el) => this.changeVariantField(el, i, 'proteins')}
+                                                        />
+                                                    </TableCell>
+
+                                                    <TableCell style={{ textAlign: 'center' }}>
+                                                        <TextField
+                                                            fullWidth
+                                                            margin="normal"
+                                                            style={{
+                                                                fontSize: '1rem',
+                                                                maxWidth: '100px',
+                                                                minWidth: '100px',
+                                                                textAlign: 'center',
+                                                            }}
+                                                            inputProps={{ type: 'number' }}
+                                                            defaultValue={e.carbs}
+                                                            onChange={(el) => this.changeVariantField(el, i, 'carbs')}
+                                                        />
+                                                    </TableCell>
+
+                                                    <TableCell style={{ textAlign: 'center' }}>
+                                                        <TextField
+                                                            fullWidth
+                                                            margin="normal"
+                                                            style={{
+                                                                fontSize: '1rem',
+                                                                maxWidth: '100px',
+                                                                minWidth: '100px',
+                                                                textAlign: 'center',
+                                                            }}
+                                                            inputProps={{ type: 'number' }}
+                                                            defaultValue={e.fat}
+                                                            onChange={(el) => this.changeVariantField(el, i, 'fat')}
+                                                        />
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableBody>
+                                        </Table>
+                                    </Grid>
+                                  </Grid>
                               </React.Fragment>
                           )
                       })}
@@ -896,8 +948,120 @@ class GroceryEditor extends React.Component {
                                 />
                             </Grid>
 
-                            <Grid item xs={12} sm={4}>
-                                <Button raised secondary default onClick={this.handleVariantAdd}>Add</Button>
+                            <Grid container>
+                              <Grid item md={8} xs={12}>
+                                  <Table className="table-lifestyles">
+                                      <TableHead>
+                                          <TableRow>
+                                              <TableCell>
+                                                  <Typography
+                                                      type="subheading"
+                                                  >
+                                                      Calories
+                                                  </Typography>
+                                              </TableCell>
+                                              <TableCell>
+                                                  <Typography
+                                                      type="subheading"
+                                                  >
+                                                      Proteins
+                                                  </Typography>
+                                              </TableCell>
+                                              <TableCell>
+                                                  <Typography
+                                                      type="subheading"
+                                                  >
+                                                      Carbs
+                                                  </Typography>
+                                              </TableCell>
+                                              <TableCell>
+                                                  <Typography
+                                                      type="subheading"
+                                                  >
+                                                      Fat
+                                                  </Typography>
+                                              </TableCell>
+                                          </TableRow>
+                                      </TableHead>
+                                      <TableBody>
+                                          <TableRow>
+                                              <TableCell>
+                                                  <TextField
+                                                      fullWidth
+                                                      margin="normal"
+                                                      style={{
+                                                          fontSize: '1rem',
+                                                          maxWidth: '100px',
+                                                          minWidth: '100px',
+                                                          textAlign: 'center',
+                                                      }}
+                                                      inputProps={{ type: 'number' }}
+                                                      id="calories"
+                                                      defaultValue="0"
+                                                      onChange={this.titleFieldChanged.bind(this)}
+                                                  />
+                                              </TableCell>
+
+                                              <TableCell style={{ textAlign: 'center' }}>
+                                                  <TextField
+                                                      fullWidth
+                                                      margin="normal"
+                                                      style={{
+                                                          fontSize: '1rem',
+                                                          maxWidth: '100px',
+                                                          minWidth: '100px',
+                                                          textAlign: 'center',
+                                                      }}
+                                                      inputProps={{ type: 'number' }}
+                                                      id="proteins"
+                                                      defaultValue="0"
+                                                      onChange={this.titleFieldChanged.bind(this)}
+                                                  />
+                                              </TableCell>
+
+                                              <TableCell style={{ textAlign: 'center' }}>
+                                                  <TextField
+                                                      fullWidth
+                                                      margin="normal"
+                                                      style={{
+                                                          fontSize: '1rem',
+                                                          maxWidth: '100px',
+                                                          minWidth: '100px',
+                                                          textAlign: 'center',
+                                                      }}
+                                                      inputProps={{ type: 'number' }}
+                                                      id="carbs"
+                                                      defaultValue="0"
+                                                      onChange={this.titleFieldChanged.bind(this)}
+                                                  />
+                                              </TableCell>
+
+                                              <TableCell style={{ textAlign: 'center' }}>
+                                                  <TextField
+                                                      fullWidth
+                                                      margin="normal"
+                                                      style={{
+                                                          fontSize: '1rem',
+                                                          maxWidth: '100px',
+                                                          minWidth: '100px',
+                                                          textAlign: 'center',
+                                                      }}
+                                                      inputProps={{ type: 'number' }}
+                                                      id="fat"
+                                                      defaultValue="0"
+                                                      onChange={this.titleFieldChanged.bind(this)}
+                                                  />
+                                              </TableCell>
+                                          </TableRow>
+                                      </TableBody>
+                                  </Table>
+                              </Grid>
+                            </Grid>
+
+                            <Grid container>
+                              <Grid item xs={12} md={12} style={{ marginTop: '10px' }}>
+                                  <Button raised secondary default onClick={this.handleVariantAdd}>Add</Button>
+                              </Grid>
                             </Grid>
                           </Grid>
                       </React.Fragment>
@@ -906,133 +1070,6 @@ class GroceryEditor extends React.Component {
               </Grid>
           </Grid>
 
-        </Grid>
-
-
-        <Grid container justify="center" style={{ marginBottom: '50px' }}>
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid item xs={12} sm={4}>
-                <Typography
-                  type="subheading"
-                  className="subheading font-medium"
-                >
-                  Allergens
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={8}>
-                <Paper elevation={2} className="paper-for-fields">
-                  <Grid container>
-                    <Grid item xs={12}>
-                      <RadioGroup
-                        name="allergens"
-                        style={{ flexDirection: 'column' }}
-                      >
-                        <Grid container>
-                          <Grid xs={12} md={6} sm={6} style={{ display: 'flex', flexDirection: 'column' }}>
-                            <FormControlLabel
-                              value="dairyFree"
-                              control={<Checkbox
-                                color="primary"
-                                onChange={this.handleChangeAllergens}
-                                checked={this.state.allergens.indexOf('dairyFree') >= 0}
-                              />}
-                              label="Dairy Free"
-                            />
-
-                            <FormControlLabel
-                              value="glutenFree"
-                              control={<Checkbox
-                                color="primary"
-                                onChange={this.handleChangeAllergens}
-                                checked={this.state.allergens.indexOf('glutenFree') >= 0}
-                              />}
-                              label="Gluten Free"
-                            />
-
-                            <FormControlLabel
-                              value="halal"
-                              control={<Checkbox
-                                color="primary"
-                                onChange={this.handleChangeAllergens}
-                                checked={this.state.allergens.indexOf('halal') >= 0}
-                              />}
-                              label="Halal"
-                            />
-
-                            <FormControlLabel
-                              value="noEgg"
-                              control={<Checkbox
-                                color="primary"
-                                onChange={this.handleChangeAllergens}
-                                checked={this.state.allergens.indexOf('noEgg') >= 0}
-                              />}
-                              label="No egg"
-                            />
-
-                          </Grid>
-
-                          <Grid xs={12} md={6} sm={6} style={{ display: 'flex', flexDirection: 'column' }}>
-                            <FormControlLabel
-                              value="noShellfish"
-                              control={<Checkbox
-                                color="primary"
-                                onChange={this.handleChangeAllergens}
-                                checked={this.state.allergens.indexOf('noShellfish') >= 0}
-                              />}
-                              label="No shellfish"
-                            />
-
-                            <FormControlLabel
-                              value="noNut"
-                              control={<Checkbox
-                                color="primary"
-                                onChange={this.handleChangeAllergens}
-                                checked={this.state.allergens.indexOf('noNut') >= 0}
-                              />}
-                              label="No nut"
-                            />
-
-                            <FormControlLabel
-                              value="soyFree"
-                              control={<Checkbox
-                                color="primary"
-                                onChange={this.handleChangeAllergens}
-                                checked={this.state.allergens.indexOf('soyFree') >= 0}
-                              />}
-                              label="Soy free"
-                            />
-
-                            <FormControlLabel
-                              value="vegan"
-                              control={<Checkbox
-                                color="primary"
-                                onChange={this.handleChangeAllergens}
-                                checked={this.state.allergens.indexOf('vegan') >= 0}
-                              />}
-                              label="Vegan"
-                            />
-
-                            <FormControlLabel
-                              value="vegetarian"
-                              control={<Checkbox
-                                color="primary"
-                                onChange={this.handleChangeAllergens}
-                                checked={this.state.allergens.indexOf('vegetarian') >= 0}
-                              />}
-                              label="Vegetarian"
-                            />
-
-                          </Grid>
-                        </Grid>
-                      </RadioGroup>
-                    </Grid>
-
-                  </Grid>
-                </Paper>
-              </Grid>
-            </Grid>
-          </Grid>
         </Grid>
 
         <Grid container justify="center" style={{ marginBottom: '50px' }}>
@@ -1080,22 +1117,6 @@ class GroceryEditor extends React.Component {
                     </MenuItem>
                   </TextField>
 
-                  <FormControlLabel
-                    style={{ marginTop: '1em' }}
-                    control={
-                      <Checkbox
-                        checked={this.state.custom}
-                        onChange={(event, checked) => {
-                          this.setState({
-                            custom: checked,
-                            hasFormChanged: true,
-                          });
-                        }}
-                        value="checked"
-                      />
-                    }
-                    label="Custom"
-                  />
                 </Paper>
               </Grid>
             </Grid>
@@ -1168,376 +1189,6 @@ class GroceryEditor extends React.Component {
                     src={this.renderLargeImageUrl()}
                     style={{ maxWidth: '100%' }}
                   />
-                </Paper>
-              </Grid>
-            </Grid>
-          </Grid>
-        </Grid>
-
-        <Divider light className="divider--space-x" />
-
-        <Grid container justify="center" style={{ marginBottom: '50px' }}>
-          <Grid item xs={12}>
-            <Grid container>
-              <Grid item xs={12} sm={4}>
-                <Typography
-                  type="subheading"
-                  className="subheading font-medium"
-                >
-                  Nutritional Facts
-                </Typography>
-              </Grid>
-              <Grid item xs={12} sm={8}>
-                <Paper elevation={2} className="paper-for-fields">
-                  <Table className="table-lifestyles">
-                    <TableHead>
-                      <TableRow>
-                        <TableCell />
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <Typography
-                            type="subheading"
-                            className="font-medium font-uppercase"
-                          >
-                            Calories
-                          </Typography>
-                        </TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <Typography
-                            type="subheading"
-                            className="font-medium font-uppercase"
-                          >
-                            Proteins
-                          </Typography>
-                        </TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <Typography
-                            type="subheading"
-                            className="font-medium font-uppercase"
-                          >
-                            Carbs
-                          </Typography>
-                        </TableCell>
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <Typography
-                            type="subheading"
-                            className="font-medium font-uppercase"
-                          >
-                            Fat
-                          </Typography>
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            type="subheading"
-                            style={{ marginTop: '10px' }}
-                          >
-                            Regular
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.regular.calories
-                                ? this.props.plate.nutritional.regular.calories
-                                : '0'
-                            }
-                            name="regular_calories"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.regular.proteins
-                                ? this.props.plate.nutritional.regular.proteins
-                                : '0'
-                            }
-                            name="regular_proteins"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.regular.carbs
-                                ? this.props.plate.nutritional.regular.carbs
-                                : '0'
-                            }
-                            name="regular_carbs"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.regular.fat
-                                ? this.props.plate.nutritional.regular.fat
-                                : '0'
-                            }
-                            name="regular_fat"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            type="subheading"
-                            style={{ marginTop: '10px' }}
-                          >
-                            Athletic
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.athletic.calories
-                                ? this.props.plate.nutritional.athletic.calories
-                                : '0'
-                            }
-                            name="athletic_calories"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.athletic.proteins
-                                ? this.props.plate.nutritional.athletic.proteins
-                                : '0'
-                            }
-                            name="athletic_proteins"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.athletic.carbs
-                                ? this.props.plate.nutritional.athletic.carbs
-                                : '0'
-                            }
-                            name="athletic_carbs"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.athletic.fat
-                                ? this.props.plate.nutritional.athletic.fat
-                                : '0'
-                            }
-                            name="athletic_fat"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-                      </TableRow>
-                      <TableRow>
-                        <TableCell>
-                          <Typography
-                            type="subheading"
-                            style={{ marginTop: '10px' }}
-                          >
-                            Bodybuilder
-                          </Typography>
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.bodybuilder.calories
-                                ? this.props.plate.nutritional.bodybuilder
-                                  .calories
-                                : '0'
-                            }
-                            name="bodybuilder_calories"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.bodybuilder.proteins
-                                ? this.props.plate.nutritional.bodybuilder
-                                  .proteins
-                                : '0'
-                            }
-                            name="bodybuilder_proteins"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.bodybuilder.carbs
-                                ? this.props.plate.nutritional.bodybuilder.carbs
-                                : '0'
-                            }
-                            name="bodybuilder_carbs"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-
-                        <TableCell style={{ textAlign: 'center' }}>
-                          <TextField
-                            fullWidth
-                            margin="normal"
-                            style={{
-                              fontSize: '1rem',
-                              maxWidth: '100px',
-                              minWidth: '100px',
-                              textAlign: 'center',
-                            }}
-                            inputProps={{ type: 'number' }}
-                            defaultValue={
-                              this.props.plate &&
-                                this.props.plate.nutritional &&
-                                this.props.plate.nutritional.bodybuilder.fat
-                                ? this.props.plate.nutritional.bodybuilder.fat
-                                : '0'
-                            }
-                            name="bodybuilder_fat"
-                            onChange={this.changeTableField.bind(this)}
-                          />
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </Table>
                 </Paper>
               </Grid>
             </Grid>

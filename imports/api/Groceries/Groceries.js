@@ -60,18 +60,6 @@ Groceries.schema = new SimpleSchema({
     optional: true,
   },
 
-  allergens: {
-    type: Array,
-    label: 'These are allergens on the dish',
-    optional: true,
-  },
-
-  'allergens.$': {
-    type: String,
-    label: 'These are allergen items on the dish',
-    optional: true,
-  },
-
   imageUrl: {
     type: String,
     label: 'URL of the plate image.',
@@ -115,52 +103,6 @@ Groceries.schema = new SimpleSchema({
   },
 
   'nutritional.regular.fat': {
-    type: String,
-    optional: true,
-  },
-  'nutritional.athletic': {
-    type: Object,
-    optional: true,
-  },
-
-  'nutritional.athletic.calories': {
-    type: String,
-    optional: true,
-  },
-
-  'nutritional.athletic.proteins': {
-    type: String,
-    optional: true,
-  },
-  'nutritional.athletic.carbs': {
-    type: String,
-    optional: true,
-  },
-
-  'nutritional.athletic.fat': {
-    type: String,
-    optional: true,
-  },
-  'nutritional.bodybuilder': {
-    type: Object,
-    optional: true,
-  },
-
-  'nutritional.bodybuilder.calories': {
-    type: String,
-    optional: true,
-  },
-
-  'nutritional.bodybuilder.proteins': {
-    type: String,
-    optional: true,
-  },
-
-  'nutritional.bodybuilder.carbs': {
-    type: String,
-    optional: true,
-  },
-  'nutritional.bodybuilder.fat': {
     type: String,
     optional: true,
   },
