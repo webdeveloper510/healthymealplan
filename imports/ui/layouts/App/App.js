@@ -107,6 +107,9 @@ import EditPlate from '../../pages/EditPlate/EditPlate';
 
 import Plating from '../../pages/Plating/Plating';
 
+import Groceries from '../../pages/Groceries/Groceries';
+import NewGrocery from '../../pages/NewGrocery/NewGrocery';
+import EditGrocery from '../../pages/EditGrocery/EditGrocery';
 
 import Sides from '../../pages/Sides/Sides';
 import NewSide from '../../pages/NewSide/NewSide';
@@ -990,6 +993,7 @@ class App extends React.Component {
                       component={Sides}
                       {...this.props}
                     />
+
                     <Authorized
                       allowedRoles={['super-admin', 'chef']}
                       exact
@@ -998,6 +1002,7 @@ class App extends React.Component {
                       component={NewSide}
                       {...this.props}
                     />
+
                     <Authorized
                       allowedRoles={['super-admin', 'chef']}
                       exact
@@ -1006,6 +1011,33 @@ class App extends React.Component {
                       component={EditSide}
                       {...this.props}
                     />
+
+                      <Authorized
+                          allowedRoles={['super-admin', 'chef']}
+                          exact
+                          path="/groceries"
+                          popTheSnackbar={this.popTheSnackbar.bind(this)}
+                          component={Groceries}
+                          {...this.props}
+                      />
+
+                      <Authorized
+                          allowedRoles={['super-admin', 'chef']}
+                          exact
+                          path="/groceries/new"
+                          popTheSnackbar={this.popTheSnackbar.bind(this)}
+                          component={NewGrocery}
+                          {...this.props}
+                      />
+
+                      <Authorized
+                          allowedRoles={['super-admin', 'chef']}
+                          exact
+                          path="/groceries/:_id/edit"
+                          popTheSnackbar={this.popTheSnackbar.bind(this)}
+                          component={EditGrocery}
+                          {...this.props}
+                      />
 
                     <Authorized
                       allowedRoles={['super-admin']}

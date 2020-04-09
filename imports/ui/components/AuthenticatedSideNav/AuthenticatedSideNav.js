@@ -39,6 +39,7 @@ import GroupIcon from 'material-ui-icons/Group';
 import SettingsIcon from 'material-ui-icons/Settings';
 import TeamIcon from 'material-ui-icons/SupervisorAccount';
 import EditIcon from 'material-ui-icons/Edit';
+import LocalGroceryStoreIcon from 'material-ui-icons/LocalGroceryStore';
 
 import Collapse from 'material-ui/transitions/Collapse';
 
@@ -270,6 +271,15 @@ class AuthenticatedSideNav extends Component {
                 </ListItemIcon>
                 <ListItemText className="subheading" primary="Sides" />
               </ListItem>
+            </NavLink>
+
+            <NavLink onClick={this.props.handleDrawerToggle} to="/groceries">
+                <ListItem className="padding-left-nested-item" button>
+                    <ListItemIcon>
+                        <LocalGroceryStoreIcon className="side-nav-icon" />
+                    </ListItemIcon>
+                    <ListItemText className="subheading" primary="Groceries" />
+                </ListItem>
             </NavLink>
 
             <NavLink onClick={this.props.handleDrawerToggle} to="/instructions">

@@ -66,6 +66,9 @@ import '../../api/Routes/server/publications';
 import '../../api/Sides/methods';
 import '../../api/Sides/server/publications';
 
+import '../../api/Groceries/methods';
+import '../../api/Groceries/server/publications';
+
 import '../../api/Subscriptions/methods';
 import '../../api/Subscriptions/server/publications';
 
