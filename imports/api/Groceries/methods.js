@@ -50,8 +50,8 @@ Meteor.methods({
     plateToInsert.title = plateToInsert.title.replace(/&/gm, 'and');
     plateToInsert.subtitle = plateToInsert.subtitle.replace(/&/gm, 'and');
 
-    plateToInsert.title = plateToInsert.title.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
-    plateToInsert.subtitle = plateToInsert.subtitle.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+    plateToInsert.title = grocery.title.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e === 'aaa' ? 'AAA' : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+    plateToInsert.subtitle = grocery.subtitle.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e === 'aaa' ? 'AAA' : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
 
     try {
       return Groceries.insert(plateToInsert);
@@ -70,7 +70,6 @@ Meteor.methods({
       variants: Array,
     });
 
-
     const keysToUnset = {};
 
     if (grocery.subtitle.length > 0) {
@@ -87,8 +86,8 @@ Meteor.methods({
     grocery.title = grocery.title.replace(/&/gm, 'and');
     grocery.subtitle = grocery.subtitle.replace(/&/gm, 'and');
 
-    grocery.title = grocery.title.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
-    grocery.subtitle = grocery.subtitle.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+    grocery.title = grocery.title.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e === 'aaa' ? 'AAA' : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
+    grocery.subtitle = grocery.subtitle.split(" ").map((e) => (e == "with" || e == "and" || e == 'in') ? e : e === 'aaa' ? 'AAA' : e.charAt(0).toUpperCase() + e.slice(1)).join(" ");
 
 
     try {

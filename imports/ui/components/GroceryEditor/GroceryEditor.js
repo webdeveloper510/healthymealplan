@@ -121,9 +121,7 @@ class GroceryEditor extends React.Component {
       submitSuccess: false,
     };
 
-
     autoBind(this);
-
   }
 
   componentDidMount() {
@@ -140,7 +138,6 @@ class GroceryEditor extends React.Component {
         title: {
           required: true,
         },
-
         type: {
           required: true,
         },
@@ -1109,8 +1106,8 @@ class GroceryEditor extends React.Component {
                     <MenuItem key={4} value="dairy">
                         Dairy
                     </MenuItem>
-                    <MenuItem key={4} value="bakery">
-                        Bakery
+                    <MenuItem key={4} value="pantry">
+                        Pantry
                     </MenuItem>
                     <MenuItem key={4} value="miscellaneous">
                         Miscellaneous
