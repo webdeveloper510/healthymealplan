@@ -101,7 +101,7 @@ class Groceries extends React.Component {
       const tableConfigPrev = tableConfig.get();
       const tableConfigCopy = clone(tableConfigPrev);
 
-      const mealTypes = ['All', 'meat', 'vegetables', 'fruit', 'dairy', 'pantry', 'miscellaneous'];
+      const mealTypes = ['All', 'meat', 'seafood', 'vegetables', 'fruit', 'dairy', 'pantry', 'miscellaneous'];
       tableConfigCopy.selector.mealType = mealTypes[value];
 
       tableConfig.set(tableConfigCopy);
@@ -128,6 +128,7 @@ class Groceries extends React.Component {
                 <Tabs indicatorColor="#000" value={this.state.currentTabValue} onChange={this.handleTabChange.bind(this)}>
                     <Tab label="All" />
                     <Tab label="Meat" />
+                    <Tab label="Seafood" />
                     <Tab label="Vegetables" />
                     <Tab label="Fruit" />
                     <Tab label="Dairy" />

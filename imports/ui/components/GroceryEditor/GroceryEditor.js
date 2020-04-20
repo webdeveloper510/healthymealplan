@@ -1097,19 +1097,22 @@ class GroceryEditor extends React.Component {
                     <MenuItem key={2} value="meat">
                       Meat
                     </MenuItem>
+                    <MenuItem key={9} value="seafood">
+                        Seafood
+                    </MenuItem>
                     <MenuItem key={3} value="vegetables">
                       Vegetables
                     </MenuItem>
                     <MenuItem key={4} value="fruit">
                       Fruit
                     </MenuItem>
-                    <MenuItem key={4} value="dairy">
+                    <MenuItem key={5} value="dairy">
                         Dairy
                     </MenuItem>
-                    <MenuItem key={4} value="pantry">
+                    <MenuItem key={6} value="pantry">
                         Pantry
                     </MenuItem>
-                    <MenuItem key={4} value="miscellaneous">
+                    <MenuItem key={7} value="miscellaneous">
                         Miscellaneous
                     </MenuItem>
                   </TextField>
