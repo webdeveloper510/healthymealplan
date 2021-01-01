@@ -1,3 +1,3 @@
 /* eslint-disable import/prefer-default-export */
 
-export const DELIVERYCOST = 3.00;
+export const DELIVERYCOST = 5.0;
