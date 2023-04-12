@@ -467,61 +467,61 @@ function renderUserDetailsOnLabel(doc, userData, currentPlate, mealType, mealPor
   }
 
    doc.text(' ', 0, 0, { continued: false, })
+  // hide macros on user label
+  // if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
+  //   doc.font('Helvetica');
+  //   doc.fontSize(7.5);
 
-  if (typeof currentPlate.plate.nutritional === 'object' && currentPlate.plate.nutritional.hasOwnProperty(mealPortion)) {
-    doc.font('Helvetica');
-    doc.fontSize(7.5);
+  //   // calories
+  //   let currentMealPortionCalories = '0';
+  //   let currentMealPortionProteins = '0';
+  //   let currentMealPortionCarbs = '0';
+  //   let currentMealPortionFat = '0';
 
-    // calories
-    let currentMealPortionCalories = '0';
-    let currentMealPortionProteins = '0';
-    let currentMealPortionCarbs = '0';
-    let currentMealPortionFat = '0';
+  //   if (currentPlate.plate.nutritional[mealPortion].calories > 0) {
+  //     currentMealPortionCalories = currentPlate.plate.nutritional[mealPortion].calories;
+  //   }
 
-    if (currentPlate.plate.nutritional[mealPortion].calories > 0) {
-      currentMealPortionCalories = currentPlate.plate.nutritional[mealPortion].calories;
-    }
+  //   doc.font('Helvetica-Bold');
+  //   doc.text(currentMealPortionCalories, 165.6, 196);
 
-    doc.font('Helvetica-Bold');
-    doc.text(currentMealPortionCalories, 165.6, 196);
+  //   doc.font('Helvetica');
+  //   doc.text('Calories', 165.6, 204);
 
-    doc.font('Helvetica');
-    doc.text('Calories', 165.6, 204);
+  //   // protein
+  //   if (currentPlate.plate.nutritional[mealPortion].proteins > 0) {
+  //     currentMealPortionProteins = currentPlate.plate.nutritional[mealPortion].proteins;
+  //   }
 
-    // protein
-    if (currentPlate.plate.nutritional[mealPortion].proteins > 0) {
-      currentMealPortionProteins = currentPlate.plate.nutritional[mealPortion].proteins;
-    }
+  //   doc.font('Helvetica-Bold');
+  //   doc.text(`${currentMealPortionProteins}g`, 204, 196);
 
-    doc.font('Helvetica-Bold');
-    doc.text(`${currentMealPortionProteins}g`, 204, 196);
+  //   doc.font('Helvetica');
+  //   doc.text('Protein', 203.7, 204);
 
-    doc.font('Helvetica');
-    doc.text('Protein', 203.7, 204);
+  //   // carbs
+  //   if (currentPlate.plate.nutritional[mealPortion].carbs > 0) {
+  //     currentMealPortionCarbs = currentPlate.plate.nutritional[mealPortion].carbs;
+  //   }
 
-    // carbs
-    if (currentPlate.plate.nutritional[mealPortion].carbs > 0) {
-      currentMealPortionCarbs = currentPlate.plate.nutritional[mealPortion].carbs;
-    }
+  //   doc.font('Helvetica-Bold');
+  //   doc.text(`${currentMealPortionCarbs}g`, 235, 196);
 
-    doc.font('Helvetica-Bold');
-    doc.text(`${currentMealPortionCarbs}g`, 235, 196);
-
-    doc.font('Helvetica');
-    doc.text('Carbs', 235, 204);
+  //   doc.font('Helvetica');
+  //   doc.text('Carbs', 235, 204);
 
 
-    // fats
-    if (currentPlate.plate.nutritional[mealPortion].fat > 0) {
-      currentMealPortionFat = currentPlate.plate.nutritional[mealPortion].fat;
-    }
+  //   // fats
+  //   if (currentPlate.plate.nutritional[mealPortion].fat > 0) {
+  //     currentMealPortionFat = currentPlate.plate.nutritional[mealPortion].fat;
+  //   }
 
-    doc.font('Helvetica-Bold');
-    doc.text(`${currentMealPortionFat}g`, 262.8, 196);
+  //   doc.font('Helvetica-Bold');
+  //   doc.text(`${currentMealPortionFat}g`, 262.8, 196);
 
-    doc.font('Helvetica');
-    doc.text('Fats', 262.8, 204);
-  }
+  //   doc.font('Helvetica');
+  //   doc.text('Fats', 262.8, 204);
+  // }
 
   doc.font('Helvetica-Bold');
   doc.text(mealPortion.charAt(0).toUpperCase() + mealPortion.substr(1), 116, 196);
