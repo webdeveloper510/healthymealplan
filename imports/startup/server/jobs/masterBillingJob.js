@@ -120,7 +120,7 @@ const masterBillingJobExists = Jobs.findOne({
 
 if (!masterBillingJobExists) {
   const masterBillingJobActual = new Job(Jobs, 'masterBillingJob', {}).repeat({
-    schedule: Jobs.later.parse.text('on every Saturday at 10 am'),
+    schedule: Jobs.later.parse.text('on every Saturday at 7 pm'),
   }).save();
 }
 

@@ -1075,7 +1075,7 @@ class PlateEditor extends React.Component {
                         onChange={this.handleChange.bind(this)}
                         style={{ flexDirection: 'row' }}
                       >
-                        <FormControlLabel value="mazen" control={<Radio color="primary" checked={this.state.madeBy == 'mazen'} />} label="Mazen Issa" />
+                        <FormControlLabel value="michael" control={<Radio color="primary" checked={this.state.madeBy == 'michael' || this.state.madeBy === 'mazen'} />} label="Michael Chesterman" />
 
                         <FormControlLabel value="jansan" control={<Radio color="primary" checked={this.state.madeBy == 'jansan'} />} label="Jansan McCorkle" />
                       </RadioGroup>
