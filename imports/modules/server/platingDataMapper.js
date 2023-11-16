@@ -224,7 +224,7 @@ export default function platingDataMapper(aggregatedSubs, currentDay) {
       delivery,
       scheduleDays,
       platingNotes: customer.platingNotes,
-        pairing,
+      pairing,
     };
 
     scheduleDays.forEach((e) => {

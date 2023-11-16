@@ -46,6 +46,7 @@
     "meteor-publish-join": "^1.1.5",
     "moment": "^2.20.1",
     "moment-timezone": "^0.5.14",
+    "mongodb": "^5.9.1",
     "payment": "^2.3.0",
     "pdfkit": "^0.10.0",
     "prop-types": "^15.5.10",
